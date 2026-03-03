@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SlipUp Observatory</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page">
+      <section id="upper-atmosphere" class="upper-atmosphere" aria-hidden="true"></section>
+      <section id="observatory-hero" class="observatory-hero" aria-label="Observatory hero">
+        <header class="topbar">
+          <h1>SlipUp Observatory</h1>
+        </header>
+        <p class="upper-cue" aria-hidden="true">Upper view</p>
+
+        <section id="observatory" class="panel panel-observatory" aria-label="Observatory">
+          <p class="eyebrow">Atmosphere — Current</p>
+          <p class="atmosphere-orientation">Reading from the last 48 hours.</p>
+          <div class="degree-wrap">
+            <p id="degreeValue" class="degree-value">50</p>
+          </div>
+          <p id="conditionLine" class="condition-line">The sky is quiet.</p>
+          <p id="transientReadingLine" class="transient-reading-line hidden" aria-live="polite"></p>
+          <p id="atmosphere-pattern-line" class="atmosphere-pattern-line hidden" aria-live="polite"></p>
+          <a class="cta cta-observatory" href="./contribute.html">Contribute a moment</a>
+          <p class="cta-microcopy">Let it rise into the atmosphere.</p>
+          <p class="scroll-cue">Horizon</p>
+        </section>
+      </section>
+
+      <section class="panel panel-recent" aria-label="Recent shared moments">
+        <div class="section-row">
+          <h2 class="visually-hidden">Shared moments</h2>
+          <button id="viewMoreButton" class="text-button" type="button">View more</button>
+        </div>
+        <p class="recent-context" aria-hidden="true">Across the atmosphere.</p>
+        <ul id="recentMoments" class="moment-list"></ul>
+      </section>
+
+      <section id="horizon" class="panel panel-horizon" aria-label="Horizon">
+        <p class="horizon-line">Horizon</p>
+        <p id="horizonPrimary" class="horizon-primary"></p>
+        <div id="horizonSecondary" class="horizon-secondary hidden"></div>
+        <button id="horizonMoreButton" class="text-button hidden" type="button">See deeper reading</button>
+      </section>
+
+      <section id="ground-strata" class="ground-strata" aria-hidden="true"></section>
+    </main>
+
+    <div id="sheet-backdrop" class="sheet-backdrop" hidden></div>
+    <section
+      id="shared-sheet"
+      class="shared-sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="shared-sheet-title"
+      hidden
+    >
+      <div class="shared-sheet-head">
+        <h2 id="shared-sheet-title">Shared moments</h2>
+        <button id="shared-sheet-close" class="text-button" type="button" aria-label="Close">Close</button>
+      </div>
+      <ul id="shared-sheet-list" class="moment-list shared-sheet-list"></ul>
+      <p id="shared-sheet-empty" class="shared-sheet-empty hidden">The sky is quiet.</p>
+    </section>
+
+    <script src="./app.js" type="module"></script>
+  </body>
+</html>

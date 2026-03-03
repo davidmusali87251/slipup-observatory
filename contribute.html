@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contribute a moment — SlipUp Observatory</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page contribute-page">
+      <header class="topbar">
+        <h1>Contribute a moment</h1>
+        <a class="text-link" href="./index.html">Back to Observatory</a>
+      </header>
+
+      <section class="panel panel-contribute">
+        <form id="contributeForm" novalidate>
+          <label class="field">
+            <span>Type</span>
+            <select id="typeInput" name="type" required>
+              <option value="avoidable">avoidable</option>
+              <option value="fertile">fertile</option>
+              <option value="observed">observed</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Mood</span>
+            <select id="moodInput" name="mood" required>
+              <option value="calm">calm</option>
+              <option value="focus">focus</option>
+              <option value="stressed">stressed</option>
+              <option value="curious">curious</option>
+              <option value="tired">tired</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <span class="visually-hidden">Intention</span>
+            <input
+              id="noteInput"
+              name="note"
+              type="text"
+              maxlength="19"
+              placeholder="What rises from this moment?"
+              required
+            />
+            <small class="field-hint" aria-hidden="true">max 19</small>
+          </label>
+
+          <label class="field field-inline">
+            <input id="sharedInput" name="shared" type="checkbox" checked />
+            <span>Share this moment</span>
+          </label>
+
+          <button id="saveButton" class="cta" type="submit">Save moment</button>
+          <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+
+    <script src="./contribute.js" type="module"></script>
+  </body>
+</html>
