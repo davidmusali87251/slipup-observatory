@@ -206,10 +206,10 @@ const COPY_VARIANTS = {
         "Nearby moments keep a measured line.",
       ],
       fallback: [
-        "Nearby read is still forming. For now, this mirrors the wider field.",
-        "Nearby read is still light. For now, it follows the wider field.",
-        "Nearby read is still emerging. For now, it reflects the wider field.",
-        "Nearby read is not yet dense. For now, it mirrors the wider field.",
+        "Nearby read is forming. It mirrors the wider field.",
+        "Nearby read is still light. It follows the wider field.",
+        "Nearby read is still emerging. It reflects the wider field.",
+        "Nearby read is not yet dense. It mirrors the wider field.",
       ],
       regional: [
         "Reading shared moments across your region.",
@@ -219,18 +219,18 @@ const COPY_VARIANTS = {
       ],
     },
     strataFallback: [
-      "Shared and private moments settle together below the surface.",
+      "Shared and private moments settle below the surface.",
       "Shared and private moments rest together in deeper layers.",
-      "Below the surface, shared and private moments settle side by side.",
+      "Below the surface, moments settle side by side.",
       "Deeper layers hold shared and private moments together.",
-      "Shared and private moments continue settling in deeper record.",
+      "Shared and private moments keep settling in deeper record.",
     ],
   },
   poetic: {
     condition: {
       quiet: [
         "Shared moments are still gathering.",
-        "Only a light layer of shared moments is present.",
+        "Shared moments are still few.",
         "The shared read is still in its first breath.",
         "The shared field is still quiet in tone.",
         "Only a light pulse is present in the shared field.",
@@ -333,10 +333,10 @@ const COPY_VARIANTS = {
         "Nearby moments hold an even rhythm.",
       ],
       fallback: [
-        "Nearby read is still forming. For now, it mirrors the wider field.",
-        "Nearby read is still thin. For now, it follows the wider field.",
-        "Nearby read is still faint. For now, it mirrors the wider field.",
-        "Nearby read is still light. For now, it follows the wider field.",
+        "Nearby read is forming. It mirrors the wider field.",
+        "Nearby read is still thin. It follows the wider field.",
+        "Nearby read is still faint. It mirrors the wider field.",
+        "Nearby read is still light. It follows the wider field.",
       ],
       regional: [
         "Reading shared moments across your region.",
@@ -347,10 +347,10 @@ const COPY_VARIANTS = {
     },
     strataFallback: [
       "Shared and private moments settle into one deeper record.",
-      "Shared and private moments rest together in the deeper record.",
-      "In deeper layers, shared and private moments settle side by side.",
+      "Shared and private moments rest in the deeper record.",
+      "In deeper layers, moments settle side by side.",
       "Deeper record gathers shared and private moments together.",
-      "Shared and private moments continue settling in deeper layers.",
+      "Shared and private moments keep settling in deeper layers.",
     ],
   },
 };
@@ -489,7 +489,7 @@ const PATTERN_LINES = {
 const COMBINATION_LINES = {
   "avoidable|calm": [
     "A quiet friction line remains near the surface.",
-    "Calm stays present while a light avoidable current persists.",
+    "Calm holds while a light avoidable current persists.",
     "A soft avoidable moment returns with low pressure.",
     "A soft avoidable rhythm remains under calm tone.",
     "Calm holds while a light avoidable line repeats.",
@@ -524,7 +524,7 @@ const COMBINATION_LINES = {
   ],
   "fertile|calm": [
     "Calm fertile moments begin to clear the air.",
-    "A softer opening appears where calm and fertile movement meet.",
+    "A softer opening appears where calm meets fertile movement.",
     "The atmosphere loosens through calm fertile currents.",
     "Calm fertile moments keep widening breathable space.",
     "A light fertile line opens with calm continuity.",
@@ -545,7 +545,7 @@ const COMBINATION_LINES = {
   ],
   "fertile|curious": [
     "Curiosity leaves fertile openings across the terrain.",
-    "Exploratory fertile movement keeps the atmosphere breathable.",
+    "Exploratory fertile movement keeps the field breathable.",
     "A widening current forms through curious fertile moments.",
     "Curious fertile moments keep extending open paths.",
     "Exploratory fertile lines widen the shared read.",
@@ -568,7 +568,7 @@ const COMBINATION_LINES = {
     "Focused observation lowers ambient noise.",
     "Observed focus keeps contours clearer near the horizon.",
     "A precise observational line steadies movement.",
-    "Focused observation sharpens the read without tightening it.",
+    "Focused observation sharpens the read without tightening.",
     "A clear observed line keeps surface contours precise.",
   ],
   "observed|stressed": [
@@ -1048,7 +1048,7 @@ function buildStrataLines(longWindowMoments, canonicalState) {
 
   const moodDiversity = Object.values(moods).filter((count) => count > 0).length;
   if (moodDiversity >= 4) {
-    lines.push("Multiple currents spread across the terrain instead of one hard line.");
+    lines.push("Multiple currents spread across the terrain.");
   }
 
   const avoidableRatio = counts.avoidable / total;
