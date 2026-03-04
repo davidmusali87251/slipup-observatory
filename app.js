@@ -500,7 +500,7 @@ function formatDegree(value) {
 }
 
 function conditionForDegree(value, total) {
-  if (total < 3) return "No strong shared trace yet.";
+  if (total < 3) return "No strong shared moment yet.";
   if (value < 38) return "Shared movement holds a steady line.";
   if (value < 60) return "The shared field tends toward balance.";
   if (value < 74) return "Density is gathering in the shared field.";
@@ -534,7 +534,7 @@ function renderRecent(sharedMoments) {
   if (list.length === 0) {
     const empty = document.createElement("li");
     empty.className = "moment-item";
-    empty.textContent = "No shared trace yet.";
+    empty.textContent = "No shared moments yet.";
     recentMoments.appendChild(empty);
     return;
   }
@@ -638,12 +638,12 @@ function renderHorizon(canonicalState, sharedMoments) {
   horizonSecondary.innerHTML = "";
 
   if (total === 0) {
-    horizonPrimary.textContent = "No shared contour has reached the horizon yet.";
+    horizonPrimary.textContent = "No shared moments have reached the surface read yet.";
     return;
   }
 
   if (total < 4) {
-    horizonPrimary.textContent = "The horizon is still gathering its first contour.";
+    horizonPrimary.textContent = "The surface read is still taking shape.";
     return;
   }
 
@@ -656,21 +656,21 @@ function renderHorizon(canonicalState, sharedMoments) {
     { avoidable: 0, fertile: 0, observed: 0 }
   );
   const dominant = Object.entries(countByType).sort((a, b) => b[1] - a[1])[0][0];
-  horizonPrimary.textContent = `A ${dominant} current is drawing the horizon line.`;
+  horizonPrimary.textContent = `A ${dominant} current is shaping the surface read.`;
 
   horizonMoreButton.classList.remove("hidden");
   horizonMoreButton.onclick = () => {
     horizonSecondary.classList.remove("hidden");
     const trend =
       canonicalState.stabilityIndex >= 0.55
-        ? "The broad flow holds a steady rhythm."
-        : "The broad flow is still redistributing.";
+        ? "The collective flow keeps a steady pulse."
+        : "The collective flow is still rearranging.";
     const drift =
       canonicalState.pressureMode === "condensing"
-        ? "A denser front lingers along the horizon."
+        ? "A denser layer lingers at the surface."
         : canonicalState.pressureMode === "clearing"
-          ? "A clearer band opens along the horizon."
-          : "The horizon keeps a balanced line.";
+          ? "A clearer lane is opening at the surface."
+          : "The surface line stays in balance.";
     horizonSecondary.innerHTML = `<p>${trend}</p><p>${drift}</p>`;
     horizonMoreButton.classList.add("hidden");
   };
@@ -680,17 +680,17 @@ function renderLocalClimate(localState) {
   const pressureMode = localState?.pressureMode || "stabilizing";
   const pressureText =
     pressureMode === "condensing"
-      ? "The regional field is condensing."
+      ? "Nearby moment flow is compacting."
       : pressureMode === "clearing"
-        ? "The regional field is opening."
-        : "The regional field is holding balance.";
+        ? "Nearby moment flow is opening."
+        : "Nearby moment flow holds a steady balance.";
 
   localClimatePrimary.textContent = pressureText;
   if (localState?.source === "global_fallback") {
-    localClimateSecondary.textContent = "Regional signal is still forming. For now, it follows the wider field.";
+    localClimateSecondary.textContent = "Nearby signal is still forming. For now, this mirrors the wider field.";
     return;
   }
-  localClimateSecondary.textContent = "Reading from shared traces across your region.";
+  localClimateSecondary.textContent = "Read from shared moments across your region.";
 }
 
 function getLongWindow(moments, days = 30) {
