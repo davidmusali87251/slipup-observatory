@@ -5,9 +5,33 @@ const RENDER_LIMIT = 10;
 const CENTER = 50;
 const BASELINE = 28;
 const SCALE = 100;
-const BASELINE_PER_48H = 24;
+const RECENCY_HALFLIFE_HOURS = 18;
+const RESPONSE_AMPLITUDE = 20;
 const COMPUTED_DEGREE_KEY = "slipup_v2_computed_degree";
 const DISPLAY_DEGREE_KEY = "slipup_v2_display_degree";
+const INFLUENCE = {
+  avoidable: {
+    stressed: { mode: "condense", strength: 1.0 },
+    tired: { mode: "condense", strength: 0.8 },
+    curious: { mode: "condense", strength: 0.55 },
+    focus: { mode: "condense", strength: 0.5 },
+    calm: { mode: "condense", strength: 0.35 },
+  },
+  fertile: {
+    calm: { mode: "clear", strength: 0.7 },
+    focus: { mode: "clear", strength: 0.55 },
+    curious: { mode: "clear", strength: 0.45 },
+    tired: { mode: "clear", strength: 0.28 },
+    stressed: { mode: "clear", strength: 0.22 },
+  },
+  observed: {
+    calm: { mode: "stabilize", strength: 0.3 },
+    focus: { mode: "stabilize", strength: 0.22 },
+    curious: { mode: "stabilize", strength: 0.18 },
+    tired: { mode: "stabilize", strength: 0.14 },
+    stressed: { mode: "stabilize", strength: 0.16 },
+  },
+};
 
 const degreeValue = document.getElementById("degreeValue");
 const conditionLine = document.getElementById("conditionLine");
@@ -118,37 +142,25 @@ function getRecentWindow(moments) {
   return moments.filter((m) => now - new Date(m.timestamp).getTime() <= twoDaysMs);
 }
 
-function safeNumber(value) {
-  return Number.isFinite(value) ? value : 0;
-}
-
-function weightedAvgMood(moodCounts, total) {
-  if (total === 0) return 0;
-  const moodWeights = {
-    calm: -0.06,
-    focus: -0.02,
-    stressed: 0.06,
-    curious: -0.01,
-    tired: 0.04,
-  };
-  const sum = Object.entries(moodWeights).reduce((acc, [mood, weight]) => {
-    return acc + safeNumber(moodCounts[mood]) * weight;
-  }, 0);
-  return sum / total;
-}
-
-function chooseAlpha(total) {
-  if (total < 6) return 0.12;
-  if (total < 20) return 0.18;
+function chooseAlpha(mass) {
+  if (mass < 4) return 0.12;
+  if (mass < 14) return 0.17;
   return 0.2;
 }
 
-function quantityDamping(total) {
-  // As sample volume grows, each new entry should move the degree less.
-  // 28 is treated as a mature-volume reference point.
-  const matureVolume = 28;
-  const ratio = Math.max(0, total) / matureVolume;
-  return clamp(1 / Math.sqrt(1 + ratio * 1.4), 0.22, 1);
+function recencyMass(ageHours) {
+  return Math.pow(0.5, ageHours / RECENCY_HALFLIFE_HOURS);
+}
+
+function signedPressure(mode, strength) {
+  if (mode === "condense") return strength;
+  if (mode === "clear") return -strength;
+  return 0;
+}
+
+function getInfluenceCell(type, mood) {
+  const row = INFLUENCE[type] || {};
+  return row[mood] || { mode: "stabilize", strength: 0.12 };
 }
 
 function calculateClimate(moments) {
@@ -164,49 +176,33 @@ function calculateClimate(moments) {
     };
   }
 
-  const counts = { avoidable: 0, fertile: 0, observed: 0 };
-  const moods = {
-    calm: 0,
-    focus: 0,
-    stressed: 0,
-    curious: 0,
-    tired: 0,
-  };
-
+  const nowMs = Date.now();
+  const total = windowed.length;
+  let atmosphericPressure = 0;
+  let fieldMass = 0;
+  let stabilizeMass = 0;
   windowed.forEach((m) => {
-    if (counts[m.type] !== undefined) counts[m.type] += 1;
-    if (moods[m.mood] !== undefined) moods[m.mood] += 1;
+    const ageHours = Math.max(0, (nowMs - new Date(m.timestamp).getTime()) / 3600_000);
+    const mass = recencyMass(ageHours);
+    const influence = getInfluenceCell(m.type, m.mood);
+    fieldMass += mass;
+    atmosphericPressure += signedPressure(influence.mode, influence.strength) * mass;
+    if (influence.mode === "stabilize") stabilizeMass += influence.strength * mass;
   });
 
-  const total = windowed.length;
-  const avoidableP = counts.avoidable / total;
-  const fertileP = counts.fertile / total;
-  const observedP = counts.observed / total;
-  const datasetSize = windowed.length;
-  const warmupFactor = Math.min(1, datasetSize / 6);
+  const warmupFactor = Math.min(1, fieldMass / 6);
+  const pressureNormalizer = 2 * Math.sqrt(fieldMass) + 80;
+  const normalizedPressure = atmosphericPressure / pressureNormalizer;
+  const stabilizeDamping = clamp(1 - stabilizeMass / (fieldMass + 1), 0.65, 1);
+  const targetDelta = RESPONSE_AMPLITUDE * Math.tanh(normalizedPressure * 2.2) * stabilizeDamping;
+  const target = clamp(BASELINE + targetDelta * warmupFactor, 0, SCALE);
+  const alpha = chooseAlpha(fieldMass);
 
-  // Activity signal compares actual density with expected baseline.
-  const activityRatio = clamp(total / BASELINE_PER_48H, 0.4, 2.2);
-  const activitySignal = (activityRatio - 1) * 6.5;
-
-  // Mood adds only a gentle modulation.
-  const moodSignal = weightedAvgMood(moods, total);
-  const moodAmplifier = clamp(1 + moodSignal * 0.65, 0.85, 1.2);
-
-  // Degree represents structural condensation level (not error count, not mood intensity).
-  const typeStructural = avoidableP * 18 + fertileP * 6 - 7;
-  const observedStabilizer = 1 - observedP * 0.45;
-  const structuralDelta = (typeStructural * moodAmplifier + activitySignal) * observedStabilizer;
-  const damping = quantityDamping(total);
-  const delta = structuralDelta * warmupFactor * damping;
-  const target = clamp(BASELINE + delta, 0, SCALE);
-  const alpha = chooseAlpha(total);
-
-  // Deterministic warm-up smoothing based on current window only.
   const warmBase = BASELINE + alpha * (target - BASELINE);
-  const repetitionNudge = clamp(repetition.strength * 4.8 * damping, 0, 2.8);
+  const repetitionDamping = clamp(1 / Math.sqrt(1 + fieldMass / 28), 0.18, 1);
+  const repetitionNudge = clamp(repetition.strength * 2.4 * repetitionDamping, 0, 1.4);
   let computedDegree = clamp(warmBase + repetitionNudge, 0, SCALE);
-  if (datasetSize === 1) {
+  if (total === 1) {
     computedDegree = Math.min(computedDegree, BASELINE + 5);
   }
 
