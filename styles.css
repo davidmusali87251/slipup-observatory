@@ -243,6 +243,11 @@ h2 {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
   text-shadow: 0 1px 0 #ffffff9a;
+  transition: opacity 220ms ease;
+}
+
+.degree-value.is-pending {
+  opacity: 0;
 }
 
 .degree-value::after {
@@ -586,6 +591,19 @@ h2 {
   padding-top: var(--page-pad-top);
 }
 
+.contribute-page .topbar {
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.contribute-page .topbar h1 {
+  font-size: clamp(1.08rem, 1.55vw, 1.32rem);
+  font-weight: 560;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
 .contribute-page .topbar .text-link {
   border: 1px solid color-mix(in oklab, var(--text) 16%, transparent);
   background: color-mix(in oklab, #ffffff 45%, transparent);
@@ -632,13 +650,76 @@ h2 {
   color: #2f455b;
 }
 
+.contribute-page .field > span {
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  font-weight: 400;
+  font-size: 0.84rem;
+}
+
 .field select,
 .field input[type="text"] {
   padding: 0.6rem 0.7rem;
   border: 1px solid #a8b8ca;
   border-radius: 10px;
-  background: #fff;
+  background: linear-gradient(180deg, #ffffff 0%, #faf7ff 100%);
   color: #1d2e3f;
+  font-family: inherit;
+  font-size: 0.92rem;
+  line-height: 1.35;
+  box-shadow:
+    0 1px 0 #ffffffde inset,
+    0 0 0 0 transparent;
+  transition:
+    border-color 160ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.contribute-page #typeInput,
+.contribute-page #moodInput,
+.contribute-page #noteInput {
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+  color: #23384d;
+}
+
+.field select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 2rem;
+  background-image:
+    linear-gradient(180deg, #ffffff 0%, #faf7ff 100%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath d='M3.2 5.1L7 8.9l3.8-3.8' fill='none' stroke='%235d6f8a' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat;
+  background-position: 0 0, right 0.68rem center;
+  background-size: auto, 0.78rem;
+}
+
+.field select:hover,
+.field input[type="text"]:hover {
+  border-color: color-mix(in oklab, var(--text) 24%, #c8d6e7);
+}
+
+.field select:focus,
+.field input[type="text"]:focus {
+  outline: none;
+  border-color: color-mix(in oklab, #8fa9c9 74%, #ffffff);
+  box-shadow:
+    0 1px 0 #ffffffea inset,
+    0 0 0 3px color-mix(in oklab, #8fa9c9 28%, transparent);
+  background: linear-gradient(180deg, #ffffff 0%, #f8f4ff 100%);
+}
+
+.field input[type="text"]::placeholder {
+  color: color-mix(in oklab, var(--muted) 74%, #ffffff);
+  opacity: 0.78;
+  font-weight: 400;
+  letter-spacing: 0.005em;
 }
 
 .field-inline {
@@ -677,6 +758,10 @@ h2 {
   .shared-sheet,
   .observatory-hero::before,
   .transient-reading-line {
+    transition: none;
+  }
+
+  .degree-value {
     transition: none;
   }
 
@@ -740,6 +825,32 @@ h2 {
     padding: 0.85rem 0.85rem 1rem;
     border-top-left-radius: 18px;
     border-top-right-radius: 18px;
+  }
+}
+
+@media (max-width: 520px) {
+  .contribute-page .topbar {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0.48rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .contribute-page .topbar h1 {
+    width: 100%;
+    font-size: 1.04rem;
+    letter-spacing: 0.01em;
+  }
+
+  .contribute-page .topbar .text-link {
+    min-height: 34px;
+    padding: 0.36rem 0.72rem;
+    font-size: 0.78rem;
+  }
+
+  .contribute-page .panel {
+    margin-top: 0.2rem;
   }
 }
 

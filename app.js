@@ -7,6 +7,7 @@ const BASELINE = 28;
 const SCALE = 100;
 const RECENCY_HALFLIFE_HOURS = 18;
 const RESPONSE_AMPLITUDE = 20;
+const NOTE_SIGNAL_CAP = 0.16;
 const COMPUTED_DEGREE_KEY = "slipup_v2_computed_degree";
 const DISPLAY_DEGREE_KEY = "slipup_v2_display_degree";
 const INFLUENCE = {
@@ -32,6 +33,66 @@ const INFLUENCE = {
     stressed: { mode: "stabilize", strength: 0.16 },
   },
 };
+const REFLECTIVE_TOKENS = [
+  "reflect",
+  "noticed",
+  "learn",
+  "learned",
+  "lesson",
+  "pause",
+  "adjust",
+  "again",
+  "next",
+  "aware",
+  "observe",
+  "chose",
+  "choice",
+  "calm",
+  "breathe",
+  "intent",
+  "reflex",
+  "aprend",
+  "leccion",
+  "pausa",
+  "ajust",
+  "proxima",
+  "siguiente",
+  "consciente",
+  "observo",
+  "elegi",
+  "eleccion",
+  "calma",
+  "respir",
+  "intencion",
+];
+const REACTIVE_TOKENS = [
+  "rush",
+  "late",
+  "panic",
+  "angry",
+  "stuck",
+  "again!",
+  "always",
+  "never",
+  "chaos",
+  "overwhelm",
+  "noise",
+  "blame",
+  "fight",
+  "explode",
+  "prisa",
+  "tarde",
+  "panico",
+  "enoj",
+  "atasc",
+  "siempre",
+  "nunca",
+  "caos",
+  "ruido",
+  "culpa",
+  "pelea",
+  "explot",
+];
 
 const degreeValue = document.getElementById("degreeValue");
 const conditionLine = document.getElementById("conditionLine");
@@ -163,6 +224,29 @@ function getInfluenceCell(type, mood) {
   return row[mood] || { mode: "stabilize", strength: 0.12 };
 }
 
+function noteSignal(note) {
+  const text = String(note || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+  if (!text) return { reflective: 0, reactive: 0 };
+
+  let reflective = 0;
+  let reactive = 0;
+  REFLECTIVE_TOKENS.forEach((token) => {
+    if (text.includes(token)) reflective += 1;
+  });
+  REACTIVE_TOKENS.forEach((token) => {
+    if (text.includes(token)) reactive += 1;
+  });
+
+  return {
+    reflective: Math.min(reflective / 2.5, NOTE_SIGNAL_CAP),
+    reactive: Math.min(reactive / 2.5, NOTE_SIGNAL_CAP),
+  };
+}
+
 function calculateClimate(moments) {
   const windowed = getRecentWindow(moments);
   const latestInWindow = windowed[windowed.length - 1] || null;
@@ -185,9 +269,13 @@ function calculateClimate(moments) {
     const ageHours = Math.max(0, (nowMs - new Date(m.timestamp).getTime()) / 3600_000);
     const mass = recencyMass(ageHours);
     const influence = getInfluenceCell(m.type, m.mood);
+    const signal = noteSignal(m.note || "");
+    const semanticPressure = signal.reactive - signal.reflective;
+    const semanticStabilize = signal.reflective * 0.75;
     fieldMass += mass;
-    atmosphericPressure += signedPressure(influence.mode, influence.strength) * mass;
+    atmosphericPressure += (signedPressure(influence.mode, influence.strength) + semanticPressure) * mass;
     if (influence.mode === "stabilize") stabilizeMass += influence.strength * mass;
+    stabilizeMass += semanticStabilize * mass;
   });
 
   const warmupFactor = Math.min(1, fieldMass / 6);
@@ -518,13 +606,21 @@ async function boot() {
   const moments = loadMoments();
   const previousComputed = getStoredComputedDegree();
   const previousDisplay = getStoredDisplayDegree();
+  const hasStoredDisplay = Number.isFinite(previousDisplay) || Number.isFinite(previousComputed);
   const optimisticStartDisplay = Number.isFinite(previousDisplay)
     ? previousDisplay
     : Number.isFinite(previousComputed)
       ? previousComputed
       : BASELINE;
-  degreeValue.textContent = formatDegree(optimisticStartDisplay);
-  document.body.style.setProperty("--atmo", String(optimisticStartDisplay));
+  if (hasStoredDisplay) {
+    degreeValue.textContent = formatDegree(optimisticStartDisplay);
+    document.body.style.setProperty("--atmo", String(optimisticStartDisplay));
+  } else {
+    // First load with no stored state: avoid flashing a temporary fixed number.
+    degreeValue.textContent = "";
+    degreeValue.classList.add("is-pending");
+    document.body.style.setProperty("--atmo", String(BASELINE));
+  }
 
   const [sharedResult, climateTruth] = await Promise.all([loadSharedMoments(moments), loadClimateTruth(moments)]);
   const sharedMoments = sharedResult.items;
@@ -535,6 +631,7 @@ async function boot() {
     : Number.isFinite(previousComputed)
       ? previousComputed
       : computedDegree;
+  degreeValue.classList.remove("is-pending");
 
   let firstPhaseTarget = computedDegree;
   let settleDuration = 400;
