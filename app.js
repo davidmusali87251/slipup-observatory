@@ -188,82 +188,82 @@ function detectStructuralPattern(activeEntries48h) {
 
 const PATTERN_LINES = {
   pattern_a: [
-    "Avoidable tension returns under stress.",
-    "Pressure gathers again where stress concentrates.",
-    "A dense current forms when stress repeats.",
+    "A familiar tension returns under stress.",
+    "Pressure gathers where stress settles.",
+    "A denser current forms as the same trace returns.",
   ],
   pattern_b: [
-    "A short loop is repeating.",
-    "A familiar cycle keeps returning in nearby form.",
-    "The same contour appears again in close succession.",
+    "A short loop keeps returning.",
+    "A familiar cycle comes back in close succession.",
+    "The same contour appears again before it fully dissolves.",
   ],
   pattern_c: [
-    "Movement concentrates in small clusters.",
-    "Signals condense into brief concentrated pockets.",
+    "Movement gathers into small clusters.",
+    "Signals condense into brief pockets.",
     "Several traces settle close together in time.",
   ],
 };
 
 const COMBINATION_LINES = {
   "avoidable|calm": [
-    "A quiet friction line is present near the surface.",
-    "Calm remains, though a light avoidable current persists.",
-    "A low-pressure avoidable trace keeps returning softly.",
+    "A quiet friction line remains near the surface.",
+    "Calm stays present while a light avoidable current persists.",
+    "A soft avoidable trace returns with low pressure.",
   ],
   "avoidable|focus": [
-    "A focused avoidable current is shaping a narrow channel.",
-    "Attention stays sharp while friction remains directed.",
-    "A concentrated avoidable line cuts through the field.",
+    "A focused avoidable current opens a narrow channel.",
+    "Attention stays sharp while friction keeps its direction.",
+    "A concentrated avoidable line crosses the atmosphere.",
   ],
   "avoidable|stressed": [
     "Stress and friction condense into a denser front.",
-    "An avoidable pressure wave forms under stress.",
-    "The field tightens where stressed avoidable traces align.",
+    "An avoidable wave rises under stress.",
+    "The atmosphere tightens where stressed traces align.",
   ],
   "avoidable|curious": [
     "Exploratory friction leaves an unsettled but open trail.",
-    "Curiosity and avoidable drag meet in shifting ground.",
-    "A searching current moves through avoidable terrain.",
+    "Curiosity and avoidable drag meet in shifting air.",
+    "A searching current moves across avoidable terrain.",
   ],
   "avoidable|tired": [
     "A tired avoidable layer settles with heavier weight.",
-    "Friction appears slower but more persistent under fatigue.",
-    "A dense low-energy avoidable band remains present.",
+    "Friction turns slower yet more persistent under fatigue.",
+    "A low-energy avoidable band remains in place.",
   ],
   "fertile|calm": [
-    "Calm fertile traces are clearing the nearby field.",
+    "Calm fertile traces begin to clear the air.",
     "A softer opening appears where calm and fertile movement meet.",
     "The atmosphere loosens through calm fertile currents.",
   ],
   "fertile|focus": [
-    "Fertile focus opens a steady channel through the field.",
-    "A structured opening appears with focused fertile movement.",
+    "Fertile focus opens a steady channel in the atmosphere.",
+    "A clear opening appears with focused fertile movement.",
     "Clearer pathways form where fertile focus repeats.",
   ],
   "fertile|stressed": [
     "A fertile signal persists even under pressure.",
-    "Openings appear through stress without fully collapsing.",
-    "The field keeps a narrow clearing despite stressed flow.",
+    "Openings appear through stress without collapsing.",
+    "A narrow clearing remains despite stressed flow.",
   ],
   "fertile|curious": [
     "Curiosity leaves fertile openings across the terrain.",
-    "Fertile exploratory movement keeps the field breathable.",
+    "Exploratory fertile movement keeps the atmosphere breathable.",
     "A widening current forms through curious fertile traces.",
   ],
   "fertile|tired": [
     "Fertile movement stays present, though at lower energy.",
-    "A slower fertile current keeps some ground open.",
-    "Openings remain, even as the field carries fatigue.",
+    "A slower fertile current keeps some openings alive.",
+    "Openings remain, even as fatigue crosses the field.",
   ],
   "observed|calm": [
     "Calm observation stabilizes the surface.",
-    "Observed calm traces keep the field readable.",
+    "Observed calm traces keep the atmosphere readable.",
     "A settled observational layer supports balance.",
   ],
   "observed|focus": [
-    "Focused observation trims noise from the field.",
+    "Focused observation lowers ambient noise.",
     "Observed focus keeps contours clearer near the horizon.",
-    "A precise observational line steadies nearby movement.",
+    "A precise observational line steadies movement.",
   ],
   "observed|stressed": [
     "Observation remains present while stress passes through.",
@@ -271,13 +271,13 @@ const COMBINATION_LINES = {
     "A watchful layer contains pressure near the surface.",
   ],
   "observed|curious": [
-    "Curious observation maps subtle changes in the field.",
+    "Curious observation maps subtle changes in the atmosphere.",
     "Observed curiosity keeps movement open and readable.",
     "A light exploratory observation line remains active.",
   ],
   "observed|tired": [
-    "Observation under fatigue still anchors the ground.",
-    "A low-energy observational layer keeps orientation.",
+    "Observation under fatigue still anchors the layer.",
+    "A low-energy observational seam keeps orientation.",
     "Even in tired conditions, observation holds a quiet frame.",
   ],
 };
@@ -638,12 +638,12 @@ function renderHorizon(canonicalState, sharedMoments) {
   horizonSecondary.innerHTML = "";
 
   if (total === 0) {
-    horizonPrimary.textContent = "Ground traces have not settled yet.";
+    horizonPrimary.textContent = "No shared contour has reached the horizon yet.";
     return;
   }
 
   if (total < 4) {
-    horizonPrimary.textContent = "Ground signals are still settling.";
+    horizonPrimary.textContent = "The horizon is still gathering its first contour.";
     return;
   }
 
@@ -656,21 +656,21 @@ function renderHorizon(canonicalState, sharedMoments) {
     { avoidable: 0, fertile: 0, observed: 0 }
   );
   const dominant = Object.entries(countByType).sort((a, b) => b[1] - a[1])[0][0];
-  horizonPrimary.textContent = `A ${dominant} current settles near the ground.`;
+  horizonPrimary.textContent = `A ${dominant} current is drawing the horizon line.`;
 
   horizonMoreButton.classList.remove("hidden");
   horizonMoreButton.onclick = () => {
     horizonSecondary.classList.remove("hidden");
     const trend =
       canonicalState.stabilityIndex >= 0.55
-        ? "Recent ground movement appears steady."
-        : "Ground movement is still redistributing.";
+        ? "The broad flow holds a steady rhythm."
+        : "The broad flow is still redistributing.";
     const drift =
       canonicalState.pressureMode === "condensing"
-        ? "Pressure remains present close to the horizon."
+        ? "A denser front lingers along the horizon."
         : canonicalState.pressureMode === "clearing"
-          ? "The field appears to clear near ground level."
-          : "Ground balance appears stable.";
+          ? "A clearer band opens along the horizon."
+          : "The horizon keeps a balanced line.";
     horizonSecondary.innerHTML = `<p>${trend}</p><p>${drift}</p>`;
     horizonMoreButton.classList.add("hidden");
   };
@@ -680,17 +680,17 @@ function renderLocalClimate(localState) {
   const pressureMode = localState?.pressureMode || "stabilizing";
   const pressureText =
     pressureMode === "condensing"
-      ? "Nearby pressure feels denser now."
+      ? "The regional air feels denser now."
       : pressureMode === "clearing"
-        ? "Nearby pressure feels lighter now."
-        : "Nearby pressure feels balanced now.";
+        ? "The regional air feels lighter now."
+        : "The regional air feels balanced now.";
 
   localClimatePrimary.textContent = pressureText;
   if (localState?.source === "global_fallback") {
-    localClimateSecondary.textContent = "Local signal still forming. Showing global reading.";
+    localClimateSecondary.textContent = "Regional signal still forming. For now, this follows the wider atmosphere.";
     return;
   }
-  localClimateSecondary.textContent = "Reading from nearby shared traces.";
+  localClimateSecondary.textContent = "Reading from shared traces across your region.";
 }
 
 function getLongWindow(moments, days = 30) {
@@ -713,21 +713,21 @@ function buildStrataLines(longWindowMoments, canonicalState) {
 
   const lines = [];
   if (canonicalState.pressureMode === "condensing") {
-    lines.push("A compacted band is pressing deeper into the ground.");
+    lines.push("A compacted band continues sinking into deeper layers.");
   } else if (canonicalState.pressureMode === "clearing") {
-    lines.push("A lighter layer is opening between settled traces.");
+    lines.push("A lighter seam opens between settled traces.");
   } else {
-    lines.push("Ground pressure stays measured, without abrupt shifts.");
+    lines.push("Deep layers hold steady, without abrupt shifts.");
   }
 
   if (counts.avoidable >= 5 && moods.stressed >= 3) {
-    lines.push("A denser layer forms where pressure and friction meet.");
+    lines.push("A denser seam forms where friction keeps returning.");
   }
   if (counts.fertile >= 4 && moods.calm >= 3) {
-    lines.push("Calmer fertile traces leave lighter veins in the soil.");
+    lines.push("Calm fertile traces leave lighter veins below.");
   }
   if (counts.observed >= 4) {
-    lines.push("Observation compacts the ground into a more readable surface.");
+    lines.push("Observation compacts the layer into a clearer reading.");
   }
 
   const moodDiversity = Object.values(moods).filter((count) => count > 0).length;
@@ -740,7 +740,7 @@ function buildStrataLines(longWindowMoments, canonicalState) {
   if (avoidableRatio > 0.42 && fertileRatio > 0.22) {
     lines.push("Rough and open traces settle together into mixed sediment.");
   } else if (fertileRatio > 0.38) {
-    lines.push("The ground keeps a clearer imprint where openings repeat.");
+    lines.push("A clearer imprint remains where openings repeat.");
   }
 
   if (total >= 24) {
@@ -748,7 +748,7 @@ function buildStrataLines(longWindowMoments, canonicalState) {
   }
 
   if (lines.length < 2) {
-    lines.push("The terrain is taking shape from recurring traces.");
+    lines.push("The deep layer is taking shape from recurring traces.");
     lines.push("Shared and private traces settle together below the weather.");
   }
 
