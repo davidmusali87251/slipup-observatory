@@ -521,6 +521,42 @@ h2 {
   opacity: 0.9;
 }
 
+.local-climate {
+  padding: 0.2rem 0.15rem 0.35rem;
+  margin-top: 1.05rem;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff00 0%,
+      color-mix(in srgb, var(--layer-ground) calc(22% + var(--atmo) * 0.1%), transparent) 100%
+    );
+}
+
+.local-climate-line {
+  color: #6b7d8f;
+  border-top: 1px solid color-mix(in srgb, var(--line) 85%, #ffffff);
+  text-align: center;
+  padding-top: 0.72rem;
+  margin-bottom: 0.6rem;
+  letter-spacing: 0.08em;
+  font-size: 0.74rem;
+  opacity: 0.88;
+}
+
+.local-climate-primary {
+  font-size: 0.89rem;
+  color: #2d4054;
+  line-height: 1.52;
+  margin-bottom: 0.24rem;
+}
+
+.local-climate-secondary {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.46;
+  opacity: 0.76;
+}
+
 /* Seed hook for future lower strata (inactive by default). */
 .ground-strata {
   height: 0;

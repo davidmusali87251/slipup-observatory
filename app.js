@@ -109,6 +109,8 @@ const sharedSheet = document.getElementById("shared-sheet");
 const sharedSheetList = document.getElementById("shared-sheet-list");
 const sharedSheetEmpty = document.getElementById("shared-sheet-empty");
 const sharedSheetCloseButton = document.getElementById("shared-sheet-close");
+const localClimatePrimary = document.getElementById("localClimatePrimary");
+const localClimateSecondary = document.getElementById("localClimateSecondary");
 const groundStrata = document.getElementById("ground-strata");
 const strataLines = document.getElementById("strataLines");
 
@@ -184,11 +186,176 @@ function detectStructuralPattern(activeEntries48h) {
   return { hasPattern: false, tag: "", strength: 0 };
 }
 
-function patternLineForTag(tag) {
-  if (tag === "pattern_a") return "Avoidable tension returns under stress.";
-  if (tag === "pattern_b") return "A short loop is repeating.";
-  if (tag === "pattern_c") return "Movement concentrates in small clusters.";
-  return "";
+const PATTERN_LINES = {
+  pattern_a: [
+    "Avoidable tension returns under stress.",
+    "Pressure gathers again where stress concentrates.",
+    "A dense current forms when stress repeats.",
+  ],
+  pattern_b: [
+    "A short loop is repeating.",
+    "A familiar cycle keeps returning in nearby form.",
+    "The same contour appears again in close succession.",
+  ],
+  pattern_c: [
+    "Movement concentrates in small clusters.",
+    "Signals condense into brief concentrated pockets.",
+    "Several traces settle close together in time.",
+  ],
+};
+
+const COMBINATION_LINES = {
+  "avoidable|calm": [
+    "A quiet friction line is present near the surface.",
+    "Calm remains, though a light avoidable current persists.",
+    "A low-pressure avoidable trace keeps returning softly.",
+  ],
+  "avoidable|focus": [
+    "A focused avoidable current is shaping a narrow channel.",
+    "Attention stays sharp while friction remains directed.",
+    "A concentrated avoidable line cuts through the field.",
+  ],
+  "avoidable|stressed": [
+    "Stress and friction condense into a denser front.",
+    "An avoidable pressure wave forms under stress.",
+    "The field tightens where stressed avoidable traces align.",
+  ],
+  "avoidable|curious": [
+    "Exploratory friction leaves an unsettled but open trail.",
+    "Curiosity and avoidable drag meet in shifting ground.",
+    "A searching current moves through avoidable terrain.",
+  ],
+  "avoidable|tired": [
+    "A tired avoidable layer settles with heavier weight.",
+    "Friction appears slower but more persistent under fatigue.",
+    "A dense low-energy avoidable band remains present.",
+  ],
+  "fertile|calm": [
+    "Calm fertile traces are clearing the nearby field.",
+    "A softer opening appears where calm and fertile movement meet.",
+    "The atmosphere loosens through calm fertile currents.",
+  ],
+  "fertile|focus": [
+    "Fertile focus opens a steady channel through the field.",
+    "A structured opening appears with focused fertile movement.",
+    "Clearer pathways form where fertile focus repeats.",
+  ],
+  "fertile|stressed": [
+    "A fertile signal persists even under pressure.",
+    "Openings appear through stress without fully collapsing.",
+    "The field keeps a narrow clearing despite stressed flow.",
+  ],
+  "fertile|curious": [
+    "Curiosity leaves fertile openings across the terrain.",
+    "Fertile exploratory movement keeps the field breathable.",
+    "A widening current forms through curious fertile traces.",
+  ],
+  "fertile|tired": [
+    "Fertile movement stays present, though at lower energy.",
+    "A slower fertile current keeps some ground open.",
+    "Openings remain, even as the field carries fatigue.",
+  ],
+  "observed|calm": [
+    "Calm observation stabilizes the surface.",
+    "Observed calm traces keep the field readable.",
+    "A settled observational layer supports balance.",
+  ],
+  "observed|focus": [
+    "Focused observation trims noise from the field.",
+    "Observed focus keeps contours clearer near the horizon.",
+    "A precise observational line steadies nearby movement.",
+  ],
+  "observed|stressed": [
+    "Observation remains present while stress passes through.",
+    "Stressed observation keeps turbulence from spreading.",
+    "A watchful layer contains pressure near the surface.",
+  ],
+  "observed|curious": [
+    "Curious observation maps subtle changes in the field.",
+    "Observed curiosity keeps movement open and readable.",
+    "A light exploratory observation line remains active.",
+  ],
+  "observed|tired": [
+    "Observation under fatigue still anchors the ground.",
+    "A low-energy observational layer keeps orientation.",
+    "Even in tired conditions, observation holds a quiet frame.",
+  ],
+};
+
+function pickLine(lines, seedNumber) {
+  if (!Array.isArray(lines) || lines.length === 0) return "";
+  const idx = Math.abs(seedNumber) % lines.length;
+  return lines[idx];
+}
+
+function lineSeed(climateTruth, collectionSize) {
+  const degreeSeed = Math.round((climateTruth?.computedDegree || BASELINE) * 10);
+  const totalSeed = Number.isFinite(climateTruth?.total) ? climateTruth.total : 0;
+  return degreeSeed + totalSeed + collectionSize;
+}
+
+function dominantCombination(sharedMoments) {
+  if (!Array.isArray(sharedMoments) || sharedMoments.length === 0) return "";
+  const counts = new Map();
+  sharedMoments.slice(0, 30).forEach((m) => {
+    const key = `${m.type}|${m.mood}`;
+    counts.set(key, (counts.get(key) || 0) + 1);
+  });
+  let maxKey = "";
+  let maxCount = 0;
+  counts.forEach((count, key) => {
+    if (count > maxCount) {
+      maxCount = count;
+      maxKey = key;
+    }
+  });
+  return maxKey;
+}
+
+function compositionCounts(moments) {
+  const byType = { avoidable: 0, fertile: 0, observed: 0 };
+  const byMood = { calm: 0, focus: 0, stressed: 0, curious: 0, tired: 0 };
+  moments.forEach((m) => {
+    if (byType[m.type] !== undefined) byType[m.type] += 1;
+    if (byMood[m.mood] !== undefined) byMood[m.mood] += 1;
+  });
+  return { byType, byMood };
+}
+
+function derivePressureMode(computedDegree, repetition) {
+  const delta = computedDegree - BASELINE;
+  if (repetition?.hasPattern && repetition?.tag === "pattern_a") return "condensing";
+  if (delta >= 4.5) return "condensing";
+  if (delta <= -3.5) return "clearing";
+  return "stabilizing";
+}
+
+function deriveClimateState(climateTruth, sharedMoments, localMoments) {
+  const shared = Array.isArray(sharedMoments) ? sharedMoments : [];
+  const counts = compositionCounts(shared.slice(0, 60));
+  const dominantMix = dominantCombination(shared);
+  const total = Math.max(1, shared.length);
+  const observedRatio = counts.byType.observed / total;
+  const calmFocusRatio = (counts.byMood.calm + counts.byMood.focus) / total;
+  const stabilityIndex = clamp(observedRatio * 0.62 + calmFocusRatio * 0.38, 0, 1);
+
+  const longWindow = getLongWindow(localMoments, 30);
+  const longCounts = compositionCounts(longWindow);
+  const longTotal = Math.max(1, longWindow.length);
+  const longAvoidable = longCounts.byType.avoidable / longTotal;
+  const longFertile = longCounts.byType.fertile / longTotal;
+  const groundIndex = clamp((longAvoidable * 0.55 + longFertile * 0.45) * Math.min(1, longTotal / 20), 0, 1);
+
+  return {
+    computedDegree: climateTruth.computedDegree,
+    total: climateTruth.total,
+    condition: climateTruth.condition,
+    repetition: climateTruth.repetition,
+    pressureMode: derivePressureMode(climateTruth.computedDegree, climateTruth.repetition),
+    dominantMix,
+    stabilityIndex,
+    groundIndex,
+  };
 }
 
 function loadMoments() {
@@ -464,7 +631,7 @@ function openSharedSheet(sharedMoments) {
   });
 }
 
-function renderHorizon(sharedMoments, climateTruth) {
+function renderHorizon(canonicalState, sharedMoments) {
   const total = sharedMoments.length;
   horizonSecondary.classList.add("hidden");
   horizonMoreButton.classList.add("hidden");
@@ -494,17 +661,36 @@ function renderHorizon(sharedMoments, climateTruth) {
   horizonMoreButton.classList.remove("hidden");
   horizonMoreButton.onclick = () => {
     horizonSecondary.classList.remove("hidden");
-    const trend = latest.length > 7 ? "Recent ground movement appears steady." : "Ground signal is still forming.";
-    const delta = climateTruth.computedDegree - BASELINE;
+    const trend =
+      canonicalState.stabilityIndex >= 0.55
+        ? "Recent ground movement appears steady."
+        : "Ground movement is still redistributing.";
     const drift =
-      delta > 5
+      canonicalState.pressureMode === "condensing"
         ? "Pressure remains present close to the horizon."
-        : delta < -5
+        : canonicalState.pressureMode === "clearing"
           ? "The field appears to clear near ground level."
           : "Ground balance appears stable.";
     horizonSecondary.innerHTML = `<p>${trend}</p><p>${drift}</p>`;
     horizonMoreButton.classList.add("hidden");
   };
+}
+
+function renderLocalClimate(localState) {
+  const pressureMode = localState?.pressureMode || "stabilizing";
+  const pressureText =
+    pressureMode === "condensing"
+      ? "Nearby pressure feels denser now."
+      : pressureMode === "clearing"
+        ? "Nearby pressure feels lighter now."
+        : "Nearby pressure feels balanced now.";
+
+  localClimatePrimary.textContent = pressureText;
+  if (localState?.source === "global_fallback") {
+    localClimateSecondary.textContent = "Local signal still forming. Showing global reading.";
+    return;
+  }
+  localClimateSecondary.textContent = "Reading from nearby shared traces.";
 }
 
 function getLongWindow(moments, days = 30) {
@@ -513,7 +699,7 @@ function getLongWindow(moments, days = 30) {
   return moments.filter((m) => now - new Date(m.timestamp).getTime() <= windowMs && !m.hidden);
 }
 
-function buildStrataLines(longWindowMoments) {
+function buildStrataLines(longWindowMoments, canonicalState) {
   const total = longWindowMoments.length;
   if (total < 12) return [];
 
@@ -526,6 +712,14 @@ function buildStrataLines(longWindowMoments) {
   });
 
   const lines = [];
+  if (canonicalState.pressureMode === "condensing") {
+    lines.push("A compacted band is pressing deeper into the ground.");
+  } else if (canonicalState.pressureMode === "clearing") {
+    lines.push("A lighter layer is opening between settled traces.");
+  } else {
+    lines.push("Ground pressure stays measured, without abrupt shifts.");
+  }
+
   if (counts.avoidable >= 5 && moods.stressed >= 3) {
     lines.push("A denser layer forms where pressure and friction meet.");
   }
@@ -561,9 +755,9 @@ function buildStrataLines(longWindowMoments) {
   return lines.slice(0, 5);
 }
 
-function renderStrata(moments) {
+function renderStrata(moments, canonicalState) {
   const longWindow = getLongWindow(moments, 30);
-  const lines = buildStrataLines(longWindow);
+  const lines = buildStrataLines(longWindow, canonicalState);
   if (!lines.length) {
     groundStrata.classList.remove("is-active");
     groundStrata.hidden = true;
@@ -622,14 +816,23 @@ function showTransientReading() {
   }, 2300);
 }
 
-function renderPatternLayer(repetition) {
+function renderPatternLayer(canonicalState) {
+  const repetition = canonicalState?.repetition || { hasPattern: false, tag: "", strength: 0 };
   heroEl.classList.toggle("observatory--pattern", Boolean(repetition?.hasPattern));
-  if (!repetition?.hasPattern) {
+
+  const seed = lineSeed(canonicalState, canonicalState?.total || 0);
+  const dominant = canonicalState?.dominantMix || "";
+  const patternLines = repetition?.hasPattern ? PATTERN_LINES[repetition.tag] || [] : [];
+  const comboLines = COMBINATION_LINES[dominant] || [];
+  const line = patternLines.length ? pickLine(patternLines, seed) : pickLine(comboLines, seed);
+
+  if (!line) {
     atmospherePatternLine.textContent = "";
     atmospherePatternLine.classList.add("hidden");
     return;
   }
-  atmospherePatternLine.textContent = patternLineForTag(repetition.tag);
+
+  atmospherePatternLine.textContent = line;
   atmospherePatternLine.classList.remove("hidden");
 }
 
@@ -671,6 +874,10 @@ async function loadClimateTruth(localMoments) {
           ? remoteClimate.condition
           : conditionForDegree(computedDegree, Number(remoteClimate?.total) || 0),
       repetition: normalizeRepetition(remoteClimate?.repetition),
+      pressureMode: remoteClimate?.pressureMode || "",
+      dominantMix: remoteClimate?.dominantMix || "",
+      stabilityIndex: Number.isFinite(remoteClimate?.stabilityIndex) ? remoteClimate.stabilityIndex : null,
+      groundIndex: Number.isFinite(remoteClimate?.groundIndex) ? remoteClimate.groundIndex : null,
     };
   } catch {
     const localClimate = calculateClimate(localSharedMoments);
@@ -680,7 +887,62 @@ async function loadClimateTruth(localMoments) {
       total: localClimate.total,
       condition: conditionForDegree(localClimate.computedDegree, localClimate.total),
       repetition: localClimate.repetition,
+      pressureMode: "",
+      dominantMix: "",
+      stabilityIndex: null,
+      groundIndex: null,
     };
+  }
+}
+
+function sanitizeBucketPart(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function guessGeoBucketFromTimezone() {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+    if (!tz) return "";
+    const segments = tz.split("/").map(sanitizeBucketPart).filter(Boolean);
+    if (!segments.length) return "";
+    return `tz.${segments.join(".")}`.slice(0, 64);
+  } catch {
+    return "";
+  }
+}
+
+async function loadLocalClimateTruth(globalClimate) {
+  const geoBucket = guessGeoBucketFromTimezone();
+  if (!geoBucket) {
+    return { source: "global_fallback", ...globalClimate };
+  }
+
+  try {
+    const remoteLocalClimate = await fetchClimateRemote(48, "", "local", geoBucket);
+    const computedDegree = Number(remoteLocalClimate?.computedDegree);
+    if (!Number.isFinite(computedDegree)) throw new Error("REMOTE_LOCAL_CLIMATE_INVALID");
+    return {
+      source: remoteLocalClimate?.source === "local" ? "local" : "global_fallback",
+      computedDegree: clamp(computedDegree, 0, SCALE),
+      total: Number.isFinite(remoteLocalClimate?.total) ? remoteLocalClimate.total : 0,
+      condition:
+        typeof remoteLocalClimate?.condition === "string" && remoteLocalClimate.condition.length > 0
+          ? remoteLocalClimate.condition
+          : globalClimate.condition,
+      repetition: normalizeRepetition(remoteLocalClimate?.repetition),
+      pressureMode: remoteLocalClimate?.pressureMode || globalClimate.pressureMode || "",
+      dominantMix: remoteLocalClimate?.dominantMix || "",
+      stabilityIndex: Number.isFinite(remoteLocalClimate?.stabilityIndex)
+        ? remoteLocalClimate.stabilityIndex
+        : null,
+      groundIndex: Number.isFinite(remoteLocalClimate?.groundIndex) ? remoteLocalClimate.groundIndex : null,
+    };
+  } catch {
+    return { source: "global_fallback", ...globalClimate };
   }
 }
 
@@ -706,6 +968,8 @@ async function boot() {
 
   const [sharedResult, climateTruth] = await Promise.all([loadSharedMoments(moments), loadClimateTruth(moments)]);
   const sharedMoments = sharedResult.items;
+  const canonicalState = deriveClimateState(climateTruth, sharedMoments, moments);
+  const localClimateTruth = await loadLocalClimateTruth(canonicalState);
   const localClimate = calculateClimate(getSharedMoments(moments));
   const computedDegree = climateTruth.computedDegree;
   const startDisplay = Number.isFinite(previousDisplay)
@@ -749,11 +1013,12 @@ async function boot() {
 
   setStoredComputedDegree(computedDegree);
   setStoredDisplayDegree(computedDegree);
-  conditionLine.textContent = climateTruth.condition;
-  renderPatternLayer(climateTruth.repetition);
+  conditionLine.textContent = canonicalState.condition;
+  renderPatternLayer(canonicalState);
   renderRecent(sharedMoments);
-  renderHorizon(sharedMoments, climateTruth);
-  renderStrata(moments);
+  renderHorizon(canonicalState, sharedMoments);
+  renderLocalClimate(localClimateTruth);
+  renderStrata(moments, canonicalState);
 
   viewMoreButton.onclick = () => openSharedSheet(sharedMoments);
   sheetBackdrop.onclick = closeSharedSheet;

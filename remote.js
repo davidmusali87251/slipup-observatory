@@ -10,6 +10,7 @@ const REMOTE_ANON_KEY = "sb_publishable_eDg1bbmJ1N8m9z7Qb4R0rg_ADAqORE7";
 
 const REMOTE_TIMEOUT_MS = 4500;
 const FP_STORAGE_KEY = "slipup_v2_fp";
+const GEO_BUCKET_KEY = "slipup_v2_geo_bucket";
 const GET_CACHE_TTL_MS = 20000;
 
 const ALLOWED_TYPES = new Set(["avoidable", "fertile", "observed"]);
@@ -55,6 +56,8 @@ function buildHeaders() {
   }
   const fp = getOrCreateFingerprint();
   if (fp) headers["x-slipup-fp"] = fp;
+  const geo = getClientGeoBucket();
+  if (geo) headers["x-slipup-geo"] = geo;
   return headers;
 }
 
@@ -67,6 +70,38 @@ function getOrCreateFingerprint() {
     return created;
   } catch {
     return "";
+  }
+}
+
+function sanitizeBucketPart(input) {
+  return String(input || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9_-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+function deriveGeoBucketFromTimezone() {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+    if (!tz) return "";
+    const parts = tz.split("/").map(sanitizeBucketPart).filter(Boolean);
+    if (!parts.length) return "";
+    return `tz.${parts.join(".")}`.slice(0, 64);
+  } catch {
+    return "";
+  }
+}
+
+function getClientGeoBucket() {
+  try {
+    const current = localStorage.getItem(GEO_BUCKET_KEY);
+    if (current) return current;
+    const derived = deriveGeoBucketFromTimezone();
+    if (derived) localStorage.setItem(GEO_BUCKET_KEY, derived);
+    return derived;
+  } catch {
+    return deriveGeoBucketFromTimezone();
   }
 }
 
@@ -154,6 +189,7 @@ async function postMomentRemote(inputMoment) {
     shared: Boolean(inputMoment.shared),
     timestamp: inputMoment.timestamp,
     client_day: inputMoment.client_day || null,
+    geo_bucket: inputMoment.geo_bucket || getClientGeoBucket() || null,
   };
 
   const scoped = withTimeout(undefined, REMOTE_TIMEOUT_MS);
@@ -181,12 +217,12 @@ async function postMomentRemote(inputMoment) {
   }
 }
 
-async function fetchClimateRemote(windowHours = 48, referenceTime = "") {
+async function fetchClimateRemote(windowHours = 48, referenceTime = "", scope = "global", geo = "") {
   if (!isRemoteReady() || !REMOTE_CLIMATE_URL) {
     throw new Error("REMOTE_CLIMATE_NOT_READY");
   }
 
-  const cacheKey = `${windowHours}|${referenceTime || "now"}`;
+  const cacheKey = `${windowHours}|${referenceTime || "now"}|${scope}|${geo}`;
   const cached = climateGetCache.get(cacheKey);
   if (cached && Date.now() - cached.at < GET_CACHE_TTL_MS) {
     return cached.item;
@@ -195,6 +231,8 @@ async function fetchClimateRemote(windowHours = 48, referenceTime = "") {
   const url = new URL(REMOTE_CLIMATE_URL);
   url.searchParams.set("windowHours", String(windowHours));
   if (referenceTime) url.searchParams.set("referenceTime", referenceTime);
+  if (scope) url.searchParams.set("scope", scope);
+  if (geo) url.searchParams.set("geo", geo);
 
   const scoped = withTimeout(undefined, REMOTE_TIMEOUT_MS);
   try {

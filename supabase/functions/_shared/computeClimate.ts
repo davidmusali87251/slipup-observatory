@@ -155,6 +155,41 @@ function noteSignal(note: string) {
   return { reflective: reflectiveNorm, reactive: reactiveNorm };
 }
 
+function compositionCounts(moments: MomentInput[]) {
+  const byType = { avoidable: 0, fertile: 0, observed: 0 };
+  const byMood = { calm: 0, focus: 0, stressed: 0, curious: 0, tired: 0 };
+  moments.forEach((m) => {
+    if (m.type in byType) byType[m.type as keyof typeof byType] += 1;
+    if (m.mood in byMood) byMood[m.mood as keyof typeof byMood] += 1;
+  });
+  return { byType, byMood };
+}
+
+function dominantCombination(moments: MomentInput[]) {
+  const counts = new Map<string, number>();
+  moments.slice(0, 60).forEach((m) => {
+    const key = `${m.type}|${m.mood}`;
+    counts.set(key, (counts.get(key) || 0) + 1);
+  });
+  let maxKey = "";
+  let maxCount = 0;
+  counts.forEach((count, key) => {
+    if (count > maxCount) {
+      maxCount = count;
+      maxKey = key;
+    }
+  });
+  return maxKey;
+}
+
+function derivePressureMode(computedDegree: number, repetition: Repetition) {
+  const delta = computedDegree - BASELINE;
+  if (repetition?.hasPattern && repetition?.tag === "pattern_a") return "condensing";
+  if (delta >= 4.5) return "condensing";
+  if (delta <= -3.5) return "clearing";
+  return "stabilizing";
+}
+
 function detectStructuralPattern(entries: MomentInput[]): Repetition {
   if (!entries.length) return { hasPattern: false, tag: "", strength: 0 };
 
@@ -263,6 +298,17 @@ export function computeClimate(
   const repetitionNudge = clamp(repetition.strength * 2.4 * repetitionDamping, 0, 1.4);
   let computedDegree = clamp(warmBase + repetitionNudge, 0, SCALE);
   if (total === 1) computedDegree = Math.min(computedDegree, BASELINE + 5);
+  const counts = compositionCounts(windowed);
+  const observedRatio = counts.byType.observed / Math.max(1, total);
+  const calmFocusRatio = (counts.byMood.calm + counts.byMood.focus) / Math.max(1, total);
+  const stabilityIndex = clamp(observedRatio * 0.62 + calmFocusRatio * 0.38, 0, 1);
+  const groundIndex = clamp(
+    (counts.byType.avoidable / Math.max(1, total)) * 0.55 + (counts.byType.fertile / Math.max(1, total)) * 0.45,
+    0,
+    1
+  );
+  const dominantMix = dominantCombination(windowed);
+  const pressureMode = derivePressureMode(computedDegree, repetition);
 
   return {
     modelVersion: MODEL_VERSION,
@@ -272,5 +318,9 @@ export function computeClimate(
     total,
     condition: conditionForDegree(computedDegree, total),
     repetition,
+    pressureMode,
+    dominantMix,
+    stabilityIndex,
+    groundIndex,
   };
 }

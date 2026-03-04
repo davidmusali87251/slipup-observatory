@@ -3,6 +3,8 @@ import { computeClimate } from "../_shared/computeClimate.ts";
 
 const DEFAULT_WINDOW_HOURS = 48;
 const MAX_WINDOW_HOURS = 168;
+const MAX_GEO_BUCKET_LENGTH = 64;
+const LOCAL_MIN_MASS = parseInt(Deno.env.get("LOCAL_MIN_MASS") ?? "30", 10);
 
 const RATE_WINDOW_SECONDS = parseInt(Deno.env.get("CLIMATE_GET_WINDOW_SECONDS") ?? "60", 10);
 const CLIMATE_GET_MAX = parseInt(Deno.env.get("CLIMATE_GET_MAX") ?? "180", 10);
@@ -15,6 +17,34 @@ const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") ?? "*")
 
 function clampInt(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
+}
+
+function normalizeScope(raw: string | null) {
+  return raw === "local" ? "local" : "global";
+}
+
+function normalizeGeoBucket(raw: string | null) {
+  if (!raw) return "";
+  const normalized = raw
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, MAX_GEO_BUCKET_LENGTH);
+  return normalized;
+}
+
+function geoCandidates(geo: string) {
+  if (!geo) return [];
+  const segments = geo.split(".").filter(Boolean);
+  // Start from a broader regional level when we have a city-like suffix.
+  // Example: tz.america.argentina.buenos-aires -> start at tz.america.argentina
+  const startLength = segments.length >= 4 ? segments.length - 1 : segments.length;
+  const buckets: string[] = [];
+  for (let i = startLength; i >= 1; i -= 1) {
+    buckets.push(segments.slice(0, i).join("."));
+  }
+  return buckets;
 }
 
 function pickCorsOrigin(origin: string | null) {
@@ -95,6 +125,36 @@ function retryAfterSeconds(resetAt: string | null) {
   return String(Math.max(1, delta));
 }
 
+async function fetchGlobalMoments(
+  supabase: ReturnType<typeof createClient>,
+  startIso: string,
+  endIso: string
+) {
+  return supabase
+    .from("moments")
+    .select("timestamp,type,mood,note")
+    .eq("shared", true)
+    .eq("hidden", false)
+    .gte("timestamp", startIso)
+    .lte("timestamp", endIso);
+}
+
+async function fetchLocalMoments(
+  supabase: ReturnType<typeof createClient>,
+  geoBucket: string,
+  startIso: string,
+  endIso: string
+) {
+  return supabase
+    .from("moments")
+    .select("timestamp,type,mood,note")
+    .eq("shared", true)
+    .eq("hidden", false)
+    .eq("geo_bucket", geoBucket)
+    .gte("timestamp", startIso)
+    .lte("timestamp", endIso);
+}
+
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin");
   if (req.method === "OPTIONS") {
@@ -132,24 +192,45 @@ Deno.serve(async (req) => {
     MAX_WINDOW_HOURS
   );
   const referenceParam = url.searchParams.get("referenceTime") ?? "";
+  const scope = normalizeScope(url.searchParams.get("scope"));
+  const requestedGeo = normalizeGeoBucket(url.searchParams.get("geo"));
   const referenceTime = referenceParam ? new Date(referenceParam) : new Date();
   if (Number.isNaN(referenceTime.getTime())) {
     return json(origin, 422, { error: "invalid_reference_time" });
   }
 
   const start = new Date(referenceTime.getTime() - windowHours * 3600_000);
-  const { data, error } = await supabase
-    .from("moments")
-    .select("timestamp,type,mood,note")
-    .eq("shared", true)
-    .eq("hidden", false)
-    .gte("timestamp", start.toISOString())
-    .lte("timestamp", referenceTime.toISOString());
+  const startIso = start.toISOString();
+  const endIso = referenceTime.toISOString();
 
-  if (error) {
-    return json(origin, 500, { error: "db_error" });
+  if (scope === "local") {
+    const candidates = geoCandidates(requestedGeo);
+    for (const candidate of candidates) {
+      const { data, error } = await fetchLocalMoments(supabase, candidate, startIso, endIso);
+      if (error) return json(origin, 500, { error: "db_error" });
+      const rows = data ?? [];
+      if (rows.length >= LOCAL_MIN_MASS) {
+        const climate = computeClimate(rows, referenceTime.toISOString(), windowHours);
+        return json(origin, 200, {
+          ...climate,
+          source: "local",
+          requestedGeo,
+          geoBucketUsed: candidate,
+          minRequired: LOCAL_MIN_MASS,
+        });
+      }
+    }
   }
 
+  const { data, error } = await fetchGlobalMoments(supabase, startIso, endIso);
+  if (error) return json(origin, 500, { error: "db_error" });
+
   const climate = computeClimate(data ?? [], referenceTime.toISOString(), windowHours);
-  return json(origin, 200, climate);
+  return json(origin, 200, {
+    ...climate,
+    source: scope === "local" ? "global_fallback" : "global",
+    requestedGeo: scope === "local" ? requestedGeo : "",
+    geoBucketUsed: scope === "local" ? "global" : "",
+    minRequired: scope === "local" ? LOCAL_MIN_MASS : undefined,
+  });
 });
