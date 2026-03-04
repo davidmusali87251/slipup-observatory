@@ -1,4 +1,4 @@
-import { fetchSharedMomentsRemote } from "./remote.js";
+import { fetchClimateRemote, fetchSharedMomentsRemote } from "./remote.js";
 
 const STORAGE_KEY = "slipup_v2_moments";
 const RENDER_LIMIT = 10;
@@ -471,18 +471,61 @@ function renderPatternLayer(repetition) {
 async function loadSharedMoments(localMoments) {
   try {
     const remoteItems = await fetchSharedMomentsRemote(SHARED_SHEET_MAX_ITEMS, 48);
-    return remoteItems.filter((m) => m.shared && !m.hidden);
+    return {
+      items: remoteItems.filter((m) => m.shared && !m.hidden),
+      source: "remote",
+    };
   } catch {
-    return getSharedMoments(localMoments);
+    return {
+      items: getSharedMoments(localMoments),
+      source: "local",
+    };
+  }
+}
+
+function normalizeRepetition(repetition) {
+  return {
+    hasPattern: Boolean(repetition?.hasPattern),
+    tag: repetition?.tag || "",
+    strength: Number.isFinite(repetition?.strength) ? repetition.strength : 0,
+  };
+}
+
+async function loadClimateTruth(localMoments) {
+  try {
+    const remoteClimate = await fetchClimateRemote(48);
+    const computedDegree = Number(remoteClimate?.computedDegree);
+    if (!Number.isFinite(computedDegree)) throw new Error("REMOTE_CLIMATE_INVALID");
+    return {
+      source: "remote",
+      computedDegree: clamp(computedDegree, 0, SCALE),
+      total: Number.isFinite(remoteClimate?.total) ? remoteClimate.total : 0,
+      condition:
+        typeof remoteClimate?.condition === "string" && remoteClimate.condition.length > 0
+          ? remoteClimate.condition
+          : conditionForDegree(computedDegree, Number(remoteClimate?.total) || 0),
+      repetition: normalizeRepetition(remoteClimate?.repetition),
+    };
+  } catch {
+    const localClimate = calculateClimate(localMoments);
+    return {
+      source: "local",
+      computedDegree: localClimate.computedDegree,
+      total: localClimate.total,
+      condition: conditionForDegree(localClimate.computedDegree, localClimate.total),
+      repetition: localClimate.repetition,
+    };
   }
 }
 
 async function boot() {
   const moments = loadMoments();
+  const [sharedResult, climateTruth] = await Promise.all([loadSharedMoments(moments), loadClimateTruth(moments)]);
+  const sharedMoments = sharedResult.items;
+  const localClimate = calculateClimate(moments);
   const previousComputed = getStoredComputedDegree();
   const previousDisplay = getStoredDisplayDegree();
-  const climate = calculateClimate(moments);
-  const computedDegree = climate.computedDegree;
+  const computedDegree = climateTruth.computedDegree;
   const startDisplay = Number.isFinite(previousDisplay)
     ? previousDisplay
     : Number.isFinite(previousComputed)
@@ -491,13 +534,17 @@ async function boot() {
 
   let firstPhaseTarget = computedDegree;
   let settleDuration = 400;
-  const patternVolatilityMs = climate.repetition.hasPattern
-    ? Math.round(clamp(climate.repetition.strength * 550, 120, 330))
+  const patternVolatilityMs = climateTruth.repetition.hasPattern
+    ? Math.round(clamp(climateTruth.repetition.strength * 550, 120, 330))
     : 0;
 
   if (contributed) {
     const delta = computedDegree - startDisplay;
     firstPhaseTarget = startDisplay + delta * 0.32;
+    if (climateTruth.source === "remote" && Math.abs(delta) < 0.6) {
+      const localDirection = Math.sign(localClimate.computedDegree - startDisplay) || 1;
+      firstPhaseTarget = clamp(startDisplay + localDirection * 1.2, 0, SCALE);
+    }
     settleDuration = clamp(3000 + Math.abs(delta) * 70 + patternVolatilityMs, 3000, 8000);
     showTransientReading();
     if (prefersReducedMotion) {
@@ -519,9 +566,8 @@ async function boot() {
 
   setStoredComputedDegree(computedDegree);
   setStoredDisplayDegree(computedDegree);
-  conditionLine.textContent = conditionForDegree(computedDegree, climate.total);
-  renderPatternLayer(climate.repetition);
-  const sharedMoments = await loadSharedMoments(moments);
+  conditionLine.textContent = climateTruth.condition;
+  renderPatternLayer(climateTruth.repetition);
   renderRecent(sharedMoments);
   renderHorizon(moments);
 

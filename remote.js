@@ -3,6 +3,7 @@ const USE_REMOTE_SHARED = true;
 // Set this to your deployed Supabase Edge Function URL:
 // https://<project-ref>.supabase.co/functions/v1/moments
 const REMOTE_MOMENTS_URL = "https://ksyfcddiuzrabujflvpb.supabase.co/functions/v1/moments";
+const REMOTE_CLIMATE_URL = "https://ksyfcddiuzrabujflvpb.supabase.co/functions/v1/climate";
 
 // Optional: anon key for gateway rules / protected functions.
 const REMOTE_ANON_KEY = "sb_publishable_eDg1bbmJ1N8m9z7Qb4R0rg_ADAqORE7";
@@ -14,6 +15,7 @@ const GET_CACHE_TTL_MS = 20000;
 const ALLOWED_TYPES = new Set(["avoidable", "fertile", "observed"]);
 const ALLOWED_MOODS = new Set(["calm", "focus", "stressed", "curious", "tired"]);
 const sharedGetCache = new Map();
+const climateGetCache = new Map();
 
 function withTimeout(signal, timeoutMs) {
   const controller = new AbortController();
@@ -179,4 +181,44 @@ async function postMomentRemote(inputMoment) {
   }
 }
 
-export { USE_REMOTE_SHARED, fetchSharedMomentsRemote, postMomentRemote };
+async function fetchClimateRemote(windowHours = 48, referenceTime = "") {
+  if (!isRemoteReady() || !REMOTE_CLIMATE_URL) {
+    throw new Error("REMOTE_CLIMATE_NOT_READY");
+  }
+
+  const cacheKey = `${windowHours}|${referenceTime || "now"}`;
+  const cached = climateGetCache.get(cacheKey);
+  if (cached && Date.now() - cached.at < GET_CACHE_TTL_MS) {
+    return cached.item;
+  }
+
+  const url = new URL(REMOTE_CLIMATE_URL);
+  url.searchParams.set("windowHours", String(windowHours));
+  if (referenceTime) url.searchParams.set("referenceTime", referenceTime);
+
+  const scoped = withTimeout(undefined, REMOTE_TIMEOUT_MS);
+  try {
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: buildHeaders(),
+      signal: scoped.signal,
+    });
+    const payload = await safeJson(response);
+    if (!response.ok) {
+      const err = new Error("REMOTE_CLIMATE_GET_FAILED");
+      err.status = response.status;
+      err.payload = payload;
+      throw err;
+    }
+
+    const item = payload && typeof payload === "object" ? payload : null;
+    if (!item) throw new Error("REMOTE_CLIMATE_EMPTY");
+
+    climateGetCache.set(cacheKey, { at: Date.now(), item });
+    return item;
+  } finally {
+    scoped.clear();
+  }
+}
+
+export { USE_REMOTE_SHARED, fetchSharedMomentsRemote, postMomentRemote, fetchClimateRemote };
