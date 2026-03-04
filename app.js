@@ -140,7 +140,7 @@ function weightedAvgMood(moodCounts, total) {
 function chooseAlpha(total) {
   if (total < 6) return 0.12;
   if (total < 20) return 0.18;
-  return 0.24;
+  return 0.2;
 }
 
 function quantityDamping(total) {
@@ -148,7 +148,7 @@ function quantityDamping(total) {
   // 28 is treated as a mature-volume reference point.
   const matureVolume = 28;
   const ratio = Math.max(0, total) / matureVolume;
-  return clamp(1 / Math.sqrt(1 + ratio), 0.35, 1);
+  return clamp(1 / Math.sqrt(1 + ratio * 1.4), 0.22, 1);
 }
 
 function calculateClimate(moments) {
@@ -187,7 +187,7 @@ function calculateClimate(moments) {
 
   // Activity signal compares actual density with expected baseline.
   const activityRatio = clamp(total / BASELINE_PER_48H, 0.4, 2.2);
-  const activitySignal = (activityRatio - 1) * 8;
+  const activitySignal = (activityRatio - 1) * 6.5;
 
   // Mood adds only a gentle modulation.
   const moodSignal = weightedAvgMood(moods, total);
@@ -204,7 +204,7 @@ function calculateClimate(moments) {
 
   // Deterministic warm-up smoothing based on current window only.
   const warmBase = BASELINE + alpha * (target - BASELINE);
-  const repetitionNudge = clamp(repetition.strength * 6 * damping, 0, 3.6);
+  const repetitionNudge = clamp(repetition.strength * 4.8 * damping, 0, 2.8);
   let computedDegree = clamp(warmBase + repetitionNudge, 0, SCALE);
   if (datasetSize === 1) {
     computedDegree = Math.min(computedDegree, BASELINE + 5);
@@ -520,11 +520,19 @@ async function loadClimateTruth(localMoments) {
 
 async function boot() {
   const moments = loadMoments();
+  const previousComputed = getStoredComputedDegree();
+  const previousDisplay = getStoredDisplayDegree();
+  const optimisticStartDisplay = Number.isFinite(previousDisplay)
+    ? previousDisplay
+    : Number.isFinite(previousComputed)
+      ? previousComputed
+      : BASELINE;
+  degreeValue.textContent = formatDegree(optimisticStartDisplay);
+  document.body.style.setProperty("--atmo", String(optimisticStartDisplay));
+
   const [sharedResult, climateTruth] = await Promise.all([loadSharedMoments(moments), loadClimateTruth(moments)]);
   const sharedMoments = sharedResult.items;
   const localClimate = calculateClimate(moments);
-  const previousComputed = getStoredComputedDegree();
-  const previousDisplay = getStoredDisplayDegree();
   const computedDegree = climateTruth.computedDegree;
   const startDisplay = Number.isFinite(previousDisplay)
     ? previousDisplay
