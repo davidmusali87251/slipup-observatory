@@ -101,60 +101,274 @@ const COPY_MODE = "poetic";
 const COPY_VARIANTS = {
   clear: {
     condition: {
-      quiet: "No strong shared moment yet.",
-      steady: "Shared movement holds a steady line.",
-      balance: "The shared field tends toward balance.",
-      gathering: "Density is gathering in the shared field.",
-      dense: "A dense shared front is forming.",
+      quiet: [
+        "Shared moments are still gathering.",
+        "Only a few shared moments are present.",
+        "The shared read is still beginning.",
+        "The shared layer is still light.",
+        "The shared field has just started to form.",
+      ],
+      steady: [
+        "Shared movement holds a steady line.",
+        "Shared moments keep a stable rhythm.",
+        "The shared field feels even.",
+        "The shared read stays calm and level.",
+        "Movement remains steady across the shared field.",
+      ],
+      balance: [
+        "The shared field tends toward balance.",
+        "The shared field is balancing out.",
+        "A balanced read is emerging.",
+        "A calmer balance is settling in.",
+        "The shared layer returns toward center.",
+      ],
+      gathering: [
+        "Density is gathering in the shared field.",
+        "The shared field is becoming denser.",
+        "Repeated moments are tightening the read.",
+        "A tighter shared layer is now forming.",
+        "Repeating moments are drawing the field inward.",
+      ],
+      dense: [
+        "A dense shared front is forming.",
+        "A compact shared layer is now present.",
+        "The shared field is tightly packed right now.",
+        "The shared layer holds strong density.",
+        "A heavy shared band is now in place.",
+      ],
     },
     horizon: {
-      empty: "No shared moments have reached the surface read yet.",
-      early: "The surface read is still taking shape.",
-      dominant: (kind) => `A ${kind} current is shaping the surface read.`,
-      trendSteady: "The collective flow keeps a steady pulse.",
-      trendShift: "The collective flow is still rearranging.",
-      driftCondensing: "A denser layer lingers at the surface.",
-      driftClearing: "A clearer lane is opening at the surface.",
-      driftStable: "The surface line stays in balance.",
+      empty: [
+        "No shared moments have reached the surface read yet.",
+        "The surface read has not formed yet.",
+        "The surface read is still waiting for momentum.",
+      ],
+      early: [
+        "The surface read is still taking shape.",
+        "The surface read is still forming.",
+        "Only a faint surface read is visible.",
+      ],
+      dominant: [
+        (kind) => `A ${kind} current is shaping the surface read.`,
+        (kind) => `The surface read is led by a ${kind} current.`,
+        (kind) => `A ${kind} tone is rising across the surface read.`,
+        (kind) => `A ${kind} movement is becoming clearer at the surface.`,
+        (kind) => `The surface read leans toward a ${kind} current.`,
+      ],
+      trendSteady: [
+        "The collective pulse is steady.",
+        "The collective rhythm holds.",
+        "The shared pulse remains even.",
+        "The broad rhythm is stable.",
+      ],
+      trendShift: [
+        "The collective pulse is still rearranging.",
+        "The collective rhythm is still shifting.",
+        "The shared pulse is still finding new order.",
+        "The broad rhythm is still re-forming.",
+      ],
+      driftCondensing: [
+        "A denser layer lingers at the surface.",
+        "The surface is compacting into a tighter layer.",
+        "A compact surface band remains present.",
+        "Density holds close to the surface line.",
+      ],
+      driftClearing: [
+        "A clearer lane is opening at the surface.",
+        "The surface is opening into a clearer line.",
+        "A lighter surface lane is appearing.",
+        "The surface read is opening out.",
+      ],
+      driftStable: [
+        "The surface line stays in balance.",
+        "The surface read is holding steady.",
+        "The surface keeps a measured balance.",
+        "The surface line remains calm.",
+      ],
     },
     local: {
-      condensing: "Nearby moment flow is compacting.",
-      clearing: "Nearby moment flow is opening.",
-      stable: "Nearby moment flow holds a steady balance.",
-      fallback: "Nearby signal is still forming. For now, this mirrors the wider field.",
-      regional: "Read from shared moments across your region.",
+      condensing: [
+        "Nearby moments are compacting.",
+        "Nearby moments are gathering into a tighter band.",
+        "Nearby moments are clustering into denser patterns.",
+        "Nearby moments are drawing inward.",
+      ],
+      clearing: [
+        "Nearby moments are opening.",
+        "Nearby moments are creating more space.",
+        "Nearby moments are spreading into lighter space.",
+        "Nearby moments are loosening.",
+      ],
+      stable: [
+        "Nearby moments hold a steady balance.",
+        "Nearby moments stay in a balanced rhythm.",
+        "Nearby moments remain calm and even.",
+        "Nearby moments keep a measured line.",
+      ],
+      fallback: [
+        "Nearby read is still forming. For now, this mirrors the wider field.",
+        "Nearby read is still light. For now, it follows the wider field.",
+        "Nearby read is still emerging. For now, it reflects the wider field.",
+        "Nearby read is not yet dense. For now, it mirrors the wider field.",
+      ],
+      regional: [
+        "Reading shared moments across your region.",
+        "Read based on shared moments from your region.",
+        "Regional read drawn from shared moments.",
+        "Shared regional moments shape this read.",
+      ],
     },
-    strataFallback: "Shared and private moments settle together below the surface.",
+    strataFallback: [
+      "Shared and private moments settle together below the surface.",
+      "Shared and private moments rest together in deeper layers.",
+      "Below the surface, shared and private moments settle side by side.",
+      "Deeper layers hold shared and private moments together.",
+      "Shared and private moments continue settling in deeper record.",
+    ],
   },
   poetic: {
     condition: {
-      quiet: "No strong shared moment has settled into view yet.",
-      steady: "Shared movement keeps a quiet line.",
-      balance: "The shared field leans toward balance.",
-      gathering: "The field grows denser around repeating moments.",
-      dense: "A compact shared front is taking shape.",
+      quiet: [
+        "Shared moments are still gathering.",
+        "Only a light layer of shared moments is present.",
+        "The shared read is still in its first breath.",
+        "The shared field is still quiet in tone.",
+        "Only a light pulse is present in the shared field.",
+      ],
+      steady: [
+        "Shared movement keeps a quiet line.",
+        "Shared moments move in a calm rhythm.",
+        "A steady line holds across the shared field.",
+        "The shared field keeps an even cadence.",
+        "The shared read remains quietly steady.",
+      ],
+      balance: [
+        "The shared field leans toward balance.",
+        "The shared field settles toward balance.",
+        "Balance is slowly returning to the shared read.",
+        "A balanced tone is returning across the field.",
+        "The shared layer drifts toward a calmer center.",
+      ],
+      gathering: [
+        "The field grows denser around repeating moments.",
+        "Repeated moments are tightening the shared read.",
+        "The shared field gathers into a denser band.",
+        "A denser shared band gathers with each return.",
+        "Repeating moments draw the shared field inward.",
+      ],
+      dense: [
+        "A compact shared front is taking shape.",
+        "A dense layer is now holding in the shared field.",
+        "The shared read is settling into a tight front.",
+        "A dense shared layer now lingers in place.",
+        "The shared field is holding a compact front.",
+      ],
     },
     horizon: {
-      empty: "No shared moments have reached the surface read yet.",
-      early: "The surface read is still settling.",
-      dominant: (kind) => `A ${kind} current is surfacing in the read.`,
-      trendSteady: "The collective pulse stays even.",
-      trendShift: "The collective pulse is still rearranging.",
-      driftCondensing: "A tighter layer lingers near the surface.",
-      driftClearing: "A clearer lane opens near the surface.",
-      driftStable: "The surface line remains steady.",
+      empty: [
+        "No shared moments have reached the surface read yet.",
+        "The surface read is still waiting for its first line.",
+        "The surface read is still quiet.",
+      ],
+      early: [
+        "The surface read is still settling.",
+        "The surface read is finding its contour.",
+        "A first contour is still forming at the surface.",
+      ],
+      dominant: [
+        (kind) => `A ${kind} current is surfacing in the read.`,
+        (kind) => `A ${kind} current is sketching the surface read.`,
+        (kind) => `A ${kind} tone is beginning to lead the surface.`,
+        (kind) => `A ${kind} movement is becoming visible at the surface.`,
+        (kind) => `The surface read is turning toward a ${kind} current.`,
+      ],
+      trendSteady: [
+        "The collective pulse stays even.",
+        "A calm collective pulse remains in place.",
+        "The collective rhythm holds a quiet balance.",
+        "A steady collective pulse continues.",
+      ],
+      trendShift: [
+        "The collective pulse is still rearranging.",
+        "The collective pulse is still shifting shape.",
+        "The collective rhythm is still re-forming.",
+        "The collective pulse is still finding its line.",
+      ],
+      driftCondensing: [
+        "A tighter layer lingers near the surface.",
+        "The surface is drawing into a denser band.",
+        "A compact band stays near the surface line.",
+        "The surface layer keeps a denser hold.",
+      ],
+      driftClearing: [
+        "A clearer lane opens near the surface.",
+        "A lighter path is opening at the surface.",
+        "A softer lane appears near the surface.",
+        "The surface line opens into lighter space.",
+      ],
+      driftStable: [
+        "The surface line remains steady.",
+        "The surface read holds a calm balance.",
+        "The surface read remains even and calm.",
+        "A stable surface line continues to hold.",
+      ],
     },
     local: {
-      condensing: "Nearby moments are drawing closer.",
-      clearing: "Nearby moments are opening space.",
-      stable: "Nearby moments hold a calm balance.",
-      fallback: "Nearby read is still forming. For now, it mirrors the wider field.",
-      regional: "Reading shared moments across your region.",
+      condensing: [
+        "Nearby moments are drawing closer.",
+        "Nearby moments are tightening into a closer pattern.",
+        "Nearby moments gather into a tighter weave.",
+        "Nearby moments settle into a denser cluster.",
+      ],
+      clearing: [
+        "Nearby moments are opening space.",
+        "Nearby moments are spreading into lighter space.",
+        "Nearby moments are opening into wider space.",
+        "Nearby moments are loosening their pattern.",
+      ],
+      stable: [
+        "Nearby moments hold a calm balance.",
+        "Nearby moments keep a quiet balance.",
+        "Nearby moments remain gently balanced.",
+        "Nearby moments hold an even rhythm.",
+      ],
+      fallback: [
+        "Nearby read is still forming. For now, it mirrors the wider field.",
+        "Nearby read is still thin. For now, it follows the wider field.",
+        "Nearby read is still faint. For now, it mirrors the wider field.",
+        "Nearby read is still light. For now, it follows the wider field.",
+      ],
+      regional: [
+        "Reading shared moments across your region.",
+        "Read drawn from shared moments across your region.",
+        "Regional read shaped by shared moments.",
+        "Shared moments across your region shape this read.",
+      ],
     },
-    strataFallback: "Shared and private moments settle into one deeper record.",
+    strataFallback: [
+      "Shared and private moments settle into one deeper record.",
+      "Shared and private moments rest together in the deeper record.",
+      "In deeper layers, shared and private moments settle side by side.",
+      "Deeper record gathers shared and private moments together.",
+      "Shared and private moments continue settling in deeper layers.",
+    ],
   },
 };
 const COPY = COPY_VARIANTS[COPY_MODE] || COPY_VARIANTS.clear;
+
+function pickCopy(entry, seed) {
+  if (Array.isArray(entry)) {
+    if (!entry.length) return "";
+    return entry[Math.abs(seed) % entry.length];
+  }
+  return entry;
+}
+
+function pickCopyFromState(entry, numericSeed) {
+  const chosen = pickCopy(entry, numericSeed);
+  if (typeof chosen === "function") return chosen;
+  return () => String(chosen || "");
+}
 
 const degreeValue = document.getElementById("degreeValue");
 const conditionLine = document.getElementById("conditionLine");
@@ -252,17 +466,23 @@ const PATTERN_LINES = {
   pattern_a: [
     "A familiar tension returns under stress.",
     "Pressure gathers where stress settles.",
-    "A denser current forms as the same trace returns.",
+    "A denser current forms as the same moment returns.",
+    "A repeated stressed line keeps tightening the field.",
+    "The same stressed movement returns before it can dissolve.",
   ],
   pattern_b: [
     "A short loop keeps returning.",
     "A familiar cycle comes back in close succession.",
     "The same contour appears again before it fully dissolves.",
+    "A looped contour keeps arriving in similar form.",
+    "The same shape reappears across short intervals.",
   ],
   pattern_c: [
     "Movement gathers into small clusters.",
     "Signals condense into brief pockets.",
-    "Several traces settle close together in time.",
+    "Several moments settle close together in time.",
+    "Short waves of moments gather into one band.",
+    "Close-timed moments cluster before dispersing.",
   ],
 };
 
@@ -270,77 +490,107 @@ const COMBINATION_LINES = {
   "avoidable|calm": [
     "A quiet friction line remains near the surface.",
     "Calm stays present while a light avoidable current persists.",
-    "A soft avoidable trace returns with low pressure.",
+    "A soft avoidable moment returns with low pressure.",
+    "A soft avoidable rhythm remains under calm tone.",
+    "Calm holds while a light avoidable line repeats.",
   ],
   "avoidable|focus": [
     "A focused avoidable current opens a narrow channel.",
     "Attention stays sharp while friction keeps its direction.",
     "A concentrated avoidable line crosses the atmosphere.",
+    "A focused avoidable line keeps cutting one narrow path.",
+    "Directed friction remains precise and persistent.",
   ],
   "avoidable|stressed": [
     "Stress and friction condense into a denser front.",
     "An avoidable wave rises under stress.",
-    "The atmosphere tightens where stressed traces align.",
+    "The atmosphere tightens where stressed moments align.",
+    "A stressed avoidable band keeps building density.",
+    "Friction and stress hold a compact line.",
   ],
   "avoidable|curious": [
     "Exploratory friction leaves an unsettled but open trail.",
     "Curiosity and avoidable drag meet in shifting air.",
     "A searching current moves across avoidable terrain.",
+    "A curious avoidable line explores without fully settling.",
+    "Searching movement opens and closes in quick turns.",
   ],
   "avoidable|tired": [
     "A tired avoidable layer settles with heavier weight.",
     "Friction turns slower yet more persistent under fatigue.",
     "A low-energy avoidable band remains in place.",
+    "Fatigue slows the line, but it keeps repeating.",
+    "A heavy avoidable tone lingers near the same track.",
   ],
   "fertile|calm": [
-    "Calm fertile traces begin to clear the air.",
+    "Calm fertile moments begin to clear the air.",
     "A softer opening appears where calm and fertile movement meet.",
     "The atmosphere loosens through calm fertile currents.",
+    "Calm fertile moments keep widening breathable space.",
+    "A light fertile line opens with calm continuity.",
   ],
   "fertile|focus": [
     "Fertile focus opens a steady channel in the atmosphere.",
     "A clear opening appears with focused fertile movement.",
     "Clearer pathways form where fertile focus repeats.",
+    "Focused fertile moments carve a clean and steady path.",
+    "A fertile line remains clear under focused attention.",
   ],
   "fertile|stressed": [
     "A fertile signal persists even under pressure.",
     "Openings appear through stress without collapsing.",
     "A narrow clearing remains despite stressed flow.",
+    "Stress passes, but fertile openings keep returning.",
+    "A strained field still leaves room for fertile movement.",
   ],
   "fertile|curious": [
     "Curiosity leaves fertile openings across the terrain.",
     "Exploratory fertile movement keeps the atmosphere breathable.",
-    "A widening current forms through curious fertile traces.",
+    "A widening current forms through curious fertile moments.",
+    "Curious fertile moments keep extending open paths.",
+    "Exploratory fertile lines widen the shared read.",
   ],
   "fertile|tired": [
     "Fertile movement stays present, though at lower energy.",
     "A slower fertile current keeps some openings alive.",
     "Openings remain, even as fatigue crosses the field.",
+    "Even in low energy, fertile moments keep a small opening.",
+    "A tired fertile line moves slowly but remains open.",
   ],
   "observed|calm": [
     "Calm observation stabilizes the surface.",
-    "Observed calm traces keep the atmosphere readable.",
+    "Observed calm moments keep the atmosphere readable.",
     "A settled observational layer supports balance.",
+    "Calm observation keeps a stable reading line.",
+    "A quiet observed band helps the field stay legible.",
   ],
   "observed|focus": [
     "Focused observation lowers ambient noise.",
     "Observed focus keeps contours clearer near the horizon.",
     "A precise observational line steadies movement.",
+    "Focused observation sharpens the read without tightening it.",
+    "A clear observed line keeps surface contours precise.",
   ],
   "observed|stressed": [
     "Observation remains present while stress passes through.",
     "Stressed observation keeps turbulence from spreading.",
     "A watchful layer contains pressure near the surface.",
+    "Even under stress, observation keeps the line readable.",
+    "Watchful observation prevents spread into wider turbulence.",
   ],
   "observed|curious": [
     "Curious observation maps subtle changes in the atmosphere.",
     "Observed curiosity keeps movement open and readable.",
     "A light exploratory observation line remains active.",
+    "Curious observation traces small shifts across the field.",
+    "An exploratory observed line keeps the read open.",
   ],
   "observed|tired": [
     "Observation under fatigue still anchors the layer.",
     "A low-energy observational seam keeps orientation.",
     "Even in tired conditions, observation holds a quiet frame.",
+    "Tired observation still offers a stable reference line.",
+    "Low-energy observation keeps the read from drifting.",
   ],
 };
 
@@ -562,11 +812,12 @@ function formatDegree(value) {
 }
 
 function conditionForDegree(value, total) {
-  if (total < 3) return COPY.condition.quiet;
-  if (value < 38) return COPY.condition.steady;
-  if (value < 60) return COPY.condition.balance;
-  if (value < 74) return COPY.condition.gathering;
-  return COPY.condition.dense;
+  const seed = Math.round(value * 10) + total;
+  if (total < 3) return pickCopy(COPY.condition.quiet, seed);
+  if (value < 38) return pickCopy(COPY.condition.steady, seed);
+  if (value < 60) return pickCopy(COPY.condition.balance, seed);
+  if (value < 74) return pickCopy(COPY.condition.gathering, seed);
+  return pickCopy(COPY.condition.dense, seed);
 }
 
 function getSharedMoments(moments) {
@@ -695,17 +946,18 @@ function openSharedSheet(sharedMoments) {
 
 function renderHorizon(canonicalState, sharedMoments) {
   const total = sharedMoments.length;
+  const seed = Math.round((canonicalState?.computedDegree || BASELINE) * 10) + total;
   horizonSecondary.classList.add("hidden");
   horizonMoreButton.classList.add("hidden");
   horizonSecondary.innerHTML = "";
 
   if (total === 0) {
-    horizonPrimary.textContent = COPY.horizon.empty;
+    horizonPrimary.textContent = pickCopy(COPY.horizon.empty, seed);
     return;
   }
 
   if (total < 4) {
-    horizonPrimary.textContent = COPY.horizon.early;
+    horizonPrimary.textContent = pickCopy(COPY.horizon.early, seed);
     return;
   }
 
@@ -718,21 +970,22 @@ function renderHorizon(canonicalState, sharedMoments) {
     { avoidable: 0, fertile: 0, observed: 0 }
   );
   const dominant = Object.entries(countByType).sort((a, b) => b[1] - a[1])[0][0];
-  horizonPrimary.textContent = COPY.horizon.dominant(dominant);
+  const dominantTemplate = pickCopyFromState(COPY.horizon.dominant, seed);
+  horizonPrimary.textContent = dominantTemplate(dominant);
 
   horizonMoreButton.classList.remove("hidden");
   horizonMoreButton.onclick = () => {
     horizonSecondary.classList.remove("hidden");
     const trend =
       canonicalState.stabilityIndex >= 0.55
-        ? COPY.horizon.trendSteady
-        : COPY.horizon.trendShift;
+        ? pickCopy(COPY.horizon.trendSteady, seed)
+        : pickCopy(COPY.horizon.trendShift, seed);
     const drift =
       canonicalState.pressureMode === "condensing"
-        ? COPY.horizon.driftCondensing
+        ? pickCopy(COPY.horizon.driftCondensing, seed)
         : canonicalState.pressureMode === "clearing"
-          ? COPY.horizon.driftClearing
-          : COPY.horizon.driftStable;
+          ? pickCopy(COPY.horizon.driftClearing, seed)
+          : pickCopy(COPY.horizon.driftStable, seed);
     horizonSecondary.innerHTML = `<p>${trend}</p><p>${drift}</p>`;
     horizonMoreButton.classList.add("hidden");
   };
@@ -740,19 +993,20 @@ function renderHorizon(canonicalState, sharedMoments) {
 
 function renderLocalClimate(localState) {
   const pressureMode = localState?.pressureMode || "stabilizing";
+  const seed = Math.round((localState?.computedDegree || BASELINE) * 10) + (localState?.total || 0);
   const pressureText =
     pressureMode === "condensing"
-      ? COPY.local.condensing
+      ? pickCopy(COPY.local.condensing, seed)
       : pressureMode === "clearing"
-        ? COPY.local.clearing
-        : COPY.local.stable;
+        ? pickCopy(COPY.local.clearing, seed)
+        : pickCopy(COPY.local.stable, seed);
 
   localClimatePrimary.textContent = pressureText;
   if (localState?.source === "global_fallback") {
-    localClimateSecondary.textContent = COPY.local.fallback;
+    localClimateSecondary.textContent = pickCopy(COPY.local.fallback, seed);
     return;
   }
-  localClimateSecondary.textContent = COPY.local.regional;
+  localClimateSecondary.textContent = pickCopy(COPY.local.regional, seed);
 }
 
 function getLongWindow(moments, days = 30) {
@@ -777,7 +1031,7 @@ function buildStrataLines(longWindowMoments, canonicalState) {
   if (canonicalState.pressureMode === "condensing") {
     lines.push("A compacted band continues sinking into deeper layers.");
   } else if (canonicalState.pressureMode === "clearing") {
-    lines.push("A lighter seam opens between settled traces.");
+    lines.push("A lighter seam opens between settled moments.");
   } else {
     lines.push("Deep layers hold steady, without abrupt shifts.");
   }
@@ -786,7 +1040,7 @@ function buildStrataLines(longWindowMoments, canonicalState) {
     lines.push("A denser seam forms where friction keeps returning.");
   }
   if (counts.fertile >= 4 && moods.calm >= 3) {
-    lines.push("Calm fertile traces leave lighter veins below.");
+    lines.push("Calm fertile moments leave lighter veins below.");
   }
   if (counts.observed >= 4) {
     lines.push("Observation compacts the layer into a clearer reading.");
@@ -800,7 +1054,7 @@ function buildStrataLines(longWindowMoments, canonicalState) {
   const avoidableRatio = counts.avoidable / total;
   const fertileRatio = counts.fertile / total;
   if (avoidableRatio > 0.42 && fertileRatio > 0.22) {
-    lines.push("Rough and open traces settle together into mixed sediment.");
+    lines.push("Rough and open moments settle together into mixed sediment.");
   } else if (fertileRatio > 0.38) {
     lines.push("A clearer imprint remains where openings repeat.");
   }
@@ -810,8 +1064,8 @@ function buildStrataLines(longWindowMoments, canonicalState) {
   }
 
   if (lines.length < 2) {
-    lines.push("The deep layer is taking shape from recurring traces.");
-    lines.push(COPY.strataFallback);
+    lines.push("The deep layer is taking shape from recurring moments.");
+    lines.push(pickCopy(COPY.strataFallback, total + lines.length));
   }
 
   return lines.slice(0, 5);
