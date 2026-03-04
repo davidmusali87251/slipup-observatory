@@ -500,11 +500,11 @@ function formatDegree(value) {
 }
 
 function conditionForDegree(value, total) {
-  if (total < 3) return "The sky is quiet.";
-  if (value < 38) return "Movement appears steady.";
-  if (value < 60) return "The atmosphere tends to balance.";
-  if (value < 74) return "Pressure appears to be rising.";
-  return "High pressure may be forming.";
+  if (total < 3) return "No strong shared trace yet.";
+  if (value < 38) return "Shared movement holds a steady line.";
+  if (value < 60) return "The shared field tends toward balance.";
+  if (value < 74) return "Density is gathering in the shared field.";
+  return "A dense shared front is forming.";
 }
 
 function getSharedMoments(moments) {
@@ -534,7 +534,7 @@ function renderRecent(sharedMoments) {
   if (list.length === 0) {
     const empty = document.createElement("li");
     empty.className = "moment-item";
-    empty.textContent = "The sky is quiet.";
+    empty.textContent = "No shared trace yet.";
     recentMoments.appendChild(empty);
     return;
   }
@@ -680,14 +680,14 @@ function renderLocalClimate(localState) {
   const pressureMode = localState?.pressureMode || "stabilizing";
   const pressureText =
     pressureMode === "condensing"
-      ? "The regional air feels denser now."
+      ? "The regional field is condensing."
       : pressureMode === "clearing"
-        ? "The regional air feels lighter now."
-        : "The regional air feels balanced now.";
+        ? "The regional field is opening."
+        : "The regional field is holding balance.";
 
   localClimatePrimary.textContent = pressureText;
   if (localState?.source === "global_fallback") {
-    localClimateSecondary.textContent = "Regional signal still forming. For now, this follows the wider atmosphere.";
+    localClimateSecondary.textContent = "Regional signal is still forming. For now, it follows the wider field.";
     return;
   }
   localClimateSecondary.textContent = "Reading from shared traces across your region.";
@@ -749,7 +749,7 @@ function buildStrataLines(longWindowMoments, canonicalState) {
 
   if (lines.length < 2) {
     lines.push("The deep layer is taking shape from recurring traces.");
-    lines.push("Shared and private traces settle together below the weather.");
+    lines.push("Shared and private traces settle together below the surface.");
   }
 
   return lines.slice(0, 5);

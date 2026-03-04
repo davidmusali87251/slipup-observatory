@@ -25,12 +25,13 @@
           <div class="degree-wrap">
             <p id="degreeValue" class="degree-value">28</p>
           </div>
-          <p id="conditionLine" class="condition-line">The sky is quiet.</p>
+          <p id="conditionLine" class="condition-line">No strong shared trace yet.</p>
           <p id="transientReadingLine" class="transient-reading-line hidden" aria-live="polite"></p>
           <p id="atmosphere-pattern-line" class="atmosphere-pattern-line hidden" aria-live="polite"></p>
           <a class="cta cta-observatory" href="./contribute.html">Contribute a moment</a>
           <p class="cta-microcopy">Let it rise into the atmosphere.</p>
-          <p class="scroll-cue">Horizon</p>
+          <p class="trust-microcopy">No account. No exact pin. Not weather, just shared traces.</p>
+          <p class="scroll-cue">Surface Read</p>
         </section>
       </section>
 
@@ -43,23 +44,23 @@
         <ul id="recentMoments" class="moment-list"></ul>
       </section>
 
-      <section id="horizon" class="panel panel-horizon" aria-label="Horizon transition">
-        <p class="horizon-line">Horizon</p>
+      <section id="horizon" class="panel panel-horizon" aria-label="Surface reading">
+        <p class="horizon-line">Surface Read</p>
         <p id="horizonPrimary" class="horizon-primary"></p>
         <div id="horizonSecondary" class="horizon-secondary hidden"></div>
-        <button id="horizonMoreButton" class="text-button hidden" type="button">See ground reading</button>
+        <button id="horizonMoreButton" class="text-button hidden" type="button">See deeper read</button>
       </section>
 
-      <section id="local-climate" class="local-climate" aria-label="Local">
-        <h2 class="visually-hidden">Local</h2>
-        <p class="local-climate-line">Local</p>
+      <section id="local-climate" class="local-climate" aria-label="Nearby field">
+        <h2 class="visually-hidden">Nearby field</h2>
+        <p class="local-climate-line">Nearby Field</p>
         <p id="localClimatePrimary" class="local-climate-primary"></p>
         <p id="localClimateSecondary" class="local-climate-secondary"></p>
       </section>
 
-      <section id="ground-strata" class="ground-strata" aria-label="Deep strata" hidden>
-        <h2 class="visually-hidden">Deep strata</h2>
-        <p class="strata-context" aria-hidden="true">Below the horizon, traces settle into ground.</p>
+      <section id="ground-strata" class="ground-strata" aria-label="Deep record" hidden>
+        <h2 class="visually-hidden">Deep record</h2>
+        <p class="strata-context" aria-hidden="true">Below the surface, traces settle into deeper record.</p>
         <ul id="strataLines" class="strata-lines"></ul>
       </section>
     </main>
@@ -78,7 +79,7 @@
         <button id="shared-sheet-close" class="text-button" type="button" aria-label="Close">Close</button>
       </div>
       <ul id="shared-sheet-list" class="moment-list shared-sheet-list"></ul>
-      <p id="shared-sheet-empty" class="shared-sheet-empty hidden">The sky is quiet.</p>
+      <p id="shared-sheet-empty" class="shared-sheet-empty hidden">No shared trace yet.</p>
     </section>
 
     <script src="./app.js" type="module"></script>

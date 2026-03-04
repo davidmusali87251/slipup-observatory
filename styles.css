@@ -335,6 +335,16 @@ h2 {
   letter-spacing: 0.01em;
 }
 
+.trust-microcopy {
+  margin-top: -0.48rem;
+  max-width: 34ch;
+  font-size: 0.69rem;
+  line-height: 1.4;
+  color: #667790;
+  opacity: 0.7;
+  letter-spacing: 0.01em;
+}
+
 .scroll-cue {
   position: absolute;
   bottom: 0.9rem;
@@ -842,6 +852,14 @@ h2 {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+}
+
+.contribute-trust-note {
+  margin: -0.1rem 0 0.08rem;
+  font-size: 0.72rem;
+  line-height: 1.38;
+  color: #607189;
+  opacity: 0.8;
 }
 
 .field-hint {
