@@ -236,11 +236,11 @@ function detectStructuralPattern(entries: MomentInput[]): Repetition {
 }
 
 export function conditionForDegree(value: number, total: number) {
-  if (total < 3) return "The sky is quiet.";
-  if (value < 38) return "Movement appears steady.";
-  if (value < 60) return "The atmosphere tends to balance.";
-  if (value < 74) return "Pressure appears to be rising.";
-  return "High pressure may be forming.";
+  if (total < 3) return "Shared moments are still gathering.";
+  if (value < 38) return "Shared movement keeps a quiet line.";
+  if (value < 60) return "The shared field leans toward balance.";
+  if (value < 74) return "The shared field is becoming denser.";
+  return "A compact shared front is taking shape.";
 }
 
 export function computeClimate(
