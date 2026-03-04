@@ -576,6 +576,7 @@ function normalizeRepetition(repetition) {
 }
 
 async function loadClimateTruth(localMoments) {
+  const localSharedMoments = getSharedMoments(localMoments);
   try {
     const remoteClimate = await fetchClimateRemote(48);
     const computedDegree = Number(remoteClimate?.computedDegree);
@@ -591,7 +592,7 @@ async function loadClimateTruth(localMoments) {
       repetition: normalizeRepetition(remoteClimate?.repetition),
     };
   } catch {
-    const localClimate = calculateClimate(localMoments);
+    const localClimate = calculateClimate(localSharedMoments);
     return {
       source: "local",
       computedDegree: localClimate.computedDegree,
@@ -624,7 +625,7 @@ async function boot() {
 
   const [sharedResult, climateTruth] = await Promise.all([loadSharedMoments(moments), loadClimateTruth(moments)]);
   const sharedMoments = sharedResult.items;
-  const localClimate = calculateClimate(moments);
+  const localClimate = calculateClimate(getSharedMoments(moments));
   const computedDegree = climateTruth.computedDegree;
   const startDisplay = Number.isFinite(previousDisplay)
     ? previousDisplay

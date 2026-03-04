@@ -97,19 +97,23 @@ form.addEventListener("submit", async (event) => {
   moments.push(localMoment);
   saveMoments(moments);
 
-  const remoteResult = await postMomentRemote(makeRemoteMomentPayload());
-  if (remoteResult.ok) {
-    formStatus.textContent = "Moment stored.";
-  } else if (remoteResult.status === 422) {
-    formStatus.textContent = "Saved locally. Shared sync couldn't accept this moment.";
-  } else if (remoteResult.status === 429) {
-    formStatus.textContent = "Saved locally. Shared channel is temporarily busy.";
+  if (!sharedInput.checked) {
+    formStatus.textContent = "Moment stored locally.";
   } else {
-    formStatus.textContent = "Saved locally. Shared sync is unavailable.";
+    const remoteResult = await postMomentRemote(makeRemoteMomentPayload());
+    if (remoteResult.ok) {
+      formStatus.textContent = "Moment stored.";
+    } else if (remoteResult.status === 422) {
+      formStatus.textContent = "Saved locally. Shared sync couldn't accept this moment.";
+    } else if (remoteResult.status === 429) {
+      formStatus.textContent = "Saved locally. Shared channel is temporarily busy.";
+    } else {
+      formStatus.textContent = "Saved locally. Shared sync is unavailable.";
+    }
   }
 
   setTimeout(() => {
-    window.location.href = "./index.html?contributed=1";
+    window.location.href = sharedInput.checked ? "./index.html?contributed=1" : "./index.html";
   }, 220);
 });
 

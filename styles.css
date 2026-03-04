@@ -676,6 +676,17 @@ h2 {
     background 180ms ease;
 }
 
+.contribute-page #typeInput,
+.contribute-page #moodInput,
+.contribute-page #noteInput {
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+  color: #23384d;
+}
+
 .field select {
   appearance: none;
   -webkit-appearance: none;
@@ -706,7 +717,9 @@ h2 {
 
 .field input[type="text"]::placeholder {
   color: color-mix(in oklab, var(--muted) 74%, #ffffff);
-  opacity: 0.82;
+  opacity: 0.78;
+  font-weight: 400;
+  letter-spacing: 0.005em;
 }
 
 .field-inline {
