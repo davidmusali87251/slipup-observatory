@@ -502,7 +502,7 @@ function renderHorizon(sharedMoments, climateTruth) {
         : delta < -5
           ? "The field appears to clear near ground level."
           : "Ground balance appears stable.";
-    horizonSecondary.innerHTML = `<p>${trend}</p><p>${drift}</p><p>What settles here comes from shared atmosphere.</p>`;
+    horizonSecondary.innerHTML = `<p>${trend}</p><p>${drift}</p>`;
     horizonMoreButton.classList.add("hidden");
   };
 }
@@ -527,35 +527,35 @@ function buildStrataLines(longWindowMoments) {
 
   const lines = [];
   if (counts.avoidable >= 5 && moods.stressed >= 3) {
-    lines.push("Friction tends to condense when pressure and stress align.");
+    lines.push("A denser layer forms where pressure and friction meet.");
   }
   if (counts.fertile >= 4 && moods.calm >= 3) {
-    lines.push("Openings appear when fertile movement meets calm ground.");
+    lines.push("Calmer fertile traces leave lighter veins in the soil.");
   }
   if (counts.observed >= 4) {
-    lines.push("Observation keeps the field readable as moments accumulate.");
+    lines.push("Observation compacts the ground into a more readable surface.");
   }
 
   const moodDiversity = Object.values(moods).filter((count) => count > 0).length;
   if (moodDiversity >= 4) {
-    lines.push("Signals spread across varied moods instead of collapsing into one state.");
+    lines.push("Multiple currents spread across the terrain instead of one hard line.");
   }
 
   const avoidableRatio = counts.avoidable / total;
   const fertileRatio = counts.fertile / total;
   if (avoidableRatio > 0.42 && fertileRatio > 0.22) {
-    lines.push("Friction and opening coexist, shaping a mixed sediment below.");
+    lines.push("Rough and open traces settle together into mixed sediment.");
   } else if (fertileRatio > 0.38) {
-    lines.push("Fertile currents are leaving a clearer trace over time.");
+    lines.push("The ground keeps a clearer imprint where openings repeat.");
   }
 
   if (total >= 24) {
-    lines.push("A longer personal sediment is forming, slower and more legible.");
+    lines.push("Deeper bedrock is forming, slower and steadier over time.");
   }
 
   if (lines.length < 2) {
-    lines.push("A personal sediment is taking shape from recurring moments.");
-    lines.push("What repeats quietly becomes easier to read over time.");
+    lines.push("The terrain is taking shape from recurring traces.");
+    lines.push("Shared and private traces settle together below the weather.");
   }
 
   return lines.slice(0, 5);

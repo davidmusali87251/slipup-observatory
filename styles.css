@@ -7,6 +7,9 @@
   --line: #c8d6e7;
   --card: #ffffffb3;
   --atmo: 50;
+  --layer-air: #ffffff00;
+  --layer-horizon: #e9e2f225;
+  --layer-ground: #d9d0e81f;
   --page-pad-top: 1.5rem;
   --page-pad-bottom: 3.5rem;
   --topbar-height: 3rem;
@@ -480,9 +483,16 @@ h2 {
 
 .panel-horizon {
   background:
-    linear-gradient(180deg, #ffffff00 0%, #ece6f224 30%, #ece6f238 100%),
-    #ffffff3b;
+    linear-gradient(
+      180deg,
+      var(--layer-air) 0%,
+      color-mix(in srgb, var(--layer-horizon) calc(46% + var(--atmo) * 0.2%), transparent) 34%,
+      color-mix(in srgb, var(--layer-horizon) calc(68% + var(--atmo) * 0.22%), transparent) 100%
+    ),
+    color-mix(in srgb, #ffffff3b calc(95% - var(--atmo) * 0.2%), #dcd2ec33);
   border-color: #ffffff42;
+  position: relative;
+  overflow: hidden;
 }
 
 .panel-horizon::before {
@@ -495,6 +505,22 @@ h2 {
   border-top-right-radius: 20px;
 }
 
+.panel-horizon::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 36%;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    #ffffff00 0%,
+    color-mix(in srgb, var(--layer-ground) calc(38% + var(--atmo) * 0.18%), transparent) 100%
+  );
+  opacity: 0.9;
+}
+
 /* Seed hook for future lower strata (inactive by default). */
 .ground-strata {
   height: 0;
@@ -503,6 +529,15 @@ h2 {
   opacity: 0;
   padding: 0 0.15rem;
   transition: opacity 260ms ease;
+  position: relative;
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff00 0%,
+      color-mix(in srgb, var(--layer-ground) calc(42% + var(--atmo) * 0.16%), transparent) 34%,
+      color-mix(in srgb, #d6cde84f calc(20% + var(--atmo) * 0.08%), transparent) 100%
+    );
+  border-top: 1px solid color-mix(in srgb, #c6b9de44 calc(30% + var(--atmo) * 0.1%), transparent);
 }
 
 /* Future activation hook (not used yet). */
