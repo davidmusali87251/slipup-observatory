@@ -94,6 +94,68 @@ const REACTIVE_TOKENS = [
   "explot",
 ];
 
+// Tone selector for key narrative lines:
+// - "clear": direct and legible
+// - "poetic": softer and more atmospheric
+const COPY_MODE = "poetic";
+const COPY_VARIANTS = {
+  clear: {
+    condition: {
+      quiet: "No strong shared moment yet.",
+      steady: "Shared movement holds a steady line.",
+      balance: "The shared field tends toward balance.",
+      gathering: "Density is gathering in the shared field.",
+      dense: "A dense shared front is forming.",
+    },
+    horizon: {
+      empty: "No shared moments have reached the surface read yet.",
+      early: "The surface read is still taking shape.",
+      dominant: (kind) => `A ${kind} current is shaping the surface read.`,
+      trendSteady: "The collective flow keeps a steady pulse.",
+      trendShift: "The collective flow is still rearranging.",
+      driftCondensing: "A denser layer lingers at the surface.",
+      driftClearing: "A clearer lane is opening at the surface.",
+      driftStable: "The surface line stays in balance.",
+    },
+    local: {
+      condensing: "Nearby moment flow is compacting.",
+      clearing: "Nearby moment flow is opening.",
+      stable: "Nearby moment flow holds a steady balance.",
+      fallback: "Nearby signal is still forming. For now, this mirrors the wider field.",
+      regional: "Read from shared moments across your region.",
+    },
+    strataFallback: "Shared and private moments settle together below the surface.",
+  },
+  poetic: {
+    condition: {
+      quiet: "No strong shared moment has settled into view yet.",
+      steady: "Shared movement keeps a quiet line.",
+      balance: "The shared field leans toward balance.",
+      gathering: "The field grows denser around repeating moments.",
+      dense: "A compact shared front is taking shape.",
+    },
+    horizon: {
+      empty: "No shared moments have reached the surface read yet.",
+      early: "The surface read is still settling.",
+      dominant: (kind) => `A ${kind} current is surfacing in the read.`,
+      trendSteady: "The collective pulse stays even.",
+      trendShift: "The collective pulse is still rearranging.",
+      driftCondensing: "A tighter layer lingers near the surface.",
+      driftClearing: "A clearer lane opens near the surface.",
+      driftStable: "The surface line remains steady.",
+    },
+    local: {
+      condensing: "Nearby moments are drawing closer.",
+      clearing: "Nearby moments are opening space.",
+      stable: "Nearby moments hold a calm balance.",
+      fallback: "Nearby read is still forming. For now, it mirrors the wider field.",
+      regional: "Reading shared moments across your region.",
+    },
+    strataFallback: "Shared and private moments settle into one deeper record.",
+  },
+};
+const COPY = COPY_VARIANTS[COPY_MODE] || COPY_VARIANTS.clear;
+
 const degreeValue = document.getElementById("degreeValue");
 const conditionLine = document.getElementById("conditionLine");
 const recentMoments = document.getElementById("recentMoments");
@@ -500,11 +562,11 @@ function formatDegree(value) {
 }
 
 function conditionForDegree(value, total) {
-  if (total < 3) return "No strong shared moment yet.";
-  if (value < 38) return "Shared movement holds a steady line.";
-  if (value < 60) return "The shared field tends toward balance.";
-  if (value < 74) return "Density is gathering in the shared field.";
-  return "A dense shared front is forming.";
+  if (total < 3) return COPY.condition.quiet;
+  if (value < 38) return COPY.condition.steady;
+  if (value < 60) return COPY.condition.balance;
+  if (value < 74) return COPY.condition.gathering;
+  return COPY.condition.dense;
 }
 
 function getSharedMoments(moments) {
@@ -638,12 +700,12 @@ function renderHorizon(canonicalState, sharedMoments) {
   horizonSecondary.innerHTML = "";
 
   if (total === 0) {
-    horizonPrimary.textContent = "No shared moments have reached the surface read yet.";
+    horizonPrimary.textContent = COPY.horizon.empty;
     return;
   }
 
   if (total < 4) {
-    horizonPrimary.textContent = "The surface read is still taking shape.";
+    horizonPrimary.textContent = COPY.horizon.early;
     return;
   }
 
@@ -656,21 +718,21 @@ function renderHorizon(canonicalState, sharedMoments) {
     { avoidable: 0, fertile: 0, observed: 0 }
   );
   const dominant = Object.entries(countByType).sort((a, b) => b[1] - a[1])[0][0];
-  horizonPrimary.textContent = `A ${dominant} current is shaping the surface read.`;
+  horizonPrimary.textContent = COPY.horizon.dominant(dominant);
 
   horizonMoreButton.classList.remove("hidden");
   horizonMoreButton.onclick = () => {
     horizonSecondary.classList.remove("hidden");
     const trend =
       canonicalState.stabilityIndex >= 0.55
-        ? "The collective flow keeps a steady pulse."
-        : "The collective flow is still rearranging.";
+        ? COPY.horizon.trendSteady
+        : COPY.horizon.trendShift;
     const drift =
       canonicalState.pressureMode === "condensing"
-        ? "A denser layer lingers at the surface."
+        ? COPY.horizon.driftCondensing
         : canonicalState.pressureMode === "clearing"
-          ? "A clearer lane is opening at the surface."
-          : "The surface line stays in balance.";
+          ? COPY.horizon.driftClearing
+          : COPY.horizon.driftStable;
     horizonSecondary.innerHTML = `<p>${trend}</p><p>${drift}</p>`;
     horizonMoreButton.classList.add("hidden");
   };
@@ -680,17 +742,17 @@ function renderLocalClimate(localState) {
   const pressureMode = localState?.pressureMode || "stabilizing";
   const pressureText =
     pressureMode === "condensing"
-      ? "Nearby moment flow is compacting."
+      ? COPY.local.condensing
       : pressureMode === "clearing"
-        ? "Nearby moment flow is opening."
-        : "Nearby moment flow holds a steady balance.";
+        ? COPY.local.clearing
+        : COPY.local.stable;
 
   localClimatePrimary.textContent = pressureText;
   if (localState?.source === "global_fallback") {
-    localClimateSecondary.textContent = "Nearby signal is still forming. For now, this mirrors the wider field.";
+    localClimateSecondary.textContent = COPY.local.fallback;
     return;
   }
-  localClimateSecondary.textContent = "Read from shared moments across your region.";
+  localClimateSecondary.textContent = COPY.local.regional;
 }
 
 function getLongWindow(moments, days = 30) {
@@ -749,7 +811,7 @@ function buildStrataLines(longWindowMoments, canonicalState) {
 
   if (lines.length < 2) {
     lines.push("The deep layer is taking shape from recurring traces.");
-    lines.push("Shared and private traces settle together below the surface.");
+    lines.push(COPY.strataFallback);
   }
 
   return lines.slice(0, 5);
