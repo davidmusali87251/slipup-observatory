@@ -611,6 +611,9 @@ h2 {
 }
 
 .contribute-page .topbar .text-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid #a8b8ca;
   background: linear-gradient(180deg, #ffffff 0%, #faf7ff 100%);
   color: #23384d;
