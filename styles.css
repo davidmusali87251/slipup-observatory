@@ -501,6 +501,8 @@ h2 {
   overflow: hidden;
   pointer-events: none;
   opacity: 0;
+  padding: 0 0.15rem;
+  transition: opacity 260ms ease;
 }
 
 /* Future activation hook (not used yet). */
@@ -508,6 +510,30 @@ h2 {
   height: auto;
   opacity: 1;
   pointer-events: auto;
+  margin-top: 1.45rem;
+}
+
+.strata-context {
+  font-size: 0.76rem;
+  color: var(--muted);
+  opacity: 0.68;
+  letter-spacing: 0.01em;
+  margin-bottom: 0.48rem;
+}
+
+.strata-lines {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.48rem;
+}
+
+.strata-line {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: color-mix(in oklab, var(--text) 82%, var(--muted));
+  opacity: 0.9;
 }
 
 .sheet-backdrop {
@@ -777,6 +803,10 @@ h2 {
   .shared-sheet,
   .observatory-hero::before,
   .transient-reading-line {
+    transition: none;
+  }
+
+  .ground-strata {
     transition: none;
   }
 

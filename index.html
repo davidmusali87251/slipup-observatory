@@ -43,14 +43,18 @@
         <ul id="recentMoments" class="moment-list"></ul>
       </section>
 
-      <section id="horizon" class="panel panel-horizon" aria-label="Horizon">
+      <section id="horizon" class="panel panel-horizon" aria-label="Horizon transition">
         <p class="horizon-line">Horizon</p>
         <p id="horizonPrimary" class="horizon-primary"></p>
         <div id="horizonSecondary" class="horizon-secondary hidden"></div>
         <button id="horizonMoreButton" class="text-button hidden" type="button">See deeper reading</button>
       </section>
 
-      <section id="ground-strata" class="ground-strata" aria-hidden="true"></section>
+      <section id="ground-strata" class="ground-strata" aria-label="Personal strata" hidden>
+        <h2 class="visually-hidden">Personal strata</h2>
+        <p class="strata-context" aria-hidden="true">What settles below stays quiet and readable.</p>
+        <ul id="strataLines" class="strata-lines"></ul>
+      </section>
     </main>
 
     <div id="sheet-backdrop" class="sheet-backdrop" hidden></div>

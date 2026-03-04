@@ -109,6 +109,8 @@ const sharedSheet = document.getElementById("shared-sheet");
 const sharedSheetList = document.getElementById("shared-sheet-list");
 const sharedSheetEmpty = document.getElementById("shared-sheet-empty");
 const sharedSheetCloseButton = document.getElementById("shared-sheet-close");
+const groundStrata = document.getElementById("ground-strata");
+const strataLines = document.getElementById("strataLines");
 
 const query = new URLSearchParams(window.location.search);
 const contributed = query.get("contributed") === "1";
@@ -462,25 +464,23 @@ function openSharedSheet(sharedMoments) {
   });
 }
 
-function renderHorizon(moments) {
-  const personal = moments.filter((m) => !m.hidden);
-  const total = personal.length;
-
+function renderHorizon(sharedMoments, climateTruth) {
+  const total = sharedMoments.length;
   horizonSecondary.classList.add("hidden");
   horizonMoreButton.classList.add("hidden");
   horizonSecondary.innerHTML = "";
 
   if (total === 0) {
-    horizonPrimary.textContent = "Horizon begins after your first moment.";
+    horizonPrimary.textContent = "Ground traces have not settled yet.";
     return;
   }
 
   if (total < 4) {
-    horizonPrimary.textContent = "Not enough signal yet.";
+    horizonPrimary.textContent = "Ground signals are still settling.";
     return;
   }
 
-  const latest = personal.slice(-12);
+  const latest = sharedMoments.slice(0, 12);
   const countByType = latest.reduce(
     (acc, item) => {
       acc[item.type] += 1;
@@ -489,17 +489,98 @@ function renderHorizon(moments) {
     { avoidable: 0, fertile: 0, observed: 0 }
   );
   const dominant = Object.entries(countByType).sort((a, b) => b[1] - a[1])[0][0];
-  horizonPrimary.textContent = `A ${dominant} pattern appears to be present.`;
+  horizonPrimary.textContent = `A ${dominant} current settles near the ground.`;
 
   horizonMoreButton.classList.remove("hidden");
   horizonMoreButton.onclick = () => {
     horizonSecondary.classList.remove("hidden");
-    const trend = latest.length > 7 ? "Recent movement is steady." : "Signal is still forming.";
-    const delta = calculateClimate(personal).computedDegree - BASELINE;
-    const drift = delta > 5 ? "Direction may be rising." : delta < -5 ? "Direction may be easing." : "Direction appears balanced.";
-    horizonSecondary.innerHTML = `<p>${trend}</p><p>${drift}</p><p>Change vs yesterday appears moderate.</p>`;
+    const trend = latest.length > 7 ? "Recent ground movement appears steady." : "Ground signal is still forming.";
+    const delta = climateTruth.computedDegree - BASELINE;
+    const drift =
+      delta > 5
+        ? "Pressure remains present close to the horizon."
+        : delta < -5
+          ? "The field appears to clear near ground level."
+          : "Ground balance appears stable.";
+    horizonSecondary.innerHTML = `<p>${trend}</p><p>${drift}</p><p>What settles here comes from shared atmosphere.</p>`;
     horizonMoreButton.classList.add("hidden");
   };
+}
+
+function getLongWindow(moments, days = 30) {
+  const now = Date.now();
+  const windowMs = days * 24 * 60 * 60 * 1000;
+  return moments.filter((m) => now - new Date(m.timestamp).getTime() <= windowMs && !m.hidden);
+}
+
+function buildStrataLines(longWindowMoments) {
+  const total = longWindowMoments.length;
+  if (total < 12) return [];
+
+  const counts = { avoidable: 0, fertile: 0, observed: 0 };
+  const moods = { calm: 0, focus: 0, stressed: 0, curious: 0, tired: 0 };
+
+  longWindowMoments.forEach((m) => {
+    if (counts[m.type] !== undefined) counts[m.type] += 1;
+    if (moods[m.mood] !== undefined) moods[m.mood] += 1;
+  });
+
+  const lines = [];
+  if (counts.avoidable >= 5 && moods.stressed >= 3) {
+    lines.push("Friction tends to condense when pressure and stress align.");
+  }
+  if (counts.fertile >= 4 && moods.calm >= 3) {
+    lines.push("Openings appear when fertile movement meets calm ground.");
+  }
+  if (counts.observed >= 4) {
+    lines.push("Observation keeps the field readable as moments accumulate.");
+  }
+
+  const moodDiversity = Object.values(moods).filter((count) => count > 0).length;
+  if (moodDiversity >= 4) {
+    lines.push("Signals spread across varied moods instead of collapsing into one state.");
+  }
+
+  const avoidableRatio = counts.avoidable / total;
+  const fertileRatio = counts.fertile / total;
+  if (avoidableRatio > 0.42 && fertileRatio > 0.22) {
+    lines.push("Friction and opening coexist, shaping a mixed sediment below.");
+  } else if (fertileRatio > 0.38) {
+    lines.push("Fertile currents are leaving a clearer trace over time.");
+  }
+
+  if (total >= 24) {
+    lines.push("A longer personal sediment is forming, slower and more legible.");
+  }
+
+  if (lines.length < 2) {
+    lines.push("A personal sediment is taking shape from recurring moments.");
+    lines.push("What repeats quietly becomes easier to read over time.");
+  }
+
+  return lines.slice(0, 5);
+}
+
+function renderStrata(moments) {
+  const longWindow = getLongWindow(moments, 30);
+  const lines = buildStrataLines(longWindow);
+  if (!lines.length) {
+    groundStrata.classList.remove("is-active");
+    groundStrata.hidden = true;
+    strataLines.innerHTML = "";
+    return;
+  }
+
+  strataLines.innerHTML = "";
+  lines.forEach((line) => {
+    const li = document.createElement("li");
+    li.className = "strata-line";
+    li.textContent = line;
+    strataLines.appendChild(li);
+  });
+
+  groundStrata.hidden = false;
+  groundStrata.classList.add("is-active");
 }
 
 function escapeHtml(text) {
@@ -671,7 +752,8 @@ async function boot() {
   conditionLine.textContent = climateTruth.condition;
   renderPatternLayer(climateTruth.repetition);
   renderRecent(sharedMoments);
-  renderHorizon(moments);
+  renderHorizon(sharedMoments, climateTruth);
+  renderStrata(moments);
 
   viewMoreButton.onclick = () => openSharedSheet(sharedMoments);
   sheetBackdrop.onclick = closeSharedSheet;
