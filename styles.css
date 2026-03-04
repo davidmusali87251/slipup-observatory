@@ -595,6 +595,7 @@ h2 {
   justify-content: space-between;
   align-items: center;
   gap: 0.7rem;
+  flex-wrap: nowrap;
 }
 
 .contribute-page .topbar h1 {
@@ -602,41 +603,56 @@ h2 {
   font-weight: 560;
   line-height: 1.15;
   letter-spacing: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .contribute-page .topbar .text-link {
-  border: 1px solid color-mix(in oklab, var(--text) 16%, transparent);
-  background: color-mix(in oklab, #ffffff 45%, transparent);
-  color: color-mix(in oklab, var(--text) 80%, var(--muted));
-  border-radius: 999px;
-  min-height: 40px;
-  padding: 0.5rem 0.95rem;
+  border: 1px solid #a8b8ca;
+  background: linear-gradient(180deg, #ffffff 0%, #faf7ff 100%);
+  color: #23384d;
+  border-radius: 10px;
+  min-height: 36px;
+  padding: 0.42rem 0.72rem;
   line-height: 1;
-  opacity: 0.88;
-  letter-spacing: 0.015em;
+  opacity: 1;
+  letter-spacing: 0.01em;
+  font-weight: 500;
   text-decoration: none;
+  box-shadow:
+    0 1px 0 #ffffffde inset,
+    0 0 0 0 transparent;
   transition:
     border-color 160ms ease,
     background 160ms ease,
     color 160ms ease,
+    box-shadow 180ms ease,
     opacity 160ms ease;
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .contribute-page .topbar .text-link:hover {
-  border-color: color-mix(in oklab, var(--text) 24%, transparent);
-  background: color-mix(in oklab, #ffffff 56%, transparent);
-  color: color-mix(in oklab, var(--text) 86%, var(--muted));
-  opacity: 0.94;
+  border-color: color-mix(in oklab, var(--text) 24%, #c8d6e7);
+  background: linear-gradient(180deg, #ffffff 0%, #f8f4ff 100%);
+  color: #23384d;
+  opacity: 1;
   text-decoration: none;
 }
 
 .contribute-page .topbar .text-link:focus-visible {
-  outline: 2px solid color-mix(in oklab, var(--text) 30%, #ffffff);
-  outline-offset: 2px;
+  outline: none;
+  border-color: color-mix(in oklab, #8fa9c9 74%, #ffffff);
+  box-shadow:
+    0 1px 0 #ffffffea inset,
+    0 0 0 3px color-mix(in oklab, #8fa9c9 28%, transparent);
 }
 
 .contribute-page .topbar .text-link:active {
-  opacity: 0.88;
+  opacity: 0.95;
 }
 
 #contributeForm {
@@ -694,10 +710,10 @@ h2 {
   padding-right: 2rem;
   background-image:
     linear-gradient(180deg, #ffffff 0%, #faf7ff 100%),
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'%3E%3Cpath d='M3.2 5.1L7 8.9l3.8-3.8' fill='none' stroke='%235d6f8a' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 5.8L8 10.3l4.5-4.5' fill='none' stroke='%233f5267' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat, no-repeat;
-  background-position: 0 0, right 0.68rem center;
-  background-size: auto, 0.78rem;
+  background-position: 0 0, right 0.62rem center;
+  background-size: auto, 0.9rem;
 }
 
 .field select:hover,
@@ -830,23 +846,23 @@ h2 {
 
 @media (max-width: 520px) {
   .contribute-page .topbar {
-    flex-wrap: wrap;
-    align-items: flex-start;
-    justify-content: flex-start;
-    gap: 0.48rem;
-    margin-bottom: 0.6rem;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.44rem;
+    margin-bottom: 0.56rem;
   }
 
   .contribute-page .topbar h1 {
-    width: 100%;
-    font-size: 1.04rem;
+    width: auto;
+    font-size: 0.98rem;
     letter-spacing: 0.01em;
   }
 
   .contribute-page .topbar .text-link {
-    min-height: 34px;
-    padding: 0.36rem 0.72rem;
-    font-size: 0.78rem;
+    min-height: 30px;
+    padding: 0.24rem 0.48rem;
+    font-size: 0.7rem;
   }
 
   .contribute-page .panel {
