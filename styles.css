@@ -355,17 +355,6 @@ h2 {
   letter-spacing: 0.01em;
 }
 
-.scroll-cue {
-  position: absolute;
-  bottom: 0.9rem;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #7f89a04f;
-  letter-spacing: 0.09em;
-  font-size: 0.7rem;
-  opacity: 0.54;
-}
-
 .section-row {
   display: flex;
   justify-content: space-between;

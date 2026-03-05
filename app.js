@@ -410,20 +410,6 @@ const COPY_VARIANTS = {
 const COPY = COPY_VARIANTS[COPY_MODE] || COPY_VARIANTS.clear;
 const SIGNAL_VARIANTS = {
   clear: {
-    confidence: {
-      early: [
-        "Read confidence: early.",
-        "Confidence still forming from low volume.",
-      ],
-      building: [
-        "Read confidence: building.",
-        "Confidence increasing with added volume.",
-      ],
-      firm: [
-        "Read confidence: firm.",
-        "Confidence stable at current volume.",
-      ],
-    },
     pulse: {
       early: [
         "Recent signal is still early in this window.",
@@ -470,20 +456,6 @@ const SIGNAL_VARIANTS = {
     },
   },
   poetic: {
-    confidence: {
-      early: [
-        "Read confidence: early.",
-        "Confidence still forming from low volume.",
-      ],
-      building: [
-        "Read confidence: building.",
-        "Confidence increasing with added volume.",
-      ],
-      firm: [
-        "Read confidence: firm.",
-        "Confidence stable at current volume.",
-      ],
-    },
     pulse: {
       early: [
         "Recent signal is still in first formation.",
@@ -664,7 +636,6 @@ function pickCopyFromState(entry, numericSeed) {
 
 const degreeValue = document.getElementById("degreeValue");
 const conditionLine = document.getElementById("conditionLine");
-const readingConfidenceLine = document.getElementById("readingConfidenceLine");
 const recentMoments = document.getElementById("recentMoments");
 const viewMoreButton = document.getElementById("viewMoreButton");
 const horizonPrimary = document.getElementById("horizonPrimary");
@@ -1951,11 +1922,6 @@ async function boot() {
   setStoredComputedDegree(computedDegree);
   setStoredDisplayDegree(computedDegree);
   conditionLine.textContent = canonicalState.condition;
-  if (readingConfidenceLine) {
-    const confidenceMode = observatoryPipeline.signalModes.confidence;
-    const seed = Math.round((canonicalState?.computedDegree || BASELINE) * 10) + (canonicalState?.total || 0);
-    readingConfidenceLine.textContent = pickCopy(SIGNALS.confidence[confidenceMode], seed);
-  }
   renderPatternLayer(canonicalState);
   renderRecent(sharedMoments);
   renderHorizon(canonicalState, sharedMoments, observatoryPipeline);
@@ -1991,12 +1957,6 @@ async function boot() {
           localClimateTruth,
           activeFieldScope
         );
-        if (readingConfidenceLine) {
-          const confidenceMode = observatoryPipeline.signalModes.confidence;
-          const seed =
-            Math.round((canonicalState?.computedDegree || BASELINE) * 10) + (canonicalState?.total || 0);
-          readingConfidenceLine.textContent = pickCopy(SIGNALS.confidence[confidenceMode], seed);
-        }
         renderHorizon(canonicalState, sharedMoments, observatoryPipeline);
         renderLocalClimate(
           localClimateTruth,
