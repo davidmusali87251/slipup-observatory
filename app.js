@@ -698,7 +698,7 @@ const strataLines = document.getElementById("strataLines");
 
 const query = new URLSearchParams(window.location.search);
 const contributed = query.get("contributed") === "1";
-const SHARED_SHEET_MAX_ITEMS = 50;
+const SHARED_SHEET_MAX_ITEMS = 100;
 const SHEET_TRANSITION_MS = 280;
 const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
 

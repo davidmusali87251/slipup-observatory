@@ -155,7 +155,7 @@ function makeHeaders(origin: string | null, extra: Record<string, string> = {}) 
   return {
     "Access-Control-Allow-Origin": allowed,
     "Access-Control-Allow-Methods": "GET,OPTIONS",
-    "Access-Control-Allow-Headers": "authorization,apikey,content-type,x-slipup-fp,x-requested-with",
+    "Access-Control-Allow-Headers": "authorization,apikey,content-type,x-slipup-fp,x-slipup-geo,x-requested-with",
     "Access-Control-Max-Age": "86400",
     ...(allowed !== "*" ? { Vary: "Origin" } : {}),
     "Content-Type": "application/json; charset=utf-8",
