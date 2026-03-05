@@ -445,10 +445,32 @@ Deno.serve(async (req) => {
     if (globalResult.error) {
       console.warn("consume_climate_bucket global unavailable:", globalResult.error.message);
     }
+    const markerGlobalResult = await supabase.rpc("consume_marker_combo_bucket", {
+      p_bucket_start: bucketStart,
+      p_geo_bucket: null,
+      p_type: row.type,
+      p_mood: row.mood,
+      p_reflective: signal.reflective,
+      p_reactive: signal.reactive,
+    });
+    if (markerGlobalResult.error) {
+      console.warn("consume_marker_combo_bucket global unavailable:", markerGlobalResult.error.message);
+    }
     if (row.geo_bucket) {
       const localResult = await consume(row.geo_bucket);
       if (localResult.error) {
         console.warn("consume_climate_bucket local unavailable:", localResult.error.message);
+      }
+      const markerLocalResult = await supabase.rpc("consume_marker_combo_bucket", {
+        p_bucket_start: bucketStart,
+        p_geo_bucket: row.geo_bucket,
+        p_type: row.type,
+        p_mood: row.mood,
+        p_reflective: signal.reflective,
+        p_reactive: signal.reactive,
+      });
+      if (markerLocalResult.error) {
+        console.warn("consume_marker_combo_bucket local unavailable:", markerLocalResult.error.message);
       }
     }
   }

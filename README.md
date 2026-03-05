@@ -35,6 +35,8 @@ This repo includes a production-early backend path that keeps privacy risk low a
 
 - SQL schema base: `schema_v2.sql`
 - SQL local bucket patch: `supabase/sql/phase2_local_geo_bucket.sql`
+- SQL scale buckets patch: `supabase/sql/phase3_scale_buckets.sql`
+- SQL marker/combo patch: `supabase/sql/phase4_marker_tables.sql`
 - Edge Functions:
   - `supabase/functions/moments/index.ts`
   - `supabase/functions/climate/index.ts`
@@ -69,6 +71,13 @@ Frontend keeps local fallback enabled by default:
 - `422` -> `Saved locally. Shared sync couldn't accept this moment.`
 - `429` -> `Saved locally. Shared channel is temporarily busy.`
 - timeout / `5xx` -> `Saved locally. Shared sync is unavailable.`
+
+### Consent and legal baseline
+
+- Keep app access open (do not hard-block homepage behind consent).
+- Require explicit consent only when user enables sharing.
+- Publish `privacy.html` and `terms.html` and link them from `index.html` and `contribute.html`.
+- Use coarse regional buckets (timezone-derived), never exact GPS coordinates.
 
 ## Metaphor guardrails
 

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy — SlipUp Observatory</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page contribute-page">
+      <header class="topbar">
+        <h1>Privacy</h1>
+        <a class="text-link" href="./index.html">Back to Observatory</a>
+      </header>
+      <section class="panel panel-contribute">
+        <p class="strata-context">Effective date: 2026-03-02</p>
+        <p class="strata-line">SlipUp Observatory stores moments in two modes:</p>
+        <ul class="strata-lines">
+          <li class="strata-line"><strong>Local only</strong>: if sharing is off, your moment stays on your device.</li>
+          <li class="strata-line"><strong>Shared</strong>: if sharing is on, your moment is sent to Supabase and used in aggregate observatory signals.</li>
+        </ul>
+        <p class="strata-line">For shared moments, we use a coarse regional bucket derived from timezone-like data (for example: country/region level), not exact GPS coordinates.</p>
+        <p class="strata-line">We do not require account creation to contribute. We use anti-abuse metadata (for example request fingerprint headers) to protect service quality.</p>
+        <p class="strata-line">You can stop sharing at any time by keeping sharing disabled when saving a new moment.</p>
+      </section>
+    </main>
+  </body>
+</html>

@@ -458,6 +458,24 @@ h2 {
   letter-spacing: 0.01em;
 }
 
+.legal-links {
+  margin-top: -0.42rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.69rem;
+  line-height: 1.4;
+  color: #61728a;
+  opacity: 0.82;
+}
+
+.legal-links .text-link {
+  min-height: auto;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* FUTURE: optional cue if the transition label returns. */
 .scroll-cue {
   position: absolute;

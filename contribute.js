@@ -7,6 +7,7 @@ const typeInput = document.getElementById("typeInput");
 const moodInput = document.getElementById("moodInput");
 const noteInput = document.getElementById("noteInput");
 const sharedInput = document.getElementById("sharedInput");
+const consentInput = document.getElementById("consentInput");
 const saveButton = document.getElementById("saveButton");
 const formStatus = document.getElementById("formStatus");
 const ALLOWED_MOODS = new Set(["calm", "focus", "stressed", "curious", "tired"]);
@@ -66,11 +67,25 @@ function syncSaveState() {
   saveButton.disabled = !hasValidNote();
 }
 
+function syncConsentState() {
+  if (!consentInput) return;
+  const sharing = Boolean(sharedInput?.checked);
+  consentInput.disabled = !sharing;
+  consentInput.required = sharing;
+}
+
 noteInput.addEventListener("input", () => {
   if (formStatus.textContent === "Let one intention rise before saving.") {
     formStatus.textContent = "";
   }
   syncSaveState();
+});
+
+sharedInput?.addEventListener("change", () => {
+  if (!sharedInput.checked) {
+    if (consentInput) consentInput.checked = false;
+  }
+  syncConsentState();
 });
 
 form.addEventListener("submit", async (event) => {
@@ -89,6 +104,11 @@ form.addEventListener("submit", async (event) => {
     formStatus.textContent = "Let one intention rise before saving.";
     syncSaveState();
     noteInput.focus();
+    return;
+  }
+  if (sharedInput.checked && consentInput && !consentInput.checked) {
+    formStatus.textContent = "Please accept Privacy and Terms to share this moment.";
+    consentInput.focus();
     return;
   }
 
@@ -118,3 +138,4 @@ form.addEventListener("submit", async (event) => {
 });
 
 syncSaveState();
+syncConsentState();
