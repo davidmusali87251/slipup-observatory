@@ -1185,6 +1185,13 @@ function buildFieldLensModel(fieldScopes, countryIndex) {
     });
   });
 
+  if (!groups[2].items.length) {
+    groups[2].items.push({
+      value: "",
+      label: "No country signal available yet",
+    });
+  }
+
   return { groups, byValue };
 }
 
@@ -1222,7 +1229,7 @@ function buildFieldScopeOptions() {
   const options = [];
   const seen = new Set();
   const pushOption = (option) => {
-    const dedupeKey = `${option.scope}|${option.geo || ""}`;
+    const dedupeKey = `${option.id}`;
     if (seen.has(dedupeKey)) return;
     seen.add(dedupeKey);
     options.push(option);
@@ -1763,7 +1770,7 @@ async function boot() {
   const preferredScopeValue = normalizeStoredFieldScopeValue(getStoredFieldScope());
   let countryIndex = new Map();
   try {
-    const geoIndex = await fetchGeoIndexRemote(720, "", 3000);
+    const geoIndex = await fetchGeoIndexRemote(8760, "", 4000);
     countryIndex = buildCountryIndex(geoIndex?.countries);
   } catch {
     countryIndex = new Map();
