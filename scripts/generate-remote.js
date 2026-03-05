@@ -37,13 +37,22 @@ if (fs.existsSync(localPath)) {
   }
 }
 
-if (process.env.REMOTE_MOMENTS_URL) config.REMOTE_MOMENTS_URL = process.env.REMOTE_MOMENTS_URL;
-if (process.env.REMOTE_CLIMATE_URL) config.REMOTE_CLIMATE_URL = process.env.REMOTE_CLIMATE_URL;
-if (process.env.REMOTE_ANON_KEY !== undefined) config.REMOTE_ANON_KEY = process.env.REMOTE_ANON_KEY;
+if (process.env.REMOTE_MOMENTS_URL) config.REMOTE_MOMENTS_URL = String(process.env.REMOTE_MOMENTS_URL || "").trim();
+if (process.env.REMOTE_CLIMATE_URL) config.REMOTE_CLIMATE_URL = String(process.env.REMOTE_CLIMATE_URL || "").trim();
+if (process.env.REMOTE_ANON_KEY !== undefined) config.REMOTE_ANON_KEY = String(process.env.REMOTE_ANON_KEY || "").trim();
 if (process.env.USE_REMOTE_SHARED !== undefined) config.USE_REMOTE_SHARED = process.env.USE_REMOTE_SHARED === "true" || process.env.USE_REMOTE_SHARED === "1";
 
+// Quita espacios/saltos de línea al pegar secrets y escapa caracteres que romperían el JS
+function trimSecret(s) {
+  return String(s ?? "").trim().replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+}
 function escape(str) {
-  return str.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  const s = trimSecret(str);
+  return s
+    .replace(/\\/g, "\\\\")
+    .replace(/"/g, '\\"')
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "\\r");
 }
 
 const configBlock = `// Generated or edited locally. Do not commit real values. See README and remote.local.js.example.
