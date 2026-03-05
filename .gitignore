@@ -1,1 +1,12 @@
 node_modules/
+
+# Supabase CLI: generados en local, no commitear
+supabase/.temp/
+
+# No incluir en deployments (solo uso interno)
+PLAN_MASTER.md
+
+# remote.js se genera con scripts/generate-remote.js (no commitear; evita subir valores reales)
+remote.js
+# Valores reales solo en local
+remote.local.js

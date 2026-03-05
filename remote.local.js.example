@@ -1,0 +1,10 @@
+// Copia este archivo a remote.local.js y rellena con tus valores. remote.local.js está en .gitignore.
+// Luego ejecuta: node scripts/generate-remote.js
+// Así remote.js se generará con estos valores y la app podrá usar el backend.
+
+module.exports = {
+  USE_REMOTE_SHARED: true,
+  REMOTE_MOMENTS_URL: "https://YOUR_PROJECT_REF.supabase.co/functions/v1/moments",
+  REMOTE_CLIMATE_URL: "https://YOUR_PROJECT_REF.supabase.co/functions/v1/climate",
+  REMOTE_ANON_KEY: "your_supabase_anon_key",
+};

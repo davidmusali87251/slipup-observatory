@@ -20,6 +20,16 @@ Clean rebuild aligned with the Observatory model.
 
 Open `index.html` in a browser.
 
+## Deployments
+
+**Condición:** no incluir `PLAN_MASTER.md` en lo que se despliega. El archivo está en `.gitignore`. Si ya fue commiteado antes, ejecutar una vez: `git rm --cached PLAN_MASTER.md` y hacer commit para quitarlo del árbol desplegado; el archivo seguirá en disco para uso interno.
+
+## Archivos que conviene dejar solo para nosotros (no en repo público)
+
+- **`supabase/.temp/`** — Generados por la CLI de Supabase (project-ref, versiones, etc.). Ya están en `.gitignore`. Si alguna vez se commitearon, quitar del repo con: `git rm -r --cached supabase/.temp/` y commit (los archivos siguen en disco pero dejan de estar en el árbol).
+- **`remote.js`** — Generado con `node scripts/generate-remote.js`. Está en `.gitignore`; no se commiteará nunca, así no se suben valores reales por error.
+- **`remote.local.js`** — Contiene tus URLs y anon key. También en `.gitignore`. Se usa solo para generar `remote.js` en tu máquina.
+
 ## Product loop
 
 `Observatory -> Contribute -> micro shift -> settling -> observe -> Horizon Line`
@@ -56,14 +66,18 @@ Set these in Supabase Functions secrets:
 - `CLIMATE_GET_MAX` (default `180`)
 - `LOCAL_MIN_MASS` (default `30`)
 
-### Frontend activation
+### Frontend activation (config remota)
 
-In `remote.js`:
+El repo incluye `remote.js` con **placeholders** (no incluir valores reales en el commit). Para usar el backend:
 
-- set `USE_REMOTE_SHARED = true`
-- set `REMOTE_MOMENTS_URL` to `https://<project-ref>.supabase.co/functions/v1/moments`
-- set `REMOTE_CLIMATE_URL` to `https://<project-ref>.supabase.co/functions/v1/climate`
-- set `REMOTE_ANON_KEY` to your public anon key
+1. Copia **`remote.local.js.example`** a **`remote.local.js`**.
+2. En `remote.local.js` rellena `REMOTE_MOMENTS_URL`, `REMOTE_CLIMATE_URL`, `REMOTE_ANON_KEY` y pon `USE_REMOTE_SHARED: true`.
+3. Desde la raíz del repo ejecuta: **`node scripts/generate-remote.js`**. Eso reescribe la cabecera de `remote.js` con los valores de `remote.local.js` (o, si no existe, con variables de entorno `REMOTE_MOMENTS_URL`, `REMOTE_CLIMATE_URL`, `REMOTE_ANON_KEY`, `USE_REMOTE_SHARED`).
+4. Abre `index.html` o despliega; la app usará ese `remote.js` generado.
+
+Para despliegue en CI (p. ej. GitHub Actions): define los secrets y en el paso de build ejecuta `node scripts/generate-remote.js` pasando esas variables de entorno, así el `remote.js` desplegado tiene los valores correctos sin guardarlos en el repo.
+
+**Importante:** `remote.js` está en `.gitignore`, así que **nunca** se sube al repo (ni tú ni el asistente pueden commitearlo por error). En el repo solo está `remote.js.template` (plantilla con placeholders). Tras clonar o hacer pull: ejecuta `node scripts/generate-remote.js` y se creará `remote.js` en tu máquina (desde la plantilla y tus `remote.local.js` o env). Si antes tenías `remote.js` en el repo, quítalo del tracking una vez: `git rm --cached remote.js` y commit.
 
 Frontend keeps local fallback enabled by default:
 

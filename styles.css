@@ -14,8 +14,9 @@
   --page-pad-bottom: 4rem;
   --topbar-height: 3rem;
   --topbar-gap: 0.75rem;
-  --section-gap: 1.75rem;
+  --section-gap: 2.35rem;
   --block-gap: 0.85rem;
+  --layer-transition: 1.15rem;
 }
 
 * {
@@ -303,8 +304,8 @@ h2 {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -34px;
-  height: 56px;
+  bottom: -48px;
+  height: 88px;
   pointer-events: none;
   background:
     radial-gradient(circle at 50% 0%, #ece4f886 0%, #ece4f800 72%),
@@ -783,7 +784,7 @@ h2 {
   padding: 0.6rem 0.2rem 0.5rem;
   position: relative;
   overflow: visible;
-  margin-top: 0.35rem;
+  margin-top: var(--layer-transition);
 }
 
 .silent-descent {
@@ -818,8 +819,8 @@ h2 {
   position: absolute;
   left: 0;
   right: 0;
-  top: -46px;
-  height: 64px;
+  top: -58px;
+  height: 88px;
   pointer-events: none;
   background:
     radial-gradient(circle at 50% 8%, #ece4f88d 0%, #ece4f800 76%),
@@ -828,7 +829,7 @@ h2 {
 }
 
 .panel-horizon {
-  margin-top: 0.7rem;
+  margin-top: 1.25rem;
   background:
     linear-gradient(
       180deg,
@@ -870,7 +871,7 @@ h2 {
 
 .local-climate {
   padding: 0.35rem 0.15rem 1.2rem;
-  margin-top: 1.75rem;
+  margin-top: 2.35rem;
   background:
     linear-gradient(
       180deg,
@@ -883,8 +884,8 @@ h2 {
 .local-climate::after {
   content: "";
   display: block;
-  height: 22px;
-  margin-top: 0.7rem;
+  height: 28px;
+  margin-top: 1rem;
   background: linear-gradient(180deg, #ffffff00 0%, color-mix(in srgb, #e7def478 48%, transparent) 100%);
   opacity: 0.74;
 }
@@ -1020,8 +1021,8 @@ h2 {
   position: absolute;
   left: 0;
   right: 0;
-  top: -22px;
-  height: 26px;
+  top: -28px;
+  height: 34px;
   pointer-events: none;
   background: linear-gradient(180deg, #ffffff00 0%, color-mix(in srgb, #e4dbf377 42%, transparent) 100%);
   opacity: 0.82;
@@ -1032,7 +1033,7 @@ h2 {
   height: auto;
   opacity: 1;
   pointer-events: auto;
-  margin-top: 2.5rem;
+  margin-top: 3.25rem;
 }
 
 @media (min-width: 900px) {
@@ -1041,7 +1042,7 @@ h2 {
   }
 
   .ground-strata.is-active {
-    margin-top: 2.1rem;
+    margin-top: 2.85rem;
   }
 }
 
@@ -1474,22 +1475,22 @@ h2 {
 
   .local-climate {
     padding-bottom: 1.2rem;
-    margin-top: 1.42rem;
+    margin-top: 2rem;
   }
 
   .local-climate::after {
     height: 30px;
-    margin-top: 0.88rem;
+    margin-top: 1rem;
     opacity: 0.8;
   }
 
   .ground-strata::before {
-    top: -26px;
-    height: 30px;
+    top: -32px;
+    height: 36px;
   }
 
   .ground-strata.is-active {
-    margin-top: 2.55rem;
+    margin-top: 2.9rem;
   }
 
   .strata-context,
@@ -1557,7 +1558,7 @@ h2 {
 
 /* --- Observatory: A shared sky (Drizzle preview) --- */
 section.panel.panel-recent {
-  margin-top: 1.28rem;
+  margin-top: 1.75rem;
 }
 
 #recentMoments.moment-list {
