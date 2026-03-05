@@ -11,7 +11,6 @@ const NOTE_SIGNAL_CAP = 0.16;
 const COMPUTED_DEGREE_KEY = "slipup_v2_computed_degree";
 const DISPLAY_DEGREE_KEY = "slipup_v2_display_degree";
 const FIELD_SCOPE_KEY = "slipup_v2_field_scope";
-const FIELD_COUNTRY_KEY = "slipup_v2_field_country";
 const INFLUENCE = {
   avoidable: {
     stressed: { mode: "condense", strength: 1.0 },
@@ -585,7 +584,6 @@ const sharedSheetList = document.getElementById("shared-sheet-list");
 const sharedSheetEmpty = document.getElementById("shared-sheet-empty");
 const sharedSheetCloseButton = document.getElementById("shared-sheet-close");
 const fieldScopeSelect = document.getElementById("fieldScopeSelect");
-const fieldCountrySelect = document.getElementById("fieldCountrySelect");
 const localClimateDegree = document.getElementById("localClimateDegree");
 const localClimateMass = document.getElementById("localClimateMass");
 const localClimatePrimary = document.getElementById("localClimatePrimary");
@@ -1124,34 +1122,12 @@ function setStoredFieldScope(value) {
   }
 }
 
-function getStoredFieldCountry() {
-  try {
-    return localStorage.getItem(FIELD_COUNTRY_KEY) || "";
-  } catch {
-    return "";
-  }
-}
-
-function setStoredFieldCountry(value) {
-  try {
-    localStorage.setItem(FIELD_COUNTRY_KEY, value);
-  } catch {
-    // Ignore write errors in private mode.
-  }
-}
-
 function toTitlePart(value) {
   return String(value || "")
     .split("-")
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
-}
-
-function continentForScope(fieldScope) {
-  const geo = String(fieldScope?.geo || "");
-  const parts = geo.split(".").filter(Boolean);
-  return parts[1] || "";
 }
 
 function buildCountryIndex(countries) {
@@ -1173,40 +1149,72 @@ function buildCountryIndex(countries) {
   return byContinent;
 }
 
-function refreshCountrySelect(fieldScope, countryIndex, preferredCountry = "") {
-  if (!fieldCountrySelect) return "";
-  const continent = continentForScope(fieldScope);
-  const countries = continent ? countryIndex.get(continent) || [] : [];
-  fieldCountrySelect.innerHTML = "";
-  const baseOption = document.createElement("option");
-  baseOption.value = "";
-  baseOption.textContent = "All countries with signal";
-  fieldCountrySelect.appendChild(baseOption);
+function buildFieldLensModel(fieldScopes, countryIndex) {
+  const groups = [
+    { label: "Home lens", items: [] },
+    { label: "Continents", items: [] },
+    { label: "Countries with signal", items: [] },
+  ];
+  const byValue = new Map();
 
-  countries.forEach((entry) => {
-    const option = document.createElement("option");
-    option.value = entry.country;
-    option.textContent = `${toTitlePart(entry.country)} (${entry.count})`;
-    fieldCountrySelect.appendChild(option);
+  const pushItem = (groupIdx, value, label, scope) => {
+    groups[groupIdx].items.push({ value, label });
+    byValue.set(value, scope);
+  };
+
+  (Array.isArray(fieldScopes) ? fieldScopes : []).forEach((scope) => {
+    const value = `scope:${scope.id}`;
+    const isHome = scope.id === "nearby" || scope.id === "regional-home" || scope.id === "wider-home";
+    const isGlobal = scope.id === "global";
+    pushItem(isHome ? 0 : isGlobal ? 1 : 1, value, scope.label, scope);
   });
 
-  const canFilter = countries.length > 0 && fieldScope?.scope !== "global";
-  fieldCountrySelect.disabled = !canFilter;
-  const selected = canFilter && countries.some((entry) => entry.country === preferredCountry) ? preferredCountry : "";
-  fieldCountrySelect.value = selected;
-  return selected;
+  const continentOrder = ["america", "europe", "africa", "asia", "australia"];
+  continentOrder.forEach((continent) => {
+    const list = countryIndex.get(continent) || [];
+    list.slice(0, 20).forEach((entry) => {
+      const value = `country:${entry.continent}:${entry.country}`;
+      const label = `${toTitlePart(entry.continent)} · ${toTitlePart(entry.country)} (${entry.count})`;
+      const scope = {
+        id: `country-${entry.continent}-${entry.country}`,
+        label: `${toTitlePart(entry.country)} field`,
+        scope: "local",
+        geo: `tz.${entry.continent}.${entry.country}`,
+      };
+      pushItem(2, value, label, scope);
+    });
+  });
+
+  return { groups, byValue };
 }
 
-function resolveScopeWithCountry(baseScope, selectedCountry) {
-  if (!selectedCountry || baseScope?.scope === "global") return baseScope;
-  const continent = continentForScope(baseScope);
-  if (!continent) return baseScope;
-  return {
-    ...baseScope,
-    id: `${baseScope.id}-country-${selectedCountry}`,
-    label: `${toTitlePart(selectedCountry)} field`,
-    geo: `tz.${continent}.${selectedCountry}`,
-  };
+function normalizeStoredFieldScopeValue(rawValue) {
+  const value = String(rawValue || "").trim();
+  if (!value) return "scope:nearby";
+  if (value.startsWith("scope:") || value.startsWith("country:")) return value;
+  return `scope:${value}`;
+}
+
+function renderFieldLensSelect(model, preferredValue) {
+  if (!fieldScopeSelect) return "";
+  fieldScopeSelect.innerHTML = "";
+  model.groups.forEach((group) => {
+    if (!group.items.length) return;
+    const optgroup = document.createElement("optgroup");
+    optgroup.label = group.label;
+    group.items.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.value;
+      option.textContent = item.label;
+      optgroup.appendChild(option);
+    });
+    fieldScopeSelect.appendChild(optgroup);
+  });
+  const fallbackValue =
+    model.groups.flatMap((group) => group.items).find((item) => model.byValue.has(item.value))?.value || "";
+  const selectedValue = model.byValue.has(preferredValue) ? preferredValue : fallbackValue;
+  fieldScopeSelect.value = selectedValue;
+  return selectedValue;
 }
 
 function buildFieldScopeOptions() {
@@ -1752,19 +1760,7 @@ async function boot() {
   const sharedMoments = sharedResult.items;
   const canonicalState = deriveClimateState(climateTruth, sharedMoments, moments);
   const fieldScopes = buildFieldScopeOptions();
-  const preferredScopeId = getStoredFieldScope();
-  const initialFieldScope =
-    fieldScopes.find((item) => item.id === preferredScopeId) || fieldScopes[0] || { id: "nearby", label: "Nearby", scope: "local", geo: "" };
-  if (fieldScopeSelect) {
-    fieldScopeSelect.innerHTML = "";
-    fieldScopes.forEach((item) => {
-      const option = document.createElement("option");
-      option.value = item.id;
-      option.textContent = item.label;
-      if (item.id === initialFieldScope.id) option.selected = true;
-      fieldScopeSelect.appendChild(option);
-    });
-  }
+  const preferredScopeValue = normalizeStoredFieldScopeValue(getStoredFieldScope());
   let countryIndex = new Map();
   try {
     const geoIndex = await fetchGeoIndexRemote(720, "", 3000);
@@ -1772,15 +1768,23 @@ async function boot() {
   } catch {
     countryIndex = new Map();
   }
-  let selectedCountry = refreshCountrySelect(initialFieldScope, countryIndex, getStoredFieldCountry());
-  let activeFieldScope = initialFieldScope;
-  let resolvedScope = resolveScopeWithCountry(activeFieldScope, selectedCountry);
-  let localClimateTruth = await loadFieldClimateTruth(canonicalState, resolvedScope);
+  const fieldLensModel = buildFieldLensModel(fieldScopes, countryIndex);
+  let selectedScopeValue = renderFieldLensSelect(fieldLensModel, preferredScopeValue);
+  let activeFieldScope =
+    fieldLensModel.byValue.get(selectedScopeValue) ||
+    fieldScopes[0] || {
+      id: "nearby",
+      label: "Nearby",
+      scope: "local",
+      geo: "",
+    };
+  setStoredFieldScope(selectedScopeValue);
+  let localClimateTruth = await loadFieldClimateTruth(canonicalState, activeFieldScope);
   let observatoryPipeline = buildObservatoryPipeline(
     sharedMoments,
     canonicalState,
     localClimateTruth,
-    resolvedScope
+    activeFieldScope
   );
   const localClimate = calculateClimate(getSharedMoments(moments));
   const computedDegree = climateTruth.computedDegree;
@@ -1837,7 +1841,7 @@ async function boot() {
   renderLocalClimate(
     localClimateTruth,
     canonicalState,
-    resolvedScope.label || "Nearby",
+    activeFieldScope.label || "Nearby",
     observatoryPipeline
   );
   renderStrata(moments, canonicalState);
@@ -1849,26 +1853,21 @@ async function boot() {
   if (fieldScopeSelect) {
     let requestToken = 0;
     fieldScopeSelect.onchange = async () => {
-      const nextScope =
-        fieldScopes.find((item) => item.id === fieldScopeSelect.value) || fieldScopes[0] || activeFieldScope;
+      const nextScope = fieldLensModel.byValue.get(fieldScopeSelect.value) || activeFieldScope;
       activeFieldScope = nextScope;
-      setStoredFieldScope(nextScope.id);
-      selectedCountry = refreshCountrySelect(nextScope, countryIndex, "");
-      setStoredFieldCountry(selectedCountry);
+      selectedScopeValue = fieldScopeSelect.value;
+      setStoredFieldScope(selectedScopeValue);
       const token = ++requestToken;
       fieldScopeSelect.disabled = true;
-      if (fieldCountrySelect) fieldCountrySelect.disabled = true;
       try {
-        const nextResolvedScope = resolveScopeWithCountry(nextScope, selectedCountry);
-        const nextClimate = await loadFieldClimateTruth(canonicalState, nextResolvedScope);
+        const nextClimate = await loadFieldClimateTruth(canonicalState, nextScope);
         if (token !== requestToken) return;
         localClimateTruth = nextClimate;
-        resolvedScope = nextResolvedScope;
         observatoryPipeline = buildObservatoryPipeline(
           sharedMoments,
           canonicalState,
           localClimateTruth,
-          resolvedScope
+          activeFieldScope
         );
         if (readingConfidenceLine) {
           const confidenceMode = observatoryPipeline.signalModes.confidence;
@@ -1880,52 +1879,11 @@ async function boot() {
         renderLocalClimate(
           localClimateTruth,
           canonicalState,
-          resolvedScope.label || "Nearby",
+          activeFieldScope.label || "Nearby",
           observatoryPipeline
         );
       } finally {
         fieldScopeSelect.disabled = false;
-        refreshCountrySelect(activeFieldScope, countryIndex, selectedCountry);
-      }
-    };
-  }
-
-  if (fieldCountrySelect) {
-    let countryToken = 0;
-    fieldCountrySelect.onchange = async () => {
-      selectedCountry = fieldCountrySelect.value || "";
-      setStoredFieldCountry(selectedCountry);
-      const token = ++countryToken;
-      fieldCountrySelect.disabled = true;
-      if (fieldScopeSelect) fieldScopeSelect.disabled = true;
-      try {
-        const nextResolvedScope = resolveScopeWithCountry(activeFieldScope, selectedCountry);
-        const nextClimate = await loadFieldClimateTruth(canonicalState, nextResolvedScope);
-        if (token !== countryToken) return;
-        localClimateTruth = nextClimate;
-        resolvedScope = nextResolvedScope;
-        observatoryPipeline = buildObservatoryPipeline(
-          sharedMoments,
-          canonicalState,
-          localClimateTruth,
-          resolvedScope
-        );
-        if (readingConfidenceLine) {
-          const confidenceMode = observatoryPipeline.signalModes.confidence;
-          const seed =
-            Math.round((canonicalState?.computedDegree || BASELINE) * 10) + (canonicalState?.total || 0);
-          readingConfidenceLine.textContent = pickCopy(SIGNALS.confidence[confidenceMode], seed);
-        }
-        renderHorizon(canonicalState, sharedMoments, observatoryPipeline);
-        renderLocalClimate(
-          localClimateTruth,
-          canonicalState,
-          resolvedScope.label || "Nearby",
-          observatoryPipeline
-        );
-      } finally {
-        if (fieldScopeSelect) fieldScopeSelect.disabled = false;
-        refreshCountrySelect(activeFieldScope, countryIndex, selectedCountry);
       }
     };
   }
