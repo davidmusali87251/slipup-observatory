@@ -103,39 +103,29 @@ const COPY_VARIANTS = {
   clear: {
     condition: {
       quiet: [
-        "Only a few shared entries are present.",
-        "Shared signal is still in early volume.",
-        "There is not enough shared volume yet.",
-        "This read is still in low-density mode.",
-        "Shared input has just started to accumulate.",
+        "Global signal is still early-volume.",
+        "Low global input volume in this window.",
+        "Global read is pending more shared input.",
       ],
       steady: [
-        "Shared density stays in a stable band.",
-        "Shared entries keep an even rhythm.",
-        "The global read stays near baseline.",
-        "Stability is holding in this window.",
-        "Short-term pressure remains contained.",
+        "Global signal stable near baseline.",
+        "Global rhythm remains even.",
+        "Pressure remains contained globally.",
       ],
       balance: [
-        "The read is re-centering toward baseline.",
-        "Shared pressure is balancing out.",
-        "Stability and pressure are near equilibrium.",
-        "The global signal is returning to center.",
-        "Balanced behavior is becoming clearer.",
+        "Global signal re-centering.",
+        "Pressure and stability are balancing.",
+        "Global read is near equilibrium.",
       ],
       gathering: [
-        "Shared density is increasing in this window.",
-        "Repetition is adding pressure to the read.",
-        "Recent entries are tightening the score.",
-        "The global signal is moving above baseline.",
-        "Pattern weight is becoming more visible.",
+        "Global pressure is increasing.",
+        "Repetition is elevating global score.",
+        "Global density is rising in this window.",
       ],
       dense: [
-        "Shared density is high in this window.",
-        "Repetition and pressure are both elevated.",
-        "The global score is in a dense band.",
-        "Input concentration is currently strong.",
-        "A high-pressure shared state is active.",
+        "High global density is active.",
+        "Global pressure remains elevated.",
+        "Global score is in a dense band.",
       ],
     },
     horizon: {
@@ -266,39 +256,29 @@ const COPY_VARIANTS = {
   poetic: {
     condition: {
       quiet: [
-        "Shared entries are still few in this window.",
-        "Global signal is still in early volume.",
-        "The read is forming from low shared density.",
-        "Not enough mass yet for a firm global line.",
-        "Early shared input is present but still light.",
+        "Global signal is still early-volume.",
+        "Low global input volume in this window.",
+        "Global read is pending more shared input.",
       ],
       steady: [
-        "Shared density stays in a stable band.",
-        "Global rhythm remains even across intervals.",
-        "The read stays close to baseline balance.",
-        "Stability remains consistent in this window.",
-        "Short-window pressure remains contained.",
+        "Global signal stable near baseline.",
+        "Global rhythm remains even.",
+        "Pressure remains contained globally.",
       ],
       balance: [
-        "The global read is re-centering toward baseline.",
-        "Pressure and stability are moving toward balance.",
-        "Shared signal is returning to equilibrium.",
-        "Balanced behavior is becoming more consistent.",
-        "Global variation is easing toward center.",
+        "Global signal re-centering.",
+        "Pressure and stability are balancing.",
+        "Global read is near equilibrium.",
       ],
       gathering: [
-        "Shared density is rising with repetition.",
-        "Repeated entries are tightening the global score.",
-        "Pressure is building in this shared window.",
-        "The read is moving into a denser band.",
-        "Pattern weight is increasing in this interval.",
+        "Global pressure is increasing.",
+        "Repetition is elevating global score.",
+        "Global density is rising in this window.",
       ],
       dense: [
-        "Shared density is high in this interval.",
-        "Repetition and pressure are both elevated.",
-        "Global score is holding in a dense range.",
-        "Input concentration remains strong right now.",
-        "High-pressure shared behavior is active.",
+        "High global density is active.",
+        "Global pressure remains elevated.",
+        "Global score is in a dense band.",
       ],
     },
     horizon: {
@@ -432,16 +412,16 @@ const SIGNAL_VARIANTS = {
   clear: {
     confidence: {
       early: [
-        "Reading confidence is still early.",
-        "Reading confidence is forming.",
+        "Read confidence: early.",
+        "Confidence still forming from low volume.",
       ],
       building: [
-        "Reading confidence is growing.",
-        "Reading confidence is becoming stable.",
+        "Read confidence: building.",
+        "Confidence increasing with added volume.",
       ],
       firm: [
-        "Reading confidence is firm.",
-        "Reading confidence is now steady.",
+        "Read confidence: firm.",
+        "Confidence stable at current volume.",
       ],
     },
     pulse: {
@@ -492,16 +472,16 @@ const SIGNAL_VARIANTS = {
   poetic: {
     confidence: {
       early: [
-        "Reading confidence is still early.",
-        "Confidence is still gathering in this read.",
+        "Read confidence: early.",
+        "Confidence still forming from low volume.",
       ],
       building: [
-        "Confidence is taking shape in this read.",
-        "Confidence is settling into a clearer line.",
+        "Read confidence: building.",
+        "Confidence increasing with added volume.",
       ],
       firm: [
-        "Confidence now holds a firm line.",
-        "This read now holds a steady confidence.",
+        "Read confidence: firm.",
+        "Confidence stable at current volume.",
       ],
     },
     pulse: {
@@ -693,6 +673,7 @@ const horizonSecondary = document.getElementById("horizonSecondary");
 const horizonMoreButton = document.getElementById("horizonMoreButton");
 const heroEl = document.getElementById("observatory-hero");
 const atmospherePatternLine = document.getElementById("atmosphere-pattern-line");
+const patternDriverLabel = document.getElementById("patternDriverLabel");
 const transientReadingLine = document.getElementById("transientReadingLine");
 const sheetBackdrop = document.getElementById("sheet-backdrop");
 const sharedSheet = document.getElementById("shared-sheet");
@@ -1734,20 +1715,28 @@ function renderPatternLayer(canonicalState) {
   const repetition = canonicalState?.repetition || { hasPattern: false, tag: "", strength: 0 };
   heroEl.classList.toggle("observatory--pattern", Boolean(repetition?.hasPattern));
 
-  const seed = lineSeed(canonicalState, canonicalState?.total || 0);
   const dominant = canonicalState?.dominantMix || "";
-  const patternLines = repetition?.hasPattern ? PATTERN_LINES[repetition.tag] || [] : [];
-  const comboLines = COMBINATION_LINES[dominant] || [];
-  const line = patternLines.length ? pickLine(patternLines, seed) : pickLine(comboLines, seed);
+  const tagMap = {
+    pattern_a: "Pattern A active: avoidable + stressed repetition.",
+    pattern_b: "Pattern B active: repeated avoidable mood loop.",
+    pattern_c: "Pattern C active: short-time avoidable clustering.",
+  };
+  const line = repetition?.hasPattern
+    ? tagMap[repetition.tag] || "Pattern signal active in this window."
+    : dominant
+      ? `Dominant mix in recent entries: ${dominant}.`
+      : "";
 
   if (!line) {
     atmospherePatternLine.textContent = "";
     atmospherePatternLine.classList.add("hidden");
+    if (patternDriverLabel) patternDriverLabel.classList.add("hidden");
     return;
   }
 
   atmospherePatternLine.textContent = line;
   atmospherePatternLine.classList.remove("hidden");
+  if (patternDriverLabel) patternDriverLabel.classList.remove("hidden");
 }
 
 async function loadSharedMoments(localMoments) {
