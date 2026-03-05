@@ -1192,12 +1192,18 @@ section.panel.panel-recent {
   color: color-mix(in oklab, var(--text) 86%, var(--muted));
   letter-spacing: 0.01em;
   line-height: 1.35;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 #recentMoments.moment-list .moment-item > span:last-child {
   color: var(--muted);
   font-size: 0.82em;
   white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 #viewMoreButton.text-button {
