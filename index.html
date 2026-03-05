@@ -44,6 +44,7 @@
         <section id="observatory" class="panel panel-observatory" aria-label="Observatory">
           <p class="eyebrow">Atmosphere — Shared Moments</p>
           <p class="atmosphere-orientation">Reading shared moments from the last 48 hours.</p>
+          <p id="atmosphereSemanticHint" class="atmosphere-semantic-hint hidden" aria-live="polite"></p>
           <div class="telescope-scope" aria-hidden="true">
             <span class="scope-ring scope-ring-outer"></span>
             <span class="scope-ring scope-ring-inner"></span>
@@ -52,13 +53,14 @@
             <span class="scope-sweep"></span>
             <span class="scope-target"></span>
           </div>
-          <div class="degree-wrap">
+          <div class="degree-wrap" aria-label="Atmosphere reading in degrees">
             <p id="degreeValue" class="degree-value">28</p>
           </div>
-          <p id="conditionLine" class="condition-line">Global signal pending.</p>
+          <p id="conditionLine" class="condition-line" role="status" aria-live="polite">Global signal pending.</p>
+          <p id="warmupHint" class="warmup-hint hidden" aria-live="polite"></p>
           <p id="transientReadingLine" class="transient-reading-line hidden" aria-live="polite"></p>
           <p id="atmosphere-pattern-line" class="atmosphere-pattern-line hidden" aria-live="polite"></p>
-          <a class="cta cta-observatory" href="./contribute.html">Contribute a moment</a>
+          <a class="cta cta-observatory" href="./contribute.html">Contribute</a>
           <p class="cta-microcopy">Let it rise into the atmosphere.</p>
           <p class="trust-microcopy">No account. No exact pin. Not weather, just shared moments.</p>
         </section>

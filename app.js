@@ -2,7 +2,6 @@ import { fetchClimateRemote, fetchGeoIndexRemote, fetchSharedMomentsRemote } fro
 
 const STORAGE_KEY = "slipup_v2_moments";
 const RENDER_LIMIT = 6;
-const CENTER = 50;
 const BASELINE = 28;
 const SCALE = 100;
 const RECENCY_HALFLIFE_HOURS = 18;
@@ -680,6 +679,8 @@ const horizonMoreButton = document.getElementById("horizonMoreButton");
 const heroEl = document.getElementById("observatory-hero");
 const atmospherePatternLine = document.getElementById("atmosphere-pattern-line");
 const transientReadingLine = document.getElementById("transientReadingLine");
+const atmosphereSemanticHint = document.getElementById("atmosphereSemanticHint");
+const warmupHint = document.getElementById("warmupHint");
 const sheetBackdrop = document.getElementById("sheet-backdrop");
 const sharedSheet = document.getElementById("shared-sheet");
 const sharedSheetList = document.getElementById("shared-sheet-list");
@@ -847,9 +848,10 @@ function applyDeepLinkIfPresent() {
   if (!hash) return;
   const target = document.querySelector(hash);
   if (!target) return;
+  const delay = hash === "#ground-strata" ? 180 : 60;
   window.setTimeout(() => {
     target.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
-  }, 40);
+  }, delay);
 }
 
 function detectStructuralPattern(activeEntries48h) {
@@ -1757,6 +1759,10 @@ function buildStrataLines(longWindowMoments, canonicalState) {
   });
 
   const lines = [];
+  const groundLevel = canonicalState.groundIndex ?? 0;
+  const mixLabel = groundLevel < 0.33 ? "low" : groundLevel < 0.66 ? "moderate" : "high";
+  lines.push(`Deep mix: ${mixLabel}.`);
+
   if (canonicalState.pressureMode === "condensing") {
     lines.push("30-day pressure trend: condensing.");
   } else if (canonicalState.pressureMode === "clearing") {
@@ -1798,7 +1804,7 @@ function buildStrataLines(longWindowMoments, canonicalState) {
   }
 
   if (total < 12) {
-    return [lines[0], pickCopy(COPY.strataEarly, total)];
+    return [lines[1], lines[0]];
   }
 
   return lines.slice(0, 5);
@@ -2031,6 +2037,7 @@ async function boot() {
     degreeValue.textContent = "";
     degreeValue.classList.add("is-pending");
     document.body.style.setProperty("--atmo", String(BASELINE));
+    if (observatoryPanel) observatoryPanel.setAttribute("aria-busy", "true");
   }
 
   const [sharedResult, climateTruth] = await Promise.all([loadSharedMoments(moments), loadClimateTruth(moments)]);
@@ -2107,6 +2114,24 @@ async function boot() {
   setStoredComputedDegree(computedDegree);
   setStoredDisplayDegree(computedDegree);
   conditionLine.textContent = canonicalState.condition;
+  const hasSemanticSignal = sharedMoments.slice(0, 48).some((m) => {
+    const s = noteSignal(m.note || "");
+    return s.reflective > 0 || s.reactive > 0;
+  });
+  if (atmosphereSemanticHint) {
+    atmosphereSemanticHint.textContent = hasSemanticSignal
+      ? "Intention wording in shared moments can nudge the reading."
+      : "";
+    atmosphereSemanticHint.classList.toggle("hidden", !hasSemanticSignal);
+  }
+  const totalForWarmup = canonicalState.total || 0;
+  if (warmupHint) {
+    const showWarmup = totalForWarmup > 0 && totalForWarmup < 6;
+    warmupHint.textContent = showWarmup
+      ? "The reading stays cautious with few shared moments."
+      : "";
+    warmupHint.classList.toggle("hidden", !showWarmup);
+  }
   renderFutureConfidenceLine(canonicalState, observatoryPipeline);
   renderPatternLayer(canonicalState);
   renderRecent(sharedMoments);
@@ -2122,6 +2147,7 @@ async function boot() {
   initSilentDescentTransitions();
   initInfiniteObservatoryScroll();
   applyDeepLinkIfPresent();
+  if (observatoryPanel) observatoryPanel.removeAttribute("aria-busy");
 
   viewMoreButton.onclick = () => openSharedSheet(sharedMoments);
   sheetBackdrop.onclick = closeSharedSheet;

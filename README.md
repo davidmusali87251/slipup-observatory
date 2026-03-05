@@ -5,7 +5,7 @@ Clean rebuild aligned with the Observatory model.
 ## Included in this baseline
 
 - `Observatory` landing as primary atmospheric view.
-- `Contribute a moment` on a separate page.
+- `A Moment` (Contribute) on a separate page.
 - Layered reading model:
   - `Horizon Line` (shared/global transition)
   - `Nearby Field` (regional reading with fallback)
@@ -75,7 +75,7 @@ Frontend keeps local fallback enabled by default:
 ### Consent and legal baseline
 
 - Keep app access open (do not hard-block homepage behind consent).
-- Require explicit consent only when user enables sharing.
+- Require explicit consent (checkbox) before saving a moment.
 - Publish `privacy.html` and `terms.html` and link them from `index.html` and `contribute.html`.
 - Use coarse regional buckets (timezone-derived), never exact GPS coordinates.
 

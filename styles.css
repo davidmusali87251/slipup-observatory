@@ -380,6 +380,23 @@ h2 {
   letter-spacing: 0.08em;
 }
 
+.atmosphere-semantic-hint {
+  margin-top: 0.35rem;
+  font-size: 0.7rem;
+  color: #6d7d94;
+  opacity: 0.78;
+  line-height: 1.5;
+  max-width: 32ch;
+}
+
+.warmup-hint {
+  margin-top: 0.28rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+  opacity: 0.85;
+  line-height: 1.5;
+}
+
 .degree-wrap {
   display: flex;
   justify-content: center;
