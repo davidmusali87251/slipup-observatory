@@ -17,6 +17,7 @@ const ALLOWED_TYPES = new Set(["avoidable", "fertile", "observed"]);
 const ALLOWED_MOODS = new Set(["calm", "focus", "stressed", "curious", "tired"]);
 const sharedGetCache = new Map();
 const climateGetCache = new Map();
+const geoIndexCache = new Map();
 
 function withTimeout(signal, timeoutMs) {
   const controller = new AbortController();
@@ -259,4 +260,48 @@ async function fetchClimateRemote(windowHours = 48, referenceTime = "", scope = 
   }
 }
 
-export { USE_REMOTE_SHARED, fetchSharedMomentsRemote, postMomentRemote, fetchClimateRemote };
+async function fetchGeoIndexRemote(windowHours = 720, continent = "", geoLimit = 2000) {
+  if (!isRemoteReady() || !REMOTE_MOMENTS_URL) {
+    throw new Error("REMOTE_GEO_INDEX_NOT_READY");
+  }
+  const cacheKey = `${windowHours}|${continent}|${geoLimit}`;
+  const cached = geoIndexCache.get(cacheKey);
+  if (cached && Date.now() - cached.at < GET_CACHE_TTL_MS) {
+    return cached.item;
+  }
+
+  const url = new URL(REMOTE_MOMENTS_URL);
+  url.searchParams.set("scope", "geo_index");
+  url.searchParams.set("windowHours", String(windowHours));
+  url.searchParams.set("geoLimit", String(geoLimit));
+  if (continent) url.searchParams.set("continent", continent);
+
+  const scoped = withTimeout(undefined, REMOTE_TIMEOUT_MS);
+  try {
+    const response = await fetch(url.toString(), {
+      method: "GET",
+      headers: buildHeaders(),
+      signal: scoped.signal,
+    });
+    const payload = await safeJson(response);
+    if (!response.ok) {
+      const err = new Error("REMOTE_GEO_INDEX_GET_FAILED");
+      err.status = response.status;
+      err.payload = payload;
+      throw err;
+    }
+    const item = payload && typeof payload === "object" ? payload : { continents: [], countries: [] };
+    geoIndexCache.set(cacheKey, { at: Date.now(), item });
+    return item;
+  } finally {
+    scoped.clear();
+  }
+}
+
+export {
+  USE_REMOTE_SHARED,
+  fetchSharedMomentsRemote,
+  postMomentRemote,
+  fetchClimateRemote,
+  fetchGeoIndexRemote,
+};

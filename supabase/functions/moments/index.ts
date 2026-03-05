@@ -8,6 +8,7 @@ const MAX_NOTE_LENGTH = 19;
 const MAX_GEO_BUCKET_LENGTH = 64;
 const NOTE_SIGNAL_CAP = 0.16;
 const BUCKET_MINUTES = 5;
+const GEO_INDEX_MAX = parseInt(Deno.env.get("MOMENTS_GEO_INDEX_MAX") ?? "4000", 10);
 
 const RATE_WINDOW_SECONDS = parseInt(Deno.env.get("MOMENTS_WINDOW_SECONDS") ?? "60", 10);
 const MOMENTS_GET_MAX = parseInt(Deno.env.get("MOMENTS_GET_MAX") ?? "240", 10);
@@ -168,7 +169,9 @@ function retryAfterSeconds(resetAt: string | null) {
 }
 
 function normalizeScope(raw: string | null) {
-  return raw === "all" ? "all" : "shared";
+  if (raw === "all") return "all";
+  if (raw === "geo_index") return "geo_index";
+  return "shared";
 }
 
 function normalizeGeoBucket(raw: string | null) {
@@ -179,6 +182,14 @@ function normalizeGeoBucket(raw: string | null) {
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "")
     .slice(0, MAX_GEO_BUCKET_LENGTH);
+}
+
+function normalizeContinent(raw: string | null) {
+  const cleaned = String(raw ?? "")
+    .toLowerCase()
+    .replace(/[^a-z]/g, "")
+    .trim();
+  return cleaned || "";
 }
 
 function normalizeNote(input: unknown) {
@@ -306,6 +317,68 @@ Deno.serve(async (req) => {
     const scope = normalizeScope(url.searchParams.get("scope"));
     const now = new Date();
     const start = new Date(now.getTime() - windowHours * 3600_000);
+
+    if (scope === "geo_index") {
+      const geoLimit = clampInt(
+        parseInt(url.searchParams.get("geoLimit") ?? "2000", 10),
+        1,
+        GEO_INDEX_MAX
+      );
+      const continent = normalizeContinent(url.searchParams.get("continent"));
+
+      let geoQuery = supabase
+        .from("moments")
+        .select("geo_bucket,timestamp")
+        .eq("shared", true)
+        .eq("hidden", false)
+        .not("geo_bucket", "is", null)
+        .gte("timestamp", start.toISOString())
+        .lte("timestamp", now.toISOString())
+        .order("timestamp", { ascending: false })
+        .limit(geoLimit);
+
+      if (continent) {
+        geoQuery = geoQuery.like("geo_bucket", `tz.${continent}.%`);
+      }
+
+      const { data, error } = await geoQuery;
+      if (error) return json(origin, 500, { error: "db_error" });
+
+      const rows = Array.isArray(data) ? data : [];
+      const geoBuckets = new Map<string, string>();
+      const countries = new Map<string, { continent: string; country: string; count: number; lastSeen: string }>();
+      const continents = new Set<string>();
+
+      rows.forEach((row) => {
+        const geo = String(row?.geo_bucket ?? "").toLowerCase();
+        const ts = String(row?.timestamp ?? "");
+        if (!geo.startsWith("tz.")) return;
+        if (!geoBuckets.has(geo)) geoBuckets.set(geo, ts);
+
+        const parts = geo.split(".").filter(Boolean);
+        const cont = parts[1] || "";
+        if (!cont) return;
+        continents.add(cont);
+        const country = parts[2] || "";
+        if (!country) return;
+        const key = `${cont}.${country}`;
+        const current = countries.get(key);
+        if (!current) {
+          countries.set(key, { continent: cont, country, count: 1, lastSeen: ts });
+          return;
+        }
+        current.count += 1;
+        if (ts && (!current.lastSeen || ts > current.lastSeen)) current.lastSeen = ts;
+      });
+
+      return json(origin, 200, {
+        scope,
+        windowHours,
+        geoCount: geoBuckets.size,
+        continents: Array.from(continents).sort(),
+        countries: Array.from(countries.values()).sort((a, b) => b.count - a.count),
+      });
+    }
 
     let query = supabase
       .from("moments")
