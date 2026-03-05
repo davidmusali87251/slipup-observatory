@@ -24,6 +24,18 @@ Open `index.html` in a browser.
 
 **Condición:** no incluir `PLAN_MASTER.md` en lo que se despliega. El archivo está en `.gitignore`. Si ya fue commiteado antes, ejecutar una vez: `git rm --cached PLAN_MASTER.md` y hacer commit para quitarlo del árbol desplegado; el archivo seguirá en disco para uso interno.
 
+### GitHub Pages con backend real (Opción A)
+
+El workflow **`.github/workflows/deploy-pages.yml`** despliega a GitHub Pages y genera `remote.js` en el build con los secrets, para que el sitio use Supabase en producción.
+
+1. **Origen del despliegue:** en el repo, **Settings → Pages → Build and deployment**: Source = **GitHub Actions** (no "Deploy from a branch").
+2. **Secrets:** **Settings → Secrets and variables → Actions → New repository secret**. Crear:
+   - `REMOTE_MOMENTS_URL` — URL de la Edge Function `moments` (p. ej. `https://TU_PROJECT_REF.supabase.co/functions/v1/moments`).
+   - `REMOTE_CLIMATE_URL` — URL de la Edge Function `climate`.
+   - `REMOTE_ANON_KEY` — Anon key del proyecto Supabase.
+   - `USE_REMOTE_SHARED` — `true` para activar el backend remoto en producción.
+3. Cada **push a `main`** (o ejecución manual del workflow) hace el build, genera `remote.js` con esos valores y despliega. El sitio desplegado mostrará datos de Supabase.
+
 ## Archivos que conviene dejar solo para nosotros (no en repo público)
 
 - **`supabase/.temp/`** — Generados por la CLI de Supabase (project-ref, versiones, etc.). Ya están en `.gitignore`. Si alguna vez se commitearon, quitar del repo con: `git rm -r --cached supabase/.temp/` y commit (los archivos siguen en disco pero dejan de estar en el árbol).

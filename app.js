@@ -671,6 +671,7 @@ const conditionLine = document.getElementById("conditionLine");
 const readingConfidenceLine = document.getElementById("readingConfidenceLine");
 const observatoryPanel = document.getElementById("observatory");
 const recentMoments = document.getElementById("recentMoments");
+const recentContext = document.getElementById("recentContext");
 const viewMoreButton = document.getElementById("viewMoreButton");
 const horizonPrimary = document.getElementById("horizonPrimary");
 const horizonPulseLine = document.getElementById("horizonPulseLine");
@@ -2053,6 +2054,11 @@ async function boot() {
 
   const [sharedResult, climateTruth] = await Promise.all([loadSharedMoments(moments), loadClimateTruth(moments)]);
   const sharedMoments = sharedResult.items;
+  if (recentContext) {
+    recentContext.textContent = sharedResult.source === "remote"
+      ? "Across the atmosphere."
+      : "Moments from this device only.";
+  }
   const canonicalState = deriveClimateState(climateTruth, sharedMoments, moments);
   const fieldScopes = buildFieldScopeOptions();
   const preferredScopeValue = normalizeStoredFieldScopeValue(getStoredFieldScope());
