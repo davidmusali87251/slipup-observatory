@@ -271,16 +271,6 @@ h2 {
   line-height: 1.72;
 }
 
-.instrument-label {
-  margin-top: -0.35rem;
-  font-size: 0.66rem;
-  line-height: 1.2;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #6a7d95;
-  opacity: 0.72;
-}
-
 .reading-confidence-line {
   margin-top: -0.25rem;
   font-size: 0.75rem;

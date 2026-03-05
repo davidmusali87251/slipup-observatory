@@ -103,29 +103,29 @@ const COPY_VARIANTS = {
   clear: {
     condition: {
       quiet: [
-        "Global signal is still early-volume.",
-        "Low global input volume in this window.",
-        "Global read is pending more shared input.",
+        "Low shared volume.",
+        "Global signal still early.",
+        "Read pending more input.",
       ],
       steady: [
-        "Global signal stable near baseline.",
-        "Global rhythm remains even.",
-        "Pressure remains contained globally.",
+        "Global signal stable.",
+        "Rhythm remains even.",
+        "Pressure stays contained.",
       ],
       balance: [
-        "Global signal re-centering.",
-        "Pressure and stability are balancing.",
-        "Global read is near equilibrium.",
+        "Signal re-centering.",
+        "Pressure and stability balancing.",
+        "Read near equilibrium.",
       ],
       gathering: [
-        "Global pressure is increasing.",
-        "Repetition is elevating global score.",
-        "Global density is rising in this window.",
+        "Global pressure increasing.",
+        "Repetition lifting score.",
+        "Shared density rising.",
       ],
       dense: [
-        "High global density is active.",
-        "Global pressure remains elevated.",
-        "Global score is in a dense band.",
+        "High global density active.",
+        "Pressure remains elevated.",
+        "Score in dense band.",
       ],
     },
     horizon: {
@@ -256,29 +256,29 @@ const COPY_VARIANTS = {
   poetic: {
     condition: {
       quiet: [
-        "Global signal is still early-volume.",
-        "Low global input volume in this window.",
-        "Global read is pending more shared input.",
+        "Low shared volume.",
+        "Global signal still early.",
+        "Read pending more input.",
       ],
       steady: [
-        "Global signal stable near baseline.",
-        "Global rhythm remains even.",
-        "Pressure remains contained globally.",
+        "Global signal stable.",
+        "Rhythm remains even.",
+        "Pressure stays contained.",
       ],
       balance: [
-        "Global signal re-centering.",
-        "Pressure and stability are balancing.",
-        "Global read is near equilibrium.",
+        "Signal re-centering.",
+        "Pressure and stability balancing.",
+        "Read near equilibrium.",
       ],
       gathering: [
-        "Global pressure is increasing.",
-        "Repetition is elevating global score.",
-        "Global density is rising in this window.",
+        "Global pressure increasing.",
+        "Repetition lifting score.",
+        "Shared density rising.",
       ],
       dense: [
-        "High global density is active.",
-        "Global pressure remains elevated.",
-        "Global score is in a dense band.",
+        "High global density active.",
+        "Pressure remains elevated.",
+        "Score in dense band.",
       ],
     },
     horizon: {
@@ -673,7 +673,6 @@ const horizonSecondary = document.getElementById("horizonSecondary");
 const horizonMoreButton = document.getElementById("horizonMoreButton");
 const heroEl = document.getElementById("observatory-hero");
 const atmospherePatternLine = document.getElementById("atmosphere-pattern-line");
-const patternDriverLabel = document.getElementById("patternDriverLabel");
 const transientReadingLine = document.getElementById("transientReadingLine");
 const sheetBackdrop = document.getElementById("sheet-backdrop");
 const sharedSheet = document.getElementById("shared-sheet");
@@ -1714,29 +1713,33 @@ function showTransientReading() {
 function renderPatternLayer(canonicalState) {
   const repetition = canonicalState?.repetition || { hasPattern: false, tag: "", strength: 0 };
   heroEl.classList.toggle("observatory--pattern", Boolean(repetition?.hasPattern));
+  const total = Number(canonicalState?.total) || 0;
+  if (total < 6) {
+    atmospherePatternLine.textContent = "";
+    atmospherePatternLine.classList.add("hidden");
+    return;
+  }
 
   const dominant = canonicalState?.dominantMix || "";
   const tagMap = {
-    pattern_a: "Pattern A active: avoidable + stressed repetition.",
-    pattern_b: "Pattern B active: repeated avoidable mood loop.",
-    pattern_c: "Pattern C active: short-time avoidable clustering.",
+    pattern_a: "Pattern A: avoidable|stressed repeating.",
+    pattern_b: "Pattern B: repeated avoidable mood.",
+    pattern_c: "Pattern C: short-time clustering.",
   };
   const line = repetition?.hasPattern
-    ? tagMap[repetition.tag] || "Pattern signal active in this window."
+    ? tagMap[repetition.tag] || "Pattern signal active."
     : dominant
-      ? `Dominant mix in recent entries: ${dominant}.`
+      ? `Dominant mix: ${dominant}.`
       : "";
 
   if (!line) {
     atmospherePatternLine.textContent = "";
     atmospherePatternLine.classList.add("hidden");
-    if (patternDriverLabel) patternDriverLabel.classList.add("hidden");
     return;
   }
 
   atmospherePatternLine.textContent = line;
   atmospherePatternLine.classList.remove("hidden");
-  if (patternDriverLabel) patternDriverLabel.classList.remove("hidden");
 }
 
 async function loadSharedMoments(localMoments) {
