@@ -10,6 +10,7 @@ const RESPONSE_AMPLITUDE = 20;
 const NOTE_SIGNAL_CAP = 0.16;
 const COMPUTED_DEGREE_KEY = "slipup_v2_computed_degree";
 const DISPLAY_DEGREE_KEY = "slipup_v2_display_degree";
+const FIELD_SCOPE_KEY = "slipup_v2_field_scope";
 const INFLUENCE = {
   avoidable: {
     stressed: { mode: "condense", strength: 1.0 },
@@ -365,6 +366,113 @@ const COPY_VARIANTS = {
   },
 };
 const COPY = COPY_VARIANTS[COPY_MODE] || COPY_VARIANTS.clear;
+const SIGNAL_VARIANTS = {
+  clear: {
+    confidence: {
+      early: [
+        "Reading confidence is still early.",
+        "Reading confidence is forming.",
+      ],
+      building: [
+        "Reading confidence is growing.",
+        "Reading confidence is becoming stable.",
+      ],
+      firm: [
+        "Reading confidence is firm.",
+        "Reading confidence is now steady.",
+      ],
+    },
+    pulse: {
+      early: [
+        "Pulse is still early in this window.",
+        "Pulse is just starting to appear.",
+      ],
+      rising: [
+        "Recent pulse is rising.",
+        "Recent pulse is gaining pace.",
+      ],
+      easing: [
+        "Recent pulse is easing.",
+        "Recent pulse is slowing down.",
+      ],
+      steady: [
+        "Recent pulse is steady.",
+        "Recent pulse is holding level.",
+      ],
+    },
+    echo: {
+      fallback: [
+        "Nearby echo follows the wider field for now.",
+        "Nearby echo is using the wider field for now.",
+      ],
+      aligned: [
+        "Nearby echo is closely aligned with the wider field.",
+        "Nearby echo tracks the wider field closely.",
+      ],
+      near: [
+        "Nearby echo is close to the wider field.",
+        "Nearby echo keeps a similar line to the wider field.",
+      ],
+      offset: [
+        "Nearby echo is moving on a distinct local line.",
+        "Nearby echo shows a distinct local contour.",
+      ],
+    },
+  },
+  poetic: {
+    confidence: {
+      early: [
+        "Reading confidence is still early.",
+        "Confidence is still gathering in this read.",
+      ],
+      building: [
+        "Confidence is taking shape in this read.",
+        "Confidence is settling into a clearer line.",
+      ],
+      firm: [
+        "Confidence now holds a firm line.",
+        "This read now holds a steady confidence.",
+      ],
+    },
+    pulse: {
+      early: [
+        "The pulse is still in first light.",
+        "A first pulse is only beginning to form.",
+      ],
+      rising: [
+        "The recent pulse is rising.",
+        "The pulse is gathering pace in this window.",
+      ],
+      easing: [
+        "The recent pulse is easing.",
+        "The pulse softens in this window.",
+      ],
+      steady: [
+        "The recent pulse keeps a steady line.",
+        "The pulse holds a quiet balance.",
+      ],
+    },
+    echo: {
+      fallback: [
+        "Nearby echo follows the wider field for now.",
+        "Nearby echo is still borrowing the wider line.",
+      ],
+      aligned: [
+        "Nearby echo stays close to the wider field.",
+        "Nearby echo moves in step with the wider field.",
+      ],
+      near: [
+        "Nearby echo remains near the wider line.",
+        "Nearby echo keeps close to the wider field.",
+      ],
+      offset: [
+        "Nearby echo draws a distinct local contour.",
+        "Nearby echo diverges into its own local line.",
+      ],
+    },
+  },
+};
+const SIGNALS = SIGNAL_VARIANTS[COPY_MODE] || SIGNAL_VARIANTS.clear;
 
 function pickCopy(entry, seed) {
   if (Array.isArray(entry)) {
@@ -382,9 +490,11 @@ function pickCopyFromState(entry, numericSeed) {
 
 const degreeValue = document.getElementById("degreeValue");
 const conditionLine = document.getElementById("conditionLine");
+const readingConfidenceLine = document.getElementById("readingConfidenceLine");
 const recentMoments = document.getElementById("recentMoments");
 const viewMoreButton = document.getElementById("viewMoreButton");
 const horizonPrimary = document.getElementById("horizonPrimary");
+const horizonPulseLine = document.getElementById("horizonPulseLine");
 const horizonSecondary = document.getElementById("horizonSecondary");
 const horizonMoreButton = document.getElementById("horizonMoreButton");
 const heroEl = document.getElementById("observatory-hero");
@@ -395,8 +505,12 @@ const sharedSheet = document.getElementById("shared-sheet");
 const sharedSheetList = document.getElementById("shared-sheet-list");
 const sharedSheetEmpty = document.getElementById("shared-sheet-empty");
 const sharedSheetCloseButton = document.getElementById("shared-sheet-close");
+const fieldScopeSelect = document.getElementById("fieldScopeSelect");
+const localClimateDegree = document.getElementById("localClimateDegree");
+const localClimateMass = document.getElementById("localClimateMass");
 const localClimatePrimary = document.getElementById("localClimatePrimary");
 const localClimateSecondary = document.getElementById("localClimateSecondary");
+const localClimateEcho = document.getElementById("localClimateEcho");
 const groundStrata = document.getElementById("ground-strata");
 const strataLines = document.getElementById("strataLines");
 
@@ -830,6 +944,100 @@ function conditionForDegree(value, total) {
   return pickCopy(COPY.condition.dense, seed);
 }
 
+function classifyConfidence(total) {
+  if (total < 8) return "early";
+  if (total < 24) return "building";
+  return "firm";
+}
+
+function countInWindow(items, minMinutes, maxMinutes) {
+  const now = Date.now();
+  return items.filter((m) => {
+    const ageMinutes = (now - new Date(m.timestamp).getTime()) / 60000;
+    return ageMinutes >= minMinutes && ageMinutes < maxMinutes;
+  }).length;
+}
+
+function classifyPulse(sharedMoments) {
+  if (!Array.isArray(sharedMoments) || sharedMoments.length < 3) return "early";
+  const recent15 = countInWindow(sharedMoments, 0, 15);
+  const prior15 = countInWindow(sharedMoments, 15, 30);
+  if (recent15 >= 2 && recent15 >= prior15 + 1) return "rising";
+  if (prior15 >= 2 && recent15 + 1 <= prior15) return "easing";
+  return "steady";
+}
+
+function classifyEcho(localState, globalState) {
+  if (localState?.source === "global_fallback") return "fallback";
+  const local = Number(localState?.computedDegree);
+  const global = Number(globalState?.computedDegree);
+  if (!Number.isFinite(local) || !Number.isFinite(global)) return "fallback";
+  const delta = Math.abs(local - global);
+  if (delta < 3) return "aligned";
+  if (delta < 7) return "near";
+  return "offset";
+}
+
+function getStoredFieldScope() {
+  try {
+    return localStorage.getItem(FIELD_SCOPE_KEY) || "nearby";
+  } catch {
+    return "nearby";
+  }
+}
+
+function setStoredFieldScope(value) {
+  try {
+    localStorage.setItem(FIELD_SCOPE_KEY, value);
+  } catch {
+    // Ignore write errors in private mode.
+  }
+}
+
+function formatGeoLabel(geoBucket) {
+  if (!geoBucket) return "Global";
+  const parts = geoBucket.split(".").slice(1).filter(Boolean);
+  if (!parts.length) return "Nearby";
+  const last = parts[parts.length - 1].replace(/-/g, " ");
+  return last.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function buildFieldScopeOptions() {
+  const nearbyGeo = guessGeoBucketFromTimezone();
+  const options = [{ id: "nearby", label: "Nearby", scope: "local", geo: nearbyGeo }];
+  const seen = new Set([nearbyGeo || ""]);
+  const segments = nearbyGeo ? nearbyGeo.split(".").filter(Boolean) : [];
+
+  if (segments.length >= 3) {
+    const regionalGeo = segments.slice(0, 3).join(".");
+    if (!seen.has(regionalGeo)) {
+      options.push({
+        id: "regional",
+        label: `${formatGeoLabel(regionalGeo)} region`,
+        scope: "local",
+        geo: regionalGeo,
+      });
+      seen.add(regionalGeo);
+    }
+  }
+
+  if (segments.length >= 2) {
+    const broadGeo = segments.slice(0, 2).join(".");
+    if (!seen.has(broadGeo)) {
+      options.push({
+        id: "broad",
+        label: `${formatGeoLabel(broadGeo)} field`,
+        scope: "local",
+        geo: broadGeo,
+      });
+      seen.add(broadGeo);
+    }
+  }
+
+  options.push({ id: "global", label: "Global", scope: "global", geo: "" });
+  return options;
+}
+
 function getSharedMoments(moments) {
   return moments.filter((m) => m.shared && !m.hidden).reverse();
 }
@@ -957,6 +1165,8 @@ function openSharedSheet(sharedMoments) {
 function renderHorizon(canonicalState, sharedMoments) {
   const total = sharedMoments.length;
   const seed = Math.round((canonicalState?.computedDegree || BASELINE) * 10) + total;
+  const pulseMode = classifyPulse(sharedMoments);
+  horizonPulseLine.textContent = pickCopy(SIGNALS.pulse[pulseMode], seed + total);
   horizonSecondary.classList.add("hidden");
   horizonMoreButton.classList.add("hidden");
   horizonSecondary.innerHTML = "";
@@ -1001,7 +1211,7 @@ function renderHorizon(canonicalState, sharedMoments) {
   };
 }
 
-function renderLocalClimate(localState) {
+function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby") {
   const pressureMode = localState?.pressureMode || "stabilizing";
   const seed = Math.round((localState?.computedDegree || BASELINE) * 10) + (localState?.total || 0);
   const pressureText =
@@ -1012,6 +1222,22 @@ function renderLocalClimate(localState) {
         : pickCopy(COPY.local.stable, seed);
 
   localClimatePrimary.textContent = pressureText;
+  const roundedDegree = Math.round(Number(localState?.computedDegree) || BASELINE);
+  const total = Number(localState?.total) || 0;
+  const confidenceMode = classifyConfidence(total);
+  if (localClimateDegree) {
+    localClimateDegree.textContent = `${roundedDegree}° ${scopeLabel.toLowerCase()}`;
+  }
+  if (localClimateMass) {
+    localClimateMass.textContent = `${total} shared · ${confidenceMode}`;
+  }
+  if (localState?.source === "global_view") {
+    localClimateSecondary.textContent = "Reading shared moments across the wider field.";
+    localClimateEcho.textContent = "Wider field lens selected.";
+    return;
+  }
+  const echoMode = classifyEcho(localState, canonicalState);
+  localClimateEcho.textContent = pickCopy(SIGNALS.echo[echoMode], seed + 5);
   if (localState?.source === "global_fallback") {
     localClimateSecondary.textContent = pickCopy(COPY.local.fallback, seed);
     return;
@@ -1247,8 +1473,13 @@ function guessGeoBucketFromTimezone() {
   }
 }
 
-async function loadLocalClimateTruth(globalClimate) {
-  const geoBucket = guessGeoBucketFromTimezone();
+async function loadFieldClimateTruth(globalClimate, fieldScope) {
+  const scope = fieldScope?.scope || "local";
+  if (scope === "global") {
+    return { source: "global_view", ...globalClimate };
+  }
+
+  const geoBucket = fieldScope?.geo || guessGeoBucketFromTimezone();
   if (!geoBucket) {
     return { source: "global_fallback", ...globalClimate };
   }
@@ -1301,7 +1532,22 @@ async function boot() {
   const [sharedResult, climateTruth] = await Promise.all([loadSharedMoments(moments), loadClimateTruth(moments)]);
   const sharedMoments = sharedResult.items;
   const canonicalState = deriveClimateState(climateTruth, sharedMoments, moments);
-  const localClimateTruth = await loadLocalClimateTruth(canonicalState);
+  const fieldScopes = buildFieldScopeOptions();
+  const preferredScopeId = getStoredFieldScope();
+  const initialFieldScope =
+    fieldScopes.find((item) => item.id === preferredScopeId) || fieldScopes[0] || { id: "nearby", label: "Nearby", scope: "local", geo: "" };
+  if (fieldScopeSelect) {
+    fieldScopeSelect.innerHTML = "";
+    fieldScopes.forEach((item) => {
+      const option = document.createElement("option");
+      option.value = item.id;
+      option.textContent = item.label;
+      if (item.id === initialFieldScope.id) option.selected = true;
+      fieldScopeSelect.appendChild(option);
+    });
+  }
+  let activeFieldScope = initialFieldScope;
+  let localClimateTruth = await loadFieldClimateTruth(canonicalState, activeFieldScope);
   const localClimate = calculateClimate(getSharedMoments(moments));
   const computedDegree = climateTruth.computedDegree;
   const startDisplay = Number.isFinite(previousDisplay)
@@ -1346,15 +1592,40 @@ async function boot() {
   setStoredComputedDegree(computedDegree);
   setStoredDisplayDegree(computedDegree);
   conditionLine.textContent = canonicalState.condition;
+  if (readingConfidenceLine) {
+    const confidenceMode = classifyConfidence(Number(canonicalState?.total) || 0);
+    const seed = Math.round((canonicalState?.computedDegree || BASELINE) * 10) + (canonicalState?.total || 0);
+    readingConfidenceLine.textContent = pickCopy(SIGNALS.confidence[confidenceMode], seed);
+  }
   renderPatternLayer(canonicalState);
   renderRecent(sharedMoments);
   renderHorizon(canonicalState, sharedMoments);
-  renderLocalClimate(localClimateTruth);
+  renderLocalClimate(localClimateTruth, canonicalState, activeFieldScope.label || "Nearby");
   renderStrata(moments, canonicalState);
 
   viewMoreButton.onclick = () => openSharedSheet(sharedMoments);
   sheetBackdrop.onclick = closeSharedSheet;
   sharedSheetCloseButton.onclick = closeSharedSheet;
+
+  if (fieldScopeSelect) {
+    let requestToken = 0;
+    fieldScopeSelect.onchange = async () => {
+      const nextScope =
+        fieldScopes.find((item) => item.id === fieldScopeSelect.value) || fieldScopes[0] || activeFieldScope;
+      activeFieldScope = nextScope;
+      setStoredFieldScope(nextScope.id);
+      const token = ++requestToken;
+      fieldScopeSelect.disabled = true;
+      try {
+        const nextClimate = await loadFieldClimateTruth(canonicalState, nextScope);
+        if (token !== requestToken) return;
+        localClimateTruth = nextClimate;
+        renderLocalClimate(localClimateTruth, canonicalState, activeFieldScope.label || "Nearby");
+      } finally {
+        fieldScopeSelect.disabled = false;
+      }
+    };
+  }
 }
 
 boot();

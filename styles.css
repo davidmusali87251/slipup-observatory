@@ -270,6 +270,15 @@ h2 {
   line-height: 1.5;
 }
 
+.reading-confidence-line {
+  margin-top: -0.25rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: #5f7290;
+  opacity: 0.78;
+  letter-spacing: 0.01em;
+}
+
 .transient-reading-line {
   margin-top: 0.05rem;
   font-size: 0.8rem;
@@ -402,6 +411,15 @@ h2 {
   margin-bottom: 0.8rem;
   line-height: 1.65;
   font-size: 0.88rem;
+  text-align: left;
+}
+
+.horizon-pulse-line {
+  font-size: 0.79rem;
+  line-height: 1.42;
+  color: #4e6077;
+  opacity: 0.78;
+  margin-bottom: 0.58rem;
   text-align: left;
 }
 
@@ -555,6 +573,54 @@ h2 {
   opacity: 0.88;
 }
 
+.local-field-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  margin-bottom: 0.4rem;
+}
+
+.local-field-label {
+  font-size: 0.7rem;
+  color: #5b6e86;
+  opacity: 0.8;
+  letter-spacing: 0.02em;
+}
+
+.local-field-select {
+  min-height: 30px;
+  padding: 0.22rem 0.55rem;
+  border: 1px solid color-mix(in oklab, var(--text) 16%, transparent);
+  border-radius: 8px;
+  background: color-mix(in oklab, #ffffff 58%, transparent);
+  color: #2b3f53;
+  font-size: 0.74rem;
+  line-height: 1;
+}
+
+.local-climate-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.28rem;
+}
+
+.local-climate-degree {
+  font-size: 0.9rem;
+  color: #2c3f54;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+}
+
+.local-climate-mass {
+  font-size: 0.72rem;
+  color: #5f7390;
+  line-height: 1.2;
+  opacity: 0.78;
+}
+
 .local-climate-primary {
   font-size: 0.89rem;
   color: #2d4054;
@@ -568,6 +634,15 @@ h2 {
   color: var(--muted);
   line-height: 1.46;
   opacity: 0.76;
+  text-align: left;
+}
+
+.local-climate-echo {
+  margin-top: 0.2rem;
+  font-size: 0.75rem;
+  color: #556983;
+  line-height: 1.42;
+  opacity: 0.75;
   text-align: left;
 }
 
