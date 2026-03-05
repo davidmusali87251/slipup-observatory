@@ -170,7 +170,7 @@ h2 {
   border-radius: 20px;
   backdrop-filter: blur(8px);
   padding: 1.25rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.2rem;
 }
 
 .panel-observatory {
@@ -180,7 +180,7 @@ h2 {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 1.35rem;
+  gap: 1.45rem;
   text-align: center;
   position: relative;
   overflow: visible;
@@ -404,6 +404,7 @@ h2 {
   line-height: 1.56;
   text-align: left;
   padding-left: 0.28rem;
+  max-width: 56ch;
 }
 
 .horizon-secondary {
@@ -415,6 +416,7 @@ h2 {
   font-size: 0.88rem;
   text-align: left;
   padding-left: 0.28rem;
+  max-width: 56ch;
 }
 
 .horizon-pulse-line {
@@ -425,6 +427,7 @@ h2 {
   margin-bottom: 0.58rem;
   text-align: left;
   padding-left: 0.28rem;
+  max-width: 56ch;
 }
 
 .cta,
@@ -484,10 +487,10 @@ h2 {
   border-radius: 0;
   backdrop-filter: none;
   box-shadow: none;
-  padding: 0.35rem 0.15rem 0.2rem;
+  padding: 0.5rem 0.2rem 0.32rem;
   position: relative;
   overflow: visible;
-  margin-top: -0.2rem;
+  margin-top: 0.12rem;
 }
 
 .panel-recent .recent-context {
@@ -516,6 +519,7 @@ h2 {
 }
 
 .panel-horizon {
+  margin-top: 0.42rem;
   background:
     linear-gradient(
       180deg,
@@ -557,7 +561,7 @@ h2 {
 
 .local-climate {
   padding: 0.2rem 0.15rem 0.35rem;
-  margin-top: 0.92rem;
+  margin-top: 1.12rem;
   background:
     linear-gradient(
       180deg,
@@ -634,6 +638,7 @@ h2 {
   margin-bottom: 0.24rem;
   text-align: left;
   padding-left: 0.58rem;
+  max-width: 54ch;
 }
 
 .local-climate-secondary {
@@ -643,6 +648,7 @@ h2 {
   opacity: 0.76;
   text-align: left;
   padding-left: 0.58rem;
+  max-width: 54ch;
 }
 
 .local-climate-echo {
@@ -653,6 +659,7 @@ h2 {
   opacity: 0.75;
   text-align: left;
   padding-left: 0.58rem;
+  max-width: 54ch;
 }
 
 /* Seed hook for future lower strata (inactive by default). */
@@ -679,7 +686,7 @@ h2 {
   height: auto;
   opacity: 1;
   pointer-events: auto;
-  margin-top: 1.1rem;
+  margin-top: 1.34rem;
 }
 
 .strata-context {
@@ -691,6 +698,7 @@ h2 {
   line-height: 1.3;
   text-align: left;
   padding-left: 0.88rem;
+  max-width: 52ch;
 }
 
 .strata-lines {
@@ -700,6 +708,7 @@ h2 {
   display: grid;
   gap: 0.48rem;
   padding-left: 0.88rem;
+  max-width: 52ch;
 }
 
 .strata-line {
@@ -1106,7 +1115,7 @@ h2 {
 
 /* --- Observatory: A shared sky (Drizzle preview) --- */
 section.panel.panel-recent {
-  margin-top: 1.05rem;
+  margin-top: 1.28rem;
 }
 
 #recentMoments.moment-list {

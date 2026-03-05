@@ -1,7 +1,7 @@
 import { fetchClimateRemote, fetchGeoIndexRemote, fetchSharedMomentsRemote } from "./remote.js";
 
 const STORAGE_KEY = "slipup_v2_moments";
-const RENDER_LIMIT = 10;
+const RENDER_LIMIT = 6;
 const CENTER = 50;
 const BASELINE = 28;
 const SCALE = 100;
