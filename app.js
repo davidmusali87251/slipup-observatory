@@ -1529,6 +1529,15 @@ function getSharedMoments(moments) {
   return moments.filter((m) => m.shared && !m.hidden).reverse();
 }
 
+function formatGeoForDisplay(geo) {
+  if (!geo || typeof geo !== "string") return "";
+  const parts = geo.trim().split(".").filter(Boolean);
+  if (!parts.length) return "";
+  const last = parts[parts.length - 1].replace(/_/g, " ");
+  if (!last) return "";
+  return last.charAt(0).toUpperCase() + last.slice(1).toLowerCase();
+}
+
 function renderMomentItems(targetElement, items) {
   targetElement.innerHTML = "";
   items.forEach((m) => {
@@ -1536,11 +1545,13 @@ function renderMomentItems(targetElement, items) {
     li.className = "moment-item";
     const note = m.note ? m.note : "(no note)";
     const left = `${m.type} · ${m.mood} · ${note}`;
-    const right = new Date(m.timestamp).toLocaleTimeString([], {
+    const timeStr = new Date(m.timestamp).toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
     });
-    li.innerHTML = `<span>${escapeHtml(left)}</span><span>${escapeHtml(right)}</span>`;
+    const regionLabel = formatGeoForDisplay(m.geo_bucket);
+    const meta = regionLabel ? `${timeStr} · ${regionLabel}` : timeStr;
+    li.innerHTML = `<span>${escapeHtml(left)}</span><span class="moment-meta">${escapeHtml(meta)}</span>`;
     targetElement.appendChild(li);
   });
 }

@@ -124,6 +124,7 @@ function sanitizeMoment(raw) {
     note: normalizeNote(raw?.note),
     shared: Boolean(raw?.shared),
     hidden: Boolean(raw?.hidden),
+    geo_bucket: typeof raw?.geo_bucket === "string" ? raw.geo_bucket.trim().slice(0, 64) : null,
   };
 }
 

@@ -382,7 +382,7 @@ Deno.serve(async (req) => {
 
     let query = supabase
       .from("moments")
-      .select("id,timestamp,created_at,client_day,type,mood,note,shared,hidden")
+      .select("id,timestamp,created_at,client_day,type,mood,note,shared,hidden,geo_bucket")
       .eq("hidden", false)
       .gte("timestamp", start.toISOString())
       .lte("timestamp", now.toISOString())
