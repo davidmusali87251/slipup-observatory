@@ -392,6 +392,7 @@ h2 {
   color: #2d4054;
   margin-bottom: 0.6rem;
   line-height: 1.65;
+  text-align: left;
 }
 
 .horizon-secondary {
@@ -401,6 +402,7 @@ h2 {
   margin-bottom: 0.8rem;
   line-height: 1.65;
   font-size: 0.88rem;
+  text-align: left;
 }
 
 .cta,
@@ -558,6 +560,7 @@ h2 {
   color: #2d4054;
   line-height: 1.52;
   margin-bottom: 0.24rem;
+  text-align: left;
 }
 
 .local-climate-secondary {
@@ -565,6 +568,7 @@ h2 {
   color: var(--muted);
   line-height: 1.46;
   opacity: 0.76;
+  text-align: left;
 }
 
 /* Seed hook for future lower strata (inactive by default). */
@@ -600,6 +604,7 @@ h2 {
   opacity: 0.68;
   letter-spacing: 0.01em;
   margin-bottom: 0.48rem;
+  text-align: left;
 }
 
 .strata-lines {
@@ -615,6 +620,7 @@ h2 {
   line-height: 1.45;
   color: color-mix(in oklab, var(--text) 82%, var(--muted));
   opacity: 0.9;
+  text-align: left;
 }
 
 .sheet-backdrop {
