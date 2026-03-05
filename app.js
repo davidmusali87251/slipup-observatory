@@ -143,11 +143,15 @@ const COPY_VARIANTS = {
         "No shared moments have reached the surface reading yet.",
         "The surface reading has not formed yet.",
         "The surface reading is still waiting for momentum.",
+        "Only sky movement is visible so far.",
+        "The descent line has not formed yet.",
       ],
       early: [
         "The surface reading is still taking shape.",
         "The surface reading is still forming.",
         "Only a faint surface reading is visible.",
+        "A first bridge is forming from sky to ground.",
+        "The horizon line is still light.",
       ],
       dominant: [
         (kind) => `A ${kind} current is shaping the surface reading.`,
@@ -155,81 +159,108 @@ const COPY_VARIANTS = {
         (kind) => `A ${kind} tone is rising across the surface reading.`,
         (kind) => `A ${kind} movement is becoming clearer at the surface.`,
         (kind) => `The surface reading leans toward a ${kind} current.`,
+        (kind) => `A ${kind} current is descending from the upper field.`,
+        (kind) => `A ${kind} tone is crossing the sky-ground edge.`,
+        (kind) => `A ${kind} stream is settling toward nearby ground.`,
       ],
       trendSteady: [
         "The collective pulse is steady.",
         "The collective rhythm holds.",
         "The shared pulse remains even.",
         "The broad rhythm is stable.",
+        "The sky line and surface line stay aligned.",
+        "Upper movement descends in a stable line.",
       ],
       trendShift: [
         "The collective pulse is still rearranging.",
         "The collective rhythm is still shifting.",
         "The shared pulse is still finding new order.",
         "The broad rhythm is still re-forming.",
+        "Upper movement is still changing before settling.",
+        "The descent line is still reorganizing.",
       ],
       driftCondensing: [
         "A denser layer lingers at the surface.",
         "The surface is compacting into a tighter layer.",
         "A compact surface band remains present.",
         "Density holds close to the surface line.",
+        "The descent from above is landing in a tighter band.",
+        "Near-ground air is compacting as it settles.",
       ],
       driftClearing: [
         "A clearer lane is opening at the surface.",
         "The surface is opening into a clearer line.",
         "A lighter surface lane is appearing.",
         "The surface reading is opening out.",
+        "The descent from above is opening near ground.",
+        "Near-ground flow is clearing as it settles.",
       ],
       driftStable: [
         "The surface line stays in balance.",
         "The surface reading is holding steady.",
         "The surface keeps a measured balance.",
         "The surface line remains calm.",
+        "The transition from sky to ground stays even.",
+        "The descent line holds a quiet balance.",
       ],
     },
     local: {
       condensing: [
-        "Nearby moments are compacting.",
-        "Nearby moments are gathering into a tighter band.",
-        "Nearby moments are clustering into denser patterns.",
-        "Nearby moments are drawing inward.",
+        "Moments around you are compacting.",
+        "Moments around you gather into a tighter band.",
+        "Moments around you cluster into denser patterns.",
+        "Moments around you draw inward.",
+        "A denser nearby band is taking shape.",
+        "Local movement is tightening near ground.",
       ],
       clearing: [
-        "Nearby moments are opening.",
-        "Nearby moments are creating more space.",
-        "Nearby moments are spreading into lighter space.",
-        "Nearby moments are loosening.",
+        "Moments around you are opening.",
+        "Moments around you are creating more space.",
+        "Moments around you spread into lighter space.",
+        "Moments around you are loosening.",
+        "A lighter nearby lane is opening.",
+        "Local movement is clearing near ground.",
       ],
       stable: [
-        "Nearby moments hold a steady balance.",
-        "Nearby moments stay in a balanced rhythm.",
-        "Nearby moments remain calm and even.",
-        "Nearby moments keep a measured line.",
+        "Moments around you hold a steady balance.",
+        "Moments around you stay in a balanced rhythm.",
+        "Moments around you remain calm and even.",
+        "Moments around you keep a measured line.",
+        "Nearby movement holds a quiet line.",
+        "Local flow remains stable and even.",
       ],
       fallback: [
-        "Nearby read is forming. It mirrors the wider field.",
-        "Nearby read is still light. It follows the wider field.",
-        "Nearby read is still emerging. It reflects the wider field.",
-        "Nearby read is not yet dense. It mirrors the wider field.",
+        "The field around you is forming. It mirrors the wider field.",
+        "The field around you is still light. It follows the wider field.",
+        "The field around you is still emerging. It reflects the wider field.",
+        "The field around you is not yet dense. It mirrors the wider field.",
+        "Your nearby field is still light. It follows the wider line.",
+        "Your nearby field is still forming from the wider read.",
       ],
       regional: [
-        "Reading shared moments across your region.",
-        "Read based on shared moments from your region.",
-        "Regional read drawn from shared moments.",
-        "Shared regional moments shape this read.",
+        "Reading shared moments around your region.",
+        "Read based on shared moments near your region.",
+        "Regional read drawn from moments around you.",
+        "Shared regional moments around you shape this read.",
+        "Regional shared moments guide this nearby read.",
+        "This read follows shared movement near your region.",
       ],
     },
     strataFallback: [
-      "Shared and private moments settle below the surface.",
-      "Shared and private moments rest together in deeper layers.",
-      "Below the surface, moments settle side by side.",
-      "Deeper layers hold shared and private moments together.",
-      "Shared and private moments keep settling in deeper record.",
+      "Your private and shared moments settle below the surface.",
+      "Your private and shared moments rest together in deeper layers.",
+      "Below the surface, your moments settle side by side.",
+      "Deeper layers hold your shared and private moments together.",
+      "Your shared and private moments keep settling in deep record.",
+      "Your deeper layers keep gathering settled moments.",
+      "Your record below keeps compacting over time.",
     ],
     strataEarly: [
-      "The deep record is still forming.",
-      "Only a light layer has settled in deep record.",
-      "Deep record is beginning to gather moments.",
+      "Your deep record is still forming.",
+      "Only a light layer has settled in your deep record.",
+      "Your deep record is beginning to gather moments.",
+      "Your deeper record is just beginning to settle.",
+      "Only first sediments are visible in your deep record.",
     ],
   },
   poetic: {
@@ -275,11 +306,15 @@ const COPY_VARIANTS = {
         "No shared moments have reached the surface reading yet.",
         "The surface reading is still waiting for its first line.",
         "The surface reading is still quiet.",
+        "Only upper movement is visible for now.",
+        "The sky-to-ground bridge is still quiet.",
       ],
       early: [
         "The surface reading is still settling.",
         "The surface reading is finding its contour.",
         "A first contour is still forming at the surface.",
+        "A first bridge is forming from upper air.",
+        "The horizon edge is beginning to gather shape.",
       ],
       dominant: [
         (kind) => `A ${kind} current is surfacing in the read.`,
@@ -287,81 +322,108 @@ const COPY_VARIANTS = {
         (kind) => `A ${kind} tone is beginning to lead the surface.`,
         (kind) => `A ${kind} movement is becoming visible at the surface.`,
         (kind) => `The surface reading is turning toward a ${kind} current.`,
+        (kind) => `A ${kind} current descends from upper view.`,
+        (kind) => `A ${kind} tone crosses the sky-ground edge.`,
+        (kind) => `A ${kind} stream settles toward nearby ground.`,
       ],
       trendSteady: [
         "The collective pulse stays even.",
         "A calm collective pulse remains in place.",
         "The collective rhythm holds a quiet balance.",
         "A steady collective pulse continues.",
+        "Upper flow descends in a calm line.",
+        "Sky and surface keep one measured rhythm.",
       ],
       trendShift: [
         "The collective pulse is still rearranging.",
         "The collective pulse is still shifting shape.",
         "The collective rhythm is still re-forming.",
         "The collective pulse is still finding its line.",
+        "Upper flow is still changing before it settles.",
+        "The descent line is still finding contour.",
       ],
       driftCondensing: [
         "A tighter layer lingers near the surface.",
         "The surface is drawing into a denser band.",
         "A compact band stays near the surface line.",
         "The surface layer keeps a denser hold.",
+        "The descent from upper view lands in a tighter band.",
+        "Near-ground flow compacts as it settles.",
       ],
       driftClearing: [
         "A clearer lane opens near the surface.",
         "A lighter path is opening at the surface.",
         "A softer lane appears near the surface.",
         "The surface line opens into lighter space.",
+        "The descent from upper view opens near ground.",
+        "Near-ground flow clears as it settles.",
       ],
       driftStable: [
         "The surface line remains steady.",
         "The surface reading holds a calm balance.",
         "The surface reading remains even and calm.",
         "A stable surface line continues to hold.",
+        "The transition from sky to ground holds steady.",
+        "The descent line stays quietly balanced.",
       ],
     },
     local: {
       condensing: [
-        "Nearby moments are drawing closer.",
-        "Nearby moments are tightening into a closer pattern.",
-        "Nearby moments gather into a tighter weave.",
-        "Nearby moments settle into a denser cluster.",
+        "Moments around you are drawing closer.",
+        "Moments around you tighten into a closer pattern.",
+        "Moments around you gather into a tighter weave.",
+        "Moments around you settle into a denser cluster.",
+        "A denser nearby weave is settling near ground.",
+        "Local movement compacts as it descends.",
       ],
       clearing: [
-        "Nearby moments are opening space.",
-        "Nearby moments are spreading into lighter space.",
-        "Nearby moments are opening into wider space.",
-        "Nearby moments are loosening their pattern.",
+        "Moments around you are opening space.",
+        "Moments around you spread into lighter space.",
+        "Moments around you open into wider space.",
+        "Moments around you loosen their pattern.",
+        "A lighter nearby lane is opening near ground.",
+        "Local movement clears as it settles.",
       ],
       stable: [
-        "Nearby moments hold a calm balance.",
-        "Nearby moments keep a quiet balance.",
-        "Nearby moments remain gently balanced.",
-        "Nearby moments hold an even rhythm.",
+        "Moments around you hold a calm balance.",
+        "Moments around you keep a quiet balance.",
+        "Moments around you remain gently balanced.",
+        "Moments around you hold an even rhythm.",
+        "Nearby movement keeps a calm local line.",
+        "Local flow remains quietly even.",
       ],
       fallback: [
-        "Nearby read is forming. It mirrors the wider field.",
-        "Nearby read is still thin. It follows the wider field.",
-        "Nearby read is still faint. It mirrors the wider field.",
-        "Nearby read is still light. It follows the wider field.",
+        "The field around you is forming. It mirrors the wider field.",
+        "The field around you is still thin. It follows the wider field.",
+        "The field around you is still faint. It mirrors the wider field.",
+        "The field around you is still light. It follows the wider field.",
+        "Your nearby field is still faint. It follows the wider line.",
+        "Your nearby field is still gathering from the wider read.",
       ],
       regional: [
-        "Reading shared moments across your region.",
-        "Read drawn from shared moments across your region.",
-        "Regional read shaped by shared moments.",
-        "Shared moments across your region shape this read.",
+        "Reading shared moments around your region.",
+        "Read drawn from shared moments around your region.",
+        "Regional read shaped by moments around you.",
+        "Shared moments around your region shape this read.",
+        "Regional shared movement shapes your nearby line.",
+        "This nearby read follows your regional field.",
       ],
     },
     strataFallback: [
-      "Shared and private moments settle into one deeper record.",
-      "Shared and private moments rest in the deeper record.",
-      "In deeper layers, moments settle side by side.",
-      "Deeper record gathers shared and private moments together.",
-      "Shared and private moments keep settling in deeper layers.",
+      "Shared and private moments settle into your deeper record.",
+      "Shared and private moments rest in your deeper record.",
+      "In deeper layers, your moments settle side by side.",
+      "Your deeper record gathers shared and private moments together.",
+      "Shared and private moments keep settling in your deeper layers.",
+      "Your deeper layers keep settling shared and private moments.",
+      "Your record below keeps compacting in quiet layers.",
     ],
     strataEarly: [
-      "Deep record is still taking shape.",
-      "Only a thin layer has settled in deep record.",
-      "Deep record is beginning to gather moments.",
+      "Your deep record is still taking shape.",
+      "Only a thin layer has settled in your deep record.",
+      "Your deep record is beginning to gather moments.",
+      "Your deeper record is still in first sediment.",
+      "Only first layers are visible in your deep record.",
     ],
   },
 };
@@ -386,18 +448,26 @@ const SIGNAL_VARIANTS = {
       early: [
         "Pulse is still early in this window.",
         "Pulse is just starting to appear.",
+        "Upper motion has not settled near ground yet.",
+        "The descent pulse is still forming.",
       ],
       rising: [
         "Recent pulse is rising.",
         "Recent pulse is gaining pace.",
+        "Upper flow is descending with stronger pace.",
+        "The horizon pulse is rising toward nearby ground.",
       ],
       easing: [
         "Recent pulse is easing.",
         "Recent pulse is slowing down.",
+        "Descending flow is easing near the field.",
+        "The horizon pulse softens near ground.",
       ],
       steady: [
         "Recent pulse is steady.",
         "Recent pulse is holding level.",
+        "Sky-to-ground pulse holds a steady lane.",
+        "The descent pulse stays even.",
       ],
     },
     echo: {
@@ -438,18 +508,26 @@ const SIGNAL_VARIANTS = {
       early: [
         "The pulse is still in first light.",
         "A first pulse is only beginning to form.",
+        "Upper movement has not settled near ground yet.",
+        "The descent pulse is still gathering.",
       ],
       rising: [
         "The recent pulse is rising.",
         "The pulse is gathering pace in this window.",
+        "Upper flow descends with stronger pace.",
+        "A rising pulse is nearing the local field.",
       ],
       easing: [
         "The recent pulse is easing.",
         "The pulse softens in this window.",
+        "Descending flow softens near the field.",
+        "The horizon pulse eases as it settles.",
       ],
       steady: [
         "The recent pulse keeps a steady line.",
         "The pulse holds a quiet balance.",
+        "Sky-to-ground pulse holds one calm lane.",
+        "The descent pulse stays quietly even.",
       ],
     },
     echo: {
@@ -978,6 +1056,56 @@ function classifyEcho(localState, globalState) {
   return "offset";
 }
 
+function deriveMomentContribution(moment, nowMs = Date.now()) {
+  const ageHours = Math.max(0, (nowMs - new Date(moment.timestamp).getTime()) / 3600_000);
+  const mass = recencyMass(ageHours);
+  const influence = getInfluenceCell(moment.type, moment.mood);
+  const signal = noteSignal(moment.note || "");
+  const semanticPressure = signal.reactive - signal.reflective;
+  const semanticStabilize = signal.reflective * 0.75;
+  const basePressure = signedPressure(influence.mode, influence.strength);
+  const weightedPressure = (basePressure + semanticPressure) * mass;
+  const weightedStabilize =
+    (influence.mode === "stabilize" ? influence.strength * mass : 0) + semanticStabilize * mass;
+  return {
+    id: moment.id || "",
+    mass,
+    weightedPressure,
+    weightedStabilize,
+  };
+}
+
+// Observatory pipeline: each contributed moment becomes weighted signal,
+// then aggregate signals feed confidence, pulse, and echo layers.
+function buildObservatoryPipeline(sharedMoments, canonicalState, localState, activeFieldScope) {
+  const entries = Array.isArray(sharedMoments) ? sharedMoments : [];
+  const contributions = entries.slice(0, 180).map((moment) => deriveMomentContribution(moment));
+  const totals = contributions.reduce(
+    (acc, item) => {
+      acc.mass += item.mass;
+      acc.pressure += item.weightedPressure;
+      acc.stabilize += item.weightedStabilize;
+      return acc;
+    },
+    { mass: 0, pressure: 0, stabilize: 0 }
+  );
+  return {
+    sourceCount: entries.length,
+    contributionMass: totals.mass,
+    contributionPressure: totals.pressure,
+    contributionStabilize: totals.stabilize,
+    signalModes: {
+      confidence: classifyConfidence(Number(localState?.total) || 0),
+      pulse: classifyPulse(entries),
+      echo: classifyEcho(localState, canonicalState),
+    },
+    fieldScope: {
+      id: activeFieldScope?.id || "nearby",
+      label: activeFieldScope?.label || "Nearby",
+    },
+  };
+}
+
 function getStoredFieldScope() {
   try {
     return localStorage.getItem(FIELD_SCOPE_KEY) || "nearby";
@@ -994,47 +1122,51 @@ function setStoredFieldScope(value) {
   }
 }
 
-function formatGeoLabel(geoBucket) {
-  if (!geoBucket) return "Global";
-  const parts = geoBucket.split(".").slice(1).filter(Boolean);
-  if (!parts.length) return "Nearby";
-  const last = parts[parts.length - 1].replace(/-/g, " ");
-  return last.replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
 function buildFieldScopeOptions() {
   const nearbyGeo = guessGeoBucketFromTimezone();
-  const options = [{ id: "nearby", label: "Nearby", scope: "local", geo: nearbyGeo }];
-  const seen = new Set([nearbyGeo || ""]);
+  const options = [];
+  const seen = new Set();
+  const pushOption = (option) => {
+    const dedupeKey = `${option.scope}|${option.geo || ""}`;
+    if (seen.has(dedupeKey)) return;
+    seen.add(dedupeKey);
+    options.push(option);
+  };
   const segments = nearbyGeo ? nearbyGeo.split(".").filter(Boolean) : [];
+
+  pushOption({ id: "nearby", label: "Nearby", scope: "local", geo: nearbyGeo });
 
   if (segments.length >= 3) {
     const regionalGeo = segments.slice(0, 3).join(".");
-    if (!seen.has(regionalGeo)) {
-      options.push({
-        id: "regional",
-        label: `${formatGeoLabel(regionalGeo)} region`,
-        scope: "local",
-        geo: regionalGeo,
-      });
-      seen.add(regionalGeo);
-    }
+    pushOption({
+      id: "regional-home",
+      label: "Regional (home)",
+      scope: "local",
+      geo: regionalGeo,
+    });
   }
 
   if (segments.length >= 2) {
     const broadGeo = segments.slice(0, 2).join(".");
-    if (!seen.has(broadGeo)) {
-      options.push({
-        id: "broad",
-        label: `${formatGeoLabel(broadGeo)} field`,
-        scope: "local",
-        geo: broadGeo,
-      });
-      seen.add(broadGeo);
-    }
+    pushOption({
+      id: "wider-home",
+      label: "Wider field (home)",
+      scope: "local",
+      geo: broadGeo,
+    });
   }
 
-  options.push({ id: "global", label: "Global", scope: "global", geo: "" });
+  [
+    { id: "zone-americas", label: "Americas field", geo: "tz.america" },
+    { id: "zone-europe", label: "Europe field", geo: "tz.europe" },
+    { id: "zone-africa", label: "Africa field", geo: "tz.africa" },
+    { id: "zone-asia", label: "Asia field", geo: "tz.asia" },
+    { id: "zone-oceania", label: "Oceania field", geo: "tz.australia" },
+  ].forEach((zone) => {
+    pushOption({ id: zone.id, label: zone.label, scope: "local", geo: zone.geo });
+  });
+
+  pushOption({ id: "global", label: "Global", scope: "global", geo: "" });
   return options;
 }
 
@@ -1162,10 +1294,10 @@ function openSharedSheet(sharedMoments) {
   });
 }
 
-function renderHorizon(canonicalState, sharedMoments) {
+function renderHorizon(canonicalState, sharedMoments, pipeline = null) {
   const total = sharedMoments.length;
   const seed = Math.round((canonicalState?.computedDegree || BASELINE) * 10) + total;
-  const pulseMode = classifyPulse(sharedMoments);
+  const pulseMode = pipeline?.signalModes?.pulse || classifyPulse(sharedMoments);
   horizonPulseLine.textContent = pickCopy(SIGNALS.pulse[pulseMode], seed + total);
   horizonSecondary.classList.add("hidden");
   horizonMoreButton.classList.add("hidden");
@@ -1211,7 +1343,7 @@ function renderHorizon(canonicalState, sharedMoments) {
   };
 }
 
-function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby") {
+function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby", pipeline = null) {
   const pressureMode = localState?.pressureMode || "stabilizing";
   const seed = Math.round((localState?.computedDegree || BASELINE) * 10) + (localState?.total || 0);
   const pressureText =
@@ -1224,7 +1356,7 @@ function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby") {
   localClimatePrimary.textContent = pressureText;
   const roundedDegree = Math.round(Number(localState?.computedDegree) || BASELINE);
   const total = Number(localState?.total) || 0;
-  const confidenceMode = classifyConfidence(total);
+  const confidenceMode = pipeline?.signalModes?.confidence || classifyConfidence(total);
   if (localClimateDegree) {
     localClimateDegree.textContent = `${roundedDegree}° ${scopeLabel.toLowerCase()}`;
   }
@@ -1236,7 +1368,7 @@ function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby") {
     localClimateEcho.textContent = "Wider field lens selected.";
     return;
   }
-  const echoMode = classifyEcho(localState, canonicalState);
+  const echoMode = pipeline?.signalModes?.echo || classifyEcho(localState, canonicalState);
   localClimateEcho.textContent = pickCopy(SIGNALS.echo[echoMode], seed + 5);
   if (localState?.source === "global_fallback") {
     localClimateSecondary.textContent = pickCopy(COPY.local.fallback, seed);
@@ -1267,11 +1399,11 @@ function buildStrataLines(longWindowMoments, canonicalState) {
 
   const lines = [];
   if (canonicalState.pressureMode === "condensing") {
-    lines.push("A compacted band continues sinking into deeper layers.");
+    lines.push("A compacted band continues sinking into your deeper layers.");
   } else if (canonicalState.pressureMode === "clearing") {
-    lines.push("A lighter seam opens between settled moments.");
+    lines.push("A lighter seam opens between your settled moments.");
   } else {
-    lines.push("Deep layers hold steady, without abrupt shifts.");
+    lines.push("Your deep layers hold steady, without abrupt shifts.");
   }
 
   if (counts.avoidable >= 5 && moods.stressed >= 3) {
@@ -1302,7 +1434,7 @@ function buildStrataLines(longWindowMoments, canonicalState) {
   }
 
   if (lines.length < 2) {
-    lines.push("The deep layer is taking shape from recurring moments.");
+    lines.push("Your deep layer is taking shape from recurring moments.");
     lines.push(pickCopy(COPY.strataFallback, total + lines.length));
   }
 
@@ -1548,6 +1680,12 @@ async function boot() {
   }
   let activeFieldScope = initialFieldScope;
   let localClimateTruth = await loadFieldClimateTruth(canonicalState, activeFieldScope);
+  let observatoryPipeline = buildObservatoryPipeline(
+    sharedMoments,
+    canonicalState,
+    localClimateTruth,
+    activeFieldScope
+  );
   const localClimate = calculateClimate(getSharedMoments(moments));
   const computedDegree = climateTruth.computedDegree;
   const startDisplay = Number.isFinite(previousDisplay)
@@ -1593,14 +1731,19 @@ async function boot() {
   setStoredDisplayDegree(computedDegree);
   conditionLine.textContent = canonicalState.condition;
   if (readingConfidenceLine) {
-    const confidenceMode = classifyConfidence(Number(canonicalState?.total) || 0);
+    const confidenceMode = observatoryPipeline.signalModes.confidence;
     const seed = Math.round((canonicalState?.computedDegree || BASELINE) * 10) + (canonicalState?.total || 0);
     readingConfidenceLine.textContent = pickCopy(SIGNALS.confidence[confidenceMode], seed);
   }
   renderPatternLayer(canonicalState);
   renderRecent(sharedMoments);
-  renderHorizon(canonicalState, sharedMoments);
-  renderLocalClimate(localClimateTruth, canonicalState, activeFieldScope.label || "Nearby");
+  renderHorizon(canonicalState, sharedMoments, observatoryPipeline);
+  renderLocalClimate(
+    localClimateTruth,
+    canonicalState,
+    activeFieldScope.label || "Nearby",
+    observatoryPipeline
+  );
   renderStrata(moments, canonicalState);
 
   viewMoreButton.onclick = () => openSharedSheet(sharedMoments);
@@ -1620,7 +1763,25 @@ async function boot() {
         const nextClimate = await loadFieldClimateTruth(canonicalState, nextScope);
         if (token !== requestToken) return;
         localClimateTruth = nextClimate;
-        renderLocalClimate(localClimateTruth, canonicalState, activeFieldScope.label || "Nearby");
+        observatoryPipeline = buildObservatoryPipeline(
+          sharedMoments,
+          canonicalState,
+          localClimateTruth,
+          activeFieldScope
+        );
+        if (readingConfidenceLine) {
+          const confidenceMode = observatoryPipeline.signalModes.confidence;
+          const seed =
+            Math.round((canonicalState?.computedDegree || BASELINE) * 10) + (canonicalState?.total || 0);
+          readingConfidenceLine.textContent = pickCopy(SIGNALS.confidence[confidenceMode], seed);
+        }
+        renderHorizon(canonicalState, sharedMoments, observatoryPipeline);
+        renderLocalClimate(
+          localClimateTruth,
+          canonicalState,
+          activeFieldScope.label || "Nearby",
+          observatoryPipeline
+        );
       } finally {
         fieldScopeSelect.disabled = false;
       }

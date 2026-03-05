@@ -140,7 +140,7 @@ body.sheet-open {
   top: 0.75rem;
   left: 1rem;
   font-size: 0.72rem;
-  line-height: 1;
+  line-height: 1.25;
   letter-spacing: 0.02em;
   color: var(--muted);
   opacity: 0.34;
@@ -180,7 +180,7 @@ h2 {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 1.05rem;
+  gap: 1.35rem;
   text-align: center;
   position: relative;
   overflow: visible;
@@ -213,11 +213,12 @@ h2 {
 }
 
 .atmosphere-orientation {
-  margin-top: -0.56rem;
+  margin-top: -0.42rem;
   font-size: 0.72rem;
   color: #6d7d94;
   opacity: 0.66;
   letter-spacing: 0.01em;
+  line-height: 1.55;
 }
 
 .degree-wrap {
@@ -267,13 +268,13 @@ h2 {
 .condition-line {
   color: var(--muted);
   font-size: 0.96rem;
-  line-height: 1.5;
+  line-height: 1.72;
 }
 
 .reading-confidence-line {
   margin-top: -0.25rem;
   font-size: 0.75rem;
-  line-height: 1.35;
+  line-height: 1.55;
   color: #5f7290;
   opacity: 0.78;
   letter-spacing: 0.01em;
@@ -295,7 +296,7 @@ h2 {
 .atmosphere-pattern-line {
   font-size: 0.82rem;
   color: #4c6179;
-  line-height: 1.45;
+  line-height: 1.62;
   opacity: 0.82;
   margin-top: 0.26rem;
 }
@@ -400,8 +401,9 @@ h2 {
   font-size: 0.97rem;
   color: #2d4054;
   margin-bottom: 0.6rem;
-  line-height: 1.65;
+  line-height: 1.56;
   text-align: left;
+  padding-left: 0.28rem;
 }
 
 .horizon-secondary {
@@ -409,18 +411,20 @@ h2 {
   display: grid;
   gap: 0.5rem;
   margin-bottom: 0.8rem;
-  line-height: 1.65;
+  line-height: 1.5;
   font-size: 0.88rem;
   text-align: left;
+  padding-left: 0.28rem;
 }
 
 .horizon-pulse-line {
   font-size: 0.79rem;
-  line-height: 1.42;
+  line-height: 1.38;
   color: #4e6077;
   opacity: 0.78;
   margin-bottom: 0.58rem;
   text-align: left;
+  padding-left: 0.28rem;
 }
 
 .cta,
@@ -553,7 +557,7 @@ h2 {
 
 .local-climate {
   padding: 0.2rem 0.15rem 0.35rem;
-  margin-top: 1.05rem;
+  margin-top: 0.92rem;
   background:
     linear-gradient(
       180deg,
@@ -579,6 +583,7 @@ h2 {
   justify-content: space-between;
   gap: 0.65rem;
   margin-bottom: 0.4rem;
+  padding-left: 0.58rem;
 }
 
 .local-field-label {
@@ -605,6 +610,7 @@ h2 {
   justify-content: space-between;
   gap: 0.6rem;
   margin-bottom: 0.28rem;
+  padding-left: 0.58rem;
 }
 
 .local-climate-degree {
@@ -624,26 +630,29 @@ h2 {
 .local-climate-primary {
   font-size: 0.89rem;
   color: #2d4054;
-  line-height: 1.52;
+  line-height: 1.42;
   margin-bottom: 0.24rem;
   text-align: left;
+  padding-left: 0.58rem;
 }
 
 .local-climate-secondary {
   font-size: 0.78rem;
   color: var(--muted);
-  line-height: 1.46;
+  line-height: 1.36;
   opacity: 0.76;
   text-align: left;
+  padding-left: 0.58rem;
 }
 
 .local-climate-echo {
   margin-top: 0.2rem;
   font-size: 0.75rem;
   color: #556983;
-  line-height: 1.42;
+  line-height: 1.32;
   opacity: 0.75;
   text-align: left;
+  padding-left: 0.58rem;
 }
 
 /* Seed hook for future lower strata (inactive by default). */
@@ -670,7 +679,7 @@ h2 {
   height: auto;
   opacity: 1;
   pointer-events: auto;
-  margin-top: 1.45rem;
+  margin-top: 1.1rem;
 }
 
 .strata-context {
@@ -678,8 +687,10 @@ h2 {
   color: var(--muted);
   opacity: 0.68;
   letter-spacing: 0.01em;
-  margin-bottom: 0.48rem;
+  margin-bottom: 0.42rem;
+  line-height: 1.3;
   text-align: left;
+  padding-left: 0.88rem;
 }
 
 .strata-lines {
@@ -688,11 +699,12 @@ h2 {
   padding: 0;
   display: grid;
   gap: 0.48rem;
+  padding-left: 0.88rem;
 }
 
 .strata-line {
   font-size: 0.82rem;
-  line-height: 1.45;
+  line-height: 1.3;
   color: color-mix(in oklab, var(--text) 82%, var(--muted));
   opacity: 0.9;
   text-align: left;
@@ -1044,6 +1056,25 @@ h2 {
     padding: 0.85rem 0.85rem 1rem;
     border-top-left-radius: 18px;
     border-top-right-radius: 18px;
+  }
+
+  .horizon-primary,
+  .horizon-secondary,
+  .horizon-pulse-line {
+    padding-left: 0.12rem;
+  }
+
+  .local-field-controls,
+  .local-climate-meta,
+  .local-climate-primary,
+  .local-climate-secondary,
+  .local-climate-echo {
+    padding-left: 0.24rem;
+  }
+
+  .strata-context,
+  .strata-lines {
+    padding-left: 0.36rem;
   }
 }
 
