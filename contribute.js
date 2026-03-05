@@ -64,14 +64,8 @@ function hasValidNote() {
 }
 
 function syncSaveState() {
-  saveButton.disabled = !hasValidNote();
-}
-
-function syncConsentState() {
-  if (!consentInput) return;
-  const sharing = Boolean(sharedInput?.checked);
-  consentInput.disabled = !sharing;
-  consentInput.required = sharing;
+  const consentOk = Boolean(consentInput?.checked);
+  saveButton.disabled = !hasValidNote() || !consentOk;
 }
 
 noteInput.addEventListener("input", () => {
@@ -81,11 +75,11 @@ noteInput.addEventListener("input", () => {
   syncSaveState();
 });
 
-sharedInput?.addEventListener("change", () => {
-  if (!sharedInput.checked) {
-    if (consentInput) consentInput.checked = false;
+consentInput?.addEventListener("change", () => {
+  if (formStatus.textContent === "Please accept Privacy and Terms to save this moment.") {
+    formStatus.textContent = "";
   }
-  syncConsentState();
+  syncSaveState();
 });
 
 form.addEventListener("submit", async (event) => {
@@ -106,8 +100,8 @@ form.addEventListener("submit", async (event) => {
     noteInput.focus();
     return;
   }
-  if (sharedInput.checked && consentInput && !consentInput.checked) {
-    formStatus.textContent = "Please accept Privacy and Terms to share this moment.";
+  if (consentInput && !consentInput.checked) {
+    formStatus.textContent = "Please accept Privacy and Terms to save this moment.";
     consentInput.focus();
     return;
   }
@@ -138,4 +132,3 @@ form.addEventListener("submit", async (event) => {
 });
 
 syncSaveState();
-syncConsentState();
