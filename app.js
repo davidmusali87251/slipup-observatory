@@ -408,8 +408,26 @@ const COPY_VARIANTS = {
   },
 };
 const COPY = COPY_VARIANTS[COPY_MODE] || COPY_VARIANTS.clear;
+// FUTURE: Keep scaffold switches explicit for non-active UI lines.
+const FUTURE_UI = {
+  readingConfidenceLine: false,
+};
 const SIGNAL_VARIANTS = {
   clear: {
+    confidence: {
+      early: [
+        "Read confidence: early.",
+        "Confidence still forming from low volume.",
+      ],
+      building: [
+        "Read confidence: building.",
+        "Confidence increasing with added volume.",
+      ],
+      firm: [
+        "Read confidence: firm.",
+        "Confidence stable at current volume.",
+      ],
+    },
     pulse: {
       early: [
         "Recent signal is still early in this window.",
@@ -456,6 +474,20 @@ const SIGNAL_VARIANTS = {
     },
   },
   poetic: {
+    confidence: {
+      early: [
+        "Read confidence: early.",
+        "Confidence still forming from low volume.",
+      ],
+      building: [
+        "Read confidence: building.",
+        "Confidence increasing with added volume.",
+      ],
+      firm: [
+        "Read confidence: firm.",
+        "Confidence stable at current volume.",
+      ],
+    },
     pulse: {
       early: [
         "Recent signal is still in first formation.",
@@ -636,6 +668,9 @@ function pickCopyFromState(entry, numericSeed) {
 
 const degreeValue = document.getElementById("degreeValue");
 const conditionLine = document.getElementById("conditionLine");
+// FUTURE: kept as scaffold for a possible hero confidence line return.
+const readingConfidenceLine = document.getElementById("readingConfidenceLine");
+const observatoryPanel = document.getElementById("observatory");
 const recentMoments = document.getElementById("recentMoments");
 const viewMoreButton = document.getElementById("viewMoreButton");
 const horizonPrimary = document.getElementById("horizonPrimary");
@@ -667,6 +702,29 @@ const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduc
 
 let isSharedSheetOpen = false;
 let lastFocusedEl = null;
+
+function renderFutureConfidenceLine(canonicalState, pipeline) {
+  if (!FUTURE_UI.readingConfidenceLine || !readingConfidenceLine) return;
+  const confidenceMode = pipeline?.signalModes?.confidence || classifyConfidence(canonicalState?.total || 0);
+  const seed = Math.round((canonicalState?.computedDegree || BASELINE) * 10) + (canonicalState?.total || 0);
+  const variants = SIGNALS?.confidence?.[confidenceMode] || SIGNALS?.confidence?.early || [];
+  readingConfidenceLine.textContent = pickCopy(variants, seed);
+}
+
+function renderScopeInstrument(canonicalState) {
+  if (!observatoryPanel) return;
+  const total = Number(canonicalState?.total) || 0;
+  const degree = Number(canonicalState?.computedDegree) || BASELINE;
+  const repetition = canonicalState?.repetition || { hasPattern: false };
+
+  let tone = "steady";
+  if (total < 3 || degree < 38) tone = "quiet";
+  else if (degree >= 74) tone = "dense";
+  else if (degree >= 60) tone = "active";
+
+  observatoryPanel.dataset.scopeTone = tone;
+  observatoryPanel.classList.toggle("is-target-lock", Boolean(repetition?.hasPattern));
+}
 
 function detectStructuralPattern(activeEntries48h) {
   if (!activeEntries48h.length) {
@@ -1684,6 +1742,7 @@ function showTransientReading() {
 function renderPatternLayer(canonicalState) {
   const repetition = canonicalState?.repetition || { hasPattern: false, tag: "", strength: 0 };
   heroEl.classList.toggle("observatory--pattern", Boolean(repetition?.hasPattern));
+  renderScopeInstrument(canonicalState);
   const total = Number(canonicalState?.total) || 0;
   if (total < 6) {
     atmospherePatternLine.textContent = "";
@@ -1922,6 +1981,7 @@ async function boot() {
   setStoredComputedDegree(computedDegree);
   setStoredDisplayDegree(computedDegree);
   conditionLine.textContent = canonicalState.condition;
+  renderFutureConfidenceLine(canonicalState, observatoryPipeline);
   renderPatternLayer(canonicalState);
   renderRecent(sharedMoments);
   renderHorizon(canonicalState, sharedMoments, observatoryPipeline);
@@ -1957,6 +2017,7 @@ async function boot() {
           localClimateTruth,
           activeFieldScope
         );
+        renderFutureConfidenceLine(canonicalState, observatoryPipeline);
         renderHorizon(canonicalState, sharedMoments, observatoryPipeline);
         renderLocalClimate(
           localClimateTruth,

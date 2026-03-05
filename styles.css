@@ -174,6 +174,8 @@ h2 {
 }
 
 .panel-observatory {
+  --scope-intensity: 0.38;
+  --scope-accent: #7f8fb2;
   min-height: calc(100vh - var(--topbar-height) - var(--topbar-gap) - (var(--page-pad-top) * 2));
   margin-bottom: 0;
   display: flex;
@@ -188,6 +190,31 @@ h2 {
   background:
     linear-gradient(180deg, #ffffff9c 0%, #ffffff8a 72%, #ffffff52 100%),
     var(--card);
+}
+
+.panel-observatory > * {
+  position: relative;
+  z-index: 1;
+}
+
+.panel-observatory[data-scope-tone="quiet"] {
+  --scope-intensity: 0.26;
+  --scope-accent: #8a9ab5;
+}
+
+.panel-observatory[data-scope-tone="steady"] {
+  --scope-intensity: 0.34;
+  --scope-accent: #7b8eb0;
+}
+
+.panel-observatory[data-scope-tone="active"] {
+  --scope-intensity: 0.45;
+  --scope-accent: #7388b2;
+}
+
+.panel-observatory[data-scope-tone="dense"] {
+  --scope-intensity: 0.58;
+  --scope-accent: #6f83af;
 }
 
 .panel-observatory::after {
@@ -205,6 +232,79 @@ h2 {
   filter: blur(0.3px);
 }
 
+.telescope-scope {
+  position: absolute;
+  width: min(74vw, 360px);
+  aspect-ratio: 1;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+  opacity: calc(var(--scope-intensity) + 0.06);
+}
+
+.scope-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--scope-accent) 34%, transparent);
+}
+
+.scope-ring-inner {
+  inset: 12%;
+  border-color: color-mix(in oklab, var(--scope-accent) 24%, transparent);
+}
+
+.scope-axis {
+  position: absolute;
+  background: color-mix(in oklab, var(--scope-accent) 24%, transparent);
+}
+
+.scope-axis-horizontal {
+  left: 7%;
+  right: 7%;
+  top: 50%;
+  height: 1px;
+  transform: translateY(-50%);
+}
+
+.scope-axis-vertical {
+  top: 7%;
+  bottom: 7%;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+}
+
+.scope-sweep {
+  position: absolute;
+  inset: 5%;
+  border-radius: 999px;
+  background: linear-gradient(112deg, #ffffff00 40%, color-mix(in oklab, var(--scope-accent) 16%, transparent) 50%, #ffffff00 60%);
+  filter: blur(0.2px);
+  animation: scopeSweep 7.2s linear infinite;
+}
+
+.scope-target {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--scope-accent) 45%, #ffffff);
+  transform: translate(-50%, -50%) scale(0.86);
+  opacity: 0.3;
+  transition: opacity 260ms ease, transform 260ms ease;
+}
+
+.panel-observatory.is-target-lock .scope-target {
+  opacity: 0.72;
+  transform: translate(-50%, -50%) scale(1);
+  animation: scopeTargetPulse 1800ms ease-in-out infinite;
+}
+
 .eyebrow {
   color: var(--muted);
   letter-spacing: 0.02em;
@@ -216,9 +316,12 @@ h2 {
   margin-top: -0.42rem;
   font-size: 0.72rem;
   color: #6d7d94;
-  opacity: 0.66;
+  opacity: 0.72;
   letter-spacing: 0.01em;
   line-height: 1.55;
+  text-transform: uppercase;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
 }
 
 .degree-wrap {
@@ -353,6 +456,18 @@ h2 {
   color: #667790;
   opacity: 0.7;
   letter-spacing: 0.01em;
+}
+
+/* FUTURE: optional cue if the transition label returns. */
+.scroll-cue {
+  position: absolute;
+  bottom: 0.9rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #7f89a04f;
+  letter-spacing: 0.09em;
+  font-size: 0.7rem;
+  opacity: 0.54;
 }
 
 .section-row {
@@ -1002,6 +1117,11 @@ h2 {
   .cta-observatory:active {
     opacity: 0.88;
   }
+
+  .scope-sweep,
+  .panel-observatory.is-target-lock .scope-target {
+    animation: none;
+  }
 }
 
 @media (max-height: 700px) {
@@ -1174,6 +1294,25 @@ section.panel.panel-recent {
   to {
     opacity: 0.92;
     transform: translateY(0);
+  }
+}
+
+@keyframes scopeSweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes scopeTargetPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--scope-accent) 0%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 8px color-mix(in oklab, var(--scope-accent) 25%, transparent);
   }
 }
 
