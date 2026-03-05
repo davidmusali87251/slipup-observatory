@@ -551,6 +551,107 @@ const SIGNAL_VARIANTS = {
   },
 };
 const SIGNALS = SIGNAL_VARIANTS[COPY_MODE] || SIGNAL_VARIANTS.clear;
+const REGIONAL_LOCAL_COPY = {
+  common: {
+    condensing: [
+      "Local movement is tightening near ground.",
+      "A denser nearby band is taking shape.",
+      "Nearby flow is compacting.",
+    ],
+    clearing: [
+      "Local movement is clearing near ground.",
+      "A lighter nearby lane is opening.",
+      "Nearby flow is opening space.",
+    ],
+    stable: [
+      "Local flow remains stable and even.",
+      "Nearby movement holds a quiet line.",
+      "Local rhythm stays balanced.",
+    ],
+    fallback: [
+      "Local signal is still light. It follows the wider field.",
+      "Local signal is still forming from the wider field.",
+      "Local signal is still emerging from shared flow.",
+    ],
+    regional: [
+      "Local reading is shaped by shared moments in this zone.",
+      "Shared moments in this zone shape this local line.",
+      "This local read follows shared signal from this zone.",
+    ],
+  },
+  continents: {
+    america: {
+      condensing: [
+        "A denser current is gathering across this American field.",
+        "American local flow is drawing into a tighter band.",
+      ],
+      clearing: [
+        "A lighter lane is opening across this American field.",
+        "American local flow is opening into clearer space.",
+      ],
+      stable: [
+        "American local flow keeps a balanced line.",
+        "A steady rhythm holds across this American field.",
+      ],
+    },
+    europe: {
+      condensing: [
+        "A compact line is forming across this European field.",
+        "European local flow is tightening into a denser seam.",
+      ],
+      clearing: [
+        "A clearer path is opening across this European field.",
+        "European local flow is easing into lighter space.",
+      ],
+      stable: [
+        "European local flow holds a steady contour.",
+        "A calm line remains across this European field.",
+      ],
+    },
+    africa: {
+      condensing: [
+        "A denser band is gathering across this African field.",
+        "African local flow is compacting near ground.",
+      ],
+      clearing: [
+        "A lighter opening is appearing across this African field.",
+        "African local flow is opening into wider space.",
+      ],
+      stable: [
+        "African local flow stays even and balanced.",
+        "A stable local rhythm holds across this African field.",
+      ],
+    },
+    asia: {
+      condensing: [
+        "A denser stream is forming across this Asian field.",
+        "Asian local flow is tightening into a closer weave.",
+      ],
+      clearing: [
+        "A clearer lane is opening across this Asian field.",
+        "Asian local flow is easing into lighter space.",
+      ],
+      stable: [
+        "Asian local flow keeps a steady line.",
+        "A calm local rhythm holds across this Asian field.",
+      ],
+    },
+    australia: {
+      condensing: [
+        "A denser stream is gathering across this Oceanian field.",
+        "Oceanian local flow is compacting near ground.",
+      ],
+      clearing: [
+        "A lighter lane is opening across this Oceanian field.",
+        "Oceanian local flow is opening into clearer space.",
+      ],
+      stable: [
+        "Oceanian local flow stays steady and balanced.",
+        "A calm line holds across this Oceanian field.",
+      ],
+    },
+  },
+};
 
 function pickCopy(entry, seed) {
   if (Array.isArray(entry)) {
@@ -558,6 +659,21 @@ function pickCopy(entry, seed) {
     return entry[Math.abs(seed) % entry.length];
   }
   return entry;
+}
+
+function scopeContinent(fieldScope) {
+  const geo = String(fieldScope?.geo || "");
+  const parts = geo.split(".").filter(Boolean);
+  return parts[1] || "";
+}
+
+function pickRegionalLocalCopy(mode, fieldScope, seed) {
+  const continent = scopeContinent(fieldScope);
+  const common = REGIONAL_LOCAL_COPY.common[mode] || [];
+  const regional = REGIONAL_LOCAL_COPY.continents[continent]?.[mode] || [];
+  const merged = [...regional, ...common];
+  if (merged.length) return pickCopy(merged, seed);
+  return "";
 }
 
 function pickCopyFromState(entry, numericSeed) {
@@ -1445,15 +1561,19 @@ function renderHorizon(canonicalState, sharedMoments, pipeline = null) {
   };
 }
 
-function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby", pipeline = null) {
+function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby", pipeline = null, fieldScope = null) {
   const pressureMode = localState?.pressureMode || "stabilizing";
   const seed = Math.round((localState?.computedDegree || BASELINE) * 10) + (localState?.total || 0);
-  const pressureText =
-    pressureMode === "condensing"
+  const pressureText = pickRegionalLocalCopy(
+    pressureMode === "condensing" ? "condensing" : pressureMode === "clearing" ? "clearing" : "stable",
+    fieldScope,
+    seed
+  ) ||
+    (pressureMode === "condensing"
       ? pickCopy(COPY.local.condensing, seed)
       : pressureMode === "clearing"
         ? pickCopy(COPY.local.clearing, seed)
-        : pickCopy(COPY.local.stable, seed);
+        : pickCopy(COPY.local.stable, seed));
 
   localClimatePrimary.textContent = pressureText;
   const roundedDegree = Math.round(Number(localState?.computedDegree) || BASELINE);
@@ -1473,10 +1593,12 @@ function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby", p
   const echoMode = pipeline?.signalModes?.echo || classifyEcho(localState, canonicalState);
   localClimateEcho.textContent = pickCopy(SIGNALS.echo[echoMode], seed + 5);
   if (localState?.source === "global_fallback") {
-    localClimateSecondary.textContent = pickCopy(COPY.local.fallback, seed);
+    localClimateSecondary.textContent =
+      pickRegionalLocalCopy("fallback", fieldScope, seed + 3) || pickCopy(COPY.local.fallback, seed);
     return;
   }
-  localClimateSecondary.textContent = pickCopy(COPY.local.regional, seed);
+  localClimateSecondary.textContent =
+    pickRegionalLocalCopy("regional", fieldScope, seed + 7) || pickCopy(COPY.local.regional, seed);
 }
 
 function getLongWindow(moments, days = 30) {
@@ -1849,7 +1971,8 @@ async function boot() {
     localClimateTruth,
     canonicalState,
     activeFieldScope.label || "Nearby",
-    observatoryPipeline
+    observatoryPipeline,
+    activeFieldScope
   );
   renderStrata(moments, canonicalState);
 
@@ -1887,7 +2010,8 @@ async function boot() {
           localClimateTruth,
           canonicalState,
           activeFieldScope.label || "Nearby",
-          observatoryPipeline
+          observatoryPipeline,
+          activeFieldScope
         );
       } finally {
         fieldScopeSelect.disabled = false;
