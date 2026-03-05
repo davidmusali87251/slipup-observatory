@@ -7,7 +7,7 @@ Clean rebuild aligned with the Observatory model.
 - `Observatory` landing as primary atmospheric view.
 - `Contribute a moment` on a separate page.
 - Layered reading model:
-  - `Surface Read` (shared/global transition)
+  - `Surface Reading` (shared/global transition)
   - `Nearby Field` (regional reading with fallback)
   - `Deep Record` (long-window sediment)
 - Climate response loop with:
@@ -22,7 +22,7 @@ Open `index.html` in a browser.
 
 ## Product loop
 
-`Observatory -> Contribute -> micro shift -> settling -> observe -> Surface Read`
+`Observatory -> Contribute -> micro shift -> settling -> observe -> Surface Reading`
 
 ## Notes
 

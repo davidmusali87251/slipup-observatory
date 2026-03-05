@@ -6,6 +6,8 @@ const DEFAULT_WINDOW_HOURS = 48;
 const MAX_WINDOW_HOURS = 168;
 const MAX_NOTE_LENGTH = 19;
 const MAX_GEO_BUCKET_LENGTH = 64;
+const NOTE_SIGNAL_CAP = 0.16;
+const BUCKET_MINUTES = 5;
 
 const RATE_WINDOW_SECONDS = parseInt(Deno.env.get("MOMENTS_WINDOW_SECONDS") ?? "60", 10);
 const MOMENTS_GET_MAX = parseInt(Deno.env.get("MOMENTS_GET_MAX") ?? "240", 10);
@@ -19,6 +21,66 @@ const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") ?? "*")
 
 const ALLOWED_TYPES = new Set(["avoidable", "fertile", "observed"]);
 const ALLOWED_MOODS = new Set(["calm", "focus", "stressed", "curious", "tired"]);
+const REFLECTIVE_TOKENS = [
+  "reflect",
+  "noticed",
+  "learn",
+  "learned",
+  "lesson",
+  "pause",
+  "adjust",
+  "again",
+  "next",
+  "aware",
+  "observe",
+  "chose",
+  "choice",
+  "calm",
+  "breathe",
+  "intent",
+  "reflex",
+  "aprend",
+  "leccion",
+  "pausa",
+  "ajust",
+  "proxima",
+  "siguiente",
+  "consciente",
+  "observo",
+  "elegi",
+  "eleccion",
+  "calma",
+  "respir",
+  "intencion",
+];
+const REACTIVE_TOKENS = [
+  "rush",
+  "late",
+  "panic",
+  "angry",
+  "stuck",
+  "again!",
+  "always",
+  "never",
+  "chaos",
+  "overwhelm",
+  "noise",
+  "blame",
+  "fight",
+  "explode",
+  "prisa",
+  "tarde",
+  "panico",
+  "enoj",
+  "atasc",
+  "siempre",
+  "nunca",
+  "caos",
+  "ruido",
+  "culpa",
+  "pelea",
+  "explot",
+];
 
 type JsonRecord = Record<string, unknown>;
 
@@ -137,6 +199,36 @@ function parseTimestamp(input: unknown) {
   const date = value ? new Date(value) : new Date();
   if (Number.isNaN(date.getTime())) return null;
   return date.toISOString();
+}
+
+function roundToBucketStart(iso: string) {
+  const date = new Date(iso);
+  const ms = date.getTime();
+  const bucketMs = BUCKET_MINUTES * 60_000;
+  return new Date(Math.floor(ms / bucketMs) * bucketMs).toISOString();
+}
+
+function noteSignal(note: string) {
+  const text = String(note || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+  if (!text) return { reflective: 0, reactive: 0 };
+
+  let reflective = 0;
+  let reactive = 0;
+  REFLECTIVE_TOKENS.forEach((token) => {
+    if (text.includes(token)) reflective += 1;
+  });
+  REACTIVE_TOKENS.forEach((token) => {
+    if (text.includes(token)) reactive += 1;
+  });
+
+  return {
+    reflective: Math.min(reflective / 2.5, NOTE_SIGNAL_CAP),
+    reactive: Math.min(reactive / 2.5, NOTE_SIGNAL_CAP),
+  };
 }
 
 function parseBody(payload: JsonRecord) {
@@ -259,6 +351,34 @@ Deno.serve(async (req) => {
 
   const { data, error } = await supabase.from("moments").insert(row).select("id,timestamp").single();
   if (error) return json(origin, 500, { error: "db_error" });
+
+  // Increment scalable 5-minute buckets for shared moments.
+  if (row.shared) {
+    const signal = noteSignal(row.note);
+    const bucketStart = roundToBucketStart(row.timestamp);
+
+    const consume = async (bucketGeo: string | null) =>
+      supabase.rpc("consume_climate_bucket", {
+        p_bucket_start: bucketStart,
+        p_geo_bucket: bucketGeo,
+        p_type: row.type,
+        p_mood: row.mood,
+        p_reflective: signal.reflective,
+        p_reactive: signal.reactive,
+      });
+
+    // Global bucket (null geo) + optional regional bucket.
+    const globalResult = await consume(null);
+    if (globalResult.error) {
+      console.warn("consume_climate_bucket global unavailable:", globalResult.error.message);
+    }
+    if (row.geo_bucket) {
+      const localResult = await consume(row.geo_bucket);
+      if (localResult.error) {
+        console.warn("consume_climate_bucket local unavailable:", localResult.error.message);
+      }
+    }
+  }
 
   return json(origin, 201, { ok: true, moment: data });
 });

@@ -139,21 +139,21 @@ const COPY_VARIANTS = {
     },
     horizon: {
       empty: [
-        "No shared moments have reached the surface read yet.",
-        "The surface read has not formed yet.",
-        "The surface read is still waiting for momentum.",
+        "No shared moments have reached the surface reading yet.",
+        "The surface reading has not formed yet.",
+        "The surface reading is still waiting for momentum.",
       ],
       early: [
-        "The surface read is still taking shape.",
-        "The surface read is still forming.",
-        "Only a faint surface read is visible.",
+        "The surface reading is still taking shape.",
+        "The surface reading is still forming.",
+        "Only a faint surface reading is visible.",
       ],
       dominant: [
-        (kind) => `A ${kind} current is shaping the surface read.`,
-        (kind) => `The surface read is led by a ${kind} current.`,
-        (kind) => `A ${kind} tone is rising across the surface read.`,
+        (kind) => `A ${kind} current is shaping the surface reading.`,
+        (kind) => `The surface reading is led by a ${kind} current.`,
+        (kind) => `A ${kind} tone is rising across the surface reading.`,
         (kind) => `A ${kind} movement is becoming clearer at the surface.`,
-        (kind) => `The surface read leans toward a ${kind} current.`,
+        (kind) => `The surface reading leans toward a ${kind} current.`,
       ],
       trendSteady: [
         "The collective pulse is steady.",
@@ -177,11 +177,11 @@ const COPY_VARIANTS = {
         "A clearer lane is opening at the surface.",
         "The surface is opening into a clearer line.",
         "A lighter surface lane is appearing.",
-        "The surface read is opening out.",
+        "The surface reading is opening out.",
       ],
       driftStable: [
         "The surface line stays in balance.",
-        "The surface read is holding steady.",
+        "The surface reading is holding steady.",
         "The surface keeps a measured balance.",
         "The surface line remains calm.",
       ],
@@ -225,6 +225,11 @@ const COPY_VARIANTS = {
       "Deeper layers hold shared and private moments together.",
       "Shared and private moments keep settling in deeper record.",
     ],
+    strataEarly: [
+      "The deep record is still forming.",
+      "Only a light layer has settled in deep record.",
+      "Deep record is beginning to gather moments.",
+    ],
   },
   poetic: {
     condition: {
@@ -266,21 +271,21 @@ const COPY_VARIANTS = {
     },
     horizon: {
       empty: [
-        "No shared moments have reached the surface read yet.",
-        "The surface read is still waiting for its first line.",
-        "The surface read is still quiet.",
+        "No shared moments have reached the surface reading yet.",
+        "The surface reading is still waiting for its first line.",
+        "The surface reading is still quiet.",
       ],
       early: [
-        "The surface read is still settling.",
-        "The surface read is finding its contour.",
+        "The surface reading is still settling.",
+        "The surface reading is finding its contour.",
         "A first contour is still forming at the surface.",
       ],
       dominant: [
         (kind) => `A ${kind} current is surfacing in the read.`,
-        (kind) => `A ${kind} current is sketching the surface read.`,
+        (kind) => `A ${kind} current is sketching the surface reading.`,
         (kind) => `A ${kind} tone is beginning to lead the surface.`,
         (kind) => `A ${kind} movement is becoming visible at the surface.`,
-        (kind) => `The surface read is turning toward a ${kind} current.`,
+        (kind) => `The surface reading is turning toward a ${kind} current.`,
       ],
       trendSteady: [
         "The collective pulse stays even.",
@@ -308,8 +313,8 @@ const COPY_VARIANTS = {
       ],
       driftStable: [
         "The surface line remains steady.",
-        "The surface read holds a calm balance.",
-        "The surface read remains even and calm.",
+        "The surface reading holds a calm balance.",
+        "The surface reading remains even and calm.",
         "A stable surface line continues to hold.",
       ],
     },
@@ -351,6 +356,11 @@ const COPY_VARIANTS = {
       "In deeper layers, moments settle side by side.",
       "Deeper record gathers shared and private moments together.",
       "Shared and private moments keep settling in deeper layers.",
+    ],
+    strataEarly: [
+      "Deep record is still taking shape.",
+      "Only a thin layer has settled in deep record.",
+      "Deep record is beginning to gather moments.",
     ],
   },
 };
@@ -1017,7 +1027,9 @@ function getLongWindow(moments, days = 30) {
 
 function buildStrataLines(longWindowMoments, canonicalState) {
   const total = longWindowMoments.length;
-  if (total < 12) return [];
+  if (total === 0) {
+    return [pickCopy(COPY.strataEarly, 0)];
+  }
 
   const counts = { avoidable: 0, fertile: 0, observed: 0 };
   const moods = { calm: 0, focus: 0, stressed: 0, curious: 0, tired: 0 };
@@ -1048,7 +1060,7 @@ function buildStrataLines(longWindowMoments, canonicalState) {
 
   const moodDiversity = Object.values(moods).filter((count) => count > 0).length;
   if (moodDiversity >= 4) {
-    lines.push("Multiple currents spread across the terrain.");
+    lines.push("Multiple currents spread across deeper layers.");
   }
 
   const avoidableRatio = counts.avoidable / total;
@@ -1066,6 +1078,10 @@ function buildStrataLines(longWindowMoments, canonicalState) {
   if (lines.length < 2) {
     lines.push("The deep layer is taking shape from recurring moments.");
     lines.push(pickCopy(COPY.strataFallback, total + lines.length));
+  }
+
+  if (total < 12) {
+    return [lines[0], pickCopy(COPY.strataEarly, total)];
   }
 
   return lines.slice(0, 5);

@@ -1,10 +1,15 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { computeClimate } from "../_shared/computeClimate.ts";
+import { computeClimate, conditionForDegree } from "../_shared/computeClimate.ts";
 
 const DEFAULT_WINDOW_HOURS = 48;
 const MAX_WINDOW_HOURS = 168;
 const MAX_GEO_BUCKET_LENGTH = 64;
 const LOCAL_MIN_MASS = parseInt(Deno.env.get("LOCAL_MIN_MASS") ?? "30", 10);
+const USE_BUCKETS = (Deno.env.get("CLIMATE_USE_BUCKETS") ?? "true").toLowerCase() !== "false";
+const RECENCY_HALFLIFE_HOURS = 18;
+const RESPONSE_AMPLITUDE = 20;
+const BASELINE = 28;
+const SCALE = 100;
 
 const RATE_WINDOW_SECONDS = parseInt(Deno.env.get("CLIMATE_GET_WINDOW_SECONDS") ?? "60", 10);
 const CLIMATE_GET_MAX = parseInt(Deno.env.get("CLIMATE_GET_MAX") ?? "180", 10);
@@ -45,6 +50,98 @@ function geoCandidates(geo: string) {
     buckets.push(segments.slice(0, i).join("."));
   }
   return buckets;
+}
+
+type BucketRow = {
+  bucket_start: string;
+  shared_count: number;
+  reflective_sum: number;
+  reactive_sum: number;
+  avoidable_calm: number;
+  avoidable_focus: number;
+  avoidable_stressed: number;
+  avoidable_curious: number;
+  avoidable_tired: number;
+  fertile_calm: number;
+  fertile_focus: number;
+  fertile_stressed: number;
+  fertile_curious: number;
+  fertile_tired: number;
+  observed_calm: number;
+  observed_focus: number;
+  observed_stressed: number;
+  observed_curious: number;
+  observed_tired: number;
+};
+
+const INFLUENCE: Record<string, Record<string, { mode: "condense" | "clear" | "stabilize"; strength: number }>> = {
+  avoidable: {
+    stressed: { mode: "condense", strength: 1.0 },
+    tired: { mode: "condense", strength: 0.8 },
+    curious: { mode: "condense", strength: 0.55 },
+    focus: { mode: "condense", strength: 0.5 },
+    calm: { mode: "condense", strength: 0.35 },
+  },
+  fertile: {
+    calm: { mode: "clear", strength: 0.7 },
+    focus: { mode: "clear", strength: 0.55 },
+    curious: { mode: "clear", strength: 0.45 },
+    tired: { mode: "clear", strength: 0.28 },
+    stressed: { mode: "clear", strength: 0.22 },
+  },
+  observed: {
+    calm: { mode: "stabilize", strength: 0.3 },
+    focus: { mode: "stabilize", strength: 0.22 },
+    curious: { mode: "stabilize", strength: 0.18 },
+    tired: { mode: "stabilize", strength: 0.14 },
+    stressed: { mode: "stabilize", strength: 0.16 },
+  },
+};
+
+const COMBO_KEYS: Array<[string, string, keyof BucketRow]> = [
+  ["avoidable", "calm", "avoidable_calm"],
+  ["avoidable", "focus", "avoidable_focus"],
+  ["avoidable", "stressed", "avoidable_stressed"],
+  ["avoidable", "curious", "avoidable_curious"],
+  ["avoidable", "tired", "avoidable_tired"],
+  ["fertile", "calm", "fertile_calm"],
+  ["fertile", "focus", "fertile_focus"],
+  ["fertile", "stressed", "fertile_stressed"],
+  ["fertile", "curious", "fertile_curious"],
+  ["fertile", "tired", "fertile_tired"],
+  ["observed", "calm", "observed_calm"],
+  ["observed", "focus", "observed_focus"],
+  ["observed", "stressed", "observed_stressed"],
+  ["observed", "curious", "observed_curious"],
+  ["observed", "tired", "observed_tired"],
+];
+
+function clamp(n: number, min: number, max: number) {
+  return Math.max(min, Math.min(max, n));
+}
+
+function recencyMass(ageHours: number) {
+  return Math.pow(0.5, ageHours / RECENCY_HALFLIFE_HOURS);
+}
+
+function chooseAlpha(mass: number) {
+  if (mass < 4) return 0.12;
+  if (mass < 14) return 0.17;
+  return 0.2;
+}
+
+function signedPressure(mode: "condense" | "clear" | "stabilize", strength: number) {
+  if (mode === "condense") return strength;
+  if (mode === "clear") return -strength;
+  return 0;
+}
+
+function derivePressureMode(computedDegree: number, repetition: { hasPattern: boolean; tag: string }) {
+  const delta = computedDegree - BASELINE;
+  if (repetition?.hasPattern && repetition?.tag === "pattern_a") return "condensing";
+  if (delta >= 4.5) return "condensing";
+  if (delta <= -3.5) return "clearing";
+  return "stabilizing";
 }
 
 function pickCorsOrigin(origin: string | null) {
@@ -155,6 +252,131 @@ async function fetchLocalMoments(
     .lte("timestamp", endIso);
 }
 
+async function fetchBucketRows(
+  supabase: ReturnType<typeof createClient>,
+  geoBucket: string | null,
+  startIso: string,
+  endIso: string
+) {
+  let query = supabase
+    .from("climate_5m_bucket")
+    .select(
+      "bucket_start,shared_count,reflective_sum,reactive_sum,avoidable_calm,avoidable_focus,avoidable_stressed,avoidable_curious,avoidable_tired,fertile_calm,fertile_focus,fertile_stressed,fertile_curious,fertile_tired,observed_calm,observed_focus,observed_stressed,observed_curious,observed_tired"
+    )
+    .gte("bucket_start", startIso)
+    .lte("bucket_start", endIso)
+    .order("bucket_start", { ascending: true });
+  query = geoBucket === null ? query.is("geo_bucket", null) : query.eq("geo_bucket", geoBucket);
+  return query;
+}
+
+function computeFromBuckets(rows: BucketRow[], referenceIso: string, windowHours: number) {
+  if (!rows.length) return null;
+  const referenceTime = new Date(referenceIso);
+  let atmosphericPressure = 0;
+  let fieldMass = 0;
+  let stabilizeMass = 0;
+  let total = 0;
+  let avoidableStressedTotal = 0;
+  const avoidableMoodTotals = { calm: 0, focus: 0, stressed: 0, curious: 0, tired: 0 };
+  let hasCluster = false;
+  const comboCounts = new Map<string, number>();
+  let observedTotal = 0;
+  let calmFocusTotal = 0;
+  let avoidableTotal = 0;
+  let fertileTotal = 0;
+
+  rows.forEach((raw) => {
+    const row = raw as BucketRow;
+    const bucketTs = new Date(row.bucket_start).getTime();
+    const ageHours = Math.max(0, (referenceTime.getTime() - bucketTs) / 3600_000);
+    const mass = recencyMass(ageHours);
+    const bucketCount = Number(row.shared_count || 0);
+    if (bucketCount <= 0) return;
+    total += bucketCount;
+    fieldMass += bucketCount * mass;
+    atmosphericPressure += (Number(row.reactive_sum || 0) - Number(row.reflective_sum || 0)) * mass;
+    stabilizeMass += Number(row.reflective_sum || 0) * 0.75 * mass;
+
+    let bucketAvoidable = 0;
+    COMBO_KEYS.forEach(([type, mood, key]) => {
+      const count = Number(row[key] || 0);
+      if (count <= 0) return;
+      comboCounts.set(`${type}|${mood}`, (comboCounts.get(`${type}|${mood}`) || 0) + count);
+      const influence = INFLUENCE[type]?.[mood] ?? { mode: "stabilize", strength: 0.12 };
+      atmosphericPressure += signedPressure(influence.mode, influence.strength) * count * mass;
+      if (influence.mode === "stabilize") stabilizeMass += influence.strength * count * mass;
+      if (type === "avoidable") {
+        bucketAvoidable += count;
+        avoidableTotal += count;
+        avoidableMoodTotals[mood as keyof typeof avoidableMoodTotals] += count;
+      } else if (type === "fertile") {
+        fertileTotal += count;
+      } else if (type === "observed") {
+        observedTotal += count;
+      }
+      if (mood === "calm" || mood === "focus") calmFocusTotal += count;
+      if (type === "avoidable" && mood === "stressed") avoidableStressedTotal += count;
+    });
+    if (bucketCount >= 3 && bucketAvoidable > bucketCount / 2) hasCluster = true;
+  });
+
+  const repetition = (() => {
+    if (avoidableStressedTotal >= 2) {
+      const strength = clamp(0.25 + (avoidableStressedTotal - 2) * 0.1, 0.25, 0.6);
+      return { hasPattern: true, tag: "pattern_a", strength };
+    }
+    const maxAvoidableMood = Math.max(...Object.values(avoidableMoodTotals));
+    if (maxAvoidableMood >= 3) {
+      const strength = clamp(0.22 + (maxAvoidableMood - 3) * 0.08, 0.22, 0.55);
+      return { hasPattern: true, tag: "pattern_b", strength };
+    }
+    if (hasCluster) return { hasPattern: true, tag: "pattern_c", strength: 0.28 };
+    return { hasPattern: false, tag: "", strength: 0 };
+  })();
+
+  if (total <= 0 || fieldMass <= 0) return null;
+  const warmupFactor = Math.min(1, fieldMass / 6);
+  const pressureNormalizer = 2 * Math.sqrt(fieldMass) + 80;
+  const normalizedPressure = atmosphericPressure / pressureNormalizer;
+  const stabilizeDamping = clamp(1 - stabilizeMass / (fieldMass + 1), 0.65, 1);
+  const targetDelta = RESPONSE_AMPLITUDE * Math.tanh(normalizedPressure * 2.2) * stabilizeDamping;
+  const target = clamp(BASELINE + targetDelta * warmupFactor, 0, SCALE);
+  const alpha = chooseAlpha(fieldMass);
+  const warmBase = BASELINE + alpha * (target - BASELINE);
+  const repetitionDamping = clamp(1 / Math.sqrt(1 + fieldMass / 28), 0.18, 1);
+  const repetitionNudge = clamp(repetition.strength * 2.4 * repetitionDamping, 0, 1.4);
+  let computedDegree = clamp(warmBase + repetitionNudge, 0, SCALE);
+  if (total === 1) computedDegree = Math.min(computedDegree, BASELINE + 5);
+
+  let dominantMix = "";
+  let maxCombo = 0;
+  comboCounts.forEach((count, key) => {
+    if (count > maxCombo) {
+      maxCombo = count;
+      dominantMix = key;
+    }
+  });
+  const totalSafe = Math.max(1, total);
+  const stabilityIndex = clamp((observedTotal / totalSafe) * 0.62 + (calmFocusTotal / totalSafe) * 0.38, 0, 1);
+  const groundIndex = clamp((avoidableTotal / totalSafe) * 0.55 + (fertileTotal / totalSafe) * 0.45, 0, 1);
+  const pressureMode = derivePressureMode(computedDegree, repetition);
+
+  return {
+    modelVersion: "v2.2-global-bucket",
+    referenceTime: referenceIso,
+    windowHours,
+    computedDegree,
+    total,
+    condition: conditionForDegree(computedDegree, total),
+    repetition,
+    pressureMode,
+    dominantMix,
+    stabilityIndex,
+    groundIndex,
+  };
+}
+
 Deno.serve(async (req) => {
   const origin = req.headers.get("origin");
   if (req.method === "OPTIONS") {
@@ -202,6 +424,43 @@ Deno.serve(async (req) => {
   const start = new Date(referenceTime.getTime() - windowHours * 3600_000);
   const startIso = start.toISOString();
   const endIso = referenceTime.toISOString();
+
+  if (USE_BUCKETS) {
+    if (scope === "local") {
+      const candidates = geoCandidates(requestedGeo);
+      for (const candidate of candidates) {
+        const { data, error } = await fetchBucketRows(supabase, candidate, startIso, endIso);
+        if (error) break;
+        const rows = (data ?? []) as BucketRow[];
+        const aggregatedTotal = rows.reduce((acc, row) => acc + Number(row.shared_count || 0), 0);
+        if (aggregatedTotal >= LOCAL_MIN_MASS) {
+          const climate = computeFromBuckets(rows, referenceTime.toISOString(), windowHours);
+          if (climate) {
+            return json(origin, 200, {
+              ...climate,
+              source: "local",
+              requestedGeo,
+              geoBucketUsed: candidate,
+              minRequired: LOCAL_MIN_MASS,
+            });
+          }
+        }
+      }
+    } else {
+      const { data, error } = await fetchBucketRows(supabase, null, startIso, endIso);
+      if (!error) {
+        const climate = computeFromBuckets((data ?? []) as BucketRow[], referenceTime.toISOString(), windowHours);
+        if (climate) {
+          return json(origin, 200, {
+            ...climate,
+            source: "global",
+            requestedGeo: "",
+            geoBucketUsed: "",
+          });
+        }
+      }
+    }
+  }
 
   if (scope === "local") {
     const candidates = geoCandidates(requestedGeo);
