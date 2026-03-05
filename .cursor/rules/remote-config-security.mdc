@@ -1,0 +1,22 @@
+---
+description: Seguridad de config remota (remote.js, claves, datos). No exponer secretos.
+alwaysApply: true
+---
+
+# Seguridad: config remota y claves
+
+## En el repositorio
+
+- **remote.js** debe ir en el repo **solo con placeholders**: `USE_REMOTE_SHARED = false`, URLs con `YOUR_PROJECT_REF`, `REMOTE_ANON_KEY = ""`. No commitear URLs reales ni claves.
+- **remote.local.js** está en `.gitignore`; **nunca** commitearlo ni sugerir subirlo. Solo existe en local para generar `remote.js` con `node scripts/generate-remote.js`.
+
+## Claves y exposición
+
+- **Anon key (Supabase)** en el frontend es uso esperado: está pensada para el cliente; se protege con RLS, reglas en Edge Functions y rate limiting. No es un secreto crítico.
+- **Service role key** y demás secretos de backend **nunca** en frontend ni en el repo. Solo en Supabase (secrets de functions) o en CI como secrets.
+- Para producción con backend real: en CI ejecutar `node scripts/generate-remote.js` con variables de entorno/secrets; no commitear un `remote.js` con valores reales.
+
+## Resumen
+
+- Repo: placeholders en `remote.js`; `remote.local.js` ignorado.
+- Frontend: solo anon key si hace falta; nunca service_role ni secretos de backend.

@@ -6,7 +6,5 @@ supabase/.temp/
 # No incluir en deployments (solo uso interno)
 PLAN_MASTER.md
 
-# remote.js se genera con scripts/generate-remote.js (no commitear; evita subir valores reales)
-remote.js
-# Valores reales solo en local
+# Valores reales solo en local (generar remote.js con: node scripts/generate-remote.js)
 remote.local.js

@@ -27,8 +27,8 @@ Open `index.html` in a browser.
 ## Archivos que conviene dejar solo para nosotros (no en repo público)
 
 - **`supabase/.temp/`** — Generados por la CLI de Supabase (project-ref, versiones, etc.). Ya están en `.gitignore`. Si alguna vez se commitearon, quitar del repo con: `git rm -r --cached supabase/.temp/` y commit (los archivos siguen en disco pero dejan de estar en el árbol).
-- **`remote.js`** — Generado con `node scripts/generate-remote.js`. Está en `.gitignore`; no se commiteará nunca, así no se suben valores reales por error.
-- **`remote.local.js`** — Contiene tus URLs y anon key. También en `.gitignore`. Se usa solo para generar `remote.js` en tu máquina.
+- **`remote.js`** — En el repo va con **placeholders** para que el sitio desplegado (p. ej. GitHub Pages) cargue la app. En local, para usar el backend real: `node scripts/generate-remote.js` (usa `remote.local.js` o env).
+- **`remote.local.js`** — Contiene tus URLs y anon key. En `.gitignore`; no se sube. Se usa solo para generar `remote.js` en tu máquina.
 
 ## Product loop
 
@@ -75,9 +75,9 @@ El repo incluye `remote.js` con **placeholders** (no incluir valores reales en e
 3. Desde la raíz del repo ejecuta: **`node scripts/generate-remote.js`**. Eso reescribe la cabecera de `remote.js` con los valores de `remote.local.js` (o, si no existe, con variables de entorno `REMOTE_MOMENTS_URL`, `REMOTE_CLIMATE_URL`, `REMOTE_ANON_KEY`, `USE_REMOTE_SHARED`).
 4. Abre `index.html` o despliega; la app usará ese `remote.js` generado.
 
-Para despliegue en CI (p. ej. GitHub Actions): define los secrets y en el paso de build ejecuta `node scripts/generate-remote.js` pasando esas variables de entorno, así el `remote.js` desplegado tiene los valores correctos sin guardarlos en el repo.
+Para **producción con backend real** (que slipup.io muestre datos de Supabase): en el paso de build del CI (p. ej. GitHub Actions) ejecuta `node scripts/generate-remote.js` con las variables de entorno / secrets; así el `remote.js` desplegado tiene los valores correctos sin guardarlos en el repo. Si no usas CI, el sitio desplegado tendrá `remote.js` con placeholders: la app cargará pero no mostrará datos remotos (solo fallback local).
 
-**Importante:** `remote.js` está en `.gitignore`, así que **nunca** se sube al repo (ni tú ni el asistente pueden commitearlo por error). En el repo solo está `remote.js.template` (plantilla con placeholders). Tras clonar o hacer pull: ejecuta `node scripts/generate-remote.js` y se creará `remote.js` en tu máquina (desde la plantilla y tus `remote.local.js` o env). Si antes tenías `remote.js` en el repo, quítalo del tracking una vez: `git rm --cached remote.js` y commit.
+Tras clonar o hacer pull: en local puedes seguir usando `remote.js` del repo (placeholders) o ejecutar `node scripts/generate-remote.js` para sobrescribir con tus `remote.local.js` o env y tener backend real.
 
 Frontend keeps local fallback enabled by default:
 
