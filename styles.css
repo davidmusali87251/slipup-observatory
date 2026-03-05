@@ -1150,6 +1150,10 @@ h2 {
   opacity: 0.95;
 }
 
+.back-link-short {
+  display: none;
+}
+
 #contributeForm {
   display: grid;
   gap: 0.9rem;
@@ -1417,27 +1421,58 @@ h2 {
 
 @media (max-width: 520px) {
   .contribute-page .topbar {
-    flex-wrap: nowrap;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    justify-content: space-between;
-    gap: 0.44rem;
+    column-gap: 0.44rem;
     margin-bottom: 0.56rem;
   }
 
   .contribute-page .topbar h1 {
-    width: auto;
+    min-width: 0;
     font-size: 0.98rem;
     letter-spacing: 0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .contribute-page .topbar .text-link {
     min-height: 30px;
     padding: 0.24rem 0.48rem;
     font-size: 0.7rem;
+    max-width: 44vw;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .contribute-page .panel {
     margin-top: 0.2rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .contribute-page .topbar {
+    column-gap: 0.36rem;
+  }
+
+  .contribute-page .topbar h1 {
+    font-size: 0.92rem;
+  }
+
+  .contribute-page .topbar .text-link {
+    font-size: 0.66rem;
+    padding: 0.2rem 0.4rem;
+    max-width: 40vw;
+  }
+
+  .back-link-full {
+    display: none;
+  }
+
+  .back-link-short {
+    display: inline;
   }
 }
 
