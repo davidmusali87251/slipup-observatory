@@ -702,6 +702,7 @@ const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduc
 
 let isSharedSheetOpen = false;
 let lastFocusedEl = null;
+let infiniteScrollReady = false;
 
 function renderFutureConfidenceLine(canonicalState, pipeline) {
   if (!FUTURE_UI.readingConfidenceLine || !readingConfidenceLine) return;
@@ -724,6 +725,131 @@ function renderScopeInstrument(canonicalState) {
 
   observatoryPanel.dataset.scopeTone = tone;
   observatoryPanel.classList.toggle("is-target-lock", Boolean(repetition?.hasPattern));
+}
+
+function initSilentDescentTransitions() {
+  const sections = [
+    document.querySelector(".panel-recent"),
+    document.getElementById("horizon"),
+    document.getElementById("local-climate"),
+  ].filter(Boolean);
+
+  if (!sections.length) return;
+
+  sections.forEach((section, index) => {
+    section.classList.add("silent-descent");
+    if (index === 0) section.classList.add("is-revealed");
+  });
+
+  if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+    sections.forEach((section) => section.classList.add("is-revealed"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-revealed");
+        observer.unobserve(entry.target);
+      });
+    },
+    { threshold: 0.2, rootMargin: "0px 0px -10% 0px" }
+  );
+
+  sections.slice(1).forEach((section) => observer.observe(section));
+}
+
+function initInfiniteObservatoryScroll() {
+  if (infiniteScrollReady) return;
+  infiniteScrollReady = true;
+
+  const scroller = document.scrollingElement || document.documentElement;
+  if (!scroller) return;
+
+  let wrapLockUntil = 0;
+  let touchStartY = null;
+  const threshold = 18;
+  const minDelta = 26;
+  const lockMs = 380;
+
+  const canWrap = () => {
+    if (Date.now() < wrapLockUntil) return false;
+    if (document.body.classList.contains("sheet-open")) return false;
+    const active = document.activeElement;
+    if (!active) return true;
+    const tag = active.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return false;
+    return true;
+  };
+
+  const wrapTo = (targetTop, direction) => {
+    wrapLockUntil = Date.now() + lockMs;
+    document.body.classList.add("loop-warp", direction === "up" ? "loop-warp-up" : "loop-warp-down");
+    window.scrollTo({ top: targetTop, behavior: "auto" });
+    window.setTimeout(() => {
+      document.body.classList.remove("loop-warp", "loop-warp-up", "loop-warp-down");
+    }, 220);
+  };
+
+  const onWheel = (event) => {
+    if (!canWrap()) return;
+    const max = Math.max(0, scroller.scrollHeight - window.innerHeight);
+    const y = window.scrollY || scroller.scrollTop || 0;
+    if (max <= threshold * 2) return;
+
+    if (y <= threshold && event.deltaY < -minDelta) {
+      event.preventDefault();
+      const carry = clamp(Math.abs(event.deltaY), 0, 120);
+      wrapTo(Math.max(threshold, max - threshold - carry), "up");
+      return;
+    }
+    if (y >= max - threshold && event.deltaY > minDelta) {
+      event.preventDefault();
+      const carry = clamp(Math.abs(event.deltaY), 0, 120);
+      wrapTo(Math.min(max - threshold, threshold + carry), "down");
+    }
+  };
+
+  const onTouchStart = (event) => {
+    if (!event.touches?.length) return;
+    touchStartY = event.touches[0].clientY;
+  };
+
+  const onTouchMove = (event) => {
+    if (!canWrap() || touchStartY === null || !event.touches?.length) return;
+    const currentY = event.touches[0].clientY;
+    const delta = touchStartY - currentY;
+    const max = Math.max(0, scroller.scrollHeight - window.innerHeight);
+    const y = window.scrollY || scroller.scrollTop || 0;
+    if (max <= threshold * 2) return;
+
+    if (y <= threshold && delta < -minDelta) {
+      const carry = clamp(Math.abs(delta), 0, 120);
+      wrapTo(Math.max(threshold, max - threshold - carry), "up");
+      touchStartY = currentY;
+      return;
+    }
+    if (y >= max - threshold && delta > minDelta) {
+      const carry = clamp(Math.abs(delta), 0, 120);
+      wrapTo(Math.min(max - threshold, threshold + carry), "down");
+      touchStartY = currentY;
+    }
+  };
+
+  window.addEventListener("wheel", onWheel, { passive: false });
+  window.addEventListener("touchstart", onTouchStart, { passive: true });
+  window.addEventListener("touchmove", onTouchMove, { passive: true });
+}
+
+function applyDeepLinkIfPresent() {
+  const hash = window.location.hash || "";
+  if (!hash) return;
+  const target = document.querySelector(hash);
+  if (!target) return;
+  window.setTimeout(() => {
+    target.scrollIntoView({ behavior: prefersReducedMotion ? "auto" : "smooth", block: "start" });
+  }, 40);
 }
 
 function detectStructuralPattern(activeEntries48h) {
@@ -1993,6 +2119,9 @@ async function boot() {
     activeFieldScope
   );
   renderStrata(moments, canonicalState);
+  initSilentDescentTransitions();
+  initInfiniteObservatoryScroll();
+  applyDeepLinkIfPresent();
 
   viewMoreButton.onclick = () => openSharedSheet(sharedMoments);
   sheetBackdrop.onclick = closeSharedSheet;
