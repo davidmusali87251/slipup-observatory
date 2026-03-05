@@ -1,0 +1,13 @@
+# Solo para comprobar que los workflows manuales aparecen en la pestaña Actions.
+# Si ves "Test manual" en la barra lateral, puedes borrar este archivo.
+
+name: Test manual
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "OK - workflow manual funciona"
