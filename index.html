@@ -56,7 +56,12 @@
           <div class="degree-wrap" aria-label="Atmosphere reading in degrees">
             <p id="degreeValue" class="degree-value">28</p>
           </div>
-          <p id="conditionLine" class="condition-line" role="status" aria-live="polite">Global signal pending.</p>
+          <p id="conditionLine" class="condition-line" role="status" aria-live="polite">Señal global pendiente.</p>
+          <div id="climateInstrument" class="climate-instrument" role="status" aria-live="polite" aria-label="Lectura del instrumento: ventana y métricas">
+            <p class="climate-instrument-scope">Ventana 48 h</p>
+            <p id="climateMetricsLine" class="climate-metrics-line"></p>
+          </div>
+          <p id="climateSummaryLine" class="climate-summary-line" role="status" aria-live="polite"></p>
           <p id="warmupHint" class="warmup-hint hidden" aria-live="polite"></p>
           <p id="transientReadingLine" class="transient-reading-line hidden" aria-live="polite"></p>
           <p id="atmosphere-pattern-line" class="atmosphere-pattern-line hidden" aria-live="polite"></p>

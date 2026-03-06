@@ -95,9 +95,12 @@ const REACTIVE_TOKENS = [
 ];
 
 // Tone selector for key narrative lines:
-// - "clear": direct and legible
-// - "poetic": softer and more atmospheric
-const COPY_MODE = "poetic";
+// Modo de copy: clear | poetic | narrative (narrative usa LANG: en | es)
+const COPY_MODE = "narrative";
+if (typeof document !== "undefined" && !document.documentElement.hasAttribute("lang")) {
+  document.documentElement.lang = navigator.language?.startsWith("es") ? "es" : "en";
+}
+const LANG = (typeof document !== "undefined" && document.documentElement?.lang?.startsWith("es")) ? "es" : "en";
 const COPY_VARIANTS = {
   clear: {
     condition: {
@@ -405,8 +408,135 @@ const COPY_VARIANTS = {
       "Only first layers are visible in your deep record.",
     ],
   },
+  narrative_en: {
+    condition: {
+      quiet: ["The atmosphere is still gathering.", "First signals only.", "Still gathering."],
+      steady: ["The reading holds steady.", "Steady. Calm field.", "The field is calm."],
+      balance: ["The mix is rebalancing.", "Settling into balance.", "Re-centering."],
+      gathering: ["Pressure is rising.", "The reading is tightening.", "Density building."],
+      dense: ["The atmosphere is full.", "Dense with signal.", "Strong reading."],
+    },
+    horizon: {
+      empty: ["No horizon line yet.", "The horizon is still open.", "Add your moment to trace a line."],
+      early: ["A horizon is forming.", "The line is still light.", "Almost enough to read."],
+      dominant: [
+        (k) => `The mix leans to ${k}.`,
+        (k) => `Right now: ${k}.`,
+        (k) => `This window reads ${k}.`,
+      ],
+      trendSteady: ["The line holds.", "No shift in sight.", "Steady across the window."],
+      trendShift: ["The line is shifting.", "Something is moving.", "The reading is changing."],
+      driftCondensing: ["Pressure tightening.", "The reading is condensing.", "Density rising."],
+      driftClearing: ["Pressure easing.", "The reading is opening.", "Clearing."],
+      driftStable: ["Pressure steady.", "No strong drift.", "Holding."],
+    },
+    local: {
+      condensing: ["This field is tightening.", "Local pressure rising.", "Denser here."],
+      clearing: ["This field is opening.", "Local pressure easing.", "Lighter here."],
+      stable: ["This field holds steady.", "Local balance.", "Calm in this scope."],
+      fallback: ["Reading from the wider field.", "Not enough here yet; using the whole."],
+      regional: ["Reading from this region.", "This scope shapes the line."],
+    },
+    strataFallback: ["Moments settle into deeper layers.", "Your record deepens.", "Layers keep settling."],
+    strataEarly: ["Your deep record is still forming.", "First layers only.", "The deep is still open."],
+  },
+  narrative_es: {
+    condition: {
+      quiet: ["La atmósfera sigue reuniendo.", "Solo las primeras señales.", "Aún reuniendo."],
+      steady: ["La lectura se mantiene estable.", "Estable. Campo en calma.", "El campo está en calma."],
+      balance: ["La mezcla se reequilibra.", "Asentándose en balance.", "Recentrando."],
+      gathering: ["La presión sube.", "La lectura se condensa.", "La densidad crece."],
+      dense: ["La atmósfera está llena.", "Denso de señal.", "Lectura fuerte."],
+    },
+    horizon: {
+      empty: ["Aún no hay línea del horizonte.", "El horizonte sigue abierto.", "Añade tu momento para trazar una línea."],
+      early: ["Se está formando un horizonte.", "La línea sigue liviana.", "Casi suficiente para leer."],
+      dominant: [
+        (k) => `La mezcla se inclina a ${k}.`,
+        (k) => `Ahora mismo: ${k}.`,
+        (k) => `Esta ventana lee ${k}.`,
+      ],
+      trendSteady: ["La línea se mantiene.", "Sin cambio a la vista.", "Estable en la ventana."],
+      trendShift: ["La línea se mueve.", "Algo está cambiando.", "La lectura cambia."],
+      driftCondensing: ["Presión condensando.", "La lectura se condensa.", "Sube la densidad."],
+      driftClearing: ["Presión abriendo.", "La lectura se abre.", "Aclarando."],
+      driftStable: ["Presión estable.", "Sin deriva fuerte.", "Se mantiene."],
+    },
+    local: {
+      condensing: ["Este campo se condensa.", "Sube la presión local.", "Más denso aquí."],
+      clearing: ["Este campo se abre.", "Baja la presión local.", "Más liviano aquí."],
+      stable: ["Este campo se mantiene.", "Balance local.", "Calma en este alcance."],
+      fallback: ["Leyendo desde el campo amplio.", "Aún no basta aquí; se usa el conjunto."],
+      regional: ["Leyendo esta región.", "Este alcance da forma a la línea."],
+    },
+    strataFallback: ["Los momentos se asientan en capas profundas.", "Tu registro se profundiza.", "Las capas siguen asentándose."],
+    strataEarly: ["Tu registro profundo sigue formándose.", "Solo las primeras capas.", "Lo profundo sigue abierto."],
+  },
 };
-const COPY = COPY_VARIANTS[COPY_MODE] || COPY_VARIANTS.clear;
+const COPY = COPY_VARIANTS[COPY_MODE === "narrative" ? "narrative_" + LANG : COPY_MODE] || COPY_VARIANTS.poetic;
+
+const UI_COPY = {
+  en: {
+    orientation: "This reading gathers the last 48 hours.",
+    cta: "Let it rise into the atmosphere.",
+    trust: "No account. No exact pin. Not weather, just shared moments.",
+    scopeLabel: "48h window",
+    recentFromRemote: "Across the atmosphere.",
+    recentFromLocal: "Moments from this device only.",
+    conditionPending: "Global signal pending.",
+    mixLine: (type, mood) => `Recent mix: mostly ${type}, ${mood}.`,
+    eyebrow: "Atmosphere — Shared Moments",
+    horizonTitle: "Horizon Line",
+    nearbyTitle: "Nearby Field",
+    viewMore: "View more",
+    close: "Close",
+    sheetEmpty: "No shared moments yet.",
+    sheetCount: (n) => (n === 1 ? "Showing 1 moment." : `Showing ${n} moments.`),
+    loading: "Loading…",
+  },
+  es: {
+    orientation: "Esta lectura reúne las últimas 48 horas.",
+    cta: "Que suba a la atmósfera.",
+    trust: "Sin cuenta. Sin pin exacto. No es el tiempo; son momentos compartidos.",
+    scopeLabel: "Ventana 48 h",
+    recentFromRemote: "En la atmósfera.",
+    recentFromLocal: "Solo momentos de este dispositivo.",
+    conditionPending: "Señal global pendiente.",
+    mixLine: (type, mood) => `Mix reciente: sobre todo ${type}, ${mood}.`,
+    eyebrow: "Atmósfera — Momentos compartidos",
+    horizonTitle: "Línea del horizonte",
+    nearbyTitle: "Campo cercano",
+    viewMore: "Ver más",
+    close: "Cerrar",
+    sheetEmpty: "Aún no hay momentos compartidos.",
+    sheetCount: (n) => (n === 1 ? "Se muestra 1 momento." : `Se muestran ${n} momentos.`),
+    loading: "Cargando…",
+  },
+};
+
+function applyUICopy() {
+  const ui = UI_COPY[LANG] || UI_COPY.en;
+  const orientationEl = document.querySelector(".atmosphere-orientation");
+  if (orientationEl) orientationEl.textContent = ui.orientation;
+  const ctaEl = document.querySelector(".cta-microcopy");
+  if (ctaEl) ctaEl.textContent = ui.cta;
+  const trustEl = document.querySelector(".trust-microcopy");
+  if (trustEl) trustEl.textContent = ui.trust;
+  const scopeEl = document.querySelector(".climate-instrument-scope");
+  if (scopeEl) scopeEl.textContent = ui.scopeLabel;
+  const eyebrowEl = document.querySelector(".eyebrow");
+  if (eyebrowEl) eyebrowEl.textContent = ui.eyebrow;
+  const horizonTitleEl = document.querySelector(".horizon-line");
+  if (horizonTitleEl) horizonTitleEl.textContent = ui.horizonTitle;
+  const nearbyTitleEl = document.querySelector(".local-climate-line");
+  if (nearbyTitleEl) nearbyTitleEl.textContent = ui.nearbyTitle;
+  if (conditionLine) conditionLine.textContent = ui.conditionPending;
+  if (viewMoreButton) viewMoreButton.textContent = ui.viewMore;
+  const closeBtn = document.getElementById("shared-sheet-close");
+  if (closeBtn) closeBtn.textContent = ui.close;
+  const sheetEmptyEl = document.getElementById("shared-sheet-empty");
+  if (sheetEmptyEl) sheetEmptyEl.textContent = ui.sheetEmpty || "No shared moments yet.";
+}
 // FUTURE: Keep scaffold switches explicit for non-active UI lines.
 const FUTURE_UI = {
   readingConfidenceLine: false,
@@ -532,8 +662,38 @@ const SIGNAL_VARIANTS = {
       ],
     },
   },
+  narrative_en: {
+    confidence: { early: ["Early."], building: ["Building."], firm: ["Firm."] },
+    pulse: {
+      early: ["Still gathering.", "First formation.", "Not enough to trace yet."],
+      rising: ["Pace rising.", "More in the last stretch.", "Gaining."],
+      easing: ["Pace easing.", "Quieter lately.", "Softening."],
+      steady: ["Steady pace.", "The line holds.", "Stable."],
+    },
+    echo: {
+      fallback: ["Echo follows the wider field."],
+      aligned: ["Echo in step with the field."],
+      near: ["Echo near the field."],
+      offset: ["Echo on its own line."],
+    },
+  },
+  narrative_es: {
+    confidence: { early: ["Temprano."], building: ["Construyendo."], firm: ["Firme."] },
+    pulse: {
+      early: ["Aún reuniendo.", "Primera formación.", "Aún no basta para trazar."],
+      rising: ["El ritmo sube.", "Más en el último tramo.", "Ganando."],
+      easing: ["El ritmo baja.", "Más tranquilo últimamente.", "Suavizando."],
+      steady: ["Ritmo estable.", "La línea se mantiene.", "Estable."],
+    },
+    echo: {
+      fallback: ["El eco sigue al campo amplio."],
+      aligned: ["El eco acompasado con el campo."],
+      near: ["El eco cerca del campo."],
+      offset: ["El eco en su propia línea."],
+    },
+  },
 };
-const SIGNALS = SIGNAL_VARIANTS[COPY_MODE] || SIGNAL_VARIANTS.clear;
+const SIGNALS = SIGNAL_VARIANTS[COPY_MODE === "narrative" ? "narrative_" + LANG : COPY_MODE] || SIGNAL_VARIANTS.poetic;
 const REGIONAL_LOCAL_COPY = {
   common: {
     condensing: [
@@ -667,6 +827,9 @@ function pickCopyFromState(entry, numericSeed) {
 
 const degreeValue = document.getElementById("degreeValue");
 const conditionLine = document.getElementById("conditionLine");
+const climateSummaryLine = document.getElementById("climateSummaryLine");
+const climateMetricsLine = document.getElementById("climateMetricsLine");
+const climateInstrument = document.getElementById("climateInstrument");
 // FUTURE: kept as scaffold for a possible hero confidence line return.
 const readingConfidenceLine = document.getElementById("readingConfidenceLine");
 const observatoryPanel = document.getElementById("observatory");
@@ -1091,6 +1254,7 @@ function compositionCounts(moments) {
   return { byType, byMood };
 }
 
+// Presión: tendencia del grado respecto al baseline (28). Condensando = sube; abriendo = baja; estable = cerca del baseline.
 function derivePressureMode(computedDegree, repetition) {
   const delta = computedDegree - BASELINE;
   if (repetition?.hasPattern && repetition?.tag === "pattern_a") return "condensing";
@@ -1106,6 +1270,7 @@ function deriveClimateState(climateTruth, sharedMoments, localMoments) {
   const total = Math.max(1, shared.length);
   const observedRatio = counts.byType.observed / total;
   const calmFocusRatio = (counts.byMood.calm + counts.byMood.focus) / total;
+  // Estabilidad: mezcla de tipo "observed" (62%) y ánimo calm/focus (38%). Alto = mix más estable.
   const stabilityIndex = clamp(observedRatio * 0.62 + calmFocusRatio * 0.38, 0, 1);
 
   const longWindow = getLongWindow(localMoments, 30);
@@ -1546,7 +1711,7 @@ function renderMomentItems(targetElement, items) {
     const li = document.createElement("li");
     li.className = "moment-item";
     const note = m.note ? m.note : "(no note)";
-    const left = `${m.type} · ${m.mood} · ${note}`;
+    const left = `${String(m.type).toLowerCase()} · ${String(m.mood).toLowerCase()} · ${String(note).toLowerCase()}`;
     const timeStr = new Date(m.timestamp).toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
@@ -1565,7 +1730,8 @@ function renderRecent(sharedMoments) {
   if (list.length === 0) {
     const empty = document.createElement("li");
     empty.className = "moment-item";
-    empty.textContent = "No shared moments yet.";
+    const ui = UI_COPY[LANG] || UI_COPY.en;
+    empty.textContent = ui.sheetEmpty || "No shared moments yet.";
     recentMoments.appendChild(empty);
     return;
   }
@@ -1582,7 +1748,7 @@ function renderSharedSheetList(sharedMoments, countLabel = "") {
     sharedSheetCount.classList.toggle("hidden", !countLabel);
   }
 
-  const isLoading = countLabel === "Loading…";
+  const isLoading = list.length === 0 && countLabel.length > 0;
   if (list.length === 0 && !isLoading) {
     sharedSheetList.classList.add("hidden");
     sharedSheetEmpty.classList.remove("hidden");
@@ -1659,7 +1825,7 @@ async function openSharedSheet(sharedMoments) {
   document.body.classList.add("sheet-open");
   document.addEventListener("keydown", onSharedSheetKeydown);
 
-  renderSharedSheetList([], "Loading…");
+  renderSharedSheetList([], (UI_COPY[LANG] || UI_COPY.en).loading || "Loading…");
   requestAnimationFrame(() => {
     sharedSheet.classList.add("is-open");
     sheetBackdrop.classList.add("is-open");
@@ -1675,7 +1841,8 @@ async function openSharedSheet(sharedMoments) {
   }
 
   const n = listToShow.length;
-  const countLabel = n === 0 ? "" : n === 1 ? "Showing 1 moment." : `Showing ${n} moments.`;
+  const ui = UI_COPY[LANG] || UI_COPY.en;
+  const countLabel = n === 0 ? "" : (ui.sheetCount ? ui.sheetCount(n) : `Showing ${n} moments.`);
   renderSharedSheetList(listToShow, countLabel);
 
   sharedSheetCloseButton.focus();
@@ -2052,6 +2219,8 @@ async function loadFieldClimateTruth(globalClimate, fieldScope) {
 }
 
 async function boot() {
+  applyUICopy();
+
   const moments = loadMoments();
   const previousComputed = getStoredComputedDegree();
   const previousDisplay = getStoredDisplayDegree();
@@ -2075,9 +2244,10 @@ async function boot() {
   const [sharedResult, climateTruth] = await Promise.all([loadSharedMoments(moments), loadClimateTruth(moments)]);
   const sharedMoments = sharedResult.items;
   if (recentContext) {
+    const ui = UI_COPY[LANG] || UI_COPY.en;
     recentContext.textContent = sharedResult.source === "remote"
-      ? "Across the atmosphere."
-      : "Moments from this device only.";
+      ? ui.recentFromRemote
+      : ui.recentFromLocal;
   }
   const canonicalState = deriveClimateState(climateTruth, sharedMoments, moments);
   const fieldScopes = buildFieldScopeOptions();
@@ -2151,6 +2321,60 @@ async function boot() {
   setStoredComputedDegree(computedDegree);
   setStoredDisplayDegree(computedDegree);
   conditionLine.textContent = canonicalState.condition;
+
+  // Instrumento observatorio. Presión: ver derivePressureMode. Estabilidad: mix observed+calm/focus (0-100). Densidad: señal en ventana 48h (0-100, 50 compartidos = 100%).
+  if (climateMetricsLine) {
+    const total = Number(canonicalState?.total) || 0;
+    const pressure = canonicalState?.pressureMode || "";
+    const stability = canonicalState?.stabilityIndex;
+    const pressureLabel =
+      pressure === "condensing"
+        ? "presión condensando"
+        : pressure === "clearing"
+          ? "presión abriendo"
+          : total > 0
+            ? "presión estable"
+            : "";
+    const densityPct = total > 0 ? Math.min(100, Math.round((total / 50) * 100)) : 0;
+    const parts = [];
+    if (pressureLabel && total > 0) parts.push(`${pressureLabel} · ${total} compartidos`);
+    if (Number.isFinite(stability) && stability >= 0) {
+      parts.push(`estabilidad ${Math.round(stability * 100)}`);
+    }
+    if (total > 0) parts.push(`densidad ${densityPct}`);
+    if (parts.length > 0) {
+      climateMetricsLine.textContent = parts.join(" · ");
+      climateMetricsLine.classList.remove("hidden");
+      if (climateInstrument) climateInstrument.classList.remove("hidden");
+    } else {
+      climateMetricsLine.textContent = "";
+      climateMetricsLine.classList.add("hidden");
+      if (climateInstrument) climateInstrument.classList.add("hidden");
+    }
+  }
+
+  if (climateSummaryLine) {
+    const latest = sharedMoments.slice(0, 12);
+    if (latest.length >= 2) {
+      const byType = { avoidable: 0, fertile: 0, observed: 0 };
+      const byMood = { calm: 0, focus: 0, stressed: 0, curious: 0, tired: 0 };
+      latest.forEach((m) => {
+        if (byType[m.type] !== undefined) byType[m.type] += 1;
+        if (byMood[m.mood] !== undefined) byMood[m.mood] += 1;
+      });
+      const topType = Object.entries(byType).sort((a, b) => b[1] - a[1])[0];
+      const topMood = Object.entries(byMood).sort((a, b) => b[1] - a[1])[0];
+      const typeLabel = topType ? topType[0] : "observed";
+      const moodLabel = topMood ? topMood[0] : "calm";
+      const ui = UI_COPY[LANG] || UI_COPY.en;
+      climateSummaryLine.textContent = ui.mixLine(typeLabel, moodLabel);
+      climateSummaryLine.classList.remove("hidden");
+    } else {
+      climateSummaryLine.textContent = "";
+      climateSummaryLine.classList.add("hidden");
+    }
+  }
+
   const hasSemanticSignal = sharedMoments.slice(0, 48).some((m) => {
     const s = noteSignal(m.note || "");
     return s.reflective > 0 || s.reactive > 0;

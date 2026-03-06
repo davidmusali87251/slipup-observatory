@@ -474,6 +474,53 @@ h2 {
   line-height: 1.72;
 }
 
+.climate-instrument {
+  margin-top: 0.5rem;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
+  border-radius: 6px;
+  background: color-mix(in oklab, var(--text) 4%, transparent);
+}
+
+.climate-instrument.hidden {
+  display: none;
+}
+
+.climate-instrument-scope {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  opacity: 0.9;
+}
+
+.climate-metrics-line {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--muted);
+  opacity: 0.9;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.climate-metrics-line.hidden {
+  display: none;
+}
+
+.climate-summary-line {
+  margin-top: 0.15rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--muted);
+  opacity: 0.88;
+}
+
+.climate-summary-line.hidden {
+  display: none;
+}
+
 .reading-confidence-line {
   margin-top: -0.25rem;
   font-size: 0.75rem;
