@@ -1016,10 +1016,12 @@ function initInfiniteObservatoryScroll() {
   if (!scroller) return;
 
   let wrapLockUntil = 0;
+  /** "up" = acabamos de hacer wrap hacia abajo (estábamos arriba, usuario subió); "down" = acabamos de hacer wrap hacia arriba */
+  let lastWrapDirection = null;
   let touchStartY = null;
   const threshold = 18;
   const minDelta = 26;
-  const lockMs = 260;
+  const lockMs = 380;
 
   const canWrap = () => {
     if (Date.now() < wrapLockUntil) return false;
@@ -1033,14 +1035,32 @@ function initInfiniteObservatoryScroll() {
 
   const wrapTo = (targetTop, direction) => {
     wrapLockUntil = Date.now() + lockMs;
+    lastWrapDirection = direction;
     document.body.classList.add("loop-warp", direction === "up" ? "loop-warp-up" : "loop-warp-down");
+    const html = document.documentElement;
+    const prevScrollBehavior = html.style.scrollBehavior;
+    html.style.scrollBehavior = "auto";
     window.scrollTo({ top: targetTop, behavior: "auto" });
     requestAnimationFrame(() => {
+      html.style.scrollBehavior = prevScrollBehavior;
       document.body.classList.remove("loop-warp", "loop-warp-up", "loop-warp-down");
     });
+    setTimeout(() => { lastWrapDirection = null; }, lockMs + 50);
   };
 
   const onWheel = (event) => {
+    const now = Date.now();
+    const inLock = now < wrapLockUntil;
+
+    if (inLock && lastWrapDirection != null) {
+      const deltaY = event.deltaY;
+      const wouldBounceBack = lastWrapDirection === "up" && deltaY < 0;
+      if (wouldBounceBack) {
+        event.preventDefault();
+        return;
+      }
+    }
+
     if (!canWrap()) return;
     const max = Math.max(0, scroller.scrollHeight - window.innerHeight);
     const y = window.scrollY || scroller.scrollTop || 0;
@@ -2322,7 +2342,7 @@ async function boot() {
     document.body.style.setProperty("--atmo", String(optimisticStartDisplay));
   } else {
     // First load with no stored state: avoid flashing a temporary fixed number.
-    degreeValue.textContent = "";
+    degreeValue.textContent = String(BASELINE);
     degreeValue.classList.add("is-pending");
     document.body.style.setProperty("--atmo", String(BASELINE));
     if (observatoryPanel) observatoryPanel.setAttribute("aria-busy", "true");

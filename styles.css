@@ -73,6 +73,7 @@ body.loop-warp .page {
 
 html {
   scroll-behavior: smooth;
+  overscroll-behavior-y: none;
 }
 
 body.sheet-open {
@@ -610,6 +611,7 @@ h2 {
   position: relative;
   display: inline-block;
   min-width: 1.75ch;
+  min-height: 1em;
   text-align: center;
   padding-right: 0.22em;
   font-variant-numeric: tabular-nums;
@@ -638,6 +640,7 @@ h2 {
   font-size: 0.96rem;
   font-weight: 500;
   line-height: 1.72;
+  min-height: 1.72em;
 }
 
 .climate-instrument {
@@ -646,6 +649,7 @@ h2 {
   border-radius: 10px;
   position: relative;
   overflow: visible;
+  min-height: 4.5rem;
   /* Panel ventana: solo paleta observatorio/atmósfera */
   background:
     linear-gradient(
@@ -676,7 +680,9 @@ h2 {
 }
 
 .climate-instrument.hidden {
-  display: none;
+  visibility: hidden;
+  pointer-events: none;
+  /* Mantiene el espacio para evitar layout shift al mostrar datos */
 }
 
 .climate-instrument-scope {
