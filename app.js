@@ -1652,10 +1652,10 @@ async function openSharedSheet(sharedMoments) {
   document.body.classList.add("sheet-open");
   document.addEventListener("keydown", onSharedSheetKeydown);
 
-  // Pedir lista completa al abrir (hasta 100) para no depender del cache del boot
+  // Pedir lista completa al abrir (hasta 100), sin caché, para ver todos
   let listToShow = sharedMoments;
   try {
-    const fresh = await fetchSharedMomentsRemote(SHARED_SHEET_MAX_ITEMS, 48);
+    const fresh = await fetchSharedMomentsRemote(SHARED_SHEET_MAX_ITEMS, 48, { skipCache: true });
     listToShow = fresh.filter((m) => m.shared && !m.hidden);
   } catch {
     listToShow = sharedMoments;

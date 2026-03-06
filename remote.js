@@ -128,15 +128,18 @@ function sanitizeMoment(raw) {
   };
 }
 
-async function fetchSharedMomentsRemote(limit = 10, windowHours = 48) {
+async function fetchSharedMomentsRemote(limit = 10, windowHours = 48, opts = {}) {
   if (!isRemoteReady()) {
     throw new Error("REMOTE_NOT_READY");
   }
 
+  const skipCache = opts.skipCache === true;
   const cacheKey = `${limit}|${windowHours}`;
-  const cached = sharedGetCache.get(cacheKey);
-  if (cached && Date.now() - cached.at < GET_CACHE_TTL_MS) {
-    return cached.items;
+  if (!skipCache) {
+    const cached = sharedGetCache.get(cacheKey);
+    if (cached && Date.now() - cached.at < GET_CACHE_TTL_MS) {
+      return cached.items;
+    }
   }
 
   const url = new URL(REMOTE_MOMENTS_URL);
@@ -168,7 +171,7 @@ async function fetchSharedMomentsRemote(limit = 10, windowHours = 48) {
         ? payload.items
         : [];
     const sanitized = items.map(sanitizeMoment);
-    sharedGetCache.set(cacheKey, { at: Date.now(), items: sanitized });
+    if (!skipCache) sharedGetCache.set(cacheKey, { at: Date.now(), items: sanitized });
     return sanitized;
   } finally {
     scoped.clear();
