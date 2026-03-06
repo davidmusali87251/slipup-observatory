@@ -217,6 +217,7 @@ export function computeClimate(
       total: 0,
       condition: conditionForDegree(BASELINE, 0),
       repetition,
+      toneReading: 50,
     };
   }
 
@@ -268,6 +269,8 @@ export function computeClimate(
   );
   const dominantMix = dominantCombination(windowed);
   const pressureMode = derivePressureMode(computedDegree, repetition);
+  /** Observatory tone 0–100: 50 = neutral, >50 condensing, <50 clearing. From normalized pressure. */
+  const toneReading = clamp(50 + 50 * Math.tanh(normalizedPressure * TANH_SENSITIVITY), 0, 100);
 
   return {
     modelVersion: MODEL_VERSION,
@@ -278,6 +281,7 @@ export function computeClimate(
     condition: conditionForDegree(computedDegree, total),
     repetition,
     pressureMode,
+    toneReading,
     dominantMix,
     stabilityIndex,
     groundIndex,

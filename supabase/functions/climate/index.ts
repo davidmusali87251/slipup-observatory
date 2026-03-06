@@ -382,6 +382,7 @@ function computeFromBuckets(rows: BucketRow[], referenceIso: string, windowHours
     1
   );
   const pressureMode = derivePressureMode(computedDegree, repetition);
+  const toneReading = clamp(50 + 50 * Math.tanh(normalizedPressure * TANH_SENSITIVITY), 0, 100);
 
   return {
     modelVersion: "v2.2-global-bucket",
@@ -392,6 +393,7 @@ function computeFromBuckets(rows: BucketRow[], referenceIso: string, windowHours
     condition: conditionForDegree(computedDegree, total),
     repetition,
     pressureMode,
+    toneReading,
     dominantMix,
     stabilityIndex,
     groundIndex,

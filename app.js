@@ -494,7 +494,7 @@ const UI_COPY = {
       pressureCondensing: "condensing",
       pressureClearing: "clearing",
       pressureStable: "stable",
-      pressureLabel: "direction",
+      pressureLabel: "tone",
       pressureUnit: "",
       stability: "stability",
       stabilityUnit: "%",
@@ -554,7 +554,7 @@ const UI_COPY = {
       pressureCondensing: "condensando",
       pressureClearing: "abriendo",
       pressureStable: "estable",
-      pressureLabel: "dirección",
+      pressureLabel: "tono",
       pressureUnit: "",
       stability: "estabilidad",
       stabilityUnit: "%",
@@ -936,7 +936,14 @@ const strataMetricsLine = document.getElementById("strataMetricsLine");
 const query = new URLSearchParams(window.location.search);
 const contributed = query.get("contributed") === "1";
 const SHARED_SHEET_MAX_ITEMS = 100;
+/** Tamaño de cada "página" al hacer scroll infinito dentro del sheet (evita paginación, navegación fluida). */
+const SHARED_SHEET_PAGE_SIZE = 25;
 const SHEET_TRANSITION_MS = 280;
+
+let sharedSheetFullList = [];
+let sharedSheetVisibleCount = 0;
+let sharedSheetSentinel = null;
+let sharedSheetIncrementalObserver = null;
 const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
 
 /**
@@ -1020,8 +1027,10 @@ function buildMetricsLineParts(state, total, lang = "en") {
   const m = ui.metrics || {};
   const pressureMode = state?.pressureMode || "";
   const stabilityIndex = state?.stabilityIndex;
-  const pressureHpa = total > 0 ? instrumentToPressureHpa(pressureMode) : null;
-  const pressureLabel = m.pressureLabel || "direction";
+  const toneReading = state?.toneReading != null && Number.isFinite(state.toneReading)
+    ? Math.round(state.toneReading)
+    : (total > 0 ? instrumentToPressureHpa(pressureMode) : null);
+  const pressureLabel = m.pressureLabel || "tone";
   const pressureUnit = m.pressureUnit ?? "";
   const stabilityPct = instrumentToStabilityPercent(stabilityIndex);
   const densitySignalPct = instrumentToDensitySignalPct(total, getDensitySignalRef(total));
@@ -1030,11 +1039,11 @@ function buildMetricsLineParts(state, total, lang = "en") {
   const densLabel = m.density || "density";
   const densUnit = m.densityUnit ?? "";
   const parts = [];
-  const showTendency = total >= OBSERVABILITY_MIN.tendency && pressureHpa != null;
+  const showTendency = total >= OBSERVABILITY_MIN.tendency && toneReading != null;
   const showBalance = total >= OBSERVABILITY_MIN.balance && stabilityPct != null;
   const showConcentration = total >= OBSERVABILITY_MIN.concentration;
   if (showTendency) {
-    const pressureVal = pressureUnit ? `${pressureHpa} ${pressureUnit}` : String(pressureHpa);
+    const pressureVal = pressureUnit ? `${toneReading} ${pressureUnit}` : String(toneReading);
     parts.push({ type: "pressure", html: `<span class="metric metric-pressure"><span class="metric-label">${pressureLabel}</span> <span class="metric-value">${pressureVal}</span></span>` });
   }
   if (showBalance) {
@@ -1491,12 +1500,18 @@ function deriveClimateState(climateTruth, sharedMoments, localMoments) {
   const longFertile = longCounts.byType.fertile / longTotal;
   const groundIndex = clamp((longAvoidable * 0.55 + longFertile * 0.45) * Math.min(1, longTotal / 20), 0, 1);
 
+  const pressureMode = derivePressureMode(climateTruth.computedDegree, climateTruth.repetition);
+  const toneReading = climateTruth.toneReading != null && Number.isFinite(climateTruth.toneReading)
+    ? climateTruth.toneReading
+    : clamp(50 + (climateTruth.computedDegree - BASELINE) * 2.2, 0, 100);
+
   return {
     computedDegree: climateTruth.computedDegree,
     total: climateTruth.total,
     condition: climateTruth.condition,
     repetition: climateTruth.repetition,
-    pressureMode: derivePressureMode(climateTruth.computedDegree, climateTruth.repetition),
+    pressureMode,
+    toneReading,
     dominantMix,
     stabilityIndex,
     groundIndex,
@@ -1565,6 +1580,7 @@ function calculateClimate(moments) {
       total: 0,
       latestTimestamp: null,
       repetition,
+      toneReading: 50,
     };
   }
 
@@ -1601,12 +1617,14 @@ function calculateClimate(moments) {
   if (total === 1) {
     computedDegree = Math.min(computedDegree, BASELINE + SINGLE_MOMENT_DEGREE_DELTA);
   }
+  const toneReading = clamp(50 + 50 * Math.tanh(normalizedPressure * TANH_SENSITIVITY), 0, 100);
 
   return {
     computedDegree,
     total,
     latestTimestamp: latestInWindow ? latestInWindow.timestamp : null,
     repetition,
+    toneReading,
   };
 }
 
@@ -1927,25 +1945,27 @@ function capitalizeNoteForDisplay(str) {
     .join(" ");
 }
 
+function createMomentItemElement(m) {
+  const li = document.createElement("li");
+  li.className = "moment-item";
+  const note = m.note ? m.note.trim() : "(no note)";
+  const typeLabel = capitalizeForDisplay(m.type);
+  const moodLabel = capitalizeForDisplay(m.mood);
+  const noteLabel = note === "(no note)" ? note : capitalizeNoteForDisplay(note);
+  const left = `${typeLabel} · ${moodLabel} · ${noteLabel}`;
+  const timeStr = new Date(m.timestamp).toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  const regionLabel = formatGeoForDisplay(m.geo_bucket);
+  const meta = regionLabel ? `${timeStr} · ${regionLabel}` : timeStr;
+  li.innerHTML = `<span>${escapeHtml(left)}</span><span class="moment-meta">${escapeHtml(meta)}</span>`;
+  return li;
+}
+
 function renderMomentItems(targetElement, items) {
   targetElement.innerHTML = "";
-  items.forEach((m) => {
-    const li = document.createElement("li");
-    li.className = "moment-item";
-    const note = m.note ? m.note.trim() : "(no note)";
-    const typeLabel = capitalizeForDisplay(m.type);
-    const moodLabel = capitalizeForDisplay(m.mood);
-    const noteLabel = note === "(no note)" ? note : capitalizeNoteForDisplay(note);
-    const left = `${typeLabel} · ${moodLabel} · ${noteLabel}`;
-    const timeStr = new Date(m.timestamp).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-    const regionLabel = formatGeoForDisplay(m.geo_bucket);
-    const meta = regionLabel ? `${timeStr} · ${regionLabel}` : timeStr;
-    li.innerHTML = `<span>${escapeHtml(left)}</span><span class="moment-meta">${escapeHtml(meta)}</span>`;
-    targetElement.appendChild(li);
-  });
+  items.forEach((m) => targetElement.appendChild(createMomentItemElement(m)));
 }
 
 function renderRecent(sharedMoments) {
@@ -1964,7 +1984,34 @@ function renderRecent(sharedMoments) {
   renderMomentItems(recentMoments, list);
 }
 
+function teardownSharedSheetIncrementalScroll() {
+  if (sharedSheetIncrementalObserver && sharedSheetSentinel) {
+    sharedSheetIncrementalObserver.disconnect();
+    sharedSheetIncrementalObserver = null;
+  }
+  if (sharedSheetSentinel && sharedSheetSentinel.parentNode) {
+    sharedSheetSentinel.remove();
+  }
+  sharedSheetSentinel = null;
+  sharedSheetFullList = [];
+  sharedSheetVisibleCount = 0;
+}
+
+function appendNextPageSharedSheet() {
+  if (sharedSheetVisibleCount >= sharedSheetFullList.length || !sharedSheetSentinel) return;
+  const nextEnd = Math.min(sharedSheetVisibleCount + SHARED_SHEET_PAGE_SIZE, sharedSheetFullList.length);
+  const chunk = sharedSheetFullList.slice(sharedSheetVisibleCount, nextEnd);
+  chunk.forEach((m) => {
+    sharedSheetList.insertBefore(createMomentItemElement(m), sharedSheetSentinel);
+  });
+  sharedSheetVisibleCount = nextEnd;
+  if (sharedSheetVisibleCount >= sharedSheetFullList.length) {
+    teardownSharedSheetIncrementalScroll();
+  }
+}
+
 function renderSharedSheetList(sharedMoments, countLabel = "") {
+  teardownSharedSheetIncrementalScroll();
   const list = sharedMoments.slice(0, SHARED_SHEET_MAX_ITEMS);
   sharedSheetList.innerHTML = "";
 
@@ -1982,7 +2029,31 @@ function renderSharedSheetList(sharedMoments, countLabel = "") {
 
   sharedSheetEmpty.classList.add("hidden");
   sharedSheetList.classList.remove("hidden");
-  if (list.length > 0) renderMomentItems(sharedSheetList, list);
+
+  if (list.length <= SHARED_SHEET_PAGE_SIZE) {
+    renderMomentItems(sharedSheetList, list);
+    return;
+  }
+
+  sharedSheetFullList = list;
+  sharedSheetVisibleCount = Math.min(SHARED_SHEET_PAGE_SIZE, list.length);
+  const firstChunk = list.slice(0, sharedSheetVisibleCount);
+  renderMomentItems(sharedSheetList, firstChunk);
+
+  sharedSheetSentinel = document.createElement("li");
+  sharedSheetSentinel.className = "shared-sheet-sentinel";
+  sharedSheetSentinel.setAttribute("aria-hidden", "true");
+  sharedSheetSentinel.setAttribute("data-sentinel", "infinite");
+  sharedSheetList.appendChild(sharedSheetSentinel);
+
+  sharedSheetIncrementalObserver = new IntersectionObserver(
+    (entries) => {
+      if (!entries[0]?.isIntersecting) return;
+      appendNextPageSharedSheet();
+    },
+    { root: sharedSheetList, rootMargin: "120px 0px", threshold: 0 }
+  );
+  sharedSheetIncrementalObserver.observe(sharedSheetSentinel);
 }
 
 function getSheetFocusableElements() {
@@ -1997,6 +2068,7 @@ function closeSharedSheet() {
   if (!isSharedSheetOpen) return;
 
   isSharedSheetOpen = false;
+  teardownSharedSheetIncrementalScroll();
   sharedSheet.classList.remove("is-open");
   sheetBackdrop.classList.remove("is-open");
   document.body.classList.remove("sheet-open");
@@ -2449,6 +2521,7 @@ async function loadClimateTruth(localMoments) {
       condition: conditionForDegree(localClimate.computedDegree, localClimate.total),
       repetition: localClimate.repetition,
       pressureMode: "",
+      toneReading: localClimate.toneReading ?? 50,
       dominantMix: "",
       stabilityIndex: null,
       groundIndex: null,
@@ -2491,6 +2564,7 @@ async function loadFieldClimateTruth(globalClimate, fieldScope) {
     const remoteLocalClimate = await fetchClimateRemote(48, "", "local", geoBucket);
     const computedDegree = Number(remoteLocalClimate?.computedDegree);
     if (!Number.isFinite(computedDegree)) throw new Error("REMOTE_LOCAL_CLIMATE_INVALID");
+    const tone = remoteLocalClimate?.toneReading;
     return {
       source: remoteLocalClimate?.source === "local" ? "local" : "global_fallback",
       computedDegree: clamp(computedDegree, 0, SCALE),
@@ -2501,6 +2575,7 @@ async function loadFieldClimateTruth(globalClimate, fieldScope) {
           : globalClimate.condition,
       repetition: normalizeRepetition(remoteLocalClimate?.repetition),
       pressureMode: remoteLocalClimate?.pressureMode || globalClimate.pressureMode || "",
+      toneReading: tone != null && Number.isFinite(tone) ? tone : (globalClimate.toneReading ?? clamp(50 + (computedDegree - BASELINE) * 2.2, 0, 100)),
       dominantMix: remoteLocalClimate?.dominantMix || "",
       stabilityIndex: Number.isFinite(remoteLocalClimate?.stabilityIndex)
         ? remoteLocalClimate.stabilityIndex
