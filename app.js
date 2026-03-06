@@ -491,7 +491,8 @@ const UI_COPY = {
     horizonTitle: "Horizon Line",
     nearbyTitle: "Nearby Field",
     instrumentAriaLabel: "Reading metrics",
-    scopeRangeLine: (n) => (n === 1 ? "48 h · global · 1 moment" : `48 h · global · ${n} moments`),
+    scopeRangeLine: (n) => (n === 1 ? "1 moment" : `${n} moments`),
+    instrumentInfoCopy: "These values are not real weather. They are derived from user-shared moments in the last 48 hours.",
     degreeScaleLabel: "0–100 scale",
     viewMore: "View more",
     close: "Close",
@@ -502,11 +503,11 @@ const UI_COPY = {
       pressureCondensing: "condensing",
       pressureClearing: "clearing",
       pressureStable: "stable",
-      pressureLabel: "pressure",
+      pressureLabel: "tendency",
       pressureUnit: "hPa",
-      stability: "stability",
+      stability: "balance",
       stabilityUnit: "%",
-      density: "density",
+      density: "concentration",
       densityUnit: "kg/m³",
       sharedUnit: "shared",
       sharedCount: (n) => `${n} shared`,
@@ -527,7 +528,8 @@ const UI_COPY = {
     horizonTitle: "Línea del horizonte",
     nearbyTitle: "Campo cercano",
     instrumentAriaLabel: "Métricas de lectura",
-    scopeRangeLine: (n) => (n === 1 ? "48 h · global · 1 momento" : `48 h · global · ${n} momentos`),
+    scopeRangeLine: (n) => (n === 1 ? "1 momento" : `${n} momentos`),
+    instrumentInfoCopy: "Estos valores no son clima real. Se derivan de los momentos compartidos por usuarios en las últimas 48 h.",
     degreeScaleLabel: "escala 0–100",
     viewMore: "Ver más",
     close: "Cerrar",
@@ -538,11 +540,11 @@ const UI_COPY = {
       pressureCondensing: "condensando",
       pressureClearing: "abriendo",
       pressureStable: "estable",
-      pressureLabel: "presión",
+      pressureLabel: "tendencia",
       pressureUnit: "hPa",
-      stability: "estabilidad",
+      stability: "equilibrio",
       stabilityUnit: "%",
-      density: "densidad",
+      density: "concentración",
       densityUnit: "kg/m³",
       sharedUnit: "compartidos",
       sharedCount: (n) => `${n} compartidos`,
@@ -560,8 +562,6 @@ function applyUICopy() {
   if (ctaEl) ctaEl.textContent = ui.cta;
   const trustEl = document.querySelector(".trust-microcopy");
   if (trustEl) trustEl.textContent = ui.trust;
-  const scopeEl = document.querySelector(".climate-instrument-scope");
-  if (scopeEl) scopeEl.textContent = ui.scopeLabel;
   const degreeScaleEl = document.getElementById("degreeScaleLabel");
   if (degreeScaleEl && ui.degreeScaleLabel) degreeScaleEl.textContent = ui.degreeScaleLabel;
   const instrumentEl = document.getElementById("climateInstrument");
@@ -580,6 +580,18 @@ function applyUICopy() {
   if (closeBtn) closeBtn.textContent = ui.close;
   const sheetEmptyEl = document.getElementById("shared-sheet-empty");
   if (sheetEmptyEl) sheetEmptyEl.textContent = ui.sheetEmpty || "No shared moments yet.";
+  const instrumentInfoText = document.getElementById("instrumentInfoText");
+  if (instrumentInfoText && ui.instrumentInfoCopy) instrumentInfoText.textContent = ui.instrumentInfoCopy;
+  const instrumentInfoBtn = document.getElementById("instrumentInfoBtn");
+  if (instrumentInfoBtn) {
+    instrumentInfoBtn.setAttribute("aria-label", LANG === "es" ? "Información sobre estos valores" : "About these values");
+    instrumentInfoBtn.onclick = () => {
+      const textEl = document.getElementById("instrumentInfoText");
+      if (!textEl) return;
+      textEl.classList.toggle("hidden");
+      instrumentInfoBtn.setAttribute("aria-expanded", String(!textEl.classList.contains("hidden")));
+    };
+  }
 }
 // FUTURE: Keep scaffold switches explicit for non-active UI lines.
 const FUTURE_UI = {
