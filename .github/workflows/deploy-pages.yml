@@ -41,12 +41,16 @@ jobs:
 
       - name: Prepare site
         run: |
+          set -e
           mkdir -p _site
           cp index.html contribute.html terms.html privacy.html ai.html _site/
           cp app.js contribute.js remote.js modelConstants.js styles.css _site/
           cp favicon.svg CNAME _site/ 2>/dev/null || true
           BUILD_ID="${{ github.sha }}"
-          for f in _site/*.html; do sed -i "s/{{BUILD_ID}}/$BUILD_ID/g" "$f"; done
+          for f in _site/*.html; do
+            sed -i "s|{{BUILD_ID}}|${BUILD_ID}|g" "$f"
+          done
+          echo "Build ID substituted in $(ls _site/*.html | wc -l) HTML files"
 
       - name: Check remote.js has real URLs when secrets are set
         env:
@@ -58,6 +62,11 @@ jobs:
               exit 1
             fi
           fi
+
+      - name: Verify _site before upload
+        run: |
+          ls -la _site/
+          test -f _site/index.html && test -f _site/app.js && echo "Artifacts OK"
 
       - name: Smoke test (backend reachable)
         env:
