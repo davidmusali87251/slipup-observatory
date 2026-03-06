@@ -467,7 +467,7 @@ const UI_COPY = {
     instrumentMetricsAriaNearby: "Nearby field metrics",
     instrumentMetricsAriaStrata: "Deep record metrics",
     instrumentInfoCopy: "Type, mood, note, recency — what shapes each moment.",
-    degreeScaleLabel: "0–100 density · 48h",
+    degreeScaleLabel: "0–100 · 48h",
     strata: {
       mixLow: "low",
       mixModerate: "moderate",
@@ -527,7 +527,7 @@ const UI_COPY = {
     instrumentMetricsAriaNearby: "Métricas del campo cercano",
     instrumentMetricsAriaStrata: "Métricas del registro profundo",
     instrumentInfoCopy: "Tipo, humor, nota, recencia: lo que da forma a cada momento.",
-    degreeScaleLabel: "0–100 densidad · 48 h",
+    degreeScaleLabel: "0–100 · 48 h",
     strata: {
       mixLow: "bajo",
       mixModerate: "moderado",

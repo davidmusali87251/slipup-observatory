@@ -357,12 +357,9 @@ h2 {
   margin-top: var(--atmo-ascend);
   margin-bottom: 0;
 }
-/* #conditionLine: lectura de estado del observatorio (quiet | steady | balance | gathering | dense).
-   Frases: backend — "Shared moments are still gathering.", "Shared movement keeps a quiet line.",
-   "The shared field leans toward balance.", "The shared field is becoming denser.",
-   "A compact shared front is taking shape."; frontend COPY.condition (narrative_en/es) según grado y total. */
+/* #conditionLine: lectura de estado (quiet | balance | gathering | dense). Ubicado dentro de .degree-wrap para formar un solo bloque "lectura" (valor + escala + frase). */
 .atmosphere-air .condition-line {
-  margin-top: var(--atmo-descend);
+  margin-top: 0.35rem;
   margin-bottom: 0;
   font-size: 0.92rem;
   font-weight: 500;
@@ -374,6 +371,7 @@ h2 {
   max-width: 32ch;
   margin-left: auto;
   margin-right: auto;
+  text-align: center;
 }
 
 .condition-line {
@@ -396,10 +394,10 @@ h2 {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 1rem;
+  gap: 1.4rem;
   max-width: 34ch;
   position: relative;
-  padding-top: var(--atmo-ground);
+  padding-top: 1rem;
 }
 
 /* Línea sutil de transición aire → horizonte */
@@ -757,10 +755,17 @@ h2 {
 
 .degree-wrap {
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+
+.degree-value-row {
+  display: flex;
   justify-content: center;
   align-items: baseline;
   gap: 0;
-  flex-wrap: wrap;
 }
 
 .degree-scale-label {
@@ -976,12 +981,23 @@ h2 {
 
 .climate-summary-line {
   margin-top: 0;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.85rem;
   font-size: 0.88rem;
-  line-height: 1.7;
-  letter-spacing: 0.02em;
+  line-height: 1.85;
+  letter-spacing: 0.03em;
   color: var(--muted);
   opacity: 0.9;
+  font-style: italic;
+}
+
+.climate-summary-line::before {
+  content: "\201C";
+  margin-right: 0.08em;
+}
+
+.climate-summary-line::after {
+  content: "\201D";
+  margin-left: 0.08em;
 }
 
 .climate-summary-line.hidden {
@@ -1013,11 +1029,12 @@ h2 {
 .atmosphere-pattern-line {
   font-size: 0.8rem;
   color: #4c6179;
-  line-height: 1.75;
-  letter-spacing: 0.03em;
+  line-height: 1.85;
+  letter-spacing: 0.04em;
   opacity: 0.84;
-  margin-top: 0;
-  margin-bottom: 0.6rem;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  font-style: italic;
 }
 
 .cta-observatory {
@@ -1030,14 +1047,39 @@ h2 {
   border: 1px solid color-mix(in oklab, var(--text) 16%, transparent);
   background: color-mix(in oklab, #ffffff 45%, transparent);
   color: color-mix(in oklab, var(--text) 80%, var(--muted));
-  box-shadow: none;
+  box-shadow:
+    0 1px 0 color-mix(in oklab, #ffffff 70%, transparent),
+    0 2px 8px color-mix(in oklab, var(--text) 6%, transparent);
   letter-spacing: 0.015em;
   opacity: 0.88;
+  position: relative;
+  overflow: hidden;
   transition:
     border-color 160ms ease,
     background 160ms ease,
     color 160ms ease,
-    opacity 160ms ease;
+    opacity 160ms ease,
+    box-shadow 200ms ease;
+}
+
+/* Reflejo / brillo sutil en el borde superior del botón */
+.cta-observatory::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 50%;
+  border-radius: 999px 999px 0 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, #ffffff 35%, transparent) 0%,
+    color-mix(in oklab, #ffffff 8%, transparent) 60%,
+    transparent 100%
+  );
+  pointer-events: none;
+  opacity: 0.9;
+  transition: opacity 180ms ease;
 }
 
 .cta-observatory:hover {
@@ -1045,6 +1087,13 @@ h2 {
   background: color-mix(in oklab, #ffffff 56%, transparent);
   color: color-mix(in oklab, var(--text) 86%, var(--muted));
   opacity: 0.94;
+  box-shadow:
+    0 1px 0 color-mix(in oklab, #ffffff 85%, transparent),
+    0 3px 12px color-mix(in oklab, var(--text) 10%, transparent);
+}
+
+.cta-observatory:hover::before {
+  opacity: 1;
 }
 
 .cta-observatory:focus-visible {

@@ -59,10 +59,12 @@
               <span class="scope-target"></span>
             </div>
             <div class="degree-wrap" aria-label="Atmosphere reading in degrees">
-              <p id="degreeValue" class="degree-value">28</p>
-              <span id="degreeScaleLabel" class="degree-scale-label" aria-hidden="true">0–100 scale</span>
+              <div class="degree-value-row">
+                <p id="degreeValue" class="degree-value">28</p>
+                <span id="degreeScaleLabel" class="degree-scale-label" aria-hidden="true">0–100 scale</span>
+              </div>
+              <p id="conditionLine" class="condition-line" role="status" aria-live="polite">Señal global pendiente.</p>
             </div>
-            <p id="conditionLine" class="condition-line" role="status" aria-live="polite">Señal global pendiente.</p>
             <div id="climateInstrument" class="climate-instrument" role="status" aria-live="polite" aria-label="Reading metrics">
               <button type="button" id="instrumentInfoBtn" class="instrument-info-btn" aria-label="About these values" aria-expanded="false" aria-controls="instrumentInfoText">i</button>
               <p id="observatoryScopeRange" class="observatory-scope-range hidden" aria-live="polite"></p>
