@@ -1,4 +1,5 @@
 :root {
+  /* Paleta observatorio. Coherencia de fondos por capa: docs/LAYER_BACKGROUNDS_COHERENCE.md */
   --bg: #f3f0fb;
   --bg-deep: #ebe5f8;
   --bg-ink: #ddd4f3;
@@ -10,6 +11,10 @@
   --layer-air: #ffffff00;
   --layer-horizon: #e9e2f225;
   --layer-ground: #d9d0e81f;
+  /* Tintes de transición entre capas (coherencia de fondos): derivados de la paleta */
+  --layer-horizon-soft: color-mix(in oklab, var(--bg-deep) 88%, var(--layer-horizon));
+  --layer-ground-soft: color-mix(in oklab, var(--bg-ink) 72%, var(--layer-ground));
+  --layer-border-soft: color-mix(in oklab, var(--line) 55%, var(--bg-ink));
   --page-pad-top: 1.75rem;
   --page-pad-bottom: 4rem;
   --topbar-height: 3rem;
@@ -168,6 +173,11 @@ body.sheet-open {
   padding: 1.1rem 0 var(--page-pad-top);
   position: relative;
   isolation: isolate;
+  /* Continuidad: tinte en base (flujo hacia abajo) y en borde superior (flujo hacia arriba, otra página) */
+  box-shadow:
+    inset 0 6rem 4rem -2.5rem color-mix(in oklab, var(--layer-air) 12%, var(--layer-horizon) 20%),
+    inset 0 -8rem 5rem -3rem color-mix(in oklab, var(--layer-horizon) 55%, transparent),
+    inset 0 -3rem 2rem -1.5rem color-mix(in oklab, var(--layer-ground) 28%, transparent);
 }
 
 .observatory-hero > * {
@@ -234,6 +244,14 @@ body.sheet-open {
   align-items: center;
   min-height: var(--topbar-height);
   margin-bottom: 0.4rem;
+  /* Continuidad hacia arriba: tinte sutil que anticipa otra capa/página superior */
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--layer-horizon) 28%, var(--bg) 20%) 0%,
+    color-mix(in oklab, var(--layer-horizon) 12%, transparent) 45%,
+    transparent 100%
+  );
+  background-origin: border-box;
 }
 
 /* Direction cue (not a tab, not a button) */
@@ -1050,7 +1068,9 @@ h2 {
   box-shadow:
     0 1px 0 color-mix(in oklab, #ffffff 70%, transparent),
     0 2px 8px color-mix(in oklab, var(--text) 6%, transparent);
-  letter-spacing: 0.015em;
+  font-family: Georgia, "Times New Roman", "Liberation Serif", serif;
+  font-weight: 500;
+  letter-spacing: 0.06em;
   opacity: 0.88;
   position: relative;
   overflow: hidden;
@@ -1407,8 +1427,8 @@ h2 {
   height: 88px;
   pointer-events: none;
   background:
-    radial-gradient(circle at 50% 8%, #ece4f88d 0%, #ece4f800 76%),
-    linear-gradient(180deg, #ffffff00 0%, #ece6f57a 58%, #ece6f500 100%);
+    radial-gradient(circle at 50% 8%, color-mix(in oklab, var(--layer-horizon-soft) 55%, transparent) 0%, transparent 76%),
+    linear-gradient(180deg, transparent 0%, color-mix(in oklab, var(--layer-horizon-soft) 48%, transparent) 58%, transparent 100%);
   opacity: 0.86;
 }
 
@@ -1421,8 +1441,8 @@ h2 {
       color-mix(in srgb, var(--layer-horizon) calc(52% + var(--atmo) * 0.22%), transparent) 35%,
       color-mix(in srgb, var(--layer-ground) calc(24% + var(--atmo) * 0.1%), transparent) 100%
     ),
-    color-mix(in srgb, #ffffff38 calc(92% - var(--atmo) * 0.2%), #e0d8ec40);
-  border-color: #ffffff42;
+    color-mix(in srgb, var(--card) calc(92% - var(--atmo) * 0.2%), var(--layer-horizon-soft));
+  border-color: color-mix(in oklab, var(--card) 26%, transparent);
   position: relative;
   overflow: hidden;
 }
@@ -1432,7 +1452,7 @@ h2 {
   display: block;
   height: 30px;
   margin: -1.25rem -1.25rem 0.7rem;
-  background: linear-gradient(180deg, #ffffff00 0%, #ece6f444 100%);
+  background: linear-gradient(180deg, transparent 0%, color-mix(in oklab, var(--layer-horizon-soft) 27%, transparent) 100%);
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
 }
@@ -1470,7 +1490,7 @@ h2 {
   display: block;
   height: 28px;
   margin-top: 1rem;
-  background: linear-gradient(180deg, #ffffff00 0%, color-mix(in srgb, #e7def478 48%, transparent) 100%);
+  background: linear-gradient(180deg, transparent 0%, color-mix(in oklab, var(--layer-ground-soft) 48%, transparent) 100%);
   opacity: 0.74;
 }
 
@@ -1604,7 +1624,7 @@ h2 {
       color-mix(in srgb, var(--layer-ground) calc(48% + var(--atmo) * 0.14%), transparent) 40%,
       color-mix(in srgb, var(--bg-ink) 38%, transparent) 100%
     );
-  border-top: 1px solid color-mix(in srgb, #c6b9de44 calc(30% + var(--atmo) * 0.1%), transparent);
+  border-top: 1px solid color-mix(in oklab, var(--layer-border-soft) calc(30% + var(--atmo) * 0.1%), transparent);
 }
 
 .ground-strata::before {
@@ -1615,7 +1635,7 @@ h2 {
   top: -28px;
   height: 34px;
   pointer-events: none;
-  background: linear-gradient(180deg, #ffffff00 0%, color-mix(in srgb, #e4dbf377 42%, transparent) 100%);
+  background: linear-gradient(180deg, transparent 0%, color-mix(in oklab, var(--layer-ground-soft) 42%, transparent) 100%);
   opacity: 0.82;
 }
 
