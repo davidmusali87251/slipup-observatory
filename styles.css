@@ -44,6 +44,7 @@ body {
   margin: 0;
   font-family: "Segoe UI", Roboto, Arial, sans-serif;
   color: var(--text);
+  -webkit-tap-highlight-color: color-mix(in oklab, var(--text) 12%, transparent);
   background:
     radial-gradient(circle at 18% 12%, #ffffff40 0%, #ffffff00 45%),
     radial-gradient(circle at 78% 22%, #c8b4ef14 0%, #c8b4ef00 55%),
@@ -83,8 +84,45 @@ body.sheet-open {
 .page {
   width: min(880px, 92vw);
   margin: 0 auto;
-  padding: 0 0 var(--page-pad-bottom);
+  padding: 0 env(safe-area-inset-right) calc(var(--page-pad-bottom) + env(safe-area-inset-bottom)) env(safe-area-inset-left);
   position: relative;
+}
+
+@media (min-width: 481px) and (max-width: 1024px) {
+  .page {
+    width: min(720px, 88vw);
+    padding-left: max(0.75rem, env(safe-area-inset-left));
+    padding-right: max(0.75rem, env(safe-area-inset-right));
+  }
+
+  .cta-observatory {
+    min-height: 44px;
+    padding: 0.55rem 1.1rem;
+  }
+
+  .text-button,
+  .text-link {
+    min-height: 44px;
+    padding: 0.5rem 0.9rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .local-field-select {
+    min-height: 44px;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.95rem;
+  }
+
+  .instrument-info-btn {
+    width: 1.5rem;
+    height: 1.5rem;
+    min-width: 1.5rem;
+    min-height: 1.5rem;
+    top: 0.6rem;
+    right: 0.6rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -96,7 +134,7 @@ body.sheet-open {
 }
 
 .page:has(.site-legal) {
-  padding-bottom: calc(var(--page-pad-bottom) + var(--site-legal-height));
+  padding-bottom: calc(var(--page-pad-bottom) + var(--site-legal-height) + env(safe-area-inset-bottom, 0px));
 }
 
 /* Degradado por capas: más claro arriba (atmósfera), más denso hacia strata */
@@ -319,10 +357,33 @@ h2 {
   margin-top: var(--atmo-ascend);
   margin-bottom: 0;
 }
+/* #conditionLine: lectura de estado del observatorio (quiet | steady | balance | gathering | dense).
+   Frases: backend — "Shared moments are still gathering.", "Shared movement keeps a quiet line.",
+   "The shared field leans toward balance.", "The shared field is becoming denser.",
+   "A compact shared front is taking shape."; frontend COPY.condition (narrative_en/es) según grado y total. */
 .atmosphere-air .condition-line {
   margin-top: var(--atmo-descend);
   margin-bottom: 0;
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.65;
+  letter-spacing: 0.035em;
+  color: color-mix(in oklab, var(--muted) 85%, var(--layer-horizon));
+  text-shadow: 0 0 1px color-mix(in oklab, var(--bg) 60%, transparent);
+  min-height: 1.72em;
+  max-width: 32ch;
+  margin-left: auto;
+  margin-right: auto;
 }
+
+.condition-line {
+  color: var(--muted);
+  font-size: 0.96rem;
+  font-weight: 500;
+  line-height: 1.72;
+  min-height: 1.72em;
+}
+
 .atmosphere-air .climate-instrument {
   margin-top: var(--atmo-descend);
   margin-bottom: 0;
@@ -513,6 +574,10 @@ h2 {
   letter-spacing: 0.08em;
 }
 
+.atmosphere-orientation:empty {
+  display: none;
+}
+
 .atmosphere-value-prop {
   margin: 0.15rem auto 0.5rem;
   font-size: 0.7rem;
@@ -555,6 +620,11 @@ h2 {
   }
 
   .climate-metrics-line {
+    font-size: 0.78rem;
+  }
+
+  .local-climate-metrics-line,
+  .strata-metrics-line {
     font-size: 0.78rem;
   }
 
@@ -784,6 +854,7 @@ h2 {
 }
 
 .climate-metrics-line {
+  /* Compartido por capas: Atmosphere (instrumento), Nearby (.local-climate-metrics-line), Strata (.strata-metrics-line). Cada capa respeta su panel con estilos específicos. */
   margin: 0;
   font-size: 0.8rem;
   line-height: 1.55;
@@ -1322,6 +1393,7 @@ h2 {
 
 .local-climate-meta {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
   gap: 0.6rem;
@@ -1341,6 +1413,12 @@ h2 {
   color: #5f7390;
   line-height: 1.2;
   opacity: 0.78;
+}
+
+.local-climate-metrics-line {
+  width: 100%;
+  margin: 0.25rem 0 0;
+  padding-left: 0;
 }
 
 .local-climate-primary {
@@ -1435,6 +1513,18 @@ h2 {
   text-align: left;
   padding-left: 0.88rem;
   max-width: 52ch;
+}
+
+.strata-metrics-line {
+  margin: 0.5rem 0 0.75rem;
+  padding-left: 0.88rem;
+  font-size: 0.8rem;
+  color: color-mix(in oklab, var(--text) 75%, var(--muted));
+  opacity: 0.88;
+}
+
+.strata-metrics-line.hidden {
+  display: none;
 }
 
 .strata-lines {
@@ -1962,6 +2052,7 @@ h2 {
   }
 
   .strata-context,
+  .strata-metrics-line,
   .strata-lines {
     padding-left: 0.36rem;
   }
@@ -2002,6 +2093,11 @@ h2 {
   }
 
   .climate-metrics-line {
+    font-size: 0.7rem;
+  }
+
+  .local-climate-metrics-line,
+  .strata-metrics-line {
     font-size: 0.7rem;
   }
 

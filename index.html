@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>SlipUp Observatory</title>
     <meta
       name="description"
@@ -48,7 +48,7 @@
               <p class="eyebrow-layer">Atmosphere</p>
               <p class="eyebrow-context">Moments</p>
             </div>
-            <p class="atmosphere-orientation">Where the reading begins.</p>
+            <p class="atmosphere-orientation" aria-hidden="true"></p>
             <p id="atmosphereSemanticHint" class="atmosphere-semantic-hint hidden" aria-live="polite"></p>
             <div class="telescope-scope" aria-hidden="true">
               <span class="scope-ring scope-ring-outer"></span>
@@ -93,7 +93,7 @@
         <ul id="recentMoments" class="moment-list"></ul>
       </section>
 
-      <section id="horizon" class="panel panel-horizon" aria-label="Horizon line">
+      <section id="horizon" class="panel panel-horizon" aria-label="Horizon line" data-layer="horizon">
         <p class="horizon-line">Horizon Line</p>
         <p id="horizonPrimary" class="horizon-primary"></p>
         <p id="horizonPulseLine" class="horizon-pulse-line"></p>
@@ -101,7 +101,7 @@
         <button id="horizonMoreButton" class="text-button hidden" type="button">See deeper reading</button>
       </section>
 
-      <section id="local-climate" class="local-climate" aria-label="Nearby field">
+      <section id="local-climate" class="local-climate" aria-label="Nearby field" data-layer="nearby">
         <h2 class="visually-hidden">Nearby field</h2>
         <p class="local-climate-line">Nearby Field</p>
         <div class="local-field-controls">
@@ -111,15 +111,17 @@
         <div class="local-climate-meta">
           <p id="localClimateDegree" class="local-climate-degree"></p>
           <p id="localClimateMass" class="local-climate-mass"></p>
+          <p id="localClimateMetricsLine" class="local-climate-metrics-line climate-metrics-line" role="status" aria-live="polite"></p>
         </div>
         <p id="localClimatePrimary" class="local-climate-primary"></p>
         <p id="localClimateSecondary" class="local-climate-secondary"></p>
         <p id="localClimateEcho" class="local-climate-echo"></p>
       </section>
 
-      <section id="ground-strata" class="ground-strata" aria-label="Deep record" hidden>
+      <section id="ground-strata" class="ground-strata" aria-label="Deep record" data-layer="strata" hidden>
         <h2 class="visually-hidden">Deep record</h2>
         <p class="strata-context" aria-hidden="true">Below the surface, your own moments settle into deeper record.</p>
+        <p id="strataMetricsLine" class="strata-metrics-line climate-metrics-line" role="status" aria-live="polite"></p>
         <ul id="strataLines" class="strata-lines"></ul>
       </section>
 

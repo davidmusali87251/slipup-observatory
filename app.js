@@ -430,7 +430,7 @@ const COPY = COPY_VARIANTS[COPY_MODE === "narrative" ? "narrative_" + LANG : COP
 
 const UI_COPY = {
   en: {
-    orientation: "Where the reading begins.",
+    orientation: "",
     valueProp: "Collective reading from shared moments · last 48 h",
     cta: "Let it rise into the atmosphere.",
     trust: "No account. No exact pin. Not weather, just shared moments.",
@@ -444,9 +444,30 @@ const UI_COPY = {
     horizonTitle: "Horizon Line",
     nearbyTitle: "Nearby Field",
     instrumentAriaLabel: "Reading metrics",
+    instrumentLayerLabel: "Atmosphere",
+    instrumentScopeLabel: "Global",
     scopeRangeLine: (n) => (n === 1 ? "1 moment" : `${n} moments`),
+    instrumentMetricsAriaNearby: "Nearby field metrics",
+    instrumentMetricsAriaStrata: "Deep record metrics",
     instrumentInfoCopy: "Same variables that define the climate — type, mood, note, recency — make shared moments represent degrees of the atmosphere. 0–100 is field density (balance ≈ 38–60), not conflict.",
     degreeScaleLabel: "0–100 density · 48h",
+    strata: {
+      mixLow: "low",
+      mixModerate: "moderate",
+      mixHigh: "high",
+      deepMix: (mixLabel) => `Deep mix: ${mixLabel}.`,
+      pressureTrendCondensing: "30-day pressure trend: condensing.",
+      pressureTrendClearing: "30-day pressure trend: clearing.",
+      pressureTrendStabilizing: "30-day pressure trend: stabilizing.",
+      avoidableStressed: "Avoidable + stressed recurrence is high in 30-day data.",
+      fertileCalm: "Fertile + calm recurrence is visible in 30-day data.",
+      observedStability: "Observed entries are adding stability to the deep read.",
+      moodDiversity: "Mood diversity is high across the 30-day window.",
+      mixedSignal: "Avoidable and fertile ratios are both significant (mixed signal).",
+      fertileDominant: "Fertile ratio is dominant in the 30-day mix.",
+      deepConfidence: "Deep confidence is stronger with sustained 30-day volume.",
+      stillBuilding: "Deep read is still building from recurring entries.",
+    },
     viewMore: "View more",
     close: "Close",
     sheetEmpty: "No shared moments yet.",
@@ -467,7 +488,7 @@ const UI_COPY = {
     },
   },
   es: {
-    orientation: "Donde empieza la lectura.",
+    orientation: "",
     valueProp: "Lectura colectiva de momentos compartidos · últimas 48 h",
     cta: "Que suba a la atmósfera.",
     trust: "Sin cuenta. Sin pin exacto. No es el tiempo; son momentos compartidos.",
@@ -481,9 +502,30 @@ const UI_COPY = {
     horizonTitle: "Línea del horizonte",
     nearbyTitle: "Campo cercano",
     instrumentAriaLabel: "Métricas de lectura",
+    instrumentLayerLabel: "Atmósfera",
+    instrumentScopeLabel: "Global",
     scopeRangeLine: (n) => (n === 1 ? "1 momento" : `${n} momentos`),
+    instrumentMetricsAriaNearby: "Métricas del campo cercano",
+    instrumentMetricsAriaStrata: "Métricas del registro profundo",
     instrumentInfoCopy: "Las mismas variables que definen el clima — tipo, humor, nota, recencia — hacen que los momentos compartidos representen los grados de la atmósfera. 0–100 es densidad del campo (balance ≈ 38–60), no conflicto.",
     degreeScaleLabel: "0–100 densidad · 48 h",
+    strata: {
+      mixLow: "bajo",
+      mixModerate: "moderado",
+      mixHigh: "alto",
+      deepMix: (mixLabel) => `Mezcla profunda: ${mixLabel}.`,
+      pressureTrendCondensing: "Tendencia de presión 30 días: condensando.",
+      pressureTrendClearing: "Tendencia de presión 30 días: abriendo.",
+      pressureTrendStabilizing: "Tendencia de presión 30 días: estabilizando.",
+      avoidableStressed: "Evitable + estresado recurrente alto en datos de 30 días.",
+      fertileCalm: "Fértil + calm recurrente visible en datos de 30 días.",
+      observedStability: "Entradas observadas aportan estabilidad a la lectura profunda.",
+      moodDiversity: "Diversidad de humor alta en la ventana de 30 días.",
+      mixedSignal: "Ratios evitable y fértil significativos (señal mixta).",
+      fertileDominant: "El ratio fértil domina en la mezcla de 30 días.",
+      deepConfidence: "Confianza profunda mayor con volumen sostenido de 30 días.",
+      stillBuilding: "La lectura profunda sigue construyéndose con entradas recurrentes.",
+    },
     viewMore: "Ver más",
     close: "Cerrar",
     sheetEmpty: "Aún no hay momentos compartidos.",
@@ -864,11 +906,13 @@ const sharedSheetCloseButton = document.getElementById("shared-sheet-close");
 const fieldScopeSelect = document.getElementById("fieldScopeSelect");
 const localClimateDegree = document.getElementById("localClimateDegree");
 const localClimateMass = document.getElementById("localClimateMass");
+const localClimateMetricsLine = document.getElementById("localClimateMetricsLine");
 const localClimatePrimary = document.getElementById("localClimatePrimary");
 const localClimateSecondary = document.getElementById("localClimateSecondary");
 const localClimateEcho = document.getElementById("localClimateEcho");
 const groundStrata = document.getElementById("ground-strata");
 const strataLines = document.getElementById("strataLines");
+const strataMetricsLine = document.getElementById("strataMetricsLine");
 
 const query = new URLSearchParams(window.location.search);
 const contributed = query.get("contributed") === "1";
@@ -946,6 +990,42 @@ function instrumentToDensitySignalPct(total, ref) {
 function instrumentToDensityKgM3(signalPct) {
   const { densityKgM3Min, densityKgM3Max } = INSTRUMENT_REAL;
   return densityKgM3Min + (clamp(signalPct, 0, 100) / 100) * (densityKgM3Max - densityKgM3Min);
+}
+
+/**
+ * Construye los fragmentos HTML de la línea de métricas (tendency · balance · concentration)
+ * para cualquier capa (atmosphere, horizon, nearby). state = { pressureMode, stabilityIndex }; total = número de momentos.
+ */
+function buildMetricsLineParts(state, total, lang = "en") {
+  const ui = UI_COPY[lang] || UI_COPY.en;
+  const m = ui.metrics || {};
+  const pressureMode = state?.pressureMode || "";
+  const stabilityIndex = state?.stabilityIndex;
+  const pressureHpa = total > 0 ? instrumentToPressureHpa(pressureMode) : null;
+  const pressureLabel = m.pressureLabel || "pressure";
+  const pressureUnit = m.pressureUnit || "hPa";
+  const stabilityPct = instrumentToStabilityPercent(stabilityIndex);
+  const densitySignalPct = instrumentToDensitySignalPct(total, getDensitySignalRef(total));
+  const densityKgM3 = instrumentToDensityKgM3(densitySignalPct);
+  const densityFormatted = densityKgM3.toFixed(2).replace(".", lang === "es" ? "," : ".");
+  const densLabel = m.density || "density";
+  const densUnit = m.densityUnit || "kg/m³";
+  const parts = [];
+  const showTendency = total >= OBSERVABILITY_MIN.tendency && pressureHpa != null;
+  const showBalance = total >= OBSERVABILITY_MIN.balance && stabilityPct != null;
+  const showConcentration = total >= OBSERVABILITY_MIN.concentration;
+  if (showTendency) {
+    parts.push({ type: "pressure", html: `<span class="metric metric-pressure"><span class="metric-label">${pressureLabel}</span> <span class="metric-value">${pressureHpa} ${pressureUnit}</span></span>` });
+  }
+  if (showBalance) {
+    const stabLabel = m.stability || "stability";
+    const stabUnit = m.stabilityUnit ?? "%";
+    parts.push({ type: "stability", html: `<span class="metric metric-stability"><span class="metric-label">${stabLabel}</span> <span class="metric-value">${stabilityPct}${stabUnit}</span></span>` });
+  }
+  if (showConcentration && total > 0) {
+    parts.push({ type: "density", html: `<span class="metric metric-density"><span class="metric-label">${densLabel}</span> <span class="metric-value">${densityFormatted} ${densUnit}</span></span>` });
+  }
+  return parts;
 }
 
 let isSharedSheetOpen = false;
@@ -1811,13 +1891,28 @@ function formatGeoForDisplay(geo) {
   return last.charAt(0).toUpperCase() + last.slice(1).toLowerCase();
 }
 
+function capitalizeForDisplay(str) {
+  const s = String(str).trim();
+  if (!s) return s;
+  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+}
+
+function capitalizeNoteForDisplay(str) {
+  const s = String(str).trim();
+  if (!s) return s;
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 function renderMomentItems(targetElement, items) {
   targetElement.innerHTML = "";
   items.forEach((m) => {
     const li = document.createElement("li");
     li.className = "moment-item";
-    const note = m.note ? m.note : "(no note)";
-    const left = `${String(m.type).toLowerCase()} · ${String(m.mood).toLowerCase()} · ${String(note).toLowerCase()}`;
+    const note = m.note ? m.note.trim() : "(no note)";
+    const typeLabel = capitalizeForDisplay(m.type);
+    const moodLabel = capitalizeForDisplay(m.mood);
+    const noteLabel = note === "(no note)" ? note : capitalizeNoteForDisplay(note);
+    const left = `${typeLabel} · ${moodLabel} · ${noteLabel}`;
     const timeStr = new Date(m.timestamp).toLocaleTimeString([], {
       hour: "2-digit",
       minute: "2-digit",
@@ -2031,6 +2126,19 @@ function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby", p
   if (localState?.source === "global_view") {
     localClimateSecondary.textContent = "Reading shared moments across the wider field.";
     localClimateEcho.textContent = "Wider field lens selected.";
+    if (localClimateMetricsLine) {
+      const parts = buildMetricsLineParts(localState, total, LANG);
+      const uiAria = UI_COPY[LANG] || UI_COPY.en;
+      if (parts.length > 0) {
+        localClimateMetricsLine.innerHTML = parts.map((p) => p.html).join('<span class="metric-sep" aria-hidden="true"> · </span>');
+        localClimateMetricsLine.setAttribute("aria-label", uiAria.instrumentMetricsAriaNearby || "Nearby field metrics");
+        localClimateMetricsLine.classList.remove("hidden");
+      } else {
+        localClimateMetricsLine.textContent = "";
+        localClimateMetricsLine.removeAttribute("aria-label");
+        localClimateMetricsLine.classList.add("hidden");
+      }
+    }
     return;
   }
   const echoMode = pipeline?.signalModes?.echo || classifyEcho(localState, canonicalState);
@@ -2038,10 +2146,37 @@ function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby", p
   if (localState?.source === "global_fallback") {
     localClimateSecondary.textContent =
       pickRegionalLocalCopy("fallback", fieldScope, seed + 3) || pickCopy(COPY.local.fallback, seed);
+    if (localClimateMetricsLine) {
+      const parts = buildMetricsLineParts(localState, total, LANG);
+      const uiAria = UI_COPY[LANG] || UI_COPY.en;
+      if (parts.length > 0) {
+        localClimateMetricsLine.innerHTML = parts.map((p) => p.html).join('<span class="metric-sep" aria-hidden="true"> · </span>');
+        localClimateMetricsLine.setAttribute("aria-label", uiAria.instrumentMetricsAriaNearby || "Nearby field metrics");
+        localClimateMetricsLine.classList.remove("hidden");
+      } else {
+        localClimateMetricsLine.textContent = "";
+        localClimateMetricsLine.removeAttribute("aria-label");
+        localClimateMetricsLine.classList.add("hidden");
+      }
+    }
     return;
   }
   localClimateSecondary.textContent =
     pickRegionalLocalCopy("regional", fieldScope, seed + 7) || pickCopy(COPY.local.regional, seed);
+  // Nearby: incorporar tendency · balance · concentration en la capa (texto e idioma coherentes con la capa).
+  if (localClimateMetricsLine) {
+    const parts = buildMetricsLineParts(localState, total, LANG);
+    const uiAria = UI_COPY[LANG] || UI_COPY.en;
+    if (parts.length > 0) {
+      localClimateMetricsLine.innerHTML = parts.map((p) => p.html).join('<span class="metric-sep" aria-hidden="true"> · </span>');
+      localClimateMetricsLine.setAttribute("aria-label", uiAria.instrumentMetricsAriaNearby || "Nearby field metrics");
+      localClimateMetricsLine.classList.remove("hidden");
+    } else {
+      localClimateMetricsLine.textContent = "";
+      localClimateMetricsLine.removeAttribute("aria-label");
+      localClimateMetricsLine.classList.add("hidden");
+    }
+  }
 }
 
 function getLongWindow(moments, days = 30) {
@@ -2052,6 +2187,8 @@ function getLongWindow(moments, days = 30) {
 
 function buildStrataLines(longWindowMoments, canonicalState) {
   const total = longWindowMoments.length;
+  const ui = UI_COPY[LANG] || UI_COPY.en;
+  const s = ui.strata || {};
   if (total === 0) {
     return [pickCopy(COPY.strataEarly, 0)];
   }
@@ -2066,46 +2203,46 @@ function buildStrataLines(longWindowMoments, canonicalState) {
 
   const lines = [];
   const groundLevel = canonicalState.groundIndex ?? 0;
-  const mixLabel = groundLevel < 0.33 ? "low" : groundLevel < 0.66 ? "moderate" : "high";
-  lines.push(`Deep mix: ${mixLabel}.`);
+  const mixLabel = groundLevel < 0.33 ? (s.mixLow || "low") : groundLevel < 0.66 ? (s.mixModerate || "moderate") : (s.mixHigh || "high");
+  lines.push(s.deepMix ? s.deepMix(mixLabel) : `Deep mix: ${mixLabel}.`);
 
   if (canonicalState.pressureMode === "condensing") {
-    lines.push("30-day pressure trend: condensing.");
+    lines.push(s.pressureTrendCondensing || "30-day pressure trend: condensing.");
   } else if (canonicalState.pressureMode === "clearing") {
-    lines.push("30-day pressure trend: clearing.");
+    lines.push(s.pressureTrendClearing || "30-day pressure trend: clearing.");
   } else {
-    lines.push("30-day pressure trend: stabilizing.");
+    lines.push(s.pressureTrendStabilizing || "30-day pressure trend: stabilizing.");
   }
 
   if (counts.avoidable >= 5 && moods.stressed >= 3) {
-    lines.push("Avoidable + stressed recurrence is high in 30-day data.");
+    lines.push(s.avoidableStressed || "Avoidable + stressed recurrence is high in 30-day data.");
   }
   if (counts.fertile >= 4 && moods.calm >= 3) {
-    lines.push("Fertile + calm recurrence is visible in 30-day data.");
+    lines.push(s.fertileCalm || "Fertile + calm recurrence is visible in 30-day data.");
   }
   if (counts.observed >= 4) {
-    lines.push("Observed entries are adding stability to the deep read.");
+    lines.push(s.observedStability || "Observed entries are adding stability to the deep read.");
   }
 
   const moodDiversity = Object.values(moods).filter((count) => count > 0).length;
   if (moodDiversity >= 4) {
-    lines.push("Mood diversity is high across the 30-day window.");
+    lines.push(s.moodDiversity || "Mood diversity is high across the 30-day window.");
   }
 
   const avoidableRatio = counts.avoidable / total;
   const fertileRatio = counts.fertile / total;
   if (avoidableRatio > 0.42 && fertileRatio > 0.22) {
-    lines.push("Avoidable and fertile ratios are both significant (mixed signal).");
+    lines.push(s.mixedSignal || "Avoidable and fertile ratios are both significant (mixed signal).");
   } else if (fertileRatio > 0.38) {
-    lines.push("Fertile ratio is dominant in the 30-day mix.");
+    lines.push(s.fertileDominant || "Fertile ratio is dominant in the 30-day mix.");
   }
 
   if (total >= 24) {
-    lines.push("Deep confidence is stronger with sustained 30-day volume.");
+    lines.push(s.deepConfidence || "Deep confidence is stronger with sustained 30-day volume.");
   }
 
   if (lines.length < 2) {
-    lines.push("Deep read is still building from recurring entries.");
+    lines.push(s.stillBuilding || "Deep read is still building from recurring entries.");
     lines.push(pickCopy(COPY.strataFallback, total + lines.length));
   }
 
@@ -2133,6 +2270,22 @@ function renderStrata(moments, canonicalState) {
     li.textContent = line;
     strataLines.appendChild(li);
   });
+
+  // Clima en capa strata: tendency · balance · concentration (canonicalState; total = ventana 30 días). Texto e idioma coherentes.
+  if (strataMetricsLine) {
+    const total = longWindow.length;
+    const parts = buildMetricsLineParts(canonicalState, total, LANG);
+    const uiAria = UI_COPY[LANG] || UI_COPY.en;
+    if (parts.length > 0) {
+      strataMetricsLine.innerHTML = parts.map((p) => p.html).join('<span class="metric-sep" aria-hidden="true"> · </span>');
+      strataMetricsLine.setAttribute("aria-label", uiAria.instrumentMetricsAriaStrata || "Deep record metrics");
+      strataMetricsLine.classList.remove("hidden");
+    } else {
+      strataMetricsLine.textContent = "";
+      strataMetricsLine.removeAttribute("aria-label");
+      strataMetricsLine.classList.add("hidden");
+    }
+  }
 
   groundStrata.hidden = false;
   groundStrata.classList.add("is-active");
@@ -2430,43 +2583,24 @@ async function boot() {
   conditionLine.textContent = canonicalState.condition;
 
   // Instrumento observatorio: usa INSTRUMENT_REAL y helpers para traducir a unidades reales.
+  // Clasificación por capa: data-layer="atmosphere", data-scope="global" (si en el futuro hay lectura por zona, se podría data-scope="local").
+  if (climateInstrument) {
+    climateInstrument.setAttribute("data-layer", "atmosphere");
+    climateInstrument.setAttribute("data-scope", canonicalState?.source === "local" ? "local" : "global");
+  }
   if (climateMetricsLine) {
     const total = Number(canonicalState?.total) || 0;
-    const pressureMode = canonicalState?.pressureMode || "";
-    const stabilityIndex = canonicalState?.stabilityIndex;
-    const ui = UI_COPY[LANG] || UI_COPY.en;
-    const m = ui.metrics || {};
-    const pressureHpa = total > 0 ? instrumentToPressureHpa(pressureMode) : null;
-    const pressureLabel = m.pressureLabel || "pressure";
-    const pressureUnit = m.pressureUnit || "hPa";
-    const stabilityPct = instrumentToStabilityPercent(stabilityIndex);
-    const densitySignalPct = instrumentToDensitySignalPct(total, getDensitySignalRef(total));
-    const densityKgM3 = instrumentToDensityKgM3(densitySignalPct);
-    const densityFormatted = densityKgM3.toFixed(2).replace(".", LANG === "es" ? "," : ".");
-    const densLabel = m.density || "density";
-    const densUnit = m.densityUnit || "kg/m³";
-    const parts = [];
-    const showTendency = total >= OBSERVABILITY_MIN.tendency && pressureHpa != null;
-    const showBalance = total >= OBSERVABILITY_MIN.balance && stabilityPct != null;
-    const showConcentration = total >= OBSERVABILITY_MIN.concentration;
-    if (showTendency) {
-      parts.push({ type: "pressure", html: `<span class="metric metric-pressure"><span class="metric-label">${pressureLabel}</span> <span class="metric-value">${pressureHpa} ${pressureUnit}</span></span>` });
-    }
-    if (showBalance) {
-      const stabLabel = m.stability || "stability";
-      const stabUnit = m.stabilityUnit ?? "%";
-      parts.push({ type: "stability", html: `<span class="metric metric-stability"><span class="metric-label">${stabLabel}</span> <span class="metric-value">${stabilityPct}${stabUnit}</span></span>` });
-    }
-    if (showConcentration && total > 0) {
-      parts.push({ type: "density", html: `<span class="metric metric-density"><span class="metric-label">${densLabel}</span> <span class="metric-value">${densityFormatted} ${densUnit}</span></span>` });
-    }
+    const parts = buildMetricsLineParts(canonicalState, total, LANG);
     if (parts.length > 0) {
       climateMetricsLine.innerHTML = parts.map((p) => p.html).join('<span class="metric-sep" aria-hidden="true"> · </span>');
       climateMetricsLine.classList.remove("hidden");
       if (climateInstrument) climateInstrument.classList.remove("hidden");
       if (observatoryScopeRange) {
         const ui = UI_COPY[LANG] || UI_COPY.en;
-        observatoryScopeRange.textContent = ui.scopeRangeLine ? ui.scopeRangeLine(total) : "";
+        const layerLabel = ui.instrumentLayerLabel || "Atmosphere";
+        const scopeLabel = ui.instrumentScopeLabel || "Global";
+        const rangeText = ui.scopeRangeLine ? ui.scopeRangeLine(total) : `${total} moments`;
+        observatoryScopeRange.textContent = `${layerLabel} · ${scopeLabel} · ${rangeText}`;
         observatoryScopeRange.classList.remove("hidden");
       }
     } else {
