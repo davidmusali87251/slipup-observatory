@@ -1,98 +1,51 @@
 import { fetchClimateRemote, fetchGeoIndexRemote, fetchSharedMomentsRemote } from "./remote.js";
+import {
+  BASELINE,
+  SCALE,
+  DEGREE_SCALE_BANDS,
+  RECENCY_HALFLIFE_HOURS,
+  RESPONSE_AMPLITUDE,
+  NOTE_SIGNAL_CAP,
+  NOTE_SIGNAL_DIVISOR,
+  WARMUP_MASS_THRESHOLD,
+  PRESSURE_NORMALIZER_SQRT_COEF,
+  PRESSURE_NORMALIZER_OFFSET,
+  TANH_SENSITIVITY,
+  STABILIZE_DAMPING_MIN,
+  STABILIZE_DAMPING_MAX,
+  REPETITION_FIELD_MASS_DIVISOR,
+  REPETITION_NUDGE_FACTOR,
+  REPETITION_NUDGE_MAX,
+  REPETITION_DAMPING_MIN,
+  REPETITION_DAMPING_MAX,
+  SINGLE_MOMENT_DEGREE_DELTA,
+  DEGREE_BAND_STEADY,
+  DEGREE_BAND_BALANCE,
+  DEGREE_BAND_GATHERING,
+  PRESSURE_MODE_CONDENSING_DELTA,
+  PRESSURE_MODE_CLEARING_DELTA,
+  PATTERN_A_STRENGTH_BASE,
+  PATTERN_A_STRENGTH_RATE,
+  PATTERN_A_STRENGTH_MIN,
+  PATTERN_A_STRENGTH_MAX,
+  PATTERN_B_STRENGTH_BASE,
+  PATTERN_B_STRENGTH_RATE,
+  PATTERN_B_STRENGTH_MIN,
+  PATTERN_B_STRENGTH_MAX,
+  PATTERN_C_STRENGTH,
+  INFLUENCE,
+  REFLECTIVE_TOKENS,
+  REACTIVE_TOKENS,
+  INFLUENCE_DEFAULT_STRENGTH,
+  chooseAlpha,
+  REFLECTIVE_SEMANTIC_STABILIZE_FACTOR,
+} from "./modelConstants.js";
 
 const STORAGE_KEY = "slipup_v2_moments";
 const RENDER_LIMIT = 6;
-const BASELINE = 28;
-const SCALE = 100;
-const RECENCY_HALFLIFE_HOURS = 18;
-const RESPONSE_AMPLITUDE = 20;
-const NOTE_SIGNAL_CAP = 0.16;
 const COMPUTED_DEGREE_KEY = "slipup_v2_computed_degree";
 const DISPLAY_DEGREE_KEY = "slipup_v2_display_degree";
 const FIELD_SCOPE_KEY = "slipup_v2_field_scope";
-const INFLUENCE = {
-  avoidable: {
-    stressed: { mode: "condense", strength: 1.0 },
-    tired: { mode: "condense", strength: 0.8 },
-    curious: { mode: "condense", strength: 0.55 },
-    focus: { mode: "condense", strength: 0.5 },
-    calm: { mode: "condense", strength: 0.35 },
-  },
-  fertile: {
-    calm: { mode: "clear", strength: 0.7 },
-    focus: { mode: "clear", strength: 0.55 },
-    curious: { mode: "clear", strength: 0.45 },
-    tired: { mode: "clear", strength: 0.28 },
-    stressed: { mode: "clear", strength: 0.22 },
-  },
-  observed: {
-    calm: { mode: "stabilize", strength: 0.3 },
-    focus: { mode: "stabilize", strength: 0.22 },
-    curious: { mode: "stabilize", strength: 0.18 },
-    tired: { mode: "stabilize", strength: 0.14 },
-    stressed: { mode: "stabilize", strength: 0.16 },
-  },
-};
-const REFLECTIVE_TOKENS = [
-  "reflect",
-  "noticed",
-  "learn",
-  "learned",
-  "lesson",
-  "pause",
-  "adjust",
-  "again",
-  "next",
-  "aware",
-  "observe",
-  "chose",
-  "choice",
-  "calm",
-  "breathe",
-  "intent",
-  "reflex",
-  "aprend",
-  "leccion",
-  "pausa",
-  "ajust",
-  "proxima",
-  "siguiente",
-  "consciente",
-  "observo",
-  "elegi",
-  "eleccion",
-  "calma",
-  "respir",
-  "intencion",
-];
-const REACTIVE_TOKENS = [
-  "rush",
-  "late",
-  "panic",
-  "angry",
-  "stuck",
-  "again!",
-  "always",
-  "never",
-  "chaos",
-  "overwhelm",
-  "noise",
-  "blame",
-  "fight",
-  "explode",
-  "prisa",
-  "tarde",
-  "panico",
-  "enoj",
-  "atasc",
-  "siempre",
-  "nunca",
-  "caos",
-  "ruido",
-  "culpa",
-  "pelea",
-  "explot",
-];
 
 // Tone selector for key narrative lines:
 // Modo de copy: clear | poetic | narrative (narrative usa LANG: en | es)
@@ -492,8 +445,8 @@ const UI_COPY = {
     nearbyTitle: "Nearby Field",
     instrumentAriaLabel: "Reading metrics",
     scopeRangeLine: (n) => (n === 1 ? "1 moment" : `${n} moments`),
-    instrumentInfoCopy: "These values are not real weather. They are derived from user-shared moments in the last 48 hours.",
-    degreeScaleLabel: "0–100 scale",
+    instrumentInfoCopy: "Same variables that define the climate — type, mood, note, recency — make shared moments represent degrees of the atmosphere. 0–100 is field density (balance ≈ 38–60), not conflict.",
+    degreeScaleLabel: "0–100 density · 48h",
     viewMore: "View more",
     close: "Close",
     sheetEmpty: "No shared moments yet.",
@@ -529,8 +482,8 @@ const UI_COPY = {
     nearbyTitle: "Campo cercano",
     instrumentAriaLabel: "Métricas de lectura",
     scopeRangeLine: (n) => (n === 1 ? "1 momento" : `${n} momentos`),
-    instrumentInfoCopy: "Estos valores no son clima real. Se derivan de los momentos compartidos por usuarios en las últimas 48 h.",
-    degreeScaleLabel: "escala 0–100",
+    instrumentInfoCopy: "Las mismas variables que definen el clima — tipo, humor, nota, recencia — hacen que los momentos compartidos representen los grados de la atmósfera. 0–100 es densidad del campo (balance ≈ 38–60), no conflicto.",
+    degreeScaleLabel: "0–100 densidad · 48 h",
     viewMore: "Ver más",
     close: "Cerrar",
     sheetEmpty: "Aún no hay momentos compartidos.",
@@ -924,6 +877,44 @@ const SHEET_TRANSITION_MS = 280;
 const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
 
 /**
+ * Variables reales del instrumento y condiciones para observarlas.
+ * Pensado para escala: early (pocos), building (cientos), firm (miles/millones).
+ *
+ * VARIABLES REALES (mapeo observatorio → homónimo físico):
+ * - Tendency (hPa): tendencia del grado respecto al baseline; necesita mezcla type/mood para que el grado sea significativo.
+ * - Balance (%): proporción observed + calm/focus; necesita variedad en type y mood.
+ * - Concentration (kg/m³): señal en ventana 48h; escala con el total de momentos (ref depende del volumen).
+ *
+ * CONDICIONES MÍNIMAS PARA OBSERVAR (por métrica):
+ * - tendency: al menos OBSERVABILITY_MIN.tendency momentos (mezcla type/mood) para que el grado no sea ruido.
+ * - balance: al menos OBSERVABILITY_MIN.balance para que los ratios no sean 0/1 puros.
+ * - concentration: al menos OBSERVABILITY_MIN.concentration para mostrar valor (sino se oculta o se muestra "—").
+ *
+ * ESCALA (miles/millones de usuarios):
+ * - early: total < SCALE_TIER_REF.building → ref = 50 (100% = 50 momentos).
+ * - building: total < SCALE_TIER_REF.firm → ref = 500 (100% = 500 en ventana 48h).
+ * - firm: total >= SCALE_TIER_REF.firm → ref = 5000 (100% = 5000 en ventana 48h).
+ * Así la concentration no se satura al 100% con pocos cientos; miles/millones tienen headroom.
+ */
+const OBSERVABILITY_MIN = {
+  tendency: 5,
+  balance: 5,
+  concentration: 3,
+};
+
+const SCALE_TIER_REF = {
+  early: 50,
+  building: 500,
+  firm: 5000,
+};
+
+function getDensitySignalRef(total) {
+  if (total < SCALE_TIER_REF.building) return SCALE_TIER_REF.early;
+  if (total < SCALE_TIER_REF.firm) return SCALE_TIER_REF.building;
+  return SCALE_TIER_REF.firm;
+}
+
+/**
  * Mapeo estable: variables internas del observatorio → unidades reales para el instrumento.
  * Relación con homónimos reales:
  * - pressureMode: tendencia del grado (derivePressureMode) → hPa nominal (sube=1018, estable=1015, baja=1012).
@@ -946,9 +937,10 @@ function instrumentToStabilityPercent(stabilityIndex) {
   return Math.round(clamp(stabilityIndex, 0, 1) * 100);
 }
 
-function instrumentToDensitySignalPct(total, ref = INSTRUMENT_REAL.densitySignalRef) {
+function instrumentToDensitySignalPct(total, ref) {
   if (!total || total <= 0) return 0;
-  return Math.min(100, Math.round((total / ref) * 100));
+  const r = ref !== undefined ? ref : getDensitySignalRef(total);
+  return Math.min(100, Math.round((total / r) * 100));
 }
 
 function instrumentToDensityKgM3(signalPct) {
@@ -1133,7 +1125,11 @@ function detectStructuralPattern(activeEntries48h) {
 
   // Pattern A: avoidable + stressed appears >= 2
   if (avoidableStressedCount >= 2) {
-    const strength = clamp(0.25 + (avoidableStressedCount - 2) * 0.1, 0.25, 0.6);
+    const strength = clamp(
+      PATTERN_A_STRENGTH_BASE + (avoidableStressedCount - 2) * PATTERN_A_STRENGTH_RATE,
+      PATTERN_A_STRENGTH_MIN,
+      PATTERN_A_STRENGTH_MAX
+    );
     return { hasPattern: true, tag: "pattern_a", strength };
   }
 
@@ -1141,7 +1137,11 @@ function detectStructuralPattern(activeEntries48h) {
   const repeatedAvoidableMood = Array.from(avoidableByMood.values()).some((count) => count >= 3);
   if (repeatedAvoidableMood) {
     const maxRepeat = Math.max(...avoidableByMood.values());
-    const strength = clamp(0.22 + (maxRepeat - 3) * 0.08, 0.22, 0.55);
+    const strength = clamp(
+      PATTERN_B_STRENGTH_BASE + (maxRepeat - 3) * PATTERN_B_STRENGTH_RATE,
+      PATTERN_B_STRENGTH_MIN,
+      PATTERN_B_STRENGTH_MAX
+    );
     return { hasPattern: true, tag: "pattern_b", strength };
   }
 
@@ -1166,7 +1166,7 @@ function detectStructuralPattern(activeEntries48h) {
   }
 
   if (hasCluster) {
-    return { hasPattern: true, tag: "pattern_c", strength: 0.28 };
+    return { hasPattern: true, tag: "pattern_c", strength: PATTERN_C_STRENGTH };
   }
 
   return { hasPattern: false, tag: "", strength: 0 };
@@ -1348,8 +1348,8 @@ function compositionCounts(moments) {
 function derivePressureMode(computedDegree, repetition) {
   const delta = computedDegree - BASELINE;
   if (repetition?.hasPattern && repetition?.tag === "pattern_a") return "condensing";
-  if (delta >= 4.5) return "condensing";
-  if (delta <= -3.5) return "clearing";
+  if (delta >= PRESSURE_MODE_CONDENSING_DELTA) return "condensing";
+  if (delta <= PRESSURE_MODE_CLEARING_DELTA) return "clearing";
   return "stabilizing";
 }
 
@@ -1396,12 +1396,6 @@ function getRecentWindow(moments) {
   return moments.filter((m) => now - new Date(m.timestamp).getTime() <= twoDaysMs);
 }
 
-function chooseAlpha(mass) {
-  if (mass < 4) return 0.12;
-  if (mass < 14) return 0.17;
-  return 0.2;
-}
-
 function recencyMass(ageHours) {
   return Math.pow(0.5, ageHours / RECENCY_HALFLIFE_HOURS);
 }
@@ -1414,7 +1408,7 @@ function signedPressure(mode, strength) {
 
 function getInfluenceCell(type, mood) {
   const row = INFLUENCE[type] || {};
-  return row[mood] || { mode: "stabilize", strength: 0.12 };
+  return row[mood] || { mode: "stabilize", strength: INFLUENCE_DEFAULT_STRENGTH };
 }
 
 function noteSignal(note) {
@@ -1435,8 +1429,8 @@ function noteSignal(note) {
   });
 
   return {
-    reflective: Math.min(reflective / 2.5, NOTE_SIGNAL_CAP),
-    reactive: Math.min(reactive / 2.5, NOTE_SIGNAL_CAP),
+    reflective: Math.min(reflective / NOTE_SIGNAL_DIVISOR, NOTE_SIGNAL_CAP),
+    reactive: Math.min(reactive / NOTE_SIGNAL_DIVISOR, NOTE_SIGNAL_CAP),
   };
 }
 
@@ -1464,27 +1458,27 @@ function calculateClimate(moments) {
     const influence = getInfluenceCell(m.type, m.mood);
     const signal = noteSignal(m.note || "");
     const semanticPressure = signal.reactive - signal.reflective;
-    const semanticStabilize = signal.reflective * 0.75;
+    const semanticStabilize = signal.reflective * REFLECTIVE_SEMANTIC_STABILIZE_FACTOR;
     fieldMass += mass;
     atmosphericPressure += (signedPressure(influence.mode, influence.strength) + semanticPressure) * mass;
     if (influence.mode === "stabilize") stabilizeMass += influence.strength * mass;
     stabilizeMass += semanticStabilize * mass;
   });
 
-  const warmupFactor = Math.min(1, fieldMass / 6);
-  const pressureNormalizer = 2 * Math.sqrt(fieldMass) + 80;
+  const warmupFactor = Math.min(1, fieldMass / WARMUP_MASS_THRESHOLD);
+  const pressureNormalizer = PRESSURE_NORMALIZER_SQRT_COEF * Math.sqrt(fieldMass) + PRESSURE_NORMALIZER_OFFSET;
   const normalizedPressure = atmosphericPressure / pressureNormalizer;
-  const stabilizeDamping = clamp(1 - stabilizeMass / (fieldMass + 1), 0.65, 1);
-  const targetDelta = RESPONSE_AMPLITUDE * Math.tanh(normalizedPressure * 2.2) * stabilizeDamping;
+  const stabilizeDamping = clamp(1 - stabilizeMass / (fieldMass + 1), STABILIZE_DAMPING_MIN, STABILIZE_DAMPING_MAX);
+  const targetDelta = RESPONSE_AMPLITUDE * Math.tanh(normalizedPressure * TANH_SENSITIVITY) * stabilizeDamping;
   const target = clamp(BASELINE + targetDelta * warmupFactor, 0, SCALE);
   const alpha = chooseAlpha(fieldMass);
 
   const warmBase = BASELINE + alpha * (target - BASELINE);
-  const repetitionDamping = clamp(1 / Math.sqrt(1 + fieldMass / 28), 0.18, 1);
-  const repetitionNudge = clamp(repetition.strength * 2.4 * repetitionDamping, 0, 1.4);
+  const repetitionDamping = clamp(1 / Math.sqrt(1 + fieldMass / REPETITION_FIELD_MASS_DIVISOR), REPETITION_DAMPING_MIN, REPETITION_DAMPING_MAX);
+  const repetitionNudge = clamp(repetition.strength * REPETITION_NUDGE_FACTOR * repetitionDamping, 0, REPETITION_NUDGE_MAX);
   let computedDegree = clamp(warmBase + repetitionNudge, 0, SCALE);
   if (total === 1) {
-    computedDegree = Math.min(computedDegree, BASELINE + 5);
+    computedDegree = Math.min(computedDegree, BASELINE + SINGLE_MOMENT_DEGREE_DELTA);
   }
 
   return {
@@ -1520,15 +1514,17 @@ function setStoredDisplayDegree(value) {
 }
 
 function formatDegree(value) {
-  return Math.round(value).toString();
+  const n = Number(value);
+  if (!Number.isFinite(n)) return String(BASELINE);
+  return n.toFixed(1);
 }
 
 function conditionForDegree(value, total) {
   const seed = Math.round(value * 10) + total;
   if (total < 3) return pickCopy(COPY.condition.quiet, seed);
-  if (value < 38) return pickCopy(COPY.condition.steady, seed);
-  if (value < 60) return pickCopy(COPY.condition.balance, seed);
-  if (value < 74) return pickCopy(COPY.condition.gathering, seed);
+  if (value < DEGREE_BAND_STEADY) return pickCopy(COPY.condition.steady, seed);
+  if (value < DEGREE_BAND_BALANCE) return pickCopy(COPY.condition.balance, seed);
+  if (value < DEGREE_BAND_GATHERING) return pickCopy(COPY.condition.gathering, seed);
   return pickCopy(COPY.condition.dense, seed);
 }
 
@@ -2002,11 +1998,12 @@ function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby", p
         : pickCopy(COPY.local.stable, seed));
 
   localClimatePrimary.textContent = pressureText;
-  const roundedDegree = Math.round(Number(localState?.computedDegree) || BASELINE);
+  const exactDegree = Number(localState?.computedDegree);
+  const degreeStr = Number.isFinite(exactDegree) ? exactDegree.toFixed(1) : String(BASELINE);
   const total = Number(localState?.total) || 0;
   const confidenceMode = pipeline?.signalModes?.confidence || classifyConfidence(total);
   if (localClimateDegree) {
-    localClimateDegree.textContent = `${roundedDegree}° ${scopeLabel.toLowerCase()}`;
+    localClimateDegree.textContent = `${degreeStr}° ${scopeLabel.toLowerCase()}`;
   }
   if (localClimateMass) {
     localClimateMass.textContent = `${total} shared · ${confidenceMode}`;
@@ -2423,21 +2420,24 @@ async function boot() {
     const pressureLabel = m.pressureLabel || "pressure";
     const pressureUnit = m.pressureUnit || "hPa";
     const stabilityPct = instrumentToStabilityPercent(stabilityIndex);
-    const densitySignalPct = instrumentToDensitySignalPct(total);
+    const densitySignalPct = instrumentToDensitySignalPct(total, getDensitySignalRef(total));
     const densityKgM3 = instrumentToDensityKgM3(densitySignalPct);
     const densityFormatted = densityKgM3.toFixed(2).replace(".", LANG === "es" ? "," : ".");
     const densLabel = m.density || "density";
     const densUnit = m.densityUnit || "kg/m³";
     const parts = [];
-    if (pressureHpa != null && total > 0) {
+    const showTendency = total >= OBSERVABILITY_MIN.tendency && pressureHpa != null;
+    const showBalance = total >= OBSERVABILITY_MIN.balance && stabilityPct != null;
+    const showConcentration = total >= OBSERVABILITY_MIN.concentration;
+    if (showTendency) {
       parts.push({ type: "pressure", html: `<span class="metric metric-pressure"><span class="metric-label">${pressureLabel}</span> <span class="metric-value">${pressureHpa} ${pressureUnit}</span></span>` });
     }
-    if (stabilityPct != null) {
+    if (showBalance) {
       const stabLabel = m.stability || "stability";
       const stabUnit = m.stabilityUnit ?? "%";
       parts.push({ type: "stability", html: `<span class="metric metric-stability"><span class="metric-label">${stabLabel}</span> <span class="metric-value">${stabilityPct}${stabUnit}</span></span>` });
     }
-    if (total > 0) {
+    if (showConcentration && total > 0) {
       parts.push({ type: "density", html: `<span class="metric metric-density"><span class="metric-label">${densLabel}</span> <span class="metric-value">${densityFormatted} ${densUnit}</span></span>` });
     }
     if (parts.length > 0) {

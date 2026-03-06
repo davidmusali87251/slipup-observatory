@@ -1,15 +1,46 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { computeClimate, conditionForDegree } from "../_shared/computeClimate.ts";
+import {
+  BASELINE,
+  SCALE,
+  RECENCY_HALFLIFE_HOURS,
+  RESPONSE_AMPLITUDE,
+  INFLUENCE,
+  chooseAlpha,
+  WARMUP_MASS_THRESHOLD,
+  PRESSURE_NORMALIZER_SQRT_COEF,
+  PRESSURE_NORMALIZER_OFFSET,
+  TANH_SENSITIVITY,
+  STABILIZE_DAMPING_MIN,
+  STABILIZE_DAMPING_MAX,
+  REPETITION_FIELD_MASS_DIVISOR,
+  REPETITION_NUDGE_FACTOR,
+  REPETITION_NUDGE_MAX,
+  REPETITION_DAMPING_MIN,
+  REPETITION_DAMPING_MAX,
+  SINGLE_MOMENT_DEGREE_DELTA,
+  PATTERN_A_STRENGTH_BASE,
+  PATTERN_A_STRENGTH_RATE,
+  PATTERN_A_STRENGTH_MIN,
+  PATTERN_A_STRENGTH_MAX,
+  PATTERN_B_STRENGTH_BASE,
+  PATTERN_B_STRENGTH_RATE,
+  PATTERN_B_STRENGTH_MIN,
+  PATTERN_B_STRENGTH_MAX,
+  PATTERN_C_STRENGTH,
+  STABILITY_OBSERVED_WEIGHT,
+  STABILITY_CALM_FOCUS_WEIGHT,
+  GROUND_AVOIDABLE_WEIGHT,
+  GROUND_FERTILE_WEIGHT,
+  PRESSURE_MODE_CONDENSING_DELTA,
+  PRESSURE_MODE_CLEARING_DELTA,
+} from "../_shared/modelConstants.ts";
 
 const DEFAULT_WINDOW_HOURS = 48;
 const MAX_WINDOW_HOURS = 168;
 const MAX_GEO_BUCKET_LENGTH = 64;
 const LOCAL_MIN_MASS = parseInt(Deno.env.get("LOCAL_MIN_MASS") ?? "30", 10);
 const USE_BUCKETS = (Deno.env.get("CLIMATE_USE_BUCKETS") ?? "true").toLowerCase() !== "false";
-const RECENCY_HALFLIFE_HOURS = 18;
-const RESPONSE_AMPLITUDE = 20;
-const BASELINE = 28;
-const SCALE = 100;
 
 const RATE_WINDOW_SECONDS = parseInt(Deno.env.get("CLIMATE_GET_WINDOW_SECONDS") ?? "60", 10);
 const CLIMATE_GET_MAX = parseInt(Deno.env.get("CLIMATE_GET_MAX") ?? "180", 10);
@@ -74,30 +105,6 @@ type BucketRow = {
   observed_tired: number;
 };
 
-const INFLUENCE: Record<string, Record<string, { mode: "condense" | "clear" | "stabilize"; strength: number }>> = {
-  avoidable: {
-    stressed: { mode: "condense", strength: 1.0 },
-    tired: { mode: "condense", strength: 0.8 },
-    curious: { mode: "condense", strength: 0.55 },
-    focus: { mode: "condense", strength: 0.5 },
-    calm: { mode: "condense", strength: 0.35 },
-  },
-  fertile: {
-    calm: { mode: "clear", strength: 0.7 },
-    focus: { mode: "clear", strength: 0.55 },
-    curious: { mode: "clear", strength: 0.45 },
-    tired: { mode: "clear", strength: 0.28 },
-    stressed: { mode: "clear", strength: 0.22 },
-  },
-  observed: {
-    calm: { mode: "stabilize", strength: 0.3 },
-    focus: { mode: "stabilize", strength: 0.22 },
-    curious: { mode: "stabilize", strength: 0.18 },
-    tired: { mode: "stabilize", strength: 0.14 },
-    stressed: { mode: "stabilize", strength: 0.16 },
-  },
-};
-
 const COMBO_KEYS: Array<[string, string, keyof BucketRow]> = [
   ["avoidable", "calm", "avoidable_calm"],
   ["avoidable", "focus", "avoidable_focus"],
@@ -124,12 +131,6 @@ function recencyMass(ageHours: number) {
   return Math.pow(0.5, ageHours / RECENCY_HALFLIFE_HOURS);
 }
 
-function chooseAlpha(mass: number) {
-  if (mass < 4) return 0.12;
-  if (mass < 14) return 0.17;
-  return 0.2;
-}
-
 function signedPressure(mode: "condense" | "clear" | "stabilize", strength: number) {
   if (mode === "condense") return strength;
   if (mode === "clear") return -strength;
@@ -139,8 +140,8 @@ function signedPressure(mode: "condense" | "clear" | "stabilize", strength: numb
 function derivePressureMode(computedDegree: number, repetition: { hasPattern: boolean; tag: string }) {
   const delta = computedDegree - BASELINE;
   if (repetition?.hasPattern && repetition?.tag === "pattern_a") return "condensing";
-  if (delta >= 4.5) return "condensing";
-  if (delta <= -3.5) return "clearing";
+  if (delta >= PRESSURE_MODE_CONDENSING_DELTA) return "condensing";
+  if (delta <= PRESSURE_MODE_CLEARING_DELTA) return "clearing";
   return "stabilizing";
 }
 
@@ -323,31 +324,43 @@ function computeFromBuckets(rows: BucketRow[], referenceIso: string, windowHours
 
   const repetition = (() => {
     if (avoidableStressedTotal >= 2) {
-      const strength = clamp(0.25 + (avoidableStressedTotal - 2) * 0.1, 0.25, 0.6);
+      const strength = clamp(
+        PATTERN_A_STRENGTH_BASE + (avoidableStressedTotal - 2) * PATTERN_A_STRENGTH_RATE,
+        PATTERN_A_STRENGTH_MIN,
+        PATTERN_A_STRENGTH_MAX
+      );
       return { hasPattern: true, tag: "pattern_a", strength };
     }
     const maxAvoidableMood = Math.max(...Object.values(avoidableMoodTotals));
     if (maxAvoidableMood >= 3) {
-      const strength = clamp(0.22 + (maxAvoidableMood - 3) * 0.08, 0.22, 0.55);
+      const strength = clamp(
+        PATTERN_B_STRENGTH_BASE + (maxAvoidableMood - 3) * PATTERN_B_STRENGTH_RATE,
+        PATTERN_B_STRENGTH_MIN,
+        PATTERN_B_STRENGTH_MAX
+      );
       return { hasPattern: true, tag: "pattern_b", strength };
     }
-    if (hasCluster) return { hasPattern: true, tag: "pattern_c", strength: 0.28 };
+    if (hasCluster) return { hasPattern: true, tag: "pattern_c", strength: PATTERN_C_STRENGTH };
     return { hasPattern: false, tag: "", strength: 0 };
   })();
 
   if (total <= 0 || fieldMass <= 0) return null;
-  const warmupFactor = Math.min(1, fieldMass / 6);
-  const pressureNormalizer = 2 * Math.sqrt(fieldMass) + 80;
+  const warmupFactor = Math.min(1, fieldMass / WARMUP_MASS_THRESHOLD);
+  const pressureNormalizer = PRESSURE_NORMALIZER_SQRT_COEF * Math.sqrt(fieldMass) + PRESSURE_NORMALIZER_OFFSET;
   const normalizedPressure = atmosphericPressure / pressureNormalizer;
-  const stabilizeDamping = clamp(1 - stabilizeMass / (fieldMass + 1), 0.65, 1);
-  const targetDelta = RESPONSE_AMPLITUDE * Math.tanh(normalizedPressure * 2.2) * stabilizeDamping;
+  const stabilizeDamping = clamp(1 - stabilizeMass / (fieldMass + 1), STABILIZE_DAMPING_MIN, STABILIZE_DAMPING_MAX);
+  const targetDelta = RESPONSE_AMPLITUDE * Math.tanh(normalizedPressure * TANH_SENSITIVITY) * stabilizeDamping;
   const target = clamp(BASELINE + targetDelta * warmupFactor, 0, SCALE);
   const alpha = chooseAlpha(fieldMass);
   const warmBase = BASELINE + alpha * (target - BASELINE);
-  const repetitionDamping = clamp(1 / Math.sqrt(1 + fieldMass / 28), 0.18, 1);
-  const repetitionNudge = clamp(repetition.strength * 2.4 * repetitionDamping, 0, 1.4);
+  const repetitionDamping = clamp(
+    1 / Math.sqrt(1 + fieldMass / REPETITION_FIELD_MASS_DIVISOR),
+    REPETITION_DAMPING_MIN,
+    REPETITION_DAMPING_MAX
+  );
+  const repetitionNudge = clamp(repetition.strength * REPETITION_NUDGE_FACTOR * repetitionDamping, 0, REPETITION_NUDGE_MAX);
   let computedDegree = clamp(warmBase + repetitionNudge, 0, SCALE);
-  if (total === 1) computedDegree = Math.min(computedDegree, BASELINE + 5);
+  if (total === 1) computedDegree = Math.min(computedDegree, BASELINE + SINGLE_MOMENT_DEGREE_DELTA);
 
   let dominantMix = "";
   let maxCombo = 0;
@@ -358,8 +371,16 @@ function computeFromBuckets(rows: BucketRow[], referenceIso: string, windowHours
     }
   });
   const totalSafe = Math.max(1, total);
-  const stabilityIndex = clamp((observedTotal / totalSafe) * 0.62 + (calmFocusTotal / totalSafe) * 0.38, 0, 1);
-  const groundIndex = clamp((avoidableTotal / totalSafe) * 0.55 + (fertileTotal / totalSafe) * 0.45, 0, 1);
+  const stabilityIndex = clamp(
+    (observedTotal / totalSafe) * STABILITY_OBSERVED_WEIGHT + (calmFocusTotal / totalSafe) * STABILITY_CALM_FOCUS_WEIGHT,
+    0,
+    1
+  );
+  const groundIndex = clamp(
+    (avoidableTotal / totalSafe) * GROUND_AVOIDABLE_WEIGHT + (fertileTotal / totalSafe) * GROUND_FERTILE_WEIGHT,
+    0,
+    1
+  );
   const pressureMode = derivePressureMode(computedDegree, repetition);
 
   return {

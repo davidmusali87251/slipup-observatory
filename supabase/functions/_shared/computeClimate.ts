@@ -1,3 +1,52 @@
+import {
+  BASELINE,
+  SCALE,
+  MODEL_VERSION,
+  RECENCY_HALFLIFE_HOURS,
+  RESPONSE_AMPLITUDE,
+  NOTE_SIGNAL_CAP,
+  NOTE_SIGNAL_DIVISOR,
+  WARMUP_MASS_THRESHOLD,
+  PRESSURE_NORMALIZER_SQRT_COEF,
+  PRESSURE_NORMALIZER_OFFSET,
+  TANH_SENSITIVITY,
+  STABILIZE_DAMPING_MIN,
+  STABILIZE_DAMPING_MAX,
+  REPETITION_FIELD_MASS_DIVISOR,
+  REPETITION_NUDGE_FACTOR,
+  REPETITION_NUDGE_MAX,
+  REPETITION_DAMPING_MIN,
+  REPETITION_DAMPING_MAX,
+  SINGLE_MOMENT_DEGREE_DELTA,
+  DEGREE_BAND_STEADY,
+  DEGREE_BAND_BALANCE,
+  DEGREE_BAND_GATHERING,
+  PRESSURE_MODE_CONDENSING_DELTA,
+  PRESSURE_MODE_CLEARING_DELTA,
+  PATTERN_A_STRENGTH_BASE,
+  PATTERN_A_STRENGTH_RATE,
+  PATTERN_A_STRENGTH_MIN,
+  PATTERN_A_STRENGTH_MAX,
+  PATTERN_B_STRENGTH_BASE,
+  PATTERN_B_STRENGTH_RATE,
+  PATTERN_B_STRENGTH_MIN,
+  PATTERN_B_STRENGTH_MAX,
+  PATTERN_C_STRENGTH,
+  PATTERN_CLUSTER_WINDOW_HOURS,
+  PATTERN_CLUSTER_MIN_SIZE,
+  STABILITY_OBSERVED_WEIGHT,
+  STABILITY_CALM_FOCUS_WEIGHT,
+  GROUND_AVOIDABLE_WEIGHT,
+  GROUND_FERTILE_WEIGHT,
+  REFLECTIVE_SEMANTIC_STABILIZE_FACTOR,
+  INFLUENCE,
+  REFLECTIVE_TOKENS,
+  REACTIVE_TOKENS,
+  INFLUENCE_DEFAULT_STRENGTH,
+  chooseAlpha,
+} from "./modelConstants.ts";
+import type { InfluenceMode, InfluenceCell } from "./modelConstants.ts";
+
 export type MomentInput = {
   timestamp: string;
   type: "avoidable" | "fertile" | "observed" | string;
@@ -11,111 +60,8 @@ type Repetition = {
   strength: number;
 };
 
-type InfluenceMode = "condense" | "clear" | "stabilize";
-type InfluenceCell = { mode: InfluenceMode; strength: number };
-type InfluenceTable = Record<string, Record<string, InfluenceCell>>;
-
-const BASELINE = 28;
-const SCALE = 100;
-const MODEL_VERSION = "v2.2-global";
-const RECENCY_HALFLIFE_HOURS = 18;
-const RESPONSE_AMPLITUDE = 20;
-const NOTE_SIGNAL_CAP = 0.16;
-
-const INFLUENCE: InfluenceTable = {
-  avoidable: {
-    stressed: { mode: "condense", strength: 1.0 },
-    tired: { mode: "condense", strength: 0.8 },
-    curious: { mode: "condense", strength: 0.55 },
-    focus: { mode: "condense", strength: 0.5 },
-    calm: { mode: "condense", strength: 0.35 },
-  },
-  fertile: {
-    calm: { mode: "clear", strength: 0.7 },
-    focus: { mode: "clear", strength: 0.55 },
-    curious: { mode: "clear", strength: 0.45 },
-    tired: { mode: "clear", strength: 0.28 },
-    stressed: { mode: "clear", strength: 0.22 },
-  },
-  observed: {
-    calm: { mode: "stabilize", strength: 0.3 },
-    focus: { mode: "stabilize", strength: 0.22 },
-    curious: { mode: "stabilize", strength: 0.18 },
-    tired: { mode: "stabilize", strength: 0.14 },
-    stressed: { mode: "stabilize", strength: 0.16 },
-  },
-};
-
-const REFLECTIVE_TOKENS = [
-  "reflect",
-  "noticed",
-  "learn",
-  "learned",
-  "lesson",
-  "pause",
-  "adjust",
-  "again",
-  "next",
-  "aware",
-  "observe",
-  "chose",
-  "choice",
-  "calm",
-  "breathe",
-  "intent",
-  "reflex",
-  "aprend",
-  "leccion",
-  "pausa",
-  "ajust",
-  "proxima",
-  "siguiente",
-  "consciente",
-  "observo",
-  "elegi",
-  "eleccion",
-  "calma",
-  "respir",
-  "intencion",
-];
-
-const REACTIVE_TOKENS = [
-  "rush",
-  "late",
-  "panic",
-  "angry",
-  "stuck",
-  "again!",
-  "always",
-  "never",
-  "chaos",
-  "overwhelm",
-  "noise",
-  "blame",
-  "fight",
-  "explode",
-  "prisa",
-  "tarde",
-  "panico",
-  "enoj",
-  "atasc",
-  "siempre",
-  "nunca",
-  "caos",
-  "ruido",
-  "culpa",
-  "pelea",
-  "explot",
-];
-
 function clamp(n: number, min: number, max: number) {
   return Math.min(max, Math.max(min, n));
-}
-
-function chooseAlpha(mass: number) {
-  if (mass < 4) return 0.12;
-  if (mass < 14) return 0.17;
-  return 0.2;
 }
 
 function recencyMass(ageHours: number) {
@@ -130,7 +76,7 @@ function signedPressure(mode: InfluenceMode, strength: number) {
 
 function getInfluenceCell(type: string, mood: string): InfluenceCell {
   const row = INFLUENCE[type] ?? {};
-  return row[mood] ?? { mode: "stabilize", strength: 0.12 };
+  return row[mood] ?? { mode: "stabilize", strength: INFLUENCE_DEFAULT_STRENGTH };
 }
 
 function noteSignal(note: string) {
@@ -150,8 +96,8 @@ function noteSignal(note: string) {
     if (text.includes(token)) reactive += 1;
   });
 
-  const reflectiveNorm = Math.min(reflective / 2.5, NOTE_SIGNAL_CAP);
-  const reactiveNorm = Math.min(reactive / 2.5, NOTE_SIGNAL_CAP);
+  const reflectiveNorm = Math.min(reflective / NOTE_SIGNAL_DIVISOR, NOTE_SIGNAL_CAP);
+  const reactiveNorm = Math.min(reactive / NOTE_SIGNAL_DIVISOR, NOTE_SIGNAL_CAP);
   return { reflective: reflectiveNorm, reactive: reactiveNorm };
 }
 
@@ -185,8 +131,8 @@ function dominantCombination(moments: MomentInput[]) {
 function derivePressureMode(computedDegree: number, repetition: Repetition) {
   const delta = computedDegree - BASELINE;
   if (repetition?.hasPattern && repetition?.tag === "pattern_a") return "condensing";
-  if (delta >= 4.5) return "condensing";
-  if (delta <= -3.5) return "clearing";
+  if (delta >= PRESSURE_MODE_CONDENSING_DELTA) return "condensing";
+  if (delta <= PRESSURE_MODE_CLEARING_DELTA) return "clearing";
   return "stabilizing";
 }
 
@@ -205,30 +151,38 @@ function detectStructuralPattern(entries: MomentInput[]): Repetition {
   });
 
   if (avoidableStressedCount >= 2) {
-    const strength = clamp(0.25 + (avoidableStressedCount - 2) * 0.1, 0.25, 0.6);
+    const strength = clamp(
+      PATTERN_A_STRENGTH_BASE + (avoidableStressedCount - 2) * PATTERN_A_STRENGTH_RATE,
+      PATTERN_A_STRENGTH_MIN,
+      PATTERN_A_STRENGTH_MAX
+    );
     return { hasPattern: true, tag: "pattern_a", strength };
   }
 
   const repeatedAvoidableMood = Array.from(avoidableByMood.values()).some((count) => count >= 3);
   if (repeatedAvoidableMood) {
     const maxRepeat = Math.max(...avoidableByMood.values());
-    const strength = clamp(0.22 + (maxRepeat - 3) * 0.08, 0.22, 0.55);
+    const strength = clamp(
+      PATTERN_B_STRENGTH_BASE + (maxRepeat - 3) * PATTERN_B_STRENGTH_RATE,
+      PATTERN_B_STRENGTH_MIN,
+      PATTERN_B_STRENGTH_MAX
+    );
     return { hasPattern: true, tag: "pattern_b", strength };
   }
 
-  const threeHoursMs = 3 * 60 * 60 * 1000;
+  const clusterWindowMs = PATTERN_CLUSTER_WINDOW_HOURS * 60 * 60 * 1000;
   let left = 0;
   for (let right = 0; right < sorted.length; right += 1) {
     const rightTs = new Date(sorted[right].timestamp).getTime();
-    while (left <= right && rightTs - new Date(sorted[left].timestamp).getTime() > threeHoursMs) {
+    while (left <= right && rightTs - new Date(sorted[left].timestamp).getTime() > clusterWindowMs) {
       left += 1;
     }
     const clusterSize = right - left + 1;
-    if (clusterSize < 3) continue;
+    if (clusterSize < PATTERN_CLUSTER_MIN_SIZE) continue;
     const clusterSlice = sorted.slice(left, right + 1);
     const avoidableInCluster = clusterSlice.filter((item) => item.type === "avoidable").length;
     if (avoidableInCluster > clusterSize / 2) {
-      return { hasPattern: true, tag: "pattern_c", strength: 0.28 };
+      return { hasPattern: true, tag: "pattern_c", strength: PATTERN_C_STRENGTH };
     }
   }
 
@@ -237,9 +191,9 @@ function detectStructuralPattern(entries: MomentInput[]): Repetition {
 
 export function conditionForDegree(value: number, total: number) {
   if (total < 3) return "Shared moments are still gathering.";
-  if (value < 38) return "Shared movement keeps a quiet line.";
-  if (value < 60) return "The shared field leans toward balance.";
-  if (value < 74) return "The shared field is becoming denser.";
+  if (value < DEGREE_BAND_STEADY) return "Shared movement keeps a quiet line.";
+  if (value < DEGREE_BAND_BALANCE) return "The shared field leans toward balance.";
+  if (value < DEGREE_BAND_GATHERING) return "The shared field is becoming denser.";
   return "A compact shared front is taking shape.";
 }
 
@@ -278,32 +232,37 @@ export function computeClimate(
     const influence = getInfluenceCell(m.type, m.mood);
     const signal = noteSignal(m.note || "");
     const semanticPressure = signal.reactive - signal.reflective;
-    const semanticStabilize = signal.reflective * 0.75;
+    const semanticStabilize = signal.reflective * REFLECTIVE_SEMANTIC_STABILIZE_FACTOR;
     fieldMass += mass;
     atmosphericPressure += (signedPressure(influence.mode, influence.strength) + semanticPressure) * mass;
     if (influence.mode === "stabilize") stabilizeMass += influence.strength * mass;
     stabilizeMass += semanticStabilize * mass;
   });
 
-  const warmupFactor = Math.min(1, fieldMass / 6);
-  const pressureNormalizer = 2 * Math.sqrt(fieldMass) + 80;
+  const warmupFactor = Math.min(1, fieldMass / WARMUP_MASS_THRESHOLD);
+  const pressureNormalizer = PRESSURE_NORMALIZER_SQRT_COEF * Math.sqrt(fieldMass) + PRESSURE_NORMALIZER_OFFSET;
   const normalizedPressure = atmosphericPressure / pressureNormalizer;
-  const stabilizeDamping = clamp(1 - stabilizeMass / (fieldMass + 1), 0.65, 1);
-  const targetDelta = RESPONSE_AMPLITUDE * Math.tanh(normalizedPressure * 2.2) * stabilizeDamping;
+  const stabilizeDamping = clamp(1 - stabilizeMass / (fieldMass + 1), STABILIZE_DAMPING_MIN, STABILIZE_DAMPING_MAX);
+  const targetDelta = RESPONSE_AMPLITUDE * Math.tanh(normalizedPressure * TANH_SENSITIVITY) * stabilizeDamping;
   const target = clamp(BASELINE + targetDelta * warmupFactor, 0, SCALE);
   const alpha = chooseAlpha(fieldMass);
 
   const warmBase = BASELINE + alpha * (target - BASELINE);
-  const repetitionDamping = clamp(1 / Math.sqrt(1 + fieldMass / 28), 0.18, 1);
-  const repetitionNudge = clamp(repetition.strength * 2.4 * repetitionDamping, 0, 1.4);
+  const repetitionDamping = clamp(
+    1 / Math.sqrt(1 + fieldMass / REPETITION_FIELD_MASS_DIVISOR),
+    REPETITION_DAMPING_MIN,
+    REPETITION_DAMPING_MAX
+  );
+  const repetitionNudge = clamp(repetition.strength * REPETITION_NUDGE_FACTOR * repetitionDamping, 0, REPETITION_NUDGE_MAX);
   let computedDegree = clamp(warmBase + repetitionNudge, 0, SCALE);
-  if (total === 1) computedDegree = Math.min(computedDegree, BASELINE + 5);
+  if (total === 1) computedDegree = Math.min(computedDegree, BASELINE + SINGLE_MOMENT_DEGREE_DELTA);
   const counts = compositionCounts(windowed);
-  const observedRatio = counts.byType.observed / Math.max(1, total);
-  const calmFocusRatio = (counts.byMood.calm + counts.byMood.focus) / Math.max(1, total);
-  const stabilityIndex = clamp(observedRatio * 0.62 + calmFocusRatio * 0.38, 0, 1);
+  const totalSafe = Math.max(1, total);
+  const observedRatio = counts.byType.observed / totalSafe;
+  const calmFocusRatio = (counts.byMood.calm + counts.byMood.focus) / totalSafe;
+  const stabilityIndex = clamp(observedRatio * STABILITY_OBSERVED_WEIGHT + calmFocusRatio * STABILITY_CALM_FOCUS_WEIGHT, 0, 1);
   const groundIndex = clamp(
-    (counts.byType.avoidable / Math.max(1, total)) * 0.55 + (counts.byType.fertile / Math.max(1, total)) * 0.45,
+    (counts.byType.avoidable / totalSafe) * GROUND_AVOIDABLE_WEIGHT + (counts.byType.fertile / totalSafe) * GROUND_FERTILE_WEIGHT,
     0,
     1
   );

@@ -642,10 +642,10 @@ h2 {
 
 .climate-instrument {
   margin-top: 0.75rem;
-  padding: 0.75rem 0.95rem 0.85rem;
+  padding: 0.75rem 1.6rem 0.85rem 0.95rem;
   border-radius: 10px;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   /* Panel ventana: solo paleta observatorio/atmósfera */
   background:
     linear-gradient(
@@ -717,15 +717,20 @@ h2 {
   max-width: 100%;
 }
 
+/* Botón info: pequeño, en esquina del instrumento para no romper el flujo */
 .instrument-info-btn {
-  flex-shrink: 0;
-  width: 1.25rem;
-  height: 1.25rem;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 1rem;
+  height: 1rem;
+  min-width: 1rem;
+  min-height: 1rem;
   border-radius: 50%;
-  border: 1px solid color-mix(in oklab, var(--muted) 60%, transparent);
-  background: color-mix(in oklab, var(--bg) 90%, var(--line));
+  border: 1px solid color-mix(in oklab, var(--muted) 50%, transparent);
+  background: color-mix(in oklab, var(--bg) 92%, var(--line));
   color: var(--muted);
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   font-weight: 600;
   line-height: 1;
   padding: 0;
@@ -733,8 +738,9 @@ h2 {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  opacity: 0.85;
+  opacity: 0.7;
   transition: opacity 0.15s ease, border-color 0.15s ease;
+  flex-shrink: 0;
 }
 
 .instrument-info-btn:hover {
@@ -749,11 +755,13 @@ h2 {
 
 @media (max-width: 480px) {
   .instrument-info-btn {
-    min-width: 2.75rem;
-    min-height: 2.75rem;
-    width: 2.75rem;
-    height: 2.75rem;
-    font-size: 0.8rem;
+    width: 1.15rem;
+    height: 1.15rem;
+    min-width: 1.15rem;
+    min-height: 1.15rem;
+    top: 0.4rem;
+    right: 0.4rem;
+    font-size: 0.58rem;
   }
 }
 
@@ -1992,10 +2000,12 @@ h2 {
   }
 
   .instrument-info-btn {
-    min-width: 2.5rem;
-    min-height: 2.5rem;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 1rem;
+    height: 1rem;
+    min-width: 1rem;
+    min-height: 1rem;
+    top: 0.35rem;
+    right: 0.35rem;
   }
 
   .panel {
