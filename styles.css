@@ -1920,6 +1920,8 @@ h2 {
 .moment-item,
 #recentMoments .moment-item,
 .shared-sheet-list .moment-item,
+.panel-recent,
+.panel-recent .recent-context,
 .panel-horizon .horizon-primary,
 .panel-horizon .horizon-secondary,
 .panel-horizon .horizon-pulse-line,

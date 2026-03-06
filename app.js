@@ -494,12 +494,12 @@ const UI_COPY = {
       pressureCondensing: "condensing",
       pressureClearing: "clearing",
       pressureStable: "stable",
-      pressureLabel: "tendency",
-      pressureUnit: "hPa",
-      stability: "balance",
+      pressureLabel: "direction",
+      pressureUnit: "",
+      stability: "stability",
       stabilityUnit: "%",
-      density: "concentration",
-      densityUnit: "kg/m³",
+      density: "density",
+      densityUnit: "",
       sharedUnit: "shared",
       sharedCount: (n) => `${n} shared`,
     },
@@ -554,12 +554,12 @@ const UI_COPY = {
       pressureCondensing: "condensando",
       pressureClearing: "abriendo",
       pressureStable: "estable",
-      pressureLabel: "tendencia",
-      pressureUnit: "hPa",
-      stability: "equilibrio",
+      pressureLabel: "dirección",
+      pressureUnit: "",
+      stability: "estabilidad",
       stabilityUnit: "%",
-      density: "concentración",
-      densityUnit: "kg/m³",
+      density: "densidad",
+      densityUnit: "",
       sharedUnit: "compartidos",
       sharedCount: (n) => `${n} compartidos`,
     },
@@ -1021,20 +1021,21 @@ function buildMetricsLineParts(state, total, lang = "en") {
   const pressureMode = state?.pressureMode || "";
   const stabilityIndex = state?.stabilityIndex;
   const pressureHpa = total > 0 ? instrumentToPressureHpa(pressureMode) : null;
-  const pressureLabel = m.pressureLabel || "pressure";
-  const pressureUnit = m.pressureUnit || "hPa";
+  const pressureLabel = m.pressureLabel || "direction";
+  const pressureUnit = m.pressureUnit ?? "";
   const stabilityPct = instrumentToStabilityPercent(stabilityIndex);
   const densitySignalPct = instrumentToDensitySignalPct(total, getDensitySignalRef(total));
   const densityKgM3 = instrumentToDensityKgM3(densitySignalPct);
   const densityFormatted = densityKgM3.toFixed(2).replace(".", lang === "es" ? "," : ".");
   const densLabel = m.density || "density";
-  const densUnit = m.densityUnit || "kg/m³";
+  const densUnit = m.densityUnit ?? "";
   const parts = [];
   const showTendency = total >= OBSERVABILITY_MIN.tendency && pressureHpa != null;
   const showBalance = total >= OBSERVABILITY_MIN.balance && stabilityPct != null;
   const showConcentration = total >= OBSERVABILITY_MIN.concentration;
   if (showTendency) {
-    parts.push({ type: "pressure", html: `<span class="metric metric-pressure"><span class="metric-label">${pressureLabel}</span> <span class="metric-value">${pressureHpa} ${pressureUnit}</span></span>` });
+    const pressureVal = pressureUnit ? `${pressureHpa} ${pressureUnit}` : String(pressureHpa);
+    parts.push({ type: "pressure", html: `<span class="metric metric-pressure"><span class="metric-label">${pressureLabel}</span> <span class="metric-value">${pressureVal}</span></span>` });
   }
   if (showBalance) {
     const stabLabel = m.stability || "stability";
@@ -1042,7 +1043,8 @@ function buildMetricsLineParts(state, total, lang = "en") {
     parts.push({ type: "stability", html: `<span class="metric metric-stability"><span class="metric-label">${stabLabel}</span> <span class="metric-value">${stabilityPct}${stabUnit}</span></span>` });
   }
   if (showConcentration && total > 0) {
-    parts.push({ type: "density", html: `<span class="metric metric-density"><span class="metric-label">${densLabel}</span> <span class="metric-value">${densityFormatted} ${densUnit}</span></span>` });
+    const densityVal = densUnit ? `${densityFormatted} ${densUnit}` : densityFormatted;
+    parts.push({ type: "density", html: `<span class="metric metric-density"><span class="metric-label">${densLabel}</span> <span class="metric-value">${densityVal}</span></span>` });
   }
   return parts;
 }
@@ -1919,7 +1921,10 @@ function capitalizeForDisplay(str) {
 function capitalizeNoteForDisplay(str) {
   const s = String(str).trim();
   if (!s) return s;
-  return s.charAt(0).toUpperCase() + s.slice(1);
+  return s
+    .split(/\s+/)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
 }
 
 function renderMomentItems(targetElement, items) {
