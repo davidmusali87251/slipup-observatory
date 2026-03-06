@@ -2,6 +2,7 @@
 const USE_REMOTE_SHARED = false;
 const REMOTE_MOMENTS_URL = "https://YOUR_PROJECT_REF.supabase.co/functions/v1/moments";
 const REMOTE_CLIMATE_URL = "https://YOUR_PROJECT_REF.supabase.co/functions/v1/climate";
+const REMOTE_RELATE_URL = REMOTE_MOMENTS_URL ? REMOTE_MOMENTS_URL.replace(/\/moments\/?$/, "/relate") : "";
 const REMOTE_ANON_KEY = "";
 
 const REMOTE_TIMEOUT_MS = 4500;

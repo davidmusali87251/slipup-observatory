@@ -2,6 +2,7 @@
 const USE_REMOTE_SHARED = false;
 const REMOTE_MOMENTS_URL = "https://YOUR_PROJECT_REF.supabase.co/functions/v1/moments";
 const REMOTE_CLIMATE_URL = "https://YOUR_PROJECT_REF.supabase.co/functions/v1/climate";
+const REMOTE_RELATE_URL = REMOTE_MOMENTS_URL ? REMOTE_MOMENTS_URL.replace(/\/moments\/?$/, "/relate") : "";
 const REMOTE_ANON_KEY = "";
 
 const REMOTE_TIMEOUT_MS = 4500;
@@ -128,6 +129,7 @@ function sanitizeMoment(raw) {
   const type = ALLOWED_TYPES.has(raw?.type) ? raw.type : "observed";
   const mood = ALLOWED_MOODS.has(raw?.mood) ? raw.mood : "calm";
   const timestamp = raw?.timestamp ? new Date(raw.timestamp).toISOString() : new Date().toISOString();
+  const relateCount = typeof raw?.relate_count === "number" && raw.relate_count >= 0 ? raw.relate_count : 0;
   return {
     id: raw?.id || crypto.randomUUID(),
     timestamp,
@@ -139,6 +141,7 @@ function sanitizeMoment(raw) {
     shared: Boolean(raw?.shared),
     hidden: Boolean(raw?.hidden),
     geo_bucket: typeof raw?.geo_bucket === "string" ? raw.geo_bucket.trim().slice(0, 64) : null,
+    relate_count: relateCount,
   };
 }
 
@@ -236,6 +239,32 @@ async function postMomentRemote(inputMoment) {
   }
 }
 
+async function postRelateMoment(momentId) {
+  if (!isRemoteReady() || !REMOTE_RELATE_URL) {
+    return { ok: false, count: 0, status: 0 };
+  }
+  const scoped = withTimeout(undefined, REMOTE_TIMEOUT_MS);
+  try {
+    const response = await fetch(REMOTE_RELATE_URL, {
+      method: "POST",
+      headers: buildHeaders(),
+      body: JSON.stringify({ moment_id: momentId }),
+      signal: scoped.signal,
+      cache: "no-store",
+    });
+    const data = await safeJson(response);
+    if (!response.ok) {
+      return { ok: false, count: 0, status: response.status, data };
+    }
+    const count = typeof data?.count === "number" ? data.count : 0;
+    return { ok: true, count, status: response.status };
+  } catch {
+    return { ok: false, count: 0, status: 0 };
+  } finally {
+    scoped.clear();
+  }
+}
+
 async function fetchClimateRemote(windowHours = 48, referenceTime = "", scope = "global", geo = "") {
   if (!isRemoteReady() || !REMOTE_CLIMATE_URL) {
     throw new Error("REMOTE_CLIMATE_NOT_READY");
@@ -327,6 +356,7 @@ export {
   isRemoteReady,
   fetchSharedMomentsRemote,
   postMomentRemote,
+  postRelateMoment,
   fetchClimateRemote,
   fetchGeoIndexRemote,
 };

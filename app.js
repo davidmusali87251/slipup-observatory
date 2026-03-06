@@ -3,6 +3,7 @@ import {
   fetchGeoIndexRemote,
   fetchSharedMomentsRemote,
   isRemoteReady,
+  postRelateMoment,
 } from "./remote.js";
 import {
   BASELINE,
@@ -50,6 +51,7 @@ const RENDER_LIMIT = 6;
 const COMPUTED_DEGREE_KEY = "slipup_v2_computed_degree";
 const DISPLAY_DEGREE_KEY = "slipup_v2_display_degree";
 const FIELD_SCOPE_KEY = "slipup_v2_field_scope";
+const RELATE_STORAGE_KEY = "slipup_v2_relate";
 
 // Tone selector for key narrative lines:
 // Modo de copy: clear | poetic | narrative (narrative usa LANG: en | es)
@@ -539,8 +541,13 @@ const UI_COPY = {
     viewMore: "View more",
     close: "Close",
     sheetEmpty: "No shared moments yet.",
+    momentRelateLabel: "Not alone",
+    momentRelateLabelYou: "Not alone · you",
+    momentRelateAria: "Mark that this resonates with you too",
     sheetCount: (n) => (n === 1 ? "Showing 1 moment." : `Showing ${n} moments.`),
     loading: "Loading…",
+    localFieldMomentsLabel: "In this field",
+    localFieldMomentsEmpty: "No shared moments in this scope yet.",
     metrics: {
       pressureCondensing: "condensing",
       pressureClearing: "clearing",
@@ -599,6 +606,11 @@ const UI_COPY = {
     viewMore: "Ver más",
     close: "Cerrar",
     sheetEmpty: "Aún no hay momentos compartidos.",
+    localFieldMomentsLabel: "En este campo",
+    localFieldMomentsEmpty: "Aún no hay momentos compartidos en este ámbito.",
+    momentRelateLabel: "No estás solo",
+    momentRelateLabelYou: "No estás solo · tú",
+    momentRelateAria: "Señalar que esto también resuena contigo",
     sheetCount: (n) => (n === 1 ? "Se muestra 1 momento." : `Se muestran ${n} momentos.`),
     loading: "Cargando…",
     metrics: {
@@ -650,12 +662,6 @@ function applyUICopy() {
   const instrumentInfoBtn = document.getElementById("instrumentInfoBtn");
   if (instrumentInfoBtn) {
     instrumentInfoBtn.setAttribute("aria-label", LANG === "es" ? "Información sobre estos valores" : "About these values");
-    instrumentInfoBtn.onclick = () => {
-      const textEl = document.getElementById("instrumentInfoText");
-      if (!textEl) return;
-      textEl.classList.toggle("hidden");
-      instrumentInfoBtn.setAttribute("aria-expanded", String(!textEl.classList.contains("hidden")));
-    };
   }
 }
 // FUTURE: Keep scaffold switches explicit for non-active UI lines.
@@ -980,6 +986,8 @@ const localClimateMetricsLine = document.getElementById("localClimateMetricsLine
 const localClimatePrimary = document.getElementById("localClimatePrimary");
 const localClimateSecondary = document.getElementById("localClimateSecondary");
 const localClimateEcho = document.getElementById("localClimateEcho");
+const localClimateMomentsLabel = document.getElementById("localClimateMomentsLabel");
+const localClimateMoments = document.getElementById("localClimateMoments");
 const groundStrata = document.getElementById("ground-strata");
 const strataLines = document.getElementById("strataLines");
 const strataMetricsLine = document.getElementById("strataMetricsLine");
@@ -1680,6 +1688,26 @@ function setStoredDisplayDegree(value) {
   localStorage.setItem(DISPLAY_DEGREE_KEY, String(value));
 }
 
+function getRelateState(momentId) {
+  try {
+    const raw = localStorage.getItem(RELATE_STORAGE_KEY);
+    const obj = raw ? JSON.parse(raw) : {};
+    return Boolean(obj[momentId]);
+  } catch {
+    return false;
+  }
+}
+
+function setRelateState(momentId, value) {
+  try {
+    const raw = localStorage.getItem(RELATE_STORAGE_KEY) || "{}";
+    const obj = raw ? JSON.parse(raw) : {};
+    if (value) obj[momentId] = true;
+    else delete obj[momentId];
+    localStorage.setItem(RELATE_STORAGE_KEY, JSON.stringify(obj));
+  } catch (_) {}
+}
+
 function formatDegree(value) {
   const n = Number(value);
   if (!Number.isFinite(n)) return String(BASELINE);
@@ -1987,7 +2015,45 @@ function createMomentItemElement(m) {
   });
   const regionLabel = formatGeoForDisplay(m.geo_bucket);
   const meta = regionLabel ? `${timeStr} · ${regionLabel}` : timeStr;
+  const momentId = m.id || `${m.timestamp || ""}-${(m.note || "").slice(0, 10)}`;
   li.innerHTML = `<span>${escapeHtml(left)}</span><span class="moment-meta">${escapeHtml(meta)}</span>`;
+
+  const ui = UI_COPY[LANG] || UI_COPY.en;
+  const baseLabel = ui.momentRelateLabel || "Not alone";
+  const relateBtn = document.createElement("button");
+  relateBtn.type = "button";
+  relateBtn.className = "moment-relate-btn";
+  relateBtn.setAttribute("aria-label", ui.momentRelateAria || "Mark that this resonates with you too");
+  relateBtn.dataset.relateCount = String(typeof m.relate_count === "number" ? m.relate_count : 0);
+
+  function updateRelateLabel() {
+    const count = parseInt(relateBtn.dataset.relateCount, 10) || 0;
+    const you = getRelateState(momentId);
+    let text = baseLabel;
+    if (count > 0) text += ` · ${count}`;
+    if (you) text += LANG === "es" ? " · tú" : " · you";
+    relateBtn.textContent = text;
+    relateBtn.classList.toggle("is-active", you);
+  }
+
+  updateRelateLabel();
+  relateBtn.addEventListener("click", async () => {
+    if (getRelateState(momentId)) return;
+    if (m.id && isRemoteReady()) {
+      relateBtn.disabled = true;
+      const res = await postRelateMoment(m.id);
+      relateBtn.disabled = false;
+      if (res.ok && typeof res.count === "number") {
+        relateBtn.dataset.relateCount = String(res.count);
+      }
+    } else {
+      const prev = parseInt(relateBtn.dataset.relateCount, 10) || 0;
+      relateBtn.dataset.relateCount = String(prev + 1);
+    }
+    setRelateState(momentId, true);
+    updateRelateLabel();
+  });
+  li.appendChild(relateBtn);
   return li;
 }
 
@@ -2222,7 +2288,47 @@ function renderHorizon(canonicalState, sharedMoments, pipeline = null) {
   };
 }
 
-function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby", pipeline = null, fieldScope = null) {
+const LOCAL_FIELD_MOMENTS_LIMIT = 6;
+
+function filterMomentsByScope(sharedMoments, fieldScope) {
+  if (!Array.isArray(sharedMoments) || !fieldScope?.geo) return [];
+  const geo = String(fieldScope.geo).toLowerCase().trim();
+  if (!geo) return [];
+  return sharedMoments.filter((m) => {
+    const bucket = (m.geo_bucket || "").toLowerCase().trim();
+    if (!bucket) return false;
+    return bucket === geo || bucket.startsWith(geo + ".");
+  });
+}
+
+function renderRegionalMomentsList(sharedMoments, fieldScope) {
+  if (!localClimateMoments) return;
+  const ui = UI_COPY[LANG] || UI_COPY.en;
+  const hasScope = fieldScope?.geo && fieldScope.scope !== "global";
+  if (localClimateMomentsLabel) {
+    localClimateMomentsLabel.textContent = ui.localFieldMomentsLabel || "In this field";
+    localClimateMomentsLabel.classList.toggle("visually-hidden", !hasScope);
+  }
+  localClimateMoments.classList.toggle("hidden", !hasScope);
+  if (!hasScope) {
+    localClimateMoments.innerHTML = "";
+    return;
+  }
+  const list = filterMomentsByScope(sharedMoments || [], fieldScope).slice(0, LOCAL_FIELD_MOMENTS_LIMIT);
+  localClimateMoments.innerHTML = "";
+  localClimateMoments.classList.remove("hidden");
+  if (list.length === 0) {
+    const li = document.createElement("li");
+    li.className = "moment-item";
+    li.textContent = ui.localFieldMomentsEmpty || "No shared moments in this scope yet.";
+    localClimateMoments.appendChild(li);
+    return;
+  }
+  list.forEach((m) => localClimateMoments.appendChild(createMomentItemElement(m)));
+}
+
+function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby", pipeline = null, fieldScope = null, sharedMoments = null) {
+  renderRegionalMomentsList(sharedMoments || [], fieldScope);
   const pressureMode = localState?.pressureMode || "stabilizing";
   const seed = Math.round((localState?.computedDegree || BASELINE) * 10) + (localState?.total || 0);
   const pressureText = pickRegionalLocalCopy(
@@ -2680,7 +2786,8 @@ async function boot() {
         canonicalState,
         activeFieldScope.label || "Nearby",
         pipeline,
-        activeFieldScope
+        activeFieldScope,
+        sharedMoments
       );
     })
     .catch(() => {
@@ -2828,7 +2935,8 @@ async function boot() {
     canonicalState,
     activeFieldScope.label || "Nearby",
     observatoryPipeline,
-    activeFieldScope
+    activeFieldScope,
+    sharedMoments
   );
   renderStrata(moments, canonicalState);
   initSilentDescentTransitions();
@@ -2839,6 +2947,15 @@ async function boot() {
   viewMoreButton.onclick = () => openSharedSheet(sharedMoments);
   sheetBackdrop.onclick = closeSharedSheet;
   sharedSheetCloseButton.onclick = closeSharedSheet;
+
+  const instrumentInfoBtn = document.getElementById("instrumentInfoBtn");
+  const instrumentInfoTextEl = document.getElementById("instrumentInfoText");
+  if (instrumentInfoBtn && instrumentInfoTextEl) {
+    instrumentInfoBtn.addEventListener("click", () => {
+      instrumentInfoTextEl.classList.toggle("hidden");
+      instrumentInfoBtn.setAttribute("aria-expanded", String(!instrumentInfoTextEl.classList.contains("hidden")));
+    });
+  }
 
   if (fieldScopeSelect) {
     let requestToken = 0;
@@ -2866,7 +2983,8 @@ async function boot() {
           canonicalState,
           activeFieldScope.label || "Nearby",
           observatoryPipeline,
-          activeFieldScope
+          activeFieldScope,
+          sharedMoments
         );
       } finally {
         fieldScopeSelect.disabled = false;

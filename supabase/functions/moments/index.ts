@@ -336,8 +336,26 @@ Deno.serve(async (req) => {
     const { data, error } = await query;
     if (error) return json(origin, 500, { error: "db_error" });
 
+    const rows = (data ?? []) as Array<{ id?: string; [k: string]: unknown }>;
+    const ids = rows.map((r) => r?.id).filter(Boolean) as string[];
+    let relateCounts: Record<string, number> = {};
+    if (ids.length > 0) {
+      const { data: relateRows } = await supabase
+        .from("moment_relates")
+        .select("moment_id")
+        .in("moment_id", ids);
+      const arr = (relateRows ?? []) as Array<{ moment_id: string }>;
+      arr.forEach((r) => {
+        relateCounts[r.moment_id] = (relateCounts[r.moment_id] ?? 0) + 1;
+      });
+    }
+    const moments = rows.map((r) => ({
+      ...r,
+      relate_count: relateCounts[r.id ?? ""] ?? 0,
+    }));
+
     return json(origin, 200, {
-      moments: data ?? [],
+      moments,
       scope,
       windowHours,
       limit,
