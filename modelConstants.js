@@ -115,3 +115,73 @@ export function chooseAlpha(mass) {
   if (mass < ALPHA_TIER2_MASS) return ALPHA_TIER2;
   return ALPHA_TIER3;
 }
+
+/* ----- Note analysis (Intention): same logic as backend, single source with REFLECTIVE/REACTIVE tokens ----- */
+
+export function normalizeNoteText(text) {
+  return String(text || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+}
+
+function wordMatchesAnyToken(word, tokens) {
+  return tokens.some((token) => word.includes(token));
+}
+
+function matchedTokens(text, tokens) {
+  const out = [];
+  tokens.forEach((token) => {
+    if (text.includes(token)) out.push(token);
+  });
+  return out;
+}
+
+function unmatchedWords(normalizedText, reflectiveTokens, reactiveTokens) {
+  if (!normalizedText) return [];
+  const words = normalizedText.split(/\s+/).filter((w) => w.length > 0);
+  const seen = new Set();
+  return words.filter((word) => {
+    if (seen.has(word)) return false;
+    const matchesReflective = wordMatchesAnyToken(word, reflectiveTokens);
+    const matchesReactive = wordMatchesAnyToken(word, reactiveTokens);
+    if (matchesReflective || matchesReactive) return false;
+    seen.add(word);
+    return true;
+  });
+}
+
+export function getNoteSignalBreakdown(note) {
+  const text = normalizeNoteText(note);
+  if (!text) {
+    return {
+      normalizedText: "",
+      reflective: 0,
+      reactive: 0,
+      matchedReflective: [],
+      matchedReactive: [],
+      unmatchedWords: [],
+    };
+  }
+  const matchedReflective = matchedTokens(text, REFLECTIVE_TOKENS);
+  const matchedReactive = matchedTokens(text, REACTIVE_TOKENS);
+  const reflectiveCount = matchedReflective.length;
+  const reactiveCount = matchedReactive.length;
+  const reflective = Math.min(reflectiveCount / NOTE_SIGNAL_DIVISOR, NOTE_SIGNAL_CAP);
+  const reactive = Math.min(reactiveCount / NOTE_SIGNAL_DIVISOR, NOTE_SIGNAL_CAP);
+  const unmatched = unmatchedWords(text, REFLECTIVE_TOKENS, REACTIVE_TOKENS);
+  return {
+    normalizedText: text,
+    reflective,
+    reactive,
+    matchedReflective,
+    matchedReactive,
+    unmatchedWords: unmatched,
+  };
+}
+
+export function noteSignal(note) {
+  const b = getNoteSignalBreakdown(note);
+  return { reflective: b.reflective, reactive: b.reactive };
+}

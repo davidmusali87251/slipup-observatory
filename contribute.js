@@ -1,5 +1,5 @@
 import { postMomentRemote } from "./remote.js";
-import { getNoteSignalBreakdown } from "./noteAnalysis.js";
+import { getNoteSignalBreakdown } from "./modelConstants.js";
 
 const STORAGE_KEY = "slipup_v2_moments";
 

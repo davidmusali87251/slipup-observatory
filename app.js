@@ -42,8 +42,8 @@ import {
   INFLUENCE_DEFAULT_STRENGTH,
   chooseAlpha,
   REFLECTIVE_SEMANTIC_STABILIZE_FACTOR,
+  noteSignal,
 } from "./modelConstants.js";
-import { noteSignal } from "./noteAnalysis.js";
 
 const STORAGE_KEY = "slipup_v2_moments";
 const RENDER_LIMIT = 6;
