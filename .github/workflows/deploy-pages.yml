@@ -77,11 +77,14 @@ jobs:
             echo "Skipping smoke test (secrets not set)."
             exit 0
           fi
+          # Trim whitespace/newlines that can break curl URL
+          REMOTE_CLIMATE_URL="$(printf '%s' "$REMOTE_CLIMATE_URL" | tr -d '\r\n' | sed 's/[[:space:]]*$//;s/^[[:space:]]*//')"
+          REMOTE_ANON_KEY="$(printf '%s' "$REMOTE_ANON_KEY" | tr -d '\r\n' | sed 's/[[:space:]]*$//;s/^[[:space:]]*//')"
           STATUS=$(curl -sS -o /dev/null -w "%{http_code}" \
             -H "Content-Type: application/json" \
             -H "apikey: $REMOTE_ANON_KEY" \
             -H "Authorization: Bearer $REMOTE_ANON_KEY" \
-            "$REMOTE_CLIMATE_URL?windowHours=48")
+            "${REMOTE_CLIMATE_URL}?windowHours=48")
           if [ "$STATUS" != "200" ]; then
             echo "::warning::Smoke test: climate GET returned $STATUS (expected 200). Check backend and CORS."
           fi
