@@ -1,4 +1,5 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { REFLECTIVE_TOKENS, REACTIVE_TOKENS, NOTE_SIGNAL_CAP, NOTE_SIGNAL_DIVISOR } from "../_shared/modelConstants.ts";
 
 const DEFAULT_LIMIT = 10;
 const MAX_LIMIT = 100;
@@ -6,7 +7,6 @@ const DEFAULT_WINDOW_HOURS = 48;
 const MAX_WINDOW_HOURS = 168;
 const MAX_NOTE_LENGTH = 19;
 const MAX_GEO_BUCKET_LENGTH = 64;
-const NOTE_SIGNAL_CAP = 0.16;
 const BUCKET_MINUTES = 5;
 const GEO_INDEX_MAX = parseInt(Deno.env.get("MOMENTS_GEO_INDEX_MAX") ?? "4000", 10);
 
@@ -22,66 +22,6 @@ const ALLOWED_ORIGINS = (Deno.env.get("ALLOWED_ORIGINS") ?? "*")
 
 const ALLOWED_TYPES = new Set(["avoidable", "fertile", "observed"]);
 const ALLOWED_MOODS = new Set(["calm", "focus", "stressed", "curious", "tired"]);
-const REFLECTIVE_TOKENS = [
-  "reflect",
-  "noticed",
-  "learn",
-  "learned",
-  "lesson",
-  "pause",
-  "adjust",
-  "again",
-  "next",
-  "aware",
-  "observe",
-  "chose",
-  "choice",
-  "calm",
-  "breathe",
-  "intent",
-  "reflex",
-  "aprend",
-  "leccion",
-  "pausa",
-  "ajust",
-  "proxima",
-  "siguiente",
-  "consciente",
-  "observo",
-  "elegi",
-  "eleccion",
-  "calma",
-  "respir",
-  "intencion",
-];
-const REACTIVE_TOKENS = [
-  "rush",
-  "late",
-  "panic",
-  "angry",
-  "stuck",
-  "again!",
-  "always",
-  "never",
-  "chaos",
-  "overwhelm",
-  "noise",
-  "blame",
-  "fight",
-  "explode",
-  "prisa",
-  "tarde",
-  "panico",
-  "enoj",
-  "atasc",
-  "siempre",
-  "nunca",
-  "caos",
-  "ruido",
-  "culpa",
-  "pelea",
-  "explot",
-];
 
 type JsonRecord = Record<string, unknown>;
 
@@ -237,8 +177,8 @@ function noteSignal(note: string) {
   });
 
   return {
-    reflective: Math.min(reflective / 2.5, NOTE_SIGNAL_CAP),
-    reactive: Math.min(reactive / 2.5, NOTE_SIGNAL_CAP),
+    reflective: Math.min(reflective / NOTE_SIGNAL_DIVISOR, NOTE_SIGNAL_CAP),
+    reactive: Math.min(reactive / NOTE_SIGNAL_DIVISOR, NOTE_SIGNAL_CAP),
   };
 }
 

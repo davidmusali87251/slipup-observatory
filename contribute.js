@@ -1,4 +1,5 @@
 import { postMomentRemote } from "./remote.js";
+import { getNoteSignalBreakdown } from "./noteAnalysis.js";
 
 const STORAGE_KEY = "slipup_v2_moments";
 
@@ -10,7 +11,27 @@ const sharedInput = document.getElementById("sharedInput");
 const consentInput = document.getElementById("consentInput");
 const saveButton = document.getElementById("saveButton");
 const formStatus = document.getElementById("formStatus");
+const noteAnalysisLine = document.getElementById("noteAnalysisLine");
 const ALLOWED_MOODS = new Set(["calm", "focus", "stressed", "curious", "tired"]);
+
+function updateNoteAnalysisLine() {
+  if (!noteAnalysisLine) return;
+  const raw = noteInput?.value?.trim() ?? "";
+  if (!raw) {
+    noteAnalysisLine.textContent = "";
+    noteAnalysisLine.hidden = true;
+    return;
+  }
+  const b = getNoteSignalBreakdown(raw);
+  const parts = [];
+  if (b.matchedReflective.length) parts.push(`Reflective: ${b.matchedReflective.join(", ")}`);
+  if (b.matchedReactive.length) parts.push(`Reactive: ${b.matchedReactive.join(", ")}`);
+  if (b.unmatchedWords.length) parts.push(`Not in lists: ${b.unmatchedWords.join(", ")}`);
+  noteAnalysisLine.textContent = parts.length
+    ? parts.join(" · ")
+    : "No token match — only type and mood shape the reading.";
+  noteAnalysisLine.hidden = false;
+}
 
 function loadMoments() {
   try {
@@ -73,6 +94,7 @@ noteInput.addEventListener("input", () => {
     formStatus.textContent = "";
   }
   syncSaveState();
+  updateNoteAnalysisLine();
 });
 
 consentInput?.addEventListener("change", () => {
@@ -132,3 +154,4 @@ form.addEventListener("submit", async (event) => {
 });
 
 syncSaveState();
+updateNoteAnalysisLine();

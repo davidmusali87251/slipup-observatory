@@ -1,4 +1,8 @@
 :root {
+  /* Tipografía: coherente en toda la página. --font-sans = UI, cuerpo, controles; --font-serif = lectura observatory (grado, condition, pattern, summary, CTA). */
+  --font-sans: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: Georgia, "Times New Roman", "Liberation Serif", serif;
+
   /* Paleta observatorio. Coherencia de fondos por capa: docs/LAYER_BACKGROUNDS_COHERENCE.md */
   --bg: #f3f0fb;
   --bg-deep: #ebe5f8;
@@ -47,7 +51,7 @@
 
 body {
   margin: 0;
-  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: var(--font-sans);
   color: var(--text);
   -webkit-tap-highlight-color: color-mix(in oklab, var(--text) 12%, transparent);
   background:
@@ -244,6 +248,7 @@ body.sheet-open {
   align-items: center;
   min-height: var(--topbar-height);
   margin-bottom: 0.4rem;
+  font-family: var(--font-sans);
   /* Continuidad hacia arriba: tinte sutil que anticipa otra capa/página superior */
   background: linear-gradient(
     180deg,
@@ -308,6 +313,7 @@ h1,
 h2,
 p {
   margin: 0;
+  font-family: var(--font-sans);
 }
 
 h1 {
@@ -396,6 +402,7 @@ h2 {
   color: var(--muted);
   font-size: 0.96rem;
   font-weight: 500;
+  font-family: var(--font-serif);
   line-height: 1.72;
   min-height: 1.72em;
 }
@@ -793,17 +800,20 @@ h2 {
   opacity: 0.6;
   margin-left: 0.5rem;
   font-weight: 500;
+  font-family: var(--font-serif);
 }
 
 .degree-label {
   color: var(--muted);
   font-size: 0.86rem;
   letter-spacing: 0.02em;
+  font-family: var(--font-sans);
 }
 
 .degree-value {
   font-size: clamp(4.25rem, 11.7vw, 6.45rem);
   font-weight: 300;
+  font-family: var(--font-serif);
   line-height: 0.88;
   letter-spacing: 0;
   position: relative;
@@ -837,6 +847,7 @@ h2 {
   color: var(--muted);
   font-size: 0.96rem;
   font-weight: 500;
+  font-family: var(--font-serif);
   line-height: 1.72;
   min-height: 1.72em;
 }
@@ -867,6 +878,7 @@ h2 {
   color: var(--muted);
   opacity: 0.85;
   font-weight: 600;
+  font-family: var(--font-sans);
   position: relative;
 }
 
@@ -966,6 +978,7 @@ h2 {
   opacity: 0.92;
   letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
+  font-family: var(--font-sans);
   position: relative;
   overflow-wrap: break-word;
   word-break: break-word;
@@ -1001,6 +1014,7 @@ h2 {
   margin-top: 0;
   margin-bottom: 0.85rem;
   font-size: 0.88rem;
+  font-family: var(--font-serif);
   line-height: 1.85;
   letter-spacing: 0.03em;
   color: var(--muted);
@@ -1046,13 +1060,27 @@ h2 {
 
 .atmosphere-pattern-line {
   font-size: 0.8rem;
-  color: #4c6179;
+  font-family: var(--font-serif);
+  color: color-mix(in oklab, var(--muted) 90%, var(--layer-horizon));
   line-height: 1.85;
   letter-spacing: 0.04em;
   opacity: 0.84;
   margin-top: 0.5rem;
   margin-bottom: 1rem;
   font-style: italic;
+}
+
+/* Patrón (type|mood) junto al grado: estilo observatory, paleta unificada */
+.degree-wrap .degree-pattern-line {
+  margin-top: 0.2rem;
+  margin-bottom: 0;
+  font-size: 0.68rem;
+  line-height: 1.4;
+  letter-spacing: 0.06em;
+  color: color-mix(in oklab, var(--muted) 92%, var(--layer-horizon));
+  opacity: 0.82;
+  font-style: italic;
+  font-family: var(--font-serif);
 }
 
 .cta-observatory {
@@ -1068,7 +1096,7 @@ h2 {
   box-shadow:
     0 1px 0 color-mix(in oklab, #ffffff 70%, transparent),
     0 2px 8px color-mix(in oklab, var(--text) 6%, transparent);
-  font-family: Georgia, "Times New Roman", "Liberation Serif", serif;
+  font-family: var(--font-serif);
   font-weight: 500;
   letter-spacing: 0.06em;
   opacity: 0.88;
@@ -1172,6 +1200,7 @@ h2 {
   width: 100%;
   margin: 1.25rem 0 0;
   text-align: center;
+  font-family: var(--font-sans);
 }
 
 .page .site-legal {
@@ -1951,7 +1980,7 @@ h2 {
   border-radius: 10px;
   background: linear-gradient(180deg, #ffffff 0%, #faf7ff 100%);
   color: #1d2e3f;
-  font-family: inherit;
+  font-family: var(--font-sans);
   font-size: 0.92rem;
   line-height: 1.35;
   text-transform: none;
@@ -1967,7 +1996,7 @@ h2 {
 .contribute-page #typeInput,
 .contribute-page #moodInput,
 .contribute-page #noteInput {
-  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 0.95rem;
   font-weight: 500;
   letter-spacing: 0.01em;
@@ -2072,6 +2101,18 @@ h2 {
   color: var(--muted);
   opacity: 0.7;
   text-align: right;
+}
+
+.note-analysis-line {
+  margin-top: 0.35rem;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: var(--muted);
+  opacity: 0.82;
+}
+
+.note-analysis-line[hidden] {
+  display: none;
 }
 
 .form-status {

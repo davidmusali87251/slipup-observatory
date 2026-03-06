@@ -39,12 +39,11 @@ import {
   PATTERN_B_STRENGTH_MAX,
   PATTERN_C_STRENGTH,
   INFLUENCE,
-  REFLECTIVE_TOKENS,
-  REACTIVE_TOKENS,
   INFLUENCE_DEFAULT_STRENGTH,
   chooseAlpha,
   REFLECTIVE_SEMANTIC_STABILIZE_FACTOR,
 } from "./modelConstants.js";
+import { noteSignal } from "./noteAnalysis.js";
 
 const STORAGE_KEY = "slipup_v2_moments";
 const RENDER_LIMIT = 6;
@@ -59,6 +58,58 @@ if (typeof document !== "undefined" && !document.documentElement.hasAttribute("l
   document.documentElement.lang = navigator.language?.startsWith("es") ? "es" : "en";
 }
 const LANG = (typeof document !== "undefined" && document.documentElement?.lang?.startsWith("es")) ? "es" : "en";
+
+/**
+ * Frases cortas observatory por combinación type|mood para #climateSummaryLine.
+ * Varias variantes por combo; se elige una con seed para variedad sutil.
+ */
+const MIX_LINE_OBSERVATORY = {
+  en: {
+    "observed|calm": ["A quiet line in the field.", "The read holds steady.", "Calm observation in the window."],
+    "observed|focus": ["Focused sight on the line.", "The field shows steady focus.", "A clear, focused read."],
+    "observed|stressed": ["Observation under strain.", "The line carries tension.", "Stressed but still watching."],
+    "observed|curious": ["The line tilts curious.", "Curiosity in the reading.", "A curious, steady watch."],
+    "observed|tired": ["A weary but steady read.", "The field rests.", "Tired observation holds the line."],
+    "avoidable|calm": ["Calm acknowledgment in the mix.", "The field notes what could shift.", "Quiet note on the avoidable."],
+    "avoidable|focus": ["Focus on what might have been otherwise.", "A sharp read on avoidable weight."],
+    "avoidable|stressed": ["Pressure in the avoidable band.", "The line bears repeated strain.", "Strain and recurrence."],
+    "avoidable|curious": ["Curiosity around the avoidable.", "The read questions the pattern."],
+    "avoidable|tired": ["Tired recurrence in the field.", "The line sags under repetition."],
+    "fertile|calm": ["Calm fertility in the read.", "The field opens quietly.", "A quiet opening."],
+    "fertile|focus": ["Focused growth in the mix.", "The line leans into possibility.", "Fertile focus in the window."],
+    "fertile|stressed": ["Fertile ground under stress.", "Tension and opening share the read."],
+    "fertile|curious": ["Curiosity and opening.", "The field tilts toward discovery.", "Fertile curiosity."],
+    "fertile|tired": ["Weary but open.", "The read holds space despite fatigue.", "Tired and opening."],
+  },
+  es: {
+    "observed|calm": ["Una línea quieta en el campo.", "La lectura se mantiene estable.", "Observación calmada en la ventana."],
+    "observed|focus": ["Mirada enfocada en la línea.", "El campo muestra un foco estable.", "Una lectura clara y atenta."],
+    "observed|stressed": ["Observación bajo tensión.", "La línea lleva carga.", "Atento aunque con tensión."],
+    "observed|curious": ["La línea se inclina curiosa.", "Curiosidad en la lectura.", "Una mirada curiosa y estable."],
+    "observed|tired": ["Una lectura cansada pero estable.", "El campo descansa.", "Observación cansada sostiene la línea."],
+    "avoidable|calm": ["Reconocimiento calmado en la mezcla.", "El campo anota lo que podría cambiar.", "Nota tranquila sobre lo evitable."],
+    "avoidable|focus": ["Foco en lo que pudo ser distinto.", "Una lectura aguda del peso evitable."],
+    "avoidable|stressed": ["Presión en la banda evitable.", "La línea soporta repetición.", "Tensión y recurrencia."],
+    "avoidable|curious": ["Curiosidad en torno a lo evitable.", "La lectura cuestiona el patrón."],
+    "avoidable|tired": ["Recurrencia cansada en el campo.", "La línea cede bajo la repetición."],
+    "fertile|calm": ["Fertilidad calmada en la lectura.", "El campo se abre en silencio.", "Una apertura tranquila."],
+    "fertile|focus": ["Crecimiento enfocado en la mezcla.", "La línea se inclina a la posibilidad.", "Foco fértil en la ventana."],
+    "fertile|stressed": ["Suelo fértil bajo estrés.", "Tensión y apertura comparten la lectura."],
+    "fertile|curious": ["Curiosidad y apertura.", "El campo se inclina al descubrimiento.", "Curiosidad fértil."],
+    "fertile|tired": ["Cansado pero abierto.", "La lectura guarda espacio pese al cansancio.", "Cansancio y apertura."],
+  },
+};
+
+function getMixLinePhrase(lang, type, mood, seed) {
+  const key = `${String(type).toLowerCase()}|${String(mood).toLowerCase()}`;
+  const variants = MIX_LINE_OBSERVATORY[lang]?.[key];
+  if (!Array.isArray(variants) || variants.length === 0) {
+    const ui = UI_COPY[lang] || UI_COPY.en;
+    return ui.mixLine(type, mood);
+  }
+  const index = Math.abs(seed) % variants.length;
+  return variants[index];
+}
 
 /** Hook opcional para métricas/servicio externo (Sentry, Analytics). Si window.__observatoryReportEvent es una función, se llama con el nombre del evento; sin payload de usuario. */
 function reportObservatoryEvent(eventName) {
@@ -1547,29 +1598,6 @@ function getInfluenceCell(type, mood) {
   return row[mood] || { mode: "stabilize", strength: INFLUENCE_DEFAULT_STRENGTH };
 }
 
-function noteSignal(note) {
-  const text = String(note || "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim();
-  if (!text) return { reflective: 0, reactive: 0 };
-
-  let reflective = 0;
-  let reactive = 0;
-  REFLECTIVE_TOKENS.forEach((token) => {
-    if (text.includes(token)) reflective += 1;
-  });
-  REACTIVE_TOKENS.forEach((token) => {
-    if (text.includes(token)) reactive += 1;
-  });
-
-  return {
-    reflective: Math.min(reflective / NOTE_SIGNAL_DIVISOR, NOTE_SIGNAL_CAP),
-    reactive: Math.min(reactive / NOTE_SIGNAL_DIVISOR, NOTE_SIGNAL_CAP),
-  };
-}
-
 function calculateClimate(moments) {
   const windowed = getRecentWindow(moments);
   const latestInWindow = windowed[windowed.length - 1] || null;
@@ -2441,14 +2469,14 @@ function renderPatternLayer(canonicalState) {
 
   const dominant = canonicalState?.dominantMix || "";
   const tagMap = {
-    pattern_a: "Pattern A: avoidable|stressed repeating.",
-    pattern_b: "Pattern B: repeated avoidable mood.",
-    pattern_c: "Pattern C: short-time clustering.",
+    pattern_a: "Repeated strain in the read.",
+    pattern_b: "Repeated mood in the field.",
+    pattern_c: "Clustering in the window.",
   };
   const line = repetition?.hasPattern
-    ? tagMap[repetition.tag] || "Pattern signal active."
+    ? tagMap[repetition.tag] || "Pattern in the reading."
     : dominant
-      ? dominant
+      ? dominant.split("|").map((s) => capitalizeForDisplay(s.trim())).join(" · ")
       : "";
 
   if (!line) {
@@ -2764,8 +2792,8 @@ async function boot() {
       const topMood = Object.entries(byMood).sort((a, b) => b[1] - a[1])[0];
       const typeLabel = topType ? topType[0] : "observed";
       const moodLabel = topMood ? topMood[0] : "calm";
-      const ui = UI_COPY[LANG] || UI_COPY.en;
-      climateSummaryLine.textContent = ui.mixLine(typeLabel, moodLabel);
+      const seed = (latest.length * 7 + (topType?.[1] ?? 0) + (topMood?.[1] ?? 0)) | 0;
+      climateSummaryLine.textContent = getMixLinePhrase(LANG, typeLabel, moodLabel, seed);
       climateSummaryLine.classList.remove("hidden");
     } else {
       climateSummaryLine.textContent = "";

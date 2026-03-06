@@ -108,18 +108,28 @@ export const INFLUENCE: InfluenceTable = {
   },
 };
 
+/** Tokens reflexivos: reflexión, calma, aprendizaje, intención. Criterio: utilidad, claridad, no genéricos. */
 export const REFLECTIVE_TOKENS = [
   "reflect", "noticed", "learn", "learned", "lesson", "pause", "adjust", "again", "next",
   "aware", "observe", "chose", "choice", "calm", "breathe", "intent", "reflex",
   "aprend", "leccion", "pausa", "ajust", "proxima", "siguiente", "consciente", "observo",
   "elegi", "eleccion", "calma", "respir", "intencion",
+  "mindful", "notice", "accept", "peace", "slow", "wait", "step back", "atencion",
+  "lento", "esper", "acept", "paz", "noto", "mirar",
+  "rest", "gentle", "patience", "space", "insight", "clarity", "ground", "center", "soften", "allow",
+  "descans", "suave", "paciencia", "espacio", "claridad", "centro", "suaviz", "permit",
 ];
 
+/** Tokens reactivos: urgencia, tensión, culpa, caos. Criterio: utilidad, claridad, no genéricos. */
 export const REACTIVE_TOKENS = [
   "rush", "late", "panic", "angry", "stuck", "again!", "always", "never", "chaos",
   "overwhelm", "noise", "blame", "fight", "explode",
   "prisa", "tarde", "panico", "enoj", "atasc", "siempre", "nunca", "caos", "ruido",
   "culpa", "pelea", "explot",
+  "stress", "worry", "anxious", "urgent", "lost", "hate", "wrong", "fail",
+  "estres", "preocup", "ansio", "urgente", "perd", "odio", "error", "fall",
+  "frustrat", "guilty", "tense", "pressure", "repeated", "loop",
+  "frustr", "culpable", "tension", "presion", "repet", "bucle",
 ];
 
 /** Default strength when type/mood not in INFLUENCE */

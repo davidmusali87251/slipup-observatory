@@ -85,7 +85,7 @@ function noteSignal(note: string) {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .trim();
-  if (!text) return { reflective: 0, reactive: 0 };
+  if (!text) return { reflective: 0, reactive: 0, hasUnmatchedText: false };
 
   let reflective = 0;
   let reactive = 0;
@@ -98,7 +98,9 @@ function noteSignal(note: string) {
 
   const reflectiveNorm = Math.min(reflective / NOTE_SIGNAL_DIVISOR, NOTE_SIGNAL_CAP);
   const reactiveNorm = Math.min(reactive / NOTE_SIGNAL_DIVISOR, NOTE_SIGNAL_CAP);
-  return { reflective: reflectiveNorm, reactive: reactiveNorm };
+  const hasUnmatchedText = text.length > 0 && reflective === 0 && reactive === 0;
+
+  return { reflective: reflectiveNorm, reactive: reactiveNorm, hasUnmatchedText };
 }
 
 function compositionCounts(moments: MomentInput[]) {
