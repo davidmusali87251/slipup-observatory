@@ -686,6 +686,7 @@ const sheetBackdrop = document.getElementById("sheet-backdrop");
 const sharedSheet = document.getElementById("shared-sheet");
 const sharedSheetList = document.getElementById("shared-sheet-list");
 const sharedSheetEmpty = document.getElementById("shared-sheet-empty");
+const sharedSheetCount = document.getElementById("shared-sheet-count");
 const sharedSheetCloseButton = document.getElementById("shared-sheet-close");
 const fieldScopeSelect = document.getElementById("fieldScopeSelect");
 const localClimateDegree = document.getElementById("localClimateDegree");
@@ -1572,11 +1573,17 @@ function renderRecent(sharedMoments) {
   renderMomentItems(recentMoments, list);
 }
 
-function renderSharedSheetList(sharedMoments) {
+function renderSharedSheetList(sharedMoments, countLabel = "") {
   const list = sharedMoments.slice(0, SHARED_SHEET_MAX_ITEMS);
   sharedSheetList.innerHTML = "";
 
-  if (list.length === 0) {
+  if (sharedSheetCount) {
+    sharedSheetCount.textContent = countLabel;
+    sharedSheetCount.classList.toggle("hidden", !countLabel);
+  }
+
+  const isLoading = countLabel === "Loading…";
+  if (list.length === 0 && !isLoading) {
     sharedSheetList.classList.add("hidden");
     sharedSheetEmpty.classList.remove("hidden");
     return;
@@ -1584,7 +1591,7 @@ function renderSharedSheetList(sharedMoments) {
 
   sharedSheetEmpty.classList.add("hidden");
   sharedSheetList.classList.remove("hidden");
-  renderMomentItems(sharedSheetList, list);
+  if (list.length > 0) renderMomentItems(sharedSheetList, list);
 }
 
 function getSheetFocusableElements() {
@@ -1652,7 +1659,13 @@ async function openSharedSheet(sharedMoments) {
   document.body.classList.add("sheet-open");
   document.addEventListener("keydown", onSharedSheetKeydown);
 
-  // Pedir lista completa al abrir (hasta 100), sin caché, para ver todos
+  renderSharedSheetList([], "Loading…");
+  requestAnimationFrame(() => {
+    sharedSheet.classList.add("is-open");
+    sheetBackdrop.classList.add("is-open");
+    sharedSheetCloseButton.focus();
+  });
+
   let listToShow = sharedMoments;
   try {
     const fresh = await fetchSharedMomentsRemote(SHARED_SHEET_MAX_ITEMS, 48, { skipCache: true });
@@ -1660,13 +1673,12 @@ async function openSharedSheet(sharedMoments) {
   } catch {
     listToShow = sharedMoments;
   }
-  renderSharedSheetList(listToShow);
 
-  requestAnimationFrame(() => {
-    sharedSheet.classList.add("is-open");
-    sheetBackdrop.classList.add("is-open");
-    sharedSheetCloseButton.focus();
-  });
+  const n = listToShow.length;
+  const countLabel = n === 0 ? "" : n === 1 ? "Showing 1 moment." : `Showing ${n} moments.`;
+  renderSharedSheetList(listToShow, countLabel);
+
+  sharedSheetCloseButton.focus();
 }
 
 function renderHorizon(canonicalState, sharedMoments, pipeline = null) {

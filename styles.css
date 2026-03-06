@@ -1117,6 +1117,15 @@ h2 {
   font-size: 0.9rem;
 }
 
+.shared-sheet-count {
+  font-size: 0.8rem;
+  color: var(--muted, #607189);
+  margin: 0 0 0.4rem 0;
+}
+.shared-sheet-count.hidden {
+  display: none;
+}
+
 .shared-sheet-list {
   display: grid;
   gap: 0.58rem;
