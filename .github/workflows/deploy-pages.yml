@@ -48,6 +48,35 @@ jobs:
           BUILD_ID="${{ github.sha }}"
           for f in _site/*.html; do sed -i "s/{{BUILD_ID}}/$BUILD_ID/g" "$f"; done
 
+      - name: Check remote.js has real URLs when secrets are set
+        env:
+          REMOTE_MOMENTS_URL: ${{ secrets.REMOTE_MOMENTS_URL }}
+        run: |
+          if [ -n "$REMOTE_MOMENTS_URL" ]; then
+            if grep -q "YOUR_PROJECT_REF" _site/remote.js; then
+              echo "::error::remote.js still contains placeholder YOUR_PROJECT_REF. Check secrets and generate-remote.js."
+              exit 1
+            fi
+          fi
+
+      - name: Smoke test (backend reachable)
+        env:
+          REMOTE_CLIMATE_URL: ${{ secrets.REMOTE_CLIMATE_URL }}
+          REMOTE_ANON_KEY: ${{ secrets.REMOTE_ANON_KEY }}
+        run: |
+          if [ -z "$REMOTE_CLIMATE_URL" ] || [ -z "$REMOTE_ANON_KEY" ]; then
+            echo "Skipping smoke test (secrets not set)."
+            exit 0
+          fi
+          STATUS=$(curl -sS -o /dev/null -w "%{http_code}" \
+            -H "Content-Type: application/json" \
+            -H "apikey: $REMOTE_ANON_KEY" \
+            -H "Authorization: Bearer $REMOTE_ANON_KEY" \
+            "$REMOTE_CLIMATE_URL?windowHours=48")
+          if [ "$STATUS" != "200" ]; then
+            echo "::warning::Smoke test: climate GET returned $STATUS (expected 200). Check backend and CORS."
+          fi
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

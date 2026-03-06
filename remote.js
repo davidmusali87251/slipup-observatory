@@ -5,9 +5,10 @@ const REMOTE_CLIMATE_URL = "https://YOUR_PROJECT_REF.supabase.co/functions/v1/cl
 const REMOTE_ANON_KEY = "";
 
 const REMOTE_TIMEOUT_MS = 4500;
+const GET_RETRY_BACKOFF_MS = 600; // GET: 1 retry on network/5xx; POST: no retry
 const FP_STORAGE_KEY = "slipup_v2_fp";
 const GEO_BUCKET_KEY = "slipup_v2_geo_bucket";
-const GET_CACHE_TTL_MS = 20000;
+const GET_CACHE_TTL_MS = 45000; // 45 s; reduce peticiones repetidas sin datos muy viejos
 
 const ALLOWED_TYPES = new Set(["avoidable", "fertile", "observed"]);
 const ALLOWED_MOODS = new Set(["calm", "focus", "stressed", "curious", "tired"]);
@@ -43,6 +44,19 @@ function normalizeNote(input) {
 
 function isRemoteReady() {
   return USE_REMOTE_SHARED && REMOTE_MOMENTS_URL.length > 0;
+}
+
+/** Ejecuta fn(); si falla con error de red o 5xx, espera GET_RETRY_BACKOFF_MS y reintenta una vez. No reintenta en 4xx. */
+async function withGetRetry(fn) {
+  try {
+    return await fn();
+  } catch (e) {
+    const status = e?.status;
+    const retryable = status === undefined || status === 0 || (typeof status === "number" && status >= 500);
+    if (!retryable) throw e;
+    await new Promise((r) => setTimeout(r, GET_RETRY_BACKOFF_MS));
+    return await fn();
+  }
 }
 
 function buildHeaders() {
@@ -147,36 +161,38 @@ async function fetchSharedMomentsRemote(limit = 10, windowHours = 48, opts = {})
   url.searchParams.set("windowHours", String(windowHours));
   url.searchParams.set("scope", "shared");
 
-  const scoped = withTimeout(undefined, REMOTE_TIMEOUT_MS);
-  try {
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: buildHeaders(),
-      signal: scoped.signal,
-      cache: "no-store",
-    });
-    const payload = await safeJson(response);
+  return withGetRetry(async () => {
+    const scoped = withTimeout(undefined, REMOTE_TIMEOUT_MS);
+    try {
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: buildHeaders(),
+        signal: scoped.signal,
+        cache: "no-store",
+      });
+      const payload = await safeJson(response);
 
-    if (!response.ok) {
-      const err = new Error("REMOTE_GET_FAILED");
-      err.status = response.status;
-      err.payload = payload;
-      throw err;
+      if (!response.ok) {
+        const err = new Error("REMOTE_GET_FAILED");
+        err.status = response.status;
+        err.payload = payload;
+        throw err;
+      }
+
+      const items = Array.isArray(payload)
+        ? payload
+        : Array.isArray(payload?.moments)
+          ? payload.moments
+          : Array.isArray(payload?.items)
+            ? payload.items
+            : [];
+      const sanitized = items.map(sanitizeMoment);
+      if (!skipCache) sharedGetCache.set(cacheKey, { at: Date.now(), items: sanitized });
+      return sanitized;
+    } finally {
+      scoped.clear();
     }
-
-    const items = Array.isArray(payload)
-      ? payload
-      : Array.isArray(payload?.moments)
-        ? payload.moments
-      : Array.isArray(payload?.items)
-        ? payload.items
-        : [];
-    const sanitized = items.map(sanitizeMoment);
-    if (!skipCache) sharedGetCache.set(cacheKey, { at: Date.now(), items: sanitized });
-    return sanitized;
-  } finally {
-    scoped.clear();
-  }
+  });
 }
 
 async function postMomentRemote(inputMoment) {
@@ -237,30 +253,32 @@ async function fetchClimateRemote(windowHours = 48, referenceTime = "", scope = 
   if (scope) url.searchParams.set("scope", scope);
   if (geo) url.searchParams.set("geo", geo);
 
-  const scoped = withTimeout(undefined, REMOTE_TIMEOUT_MS);
-  try {
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: buildHeaders(),
-      signal: scoped.signal,
-      cache: "no-store",
-    });
-    const payload = await safeJson(response);
-    if (!response.ok) {
-      const err = new Error("REMOTE_CLIMATE_GET_FAILED");
-      err.status = response.status;
-      err.payload = payload;
-      throw err;
+  return withGetRetry(async () => {
+    const scoped = withTimeout(undefined, REMOTE_TIMEOUT_MS);
+    try {
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: buildHeaders(),
+        signal: scoped.signal,
+        cache: "no-store",
+      });
+      const payload = await safeJson(response);
+      if (!response.ok) {
+        const err = new Error("REMOTE_CLIMATE_GET_FAILED");
+        err.status = response.status;
+        err.payload = payload;
+        throw err;
+      }
+
+      const item = payload && typeof payload === "object" ? payload : null;
+      if (!item) throw new Error("REMOTE_CLIMATE_EMPTY");
+
+      climateGetCache.set(cacheKey, { at: Date.now(), item });
+      return item;
+    } finally {
+      scoped.clear();
     }
-
-    const item = payload && typeof payload === "object" ? payload : null;
-    if (!item) throw new Error("REMOTE_CLIMATE_EMPTY");
-
-    climateGetCache.set(cacheKey, { at: Date.now(), item });
-    return item;
-  } finally {
-    scoped.clear();
-  }
+  });
 }
 
 async function fetchGeoIndexRemote(windowHours = 720, continent = "", geoLimit = 2000) {
@@ -279,31 +297,34 @@ async function fetchGeoIndexRemote(windowHours = 720, continent = "", geoLimit =
   url.searchParams.set("geoLimit", String(geoLimit));
   if (continent) url.searchParams.set("continent", continent);
 
-  const scoped = withTimeout(undefined, REMOTE_TIMEOUT_MS);
-  try {
-    const response = await fetch(url.toString(), {
-      method: "GET",
-      headers: buildHeaders(),
-      signal: scoped.signal,
-      cache: "no-store",
-    });
-    const payload = await safeJson(response);
-    if (!response.ok) {
-      const err = new Error("REMOTE_GEO_INDEX_GET_FAILED");
-      err.status = response.status;
-      err.payload = payload;
-      throw err;
+  return withGetRetry(async () => {
+    const scoped = withTimeout(undefined, REMOTE_TIMEOUT_MS);
+    try {
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: buildHeaders(),
+        signal: scoped.signal,
+        cache: "no-store",
+      });
+      const payload = await safeJson(response);
+      if (!response.ok) {
+        const err = new Error("REMOTE_GEO_INDEX_GET_FAILED");
+        err.status = response.status;
+        err.payload = payload;
+        throw err;
+      }
+      const item = payload && typeof payload === "object" ? payload : { continents: [], countries: [] };
+      geoIndexCache.set(cacheKey, { at: Date.now(), item });
+      return item;
+    } finally {
+      scoped.clear();
     }
-    const item = payload && typeof payload === "object" ? payload : { continents: [], countries: [] };
-    geoIndexCache.set(cacheKey, { at: Date.now(), item });
-    return item;
-  } finally {
-    scoped.clear();
-  }
+  });
 }
 
 export {
   USE_REMOTE_SHARED,
+  isRemoteReady,
   fetchSharedMomentsRemote,
   postMomentRemote,
   fetchClimateRemote,

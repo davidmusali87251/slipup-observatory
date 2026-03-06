@@ -20,8 +20,13 @@
         </a>
       </header>
 
-      <section class="panel panel-contribute">
-        <form id="contributeForm" novalidate>
+      <section class="panel panel-contribute" aria-label="Contribute a moment — Atmosphere rise" data-layer="atmosphere-rise">
+        <div class="contribute-layer-entry" aria-hidden="true">
+          <p class="contribute-layer-eyebrow">Atmosphere</p>
+          <p class="contribute-layer-context">Rise</p>
+        </div>
+        <p class="contribute-layer-hint" aria-hidden="true">Where your moment enters the reading.</p>
+        <form id="contributeForm" class="contribute-rise-form" novalidate>
           <label class="field">
             <span>Type</span>
             <select id="typeInput" name="type" required>
@@ -55,13 +60,13 @@
             <small class="field-hint" aria-hidden="true">max 19</small>
           </label>
 
-          <label class="field field-inline">
+          <label class="field field-inline" for="sharedInput">
             <input id="sharedInput" name="shared" type="checkbox" checked />
             <span>Share this moment (shared field)</span>
           </label>
           <p class="contribute-trust-note">No account. No exact pin. Sharing off keeps this moment on your device.</p>
-          <label class="field field-inline">
-            <input id="consentInput" name="consent" type="checkbox" />
+          <label class="field field-inline" for="consentInput">
+            <input id="consentInput" name="consent" type="checkbox" required />
             <span>I accept Privacy and Terms, including coarse regional bucket use for shared moments.</span>
           </label>
           <p class="legal-links">

@@ -1634,6 +1634,57 @@ h2 {
   max-width: 560px;
 }
 
+/* Observatory layer: "Atmosphere — Rise" (evaporation / contribution zone) */
+.panel-contribute {
+  --contribute-accent: #7f8fb2;
+  position: relative;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(248, 246, 252, 0.98) 100%);
+  background: linear-gradient(180deg, color-mix(in oklab, #ffffff 94%, var(--contribute-accent)) 0%, color-mix(in oklab, #f8f6fc 96%, var(--contribute-accent)) 100%);
+  border: 1px solid rgba(127, 143, 178, 0.28);
+  border: 1px solid color-mix(in oklab, var(--contribute-accent) 28%, transparent);
+  border-radius: 14px;
+  padding: 1.1rem 1.15rem 1.25rem;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.88) inset;
+  box-shadow: 0 1px 0 color-mix(in oklab, #ffffff 88%, transparent) inset;
+}
+
+.contribute-layer-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.12rem;
+  margin-bottom: 0.35rem;
+}
+
+.contribute-layer-eyebrow {
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.contribute-layer-context {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  margin: 0;
+}
+
+.contribute-layer-hint {
+  margin: 0 0 1rem 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: #607189;
+  opacity: 0.85;
+  letter-spacing: 0.01em;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(127, 143, 178, 0.18);
+  border-bottom: 1px solid color-mix(in oklab, var(--contribute-accent) 18%, transparent);
+}
+
 .contribute-page {
   padding-top: var(--page-pad-top);
 }
@@ -1802,6 +1853,18 @@ h2 {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  cursor: pointer;
+}
+
+.contribute-page .field-inline input[type="checkbox"] {
+  width: 1.25rem;
+  height: 1.25rem;
+  min-width: 1.25rem;
+  min-height: 1.25rem;
+  margin: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  accent-color: #5a7a9e;
 }
 
 .contribute-trust-note {
@@ -2145,6 +2208,16 @@ h2 {
 
   .contribute-page .panel {
     margin-top: 0.2rem;
+  }
+
+  .panel-contribute {
+    padding: 0.9rem 1rem 1.1rem;
+  }
+
+  .contribute-layer-hint {
+    margin-bottom: 0.85rem;
+    padding-bottom: 0.7rem;
+    font-size: 0.68rem;
   }
 }
 

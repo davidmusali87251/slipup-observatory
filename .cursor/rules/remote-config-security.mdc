@@ -7,16 +7,22 @@ alwaysApply: true
 
 ## En el repositorio
 
-- **remote.js** debe ir en el repo **solo con placeholders**: `USE_REMOTE_SHARED = false`, URLs con `YOUR_PROJECT_REF`, `REMOTE_ANON_KEY = ""`. No commitear URLs reales ni claves.
+- **remote.js** debe ir en el repo **solo con placeholders**: `USE_REMOTE_SHARED = false`, `REMOTE_MOMENTS_URL` y `REMOTE_CLIMATE_URL` con `YOUR_PROJECT_REF`, `REMOTE_ANON_KEY = ""`. No commitear URLs reales ni claves.
 - **remote.local.js** está en `.gitignore`; **nunca** commitearlo ni sugerir subirlo. Solo existe en local para generar `remote.js` con `node scripts/generate-remote.js`.
 
 ## Claves y exposición
 
 - **Anon key (Supabase)** en el frontend es uso esperado: está pensada para el cliente; se protege con RLS, reglas en Edge Functions y rate limiting. No es un secreto crítico.
 - **Service role key** y demás secretos de backend **nunca** en frontend ni en el repo. Solo en Supabase (secrets de functions) o en CI como secrets.
-- Para producción con backend real: en CI ejecutar `node scripts/generate-remote.js` con variables de entorno/secrets; no commitear un `remote.js` con valores reales.
+- Para producción con backend real: en CI ejecutar `node scripts/generate-remote.js` con variables de entorno/secrets (`REMOTE_MOMENTS_URL`, `REMOTE_CLIMATE_URL`, `REMOTE_ANON_KEY`, `USE_REMOTE_SHARED`); no commitear un `remote.js` con valores reales.
+- En deploy: si los secrets están definidos, el workflow comprueba que `_site/remote.js` no contenga `YOUR_PROJECT_REF`; si lo contiene, el job falla para evitar publicar placeholders en producción.
+
+## Depuración sin exponer datos
+
+- Con `?debug=1` la app puede hacer `console.warn` con códigos genéricos (ej. `REMOTE_GET_FAILED`) cuando falle el remoto; no loguear ni incluir en mensajes el valor de `REMOTE_ANON_KEY` ni datos de usuarios.
 
 ## Resumen
 
 - Repo: placeholders en `remote.js`; `remote.local.js` ignorado.
 - Frontend: solo anon key si hace falta; nunca service_role ni secretos de backend.
+- CI: generar `remote.js` con secrets; comprobar que no queden placeholders cuando los secrets están seteados.

@@ -1,4 +1,9 @@
-import { fetchClimateRemote, fetchGeoIndexRemote, fetchSharedMomentsRemote } from "./remote.js";
+import {
+  fetchClimateRemote,
+  fetchGeoIndexRemote,
+  fetchSharedMomentsRemote,
+  isRemoteReady,
+} from "./remote.js";
 import {
   BASELINE,
   SCALE,
@@ -54,6 +59,16 @@ if (typeof document !== "undefined" && !document.documentElement.hasAttribute("l
   document.documentElement.lang = navigator.language?.startsWith("es") ? "es" : "en";
 }
 const LANG = (typeof document !== "undefined" && document.documentElement?.lang?.startsWith("es")) ? "es" : "en";
+
+/** Hook opcional para métricas/servicio externo (Sentry, Analytics). Si window.__observatoryReportEvent es una función, se llama con el nombre del evento; sin payload de usuario. */
+function reportObservatoryEvent(eventName) {
+  try {
+    if (typeof window !== "undefined" && typeof window.__observatoryReportEvent === "function") {
+      window.__observatoryReportEvent(eventName);
+    }
+  } catch (_) {}
+}
+
 const COPY_VARIANTS = {
   clear: {
     condition: {
@@ -438,6 +453,8 @@ const UI_COPY = {
     recentFromRemote: "Across the atmosphere.",
     recentFromLocal: "Moments from this device only.",
     conditionPending: "Global signal pending.",
+    conditionError: "Something went wrong. Refresh the page.",
+    conditionOffline: "Reading from this device only.",
     mixLine: (type, mood) => `Recent mix: mostly ${type}, ${mood}.`,
     eyebrowLayer: "Atmosphere",
     eyebrowContext: "Moments",
@@ -449,7 +466,7 @@ const UI_COPY = {
     scopeRangeLine: (n) => (n === 1 ? "1 moment" : `${n} moments`),
     instrumentMetricsAriaNearby: "Nearby field metrics",
     instrumentMetricsAriaStrata: "Deep record metrics",
-    instrumentInfoCopy: "Same variables that define the climate — type, mood, note, recency — make shared moments represent degrees of the atmosphere. 0–100 is field density (balance ≈ 38–60), not conflict.",
+    instrumentInfoCopy: "Type, mood, note, recency shape the shared field. 0–100 is density (balance ≈ 38–60), not conflict.",
     degreeScaleLabel: "0–100 density · 48h",
     strata: {
       mixLow: "low",
@@ -496,6 +513,8 @@ const UI_COPY = {
     recentFromRemote: "En la atmósfera.",
     recentFromLocal: "Solo momentos de este dispositivo.",
     conditionPending: "Señal global pendiente.",
+    conditionError: "Algo ha fallado. Recarga la página.",
+    conditionOffline: "Leyendo solo desde este dispositivo.",
     mixLine: (type, mood) => `Mix reciente: sobre todo ${type}, ${mood}.`,
     eyebrowLayer: "Atmósfera",
     eyebrowContext: "Momentos",
@@ -507,7 +526,7 @@ const UI_COPY = {
     scopeRangeLine: (n) => (n === 1 ? "1 momento" : `${n} momentos`),
     instrumentMetricsAriaNearby: "Métricas del campo cercano",
     instrumentMetricsAriaStrata: "Métricas del registro profundo",
-    instrumentInfoCopy: "Las mismas variables que definen el clima — tipo, humor, nota, recencia — hacen que los momentos compartidos representen los grados de la atmósfera. 0–100 es densidad del campo (balance ≈ 38–60), no conflicto.",
+    instrumentInfoCopy: "Tipo, humor, nota, recencia dan forma al campo compartido. 0–100 es densidad (balance ≈ 38–60), no conflicto.",
     degreeScaleLabel: "0–100 densidad · 48 h",
     strata: {
       mixLow: "bajo",
@@ -2370,7 +2389,11 @@ async function loadSharedMoments(localMoments) {
       items: remoteItems.filter((m) => m.shared && !m.hidden),
       source: "remote",
     };
-  } catch {
+  } catch (e) {
+    reportObservatoryEvent("remote_fallback_moments");
+    if (typeof window !== "undefined" && /[?&]debug=1/.test(window.location.search) && typeof console !== "undefined" && console.warn) {
+      console.warn("[Observatory] REMOTE_GET_FAILED; using local.", e?.message || "");
+    }
     return {
       items: getSharedMoments(localMoments),
       source: "local",
@@ -2406,7 +2429,11 @@ async function loadClimateTruth(localMoments) {
       stabilityIndex: Number.isFinite(remoteClimate?.stabilityIndex) ? remoteClimate.stabilityIndex : null,
       groundIndex: Number.isFinite(remoteClimate?.groundIndex) ? remoteClimate.groundIndex : null,
     };
-  } catch {
+  } catch (e) {
+    reportObservatoryEvent("remote_fallback_climate");
+    if (typeof window !== "undefined" && /[?&]debug=1/.test(window.location.search) && typeof console !== "undefined" && console.warn) {
+      console.warn("[Observatory] REMOTE_CLIMATE_GET_FAILED; using local.", e?.message || "");
+    }
     const localClimate = calculateClimate(localSharedMoments);
     return {
       source: "local",
@@ -2501,7 +2528,11 @@ async function boot() {
     if (observatoryPanel) observatoryPanel.setAttribute("aria-busy", "true");
   }
 
-  const [sharedResult, climateTruth] = await Promise.all([loadSharedMoments(moments), loadClimateTruth(moments)]);
+  const [sharedResult, climateTruth, geoIndexResult] = await Promise.all([
+    loadSharedMoments(moments),
+    loadClimateTruth(moments),
+    fetchGeoIndexRemote(8760, "", 4000).then((g) => g).catch(() => null),
+  ]);
   const sharedMoments = sharedResult.items;
   if (recentContext) {
     const ui = UI_COPY[LANG] || UI_COPY.en;
@@ -2513,11 +2544,8 @@ async function boot() {
   const fieldScopes = buildFieldScopeOptions();
   const preferredScopeValue = normalizeStoredFieldScopeValue(getStoredFieldScope());
   let countryIndex = new Map();
-  try {
-    const geoIndex = await fetchGeoIndexRemote(8760, "", 4000);
-    countryIndex = buildCountryIndex(geoIndex?.countries);
-  } catch {
-    countryIndex = new Map();
+  if (geoIndexResult?.countries) {
+    countryIndex = buildCountryIndex(geoIndexResult.countries);
   }
   const fieldLensModel = buildFieldLensModel(fieldScopes, countryIndex);
   let selectedScopeValue = renderFieldLensSelect(fieldLensModel, preferredScopeValue);
@@ -2530,7 +2558,26 @@ async function boot() {
       geo: "",
     };
   setStoredFieldScope(selectedScopeValue);
-  let localClimateTruth = await loadFieldClimateTruth(canonicalState, activeFieldScope);
+  // Pintar la UI en cuanto tengamos momentos y clima global; clima del campo (Nearby) se carga en segundo plano.
+  let localClimateTruth = { source: "global_fallback", ...canonicalState };
+  loadFieldClimateTruth(canonicalState, activeFieldScope)
+    .then((truth) => {
+      localClimateTruth = truth;
+      const pipeline = buildObservatoryPipeline(sharedMoments, canonicalState, localClimateTruth, activeFieldScope);
+      renderLocalClimate(
+        localClimateTruth,
+        canonicalState,
+        activeFieldScope.label || "Nearby",
+        pipeline,
+        activeFieldScope
+      );
+    })
+    .catch(() => {
+      reportObservatoryEvent("remote_fallback_nearby");
+      if (typeof console !== "undefined" && console.warn) {
+        console.warn("[Observatory] Nearby field data could not be loaded; using wider field.");
+      }
+    });
   let observatoryPipeline = buildObservatoryPipeline(
     sharedMoments,
     canonicalState,
@@ -2580,7 +2627,14 @@ async function boot() {
 
   setStoredComputedDegree(computedDegree);
   setStoredDisplayDegree(computedDegree);
-  conditionLine.textContent = canonicalState.condition;
+  if (conditionLine) {
+    const ui = UI_COPY[LANG] || UI_COPY.en;
+    if (isRemoteReady() && sharedResult.source === "local" && climateTruth.source === "local") {
+      conditionLine.textContent = ui.conditionOffline || "Reading from this device only.";
+    } else {
+      conditionLine.textContent = canonicalState.condition;
+    }
+  }
 
   // Instrumento observatorio: usa INSTRUMENT_REAL y helpers para traducir a unidades reales.
   // Clasificación por capa: data-layer="atmosphere", data-scope="global" (si en el futuro hay lectura por zona, se podría data-scope="local").
@@ -2710,4 +2764,13 @@ async function boot() {
   }
 }
 
-boot();
+boot().catch((err) => {
+  reportObservatoryEvent("boot_error");
+  if (observatoryPanel) observatoryPanel.removeAttribute("aria-busy");
+  if (degreeValue) degreeValue.classList.remove("is-pending");
+  if (conditionLine) {
+    const ui = UI_COPY[LANG] || UI_COPY.en;
+    conditionLine.textContent = ui.conditionError || "Something went wrong. Refresh the page.";
+  }
+  if (typeof console !== "undefined" && console.error) console.error("[Observatory] boot error", err);
+});
