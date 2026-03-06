@@ -442,6 +442,30 @@ h2 {
   animation: scopeTargetPulse 1800ms ease-in-out infinite;
 }
 
+.observatory-entry {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.eyebrow-layer {
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.eyebrow-context {
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  margin: 0;
+}
+
 .eyebrow {
   color: var(--muted);
   letter-spacing: 0.04em;
@@ -459,6 +483,47 @@ h2 {
   text-transform: uppercase;
   font-size: 0.68rem;
   letter-spacing: 0.08em;
+}
+
+.atmosphere-value-prop {
+  margin: 0.2rem auto 0.6rem;
+  font-size: 0.7rem;
+  line-height: 1.45;
+  color: var(--muted);
+  opacity: 0.78;
+  max-width: 32ch;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .atmosphere-value-prop {
+    font-size: 0.65rem;
+    line-height: 1.5;
+    max-width: 100%;
+    padding: 0 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .climate-instrument {
+    padding: 0.65rem 0.75rem 0.75rem;
+  }
+
+  .climate-instrument-scope {
+    font-size: 0.65rem;
+  }
+
+  .observatory-scope-range {
+    font-size: 0.63rem;
+  }
+
+  .climate-metrics-line {
+    font-size: 0.78rem;
+  }
+
+  .degree-scale-label {
+    font-size: 0.58rem;
+  }
 }
 
 .atmosphere-semantic-hint {
@@ -483,6 +548,16 @@ h2 {
   justify-content: center;
   align-items: baseline;
   gap: 0;
+  flex-wrap: wrap;
+}
+
+.degree-scale-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  opacity: 0.6;
+  margin-left: 0.5rem;
+  font-weight: 500;
 }
 
 .degree-label {
@@ -577,6 +652,18 @@ h2 {
   opacity: 0.85;
   font-weight: 600;
   position: relative;
+}
+
+.observatory-scope-range {
+  margin: 0 0 0.35rem 0;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  opacity: 0.75;
+}
+
+.observatory-scope-range.hidden {
+  display: none;
 }
 
 .climate-metrics-line {
@@ -1620,8 +1707,56 @@ h2 {
     gap: 0.74rem;
   }
 
+  .atmosphere-value-prop {
+    font-size: 0.62rem;
+    padding: 0 0.5rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .atmosphere-air {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+
+  .atmosphere-grounding {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+
   .degree-value {
     font-size: clamp(3.2rem, 15.2vw, 4.6rem);
+  }
+
+  .degree-scale-label {
+    font-size: 0.55rem;
+    margin-left: 0.35rem;
+  }
+
+  .degree-wrap {
+    gap: 0.25rem;
+  }
+
+  .climate-instrument {
+    padding: 0.6rem 0.65rem 0.7rem;
+    margin-left: 0.15rem;
+    margin-right: 0.15rem;
+  }
+
+  .climate-instrument-scope {
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+  }
+
+  .observatory-scope-range {
+    font-size: 0.6rem;
+  }
+
+  .climate-metrics-line {
+    font-size: 0.74rem;
+  }
+
+  .climate-metrics-line .metric-value {
+    font-size: inherit;
   }
 
   .condition-line {

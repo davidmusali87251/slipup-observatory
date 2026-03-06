@@ -38,13 +38,17 @@
         <header class="topbar">
           <h1>SlipUp Observatory</h1>
         </header>
+        <p class="atmosphere-value-prop" aria-hidden="true">Collective reading from shared moments · last 48 h</p>
         <p class="upper-cue" aria-hidden="true">Upper view</p>
         <a class="space-cue space-cue-link" href="./ai.html">AI sector ↑</a>
 
         <section id="observatory" class="panel panel-observatory" aria-label="Observatory">
           <div class="atmosphere-air" aria-label="Reading in the air">
-            <p class="eyebrow">Atmosphere — Shared Moments</p>
-            <p class="atmosphere-orientation">This reading gathers the time window below.</p>
+            <div class="observatory-entry">
+              <p class="eyebrow-layer">Atmosphere</p>
+              <p class="eyebrow-context">Moments</p>
+            </div>
+            <p class="atmosphere-orientation">Where the reading begins.</p>
             <p id="atmosphereSemanticHint" class="atmosphere-semantic-hint hidden" aria-live="polite"></p>
             <div class="telescope-scope" aria-hidden="true">
               <span class="scope-ring scope-ring-outer"></span>
@@ -56,10 +60,12 @@
             </div>
             <div class="degree-wrap" aria-label="Atmosphere reading in degrees">
               <p id="degreeValue" class="degree-value">28</p>
+              <span id="degreeScaleLabel" class="degree-scale-label" aria-hidden="true">0–100 scale</span>
             </div>
             <p id="conditionLine" class="condition-line" role="status" aria-live="polite">Señal global pendiente.</p>
-            <div id="climateInstrument" class="climate-instrument" role="status" aria-live="polite" aria-label="Lectura del instrumento: ventana y métricas">
-              <p class="climate-instrument-scope">Ventana 48 h</p>
+            <div id="climateInstrument" class="climate-instrument" role="status" aria-live="polite" aria-label="Reading metrics">
+              <p class="climate-instrument-scope">48 h</p>
+              <p id="observatoryScopeRange" class="observatory-scope-range hidden" aria-live="polite"></p>
               <p id="climateMetricsLine" class="climate-metrics-line"></p>
             </div>
           </div>

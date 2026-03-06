@@ -477,17 +477,22 @@ const COPY = COPY_VARIANTS[COPY_MODE === "narrative" ? "narrative_" + LANG : COP
 
 const UI_COPY = {
   en: {
-    orientation: "This reading gathers the time window below.",
+    orientation: "Where the reading begins.",
+    valueProp: "Collective reading from shared moments · last 48 h",
     cta: "Let it rise into the atmosphere.",
     trust: "No account. No exact pin. Not weather, just shared moments.",
-    scopeLabel: "48h window",
+    scopeLabel: "48h",
     recentFromRemote: "Across the atmosphere.",
     recentFromLocal: "Moments from this device only.",
     conditionPending: "Global signal pending.",
     mixLine: (type, mood) => `Recent mix: mostly ${type}, ${mood}.`,
-    eyebrow: "Atmosphere — Shared Moments",
+    eyebrowLayer: "Atmosphere",
+    eyebrowContext: "Moments",
     horizonTitle: "Horizon Line",
     nearbyTitle: "Nearby Field",
+    instrumentAriaLabel: "Reading metrics",
+    scopeRangeLine: (n) => (n === 1 ? "48 h · global · 1 moment" : `48 h · global · ${n} moments`),
+    degreeScaleLabel: "0–100 scale",
     viewMore: "View more",
     close: "Close",
     sheetEmpty: "No shared moments yet.",
@@ -497,24 +502,33 @@ const UI_COPY = {
       pressureCondensing: "condensing",
       pressureClearing: "clearing",
       pressureStable: "stable",
+      pressureLabel: "pressure",
+      pressureUnit: "hPa",
+      stability: "stability",
+      stabilityUnit: "%",
+      density: "density",
+      densityUnit: "kg/m³",
       sharedUnit: "shared",
       sharedCount: (n) => `${n} shared`,
-      stability: "stability",
-      density: "density",
     },
   },
   es: {
-    orientation: "Esta lectura reúne la ventana de abajo.",
+    orientation: "Donde empieza la lectura.",
+    valueProp: "Lectura colectiva de momentos compartidos · últimas 48 h",
     cta: "Que suba a la atmósfera.",
     trust: "Sin cuenta. Sin pin exacto. No es el tiempo; son momentos compartidos.",
-    scopeLabel: "Ventana 48 h",
+    scopeLabel: "48 h",
     recentFromRemote: "En la atmósfera.",
     recentFromLocal: "Solo momentos de este dispositivo.",
     conditionPending: "Señal global pendiente.",
     mixLine: (type, mood) => `Mix reciente: sobre todo ${type}, ${mood}.`,
-    eyebrow: "Atmósfera — Momentos compartidos",
+    eyebrowLayer: "Atmósfera",
+    eyebrowContext: "Momentos",
     horizonTitle: "Línea del horizonte",
     nearbyTitle: "Campo cercano",
+    instrumentAriaLabel: "Métricas de lectura",
+    scopeRangeLine: (n) => (n === 1 ? "48 h · global · 1 momento" : `48 h · global · ${n} momentos`),
+    degreeScaleLabel: "escala 0–100",
     viewMore: "Ver más",
     close: "Cerrar",
     sheetEmpty: "Aún no hay momentos compartidos.",
@@ -524,10 +538,14 @@ const UI_COPY = {
       pressureCondensing: "condensando",
       pressureClearing: "abriendo",
       pressureStable: "estable",
+      pressureLabel: "presión",
+      pressureUnit: "hPa",
+      stability: "estabilidad",
+      stabilityUnit: "%",
+      density: "densidad",
+      densityUnit: "kg/m³",
       sharedUnit: "compartidos",
       sharedCount: (n) => `${n} compartidos`,
-      stability: "estabilidad",
-      density: "densidad",
     },
   },
 };
@@ -536,14 +554,22 @@ function applyUICopy() {
   const ui = UI_COPY[LANG] || UI_COPY.en;
   const orientationEl = document.querySelector(".atmosphere-orientation");
   if (orientationEl) orientationEl.textContent = ui.orientation;
+  const valuePropEl = document.querySelector(".atmosphere-value-prop");
+  if (valuePropEl) valuePropEl.textContent = ui.valueProp || "";
   const ctaEl = document.querySelector(".cta-microcopy");
   if (ctaEl) ctaEl.textContent = ui.cta;
   const trustEl = document.querySelector(".trust-microcopy");
   if (trustEl) trustEl.textContent = ui.trust;
   const scopeEl = document.querySelector(".climate-instrument-scope");
   if (scopeEl) scopeEl.textContent = ui.scopeLabel;
-  const eyebrowEl = document.querySelector(".eyebrow");
-  if (eyebrowEl) eyebrowEl.textContent = ui.eyebrow;
+  const degreeScaleEl = document.getElementById("degreeScaleLabel");
+  if (degreeScaleEl && ui.degreeScaleLabel) degreeScaleEl.textContent = ui.degreeScaleLabel;
+  const instrumentEl = document.getElementById("climateInstrument");
+  if (instrumentEl && ui.instrumentAriaLabel) instrumentEl.setAttribute("aria-label", ui.instrumentAriaLabel);
+  const eyebrowLayerEl = document.querySelector(".eyebrow-layer");
+  if (eyebrowLayerEl) eyebrowLayerEl.textContent = ui.eyebrowLayer;
+  const eyebrowContextEl = document.querySelector(".eyebrow-context");
+  if (eyebrowContextEl) eyebrowContextEl.textContent = ui.eyebrowContext;
   const horizonTitleEl = document.querySelector(".horizon-line");
   if (horizonTitleEl) horizonTitleEl.textContent = ui.horizonTitle;
   const nearbyTitleEl = document.querySelector(".local-climate-line");
@@ -848,6 +874,7 @@ const conditionLine = document.getElementById("conditionLine");
 const climateSummaryLine = document.getElementById("climateSummaryLine");
 const climateMetricsLine = document.getElementById("climateMetricsLine");
 const climateInstrument = document.getElementById("climateInstrument");
+const observatoryScopeRange = document.getElementById("observatoryScopeRange");
 // FUTURE: kept as scaffold for a possible hero confidence line return.
 const readingConfidenceLine = document.getElementById("readingConfidenceLine");
 const observatoryPanel = document.getElementById("observatory");
@@ -883,6 +910,39 @@ const contributed = query.get("contributed") === "1";
 const SHARED_SHEET_MAX_ITEMS = 100;
 const SHEET_TRANSITION_MS = 280;
 const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
+
+/**
+ * Mapeo estable: variables internas del observatorio → unidades reales para el instrumento.
+ * Relación con homónimos reales:
+ * - pressureMode: tendencia del grado (derivePressureMode) → hPa nominal (sube=1018, estable=1015, baja=1012).
+ * - stabilityIndex: índice 0-1 (observed + calm/focus) → mismo valor en % (estabilidad atmosférica adimensional).
+ * - density: señal en ventana (total/REF = 100%) → kg/m³ (1.0–1.25, rango típico superficie).
+ */
+const INSTRUMENT_REAL = {
+  pressureHpa: { condensing: 1018, clearing: 1012, stabilizing: 1015, stable: 1015 },
+  densitySignalRef: 50,
+  densityKgM3Min: 1.0,
+  densityKgM3Max: 1.25,
+};
+
+function instrumentToPressureHpa(pressureMode) {
+  return INSTRUMENT_REAL.pressureHpa[pressureMode] ?? INSTRUMENT_REAL.pressureHpa.stable;
+}
+
+function instrumentToStabilityPercent(stabilityIndex) {
+  if (!Number.isFinite(stabilityIndex) || stabilityIndex < 0) return null;
+  return Math.round(clamp(stabilityIndex, 0, 1) * 100);
+}
+
+function instrumentToDensitySignalPct(total, ref = INSTRUMENT_REAL.densitySignalRef) {
+  if (!total || total <= 0) return 0;
+  return Math.min(100, Math.round((total / ref) * 100));
+}
+
+function instrumentToDensityKgM3(signalPct) {
+  const { densityKgM3Min, densityKgM3Max } = INSTRUMENT_REAL;
+  return densityKgM3Min + (clamp(signalPct, 0, 100) / 100) * (densityKgM3Max - densityKgM3Min);
+}
 
 let isSharedSheetOpen = false;
 let lastFocusedEl = null;
@@ -2108,7 +2168,7 @@ function renderPatternLayer(canonicalState) {
   const line = repetition?.hasPattern
     ? tagMap[repetition.tag] || "Pattern signal active."
     : dominant
-      ? `Dominant mix: ${dominant}.`
+      ? dominant
       : "";
 
   if (!line) {
@@ -2340,43 +2400,51 @@ async function boot() {
   setStoredDisplayDegree(computedDegree);
   conditionLine.textContent = canonicalState.condition;
 
-  // Instrumento observatorio. Presión: ver derivePressureMode. Estabilidad: mix observed+calm/focus (0-100). Densidad: señal en ventana 48h (0-100, 50 compartidos = 100%).
+  // Instrumento observatorio: usa INSTRUMENT_REAL y helpers para traducir a unidades reales.
   if (climateMetricsLine) {
     const total = Number(canonicalState?.total) || 0;
-    const pressure = canonicalState?.pressureMode || "";
-    const stability = canonicalState?.stabilityIndex;
+    const pressureMode = canonicalState?.pressureMode || "";
+    const stabilityIndex = canonicalState?.stabilityIndex;
     const ui = UI_COPY[LANG] || UI_COPY.en;
     const m = ui.metrics || {};
-    const pressureLabel =
-      pressure === "condensing"
-        ? (m.pressureCondensing ?? "condensing")
-        : pressure === "clearing"
-          ? (m.pressureClearing ?? "clearing")
-          : total > 0
-            ? (m.pressureStable ?? "stable")
-            : "";
-    const densityPct = total > 0 ? Math.min(100, Math.round((total / 50) * 100)) : 0;
+    const pressureHpa = total > 0 ? instrumentToPressureHpa(pressureMode) : null;
+    const pressureLabel = m.pressureLabel || "pressure";
+    const pressureUnit = m.pressureUnit || "hPa";
+    const stabilityPct = instrumentToStabilityPercent(stabilityIndex);
+    const densitySignalPct = instrumentToDensitySignalPct(total);
+    const densityKgM3 = instrumentToDensityKgM3(densitySignalPct);
+    const densityFormatted = densityKgM3.toFixed(2).replace(".", LANG === "es" ? "," : ".");
+    const densLabel = m.density || "density";
+    const densUnit = m.densityUnit || "kg/m³";
     const parts = [];
-    if (pressureLabel && total > 0) {
-      const sharedText = m.sharedCount ? m.sharedCount(total) : `${total} ${m.sharedUnit || "shared"}`;
-      parts.push({ type: "pressure", html: `<span class="metric metric-pressure">${pressureLabel}</span><span class="metric metric-shared">${sharedText}</span>` });
+    if (pressureHpa != null && total > 0) {
+      parts.push({ type: "pressure", html: `<span class="metric metric-pressure"><span class="metric-label">${pressureLabel}</span> <span class="metric-value">${pressureHpa} ${pressureUnit}</span></span>` });
     }
-    if (Number.isFinite(stability) && stability >= 0) {
+    if (stabilityPct != null) {
       const stabLabel = m.stability || "stability";
-      parts.push({ type: "stability", html: `<span class="metric metric-stability"><span class="metric-label">${stabLabel}</span> <span class="metric-value">${Math.round(stability * 100)}</span></span>` });
+      const stabUnit = m.stabilityUnit ?? "%";
+      parts.push({ type: "stability", html: `<span class="metric metric-stability"><span class="metric-label">${stabLabel}</span> <span class="metric-value">${stabilityPct}${stabUnit}</span></span>` });
     }
     if (total > 0) {
-      const densLabel = m.density || "density";
-      parts.push({ type: "density", html: `<span class="metric metric-density"><span class="metric-label">${densLabel}</span> <span class="metric-value">${densityPct}</span></span>` });
+      parts.push({ type: "density", html: `<span class="metric metric-density"><span class="metric-label">${densLabel}</span> <span class="metric-value">${densityFormatted} ${densUnit}</span></span>` });
     }
     if (parts.length > 0) {
       climateMetricsLine.innerHTML = parts.map((p) => p.html).join('<span class="metric-sep" aria-hidden="true"> · </span>');
       climateMetricsLine.classList.remove("hidden");
       if (climateInstrument) climateInstrument.classList.remove("hidden");
+      if (observatoryScopeRange) {
+        const ui = UI_COPY[LANG] || UI_COPY.en;
+        observatoryScopeRange.textContent = ui.scopeRangeLine ? ui.scopeRangeLine(total) : "";
+        observatoryScopeRange.classList.remove("hidden");
+      }
     } else {
       climateMetricsLine.textContent = "";
       climateMetricsLine.classList.add("hidden");
       if (climateInstrument) climateInstrument.classList.add("hidden");
+      if (observatoryScopeRange) {
+        observatoryScopeRange.textContent = "";
+        observatoryScopeRange.classList.add("hidden");
+      }
     }
   }
 
