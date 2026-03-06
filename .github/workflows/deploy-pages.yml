@@ -45,6 +45,8 @@ jobs:
           cp index.html contribute.html terms.html privacy.html ai.html _site/
           cp app.js contribute.js remote.js styles.css _site/
           cp favicon.svg CNAME _site/ 2>/dev/null || true
+          BUILD_ID="${{ github.sha }}"
+          for f in _site/*.html; do sed -i "s/{{BUILD_ID}}/$BUILD_ID/g" "$f"; done
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

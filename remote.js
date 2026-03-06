@@ -153,6 +153,7 @@ async function fetchSharedMomentsRemote(limit = 10, windowHours = 48, opts = {})
       method: "GET",
       headers: buildHeaders(),
       signal: scoped.signal,
+      cache: "no-store",
     });
     const payload = await safeJson(response);
 
@@ -200,6 +201,7 @@ async function postMomentRemote(inputMoment) {
       headers: buildHeaders(),
       body: JSON.stringify(payload),
       signal: scoped.signal,
+      cache: "no-store",
     });
     const data = await safeJson(response);
     if (!response.ok) {
@@ -241,6 +243,7 @@ async function fetchClimateRemote(windowHours = 48, referenceTime = "", scope = 
       method: "GET",
       headers: buildHeaders(),
       signal: scoped.signal,
+      cache: "no-store",
     });
     const payload = await safeJson(response);
     if (!response.ok) {
@@ -282,6 +285,7 @@ async function fetchGeoIndexRemote(windowHours = 720, continent = "", geoLimit =
       method: "GET",
       headers: buildHeaders(),
       signal: scoped.signal,
+      cache: "no-store",
     });
     const payload = await safeJson(response);
     if (!response.ok) {
