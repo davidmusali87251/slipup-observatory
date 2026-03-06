@@ -466,7 +466,7 @@ const UI_COPY = {
     scopeRangeLine: (n) => (n === 1 ? "1 moment" : `${n} moments`),
     instrumentMetricsAriaNearby: "Nearby field metrics",
     instrumentMetricsAriaStrata: "Deep record metrics",
-    instrumentInfoCopy: "Type, mood, note, recency shape the shared field. 0–100 is density (balance ≈ 38–60), not conflict.",
+    instrumentInfoCopy: "Type, mood, note, recency — what shapes each moment.",
     degreeScaleLabel: "0–100 density · 48h",
     strata: {
       mixLow: "low",
@@ -526,7 +526,7 @@ const UI_COPY = {
     scopeRangeLine: (n) => (n === 1 ? "1 momento" : `${n} momentos`),
     instrumentMetricsAriaNearby: "Métricas del campo cercano",
     instrumentMetricsAriaStrata: "Métricas del registro profundo",
-    instrumentInfoCopy: "Tipo, humor, nota, recencia dan forma al campo compartido. 0–100 es densidad (balance ≈ 38–60), no conflicto.",
+    instrumentInfoCopy: "Tipo, humor, nota, recencia: lo que da forma a cada momento.",
     degreeScaleLabel: "0–100 densidad · 48 h",
     strata: {
       mixLow: "bajo",
@@ -589,6 +589,7 @@ function applyUICopy() {
   const nearbyTitleEl = document.querySelector(".local-climate-line");
   if (nearbyTitleEl) nearbyTitleEl.textContent = ui.nearbyTitle;
   if (conditionLine) conditionLine.textContent = ui.conditionPending;
+  if (stripCondition) stripCondition.textContent = ui.conditionPending || "";
   if (viewMoreButton) viewMoreButton.textContent = ui.viewMore;
   const closeBtn = document.getElementById("shared-sheet-close");
   if (closeBtn) closeBtn.textContent = ui.close;
@@ -897,6 +898,8 @@ function pickCopyFromState(entry, numericSeed) {
 
 const degreeValue = document.getElementById("degreeValue");
 const conditionLine = document.getElementById("conditionLine");
+const stripDegree = document.getElementById("stripDegree");
+const stripCondition = document.getElementById("stripCondition");
 const climateSummaryLine = document.getElementById("climateSummaryLine");
 const climateMetricsLine = document.getElementById("climateMetricsLine");
 const climateInstrument = document.getElementById("climateInstrument");
@@ -2321,7 +2324,9 @@ function escapeHtml(text) {
 
 function animateDegree(from, to, ms) {
   if (prefersReducedMotion || ms <= 0) {
-    degreeValue.textContent = formatDegree(to);
+    const t = formatDegree(to);
+    degreeValue.textContent = t;
+    if (stripDegree) stripDegree.textContent = t;
     return;
   }
   const start = performance.now();
@@ -2329,7 +2334,9 @@ function animateDegree(from, to, ms) {
     const t = clamp((now - start) / ms, 0, 1);
     const eased = 1 - (1 - t) * (1 - t);
     const current = from + (to - from) * eased;
-    degreeValue.textContent = formatDegree(current);
+    const txt = formatDegree(current);
+    degreeValue.textContent = txt;
+    if (stripDegree) stripDegree.textContent = txt;
     if (t < 1) requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
@@ -2518,11 +2525,14 @@ async function boot() {
       ? previousComputed
       : BASELINE;
   if (hasStoredDisplay) {
-    degreeValue.textContent = formatDegree(optimisticStartDisplay);
+    const d = formatDegree(optimisticStartDisplay);
+    degreeValue.textContent = d;
+    if (stripDegree) stripDegree.textContent = d;
     document.body.style.setProperty("--atmo", String(optimisticStartDisplay));
   } else {
     // First load with no stored state: avoid flashing a temporary fixed number.
     degreeValue.textContent = String(BASELINE);
+    if (stripDegree) stripDegree.textContent = String(BASELINE);
     degreeValue.classList.add("is-pending");
     document.body.style.setProperty("--atmo", String(BASELINE));
     if (observatoryPanel) observatoryPanel.setAttribute("aria-busy", "true");
@@ -2634,6 +2644,7 @@ async function boot() {
     } else {
       conditionLine.textContent = canonicalState.condition;
     }
+    if (stripCondition) stripCondition.textContent = conditionLine.textContent;
   }
 
   // Instrumento observatorio: usa INSTRUMENT_REAL y helpers para traducir a unidades reales.
@@ -2771,6 +2782,7 @@ boot().catch((err) => {
   if (conditionLine) {
     const ui = UI_COPY[LANG] || UI_COPY.en;
     conditionLine.textContent = ui.conditionError || "Something went wrong. Refresh the page.";
+    if (stripCondition) stripCondition.textContent = conditionLine.textContent;
   }
   if (typeof console !== "undefined" && console.error) console.error("[Observatory] boot error", err);
 });
