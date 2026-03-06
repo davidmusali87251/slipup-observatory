@@ -477,7 +477,7 @@ const COPY = COPY_VARIANTS[COPY_MODE === "narrative" ? "narrative_" + LANG : COP
 
 const UI_COPY = {
   en: {
-    orientation: "This reading gathers the last 48 hours.",
+    orientation: "This reading gathers the time window below.",
     cta: "Let it rise into the atmosphere.",
     trust: "No account. No exact pin. Not weather, just shared moments.",
     scopeLabel: "48h window",
@@ -495,7 +495,7 @@ const UI_COPY = {
     loading: "Loading…",
   },
   es: {
-    orientation: "Esta lectura reúne las últimas 48 horas.",
+    orientation: "Esta lectura reúne la ventana de abajo.",
     cta: "Que suba a la atmósfera.",
     trust: "Sin cuenta. Sin pin exacto. No es el tiempo; son momentos compartidos.",
     scopeLabel: "Ventana 48 h",

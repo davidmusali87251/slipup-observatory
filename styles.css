@@ -126,30 +126,37 @@ body.sheet-open {
   z-index: 1;
 }
 
+/* Aire arriba, transición hacia horizonte abajo — solo paleta observatorio */
 .observatory-hero::before {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 52% 8%, #ffffff7a 0%, #ffffff00 58%),
-    radial-gradient(circle at 50% 65%, #d7caee45 0%, #d7caee00 70%);
-  opacity: 0.06;
+    radial-gradient(circle at 50% 15%, color-mix(in oklab, var(--bg) 92%, var(--layer-air)) 0%, transparent 50%),
+    radial-gradient(ellipse 120% 80% at 50% 55%, var(--layer-horizon) 0%, transparent 55%);
+  opacity: 0.5;
   transition: opacity 1.5s ease;
   z-index: 0;
 }
 
-/* Seed: subtle upward continuity (inactive layers live above) */
+/* Transición aire → horizonte (más denso abajo) */
 .observatory-hero::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
   top: 0;
-  height: 28vh;
+  height: 100%;
   pointer-events: none;
-  background: linear-gradient(to bottom, #ffffff85 0%, #ffffff00 70%);
-  opacity: 0.22;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--bg) 25%, transparent) 0%,
+    transparent 35%,
+    color-mix(in oklab, var(--layer-horizon) 40%, transparent) 85%,
+    color-mix(in oklab, var(--layer-ground) 30%, transparent) 100%
+  );
+  opacity: 0.65;
   z-index: 0;
 }
 
@@ -264,13 +271,19 @@ h2 {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 1.85rem;
+  gap: 2.25rem;
   text-align: center;
   position: relative;
   overflow: visible;
   border-bottom-color: transparent;
+  /* Aire (arriba) → hacia horizonte (abajo), paleta observatorio */
   background:
-    linear-gradient(180deg, #ffffff9c 0%, #ffffff8a 72%, #ffffff52 100%),
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--bg) 94%, var(--card)) 0%,
+      color-mix(in oklab, var(--bg-deep) 88%, var(--card)) 65%,
+      color-mix(in oklab, var(--layer-horizon) 75%, var(--card)) 100%
+    ),
     var(--card);
 }
 
@@ -278,6 +291,53 @@ h2 {
   position: relative;
   z-index: 1;
 }
+
+/* Estrato: lectura en el aire (arriba del horizonte) */
+.atmosphere-air {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.05rem;
+  max-width: 36ch;
+}
+
+.atmosphere-air .condition-line { margin-top: 0; }
+.atmosphere-air .climate-instrument { margin-top: 0; }
+.atmosphere-air .climate-instrument-scope { margin-bottom: 0.35rem; }
+
+/* Estrato: hacia el horizonte (resumen, CTA, confianza) */
+.atmosphere-grounding {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.75rem;
+  max-width: 34ch;
+  position: relative;
+  padding-top: 0.5rem;
+}
+
+/* Línea sutil de transición aire → horizonte */
+.atmosphere-grounding::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  width: min(60%, 140px);
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--line) 90%, transparent),
+    transparent
+  );
+  opacity: 0.6;
+}
+
+.atmosphere-grounding .climate-summary-line { margin-top: 0; }
+.atmosphere-grounding .cta-observatory { margin-top: 0; }
 
 .panel-observatory[data-scope-tone="quiet"] {
   --scope-intensity: 0.26;
@@ -308,9 +368,9 @@ h2 {
   height: 88px;
   pointer-events: none;
   background:
-    radial-gradient(circle at 50% 0%, #ece4f886 0%, #ece4f800 72%),
-    linear-gradient(180deg, #ece6f57a 0%, #ece6f500 100%);
-  opacity: 0.9;
+    radial-gradient(circle at 50% 0%, color-mix(in oklab, var(--bg-deep) 82%, var(--layer-horizon)) 0%, transparent 72%),
+    linear-gradient(180deg, color-mix(in oklab, var(--layer-horizon) 65%, transparent) 0%, transparent 100%);
+  opacity: 0.85;
   filter: blur(0.3px);
 }
 
@@ -475,11 +535,38 @@ h2 {
 }
 
 .climate-instrument {
-  margin-top: 0.5rem;
-  padding: 0.45rem 0.65rem;
-  border: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
-  border-radius: 6px;
-  background: color-mix(in oklab, var(--text) 4%, transparent);
+  margin-top: 0.75rem;
+  padding: 0.75rem 0.95rem 0.85rem;
+  border-radius: 10px;
+  position: relative;
+  overflow: hidden;
+  /* Panel ventana: solo paleta observatorio/atmósfera */
+  background:
+    linear-gradient(
+      165deg,
+      var(--bg) 0%,
+      color-mix(in oklab, var(--bg) 88%, var(--bg-deep)) 45%,
+      color-mix(in oklab, var(--bg-deep) 88%, var(--line)) 100%
+    );
+  border: 1px solid color-mix(in oklab, var(--text) 8%, var(--line));
+  box-shadow:
+    0 1px 0 0 color-mix(in oklab, var(--bg) 95%, var(--line)) inset,
+    0 2px 12px -4px color-mix(in oklab, var(--text) 10%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--line) 70%, transparent);
+}
+
+.climate-instrument::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(
+    180deg,
+    var(--layer-horizon) 0%,
+    transparent 45%
+  );
+  opacity: 0.85;
 }
 
 .climate-instrument.hidden {
@@ -487,22 +574,25 @@ h2 {
 }
 
 .climate-instrument-scope {
-  margin: 0 0 0.25rem 0;
-  font-size: 0.7rem;
+  margin: 0 0 0.4rem 0;
+  font-size: 0.68rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.14em;
   color: var(--muted);
-  opacity: 0.9;
+  opacity: 0.85;
+  font-weight: 600;
+  position: relative;
 }
 
 .climate-metrics-line {
   margin: 0;
   font-size: 0.8rem;
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--muted);
-  opacity: 0.9;
+  opacity: 0.92;
   letter-spacing: 0.02em;
   font-variant-numeric: tabular-nums;
+  position: relative;
 }
 
 .climate-metrics-line.hidden {

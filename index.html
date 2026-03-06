@@ -42,32 +42,36 @@
         <a class="space-cue space-cue-link" href="./ai.html">AI sector ↑</a>
 
         <section id="observatory" class="panel panel-observatory" aria-label="Observatory">
-          <p class="eyebrow">Atmosphere — Shared Moments</p>
-          <p class="atmosphere-orientation">Reading shared moments from the last 48 hours.</p>
-          <p id="atmosphereSemanticHint" class="atmosphere-semantic-hint hidden" aria-live="polite"></p>
-          <div class="telescope-scope" aria-hidden="true">
-            <span class="scope-ring scope-ring-outer"></span>
-            <span class="scope-ring scope-ring-inner"></span>
-            <span class="scope-axis scope-axis-horizontal"></span>
-            <span class="scope-axis scope-axis-vertical"></span>
-            <span class="scope-sweep"></span>
-            <span class="scope-target"></span>
+          <div class="atmosphere-air" aria-label="Reading in the air">
+            <p class="eyebrow">Atmosphere — Shared Moments</p>
+            <p class="atmosphere-orientation">This reading gathers the time window below.</p>
+            <p id="atmosphereSemanticHint" class="atmosphere-semantic-hint hidden" aria-live="polite"></p>
+            <div class="telescope-scope" aria-hidden="true">
+              <span class="scope-ring scope-ring-outer"></span>
+              <span class="scope-ring scope-ring-inner"></span>
+              <span class="scope-axis scope-axis-horizontal"></span>
+              <span class="scope-axis scope-axis-vertical"></span>
+              <span class="scope-sweep"></span>
+              <span class="scope-target"></span>
+            </div>
+            <div class="degree-wrap" aria-label="Atmosphere reading in degrees">
+              <p id="degreeValue" class="degree-value">28</p>
+            </div>
+            <p id="conditionLine" class="condition-line" role="status" aria-live="polite">Señal global pendiente.</p>
+            <div id="climateInstrument" class="climate-instrument" role="status" aria-live="polite" aria-label="Lectura del instrumento: ventana y métricas">
+              <p class="climate-instrument-scope">Ventana 48 h</p>
+              <p id="climateMetricsLine" class="climate-metrics-line"></p>
+            </div>
           </div>
-          <div class="degree-wrap" aria-label="Atmosphere reading in degrees">
-            <p id="degreeValue" class="degree-value">28</p>
+          <div class="atmosphere-grounding" aria-label="Toward the horizon">
+            <p id="climateSummaryLine" class="climate-summary-line" role="status" aria-live="polite"></p>
+            <p id="warmupHint" class="warmup-hint hidden" aria-live="polite"></p>
+            <p id="transientReadingLine" class="transient-reading-line hidden" aria-live="polite"></p>
+            <p id="atmosphere-pattern-line" class="atmosphere-pattern-line hidden" aria-live="polite"></p>
+            <a class="cta cta-observatory" href="./contribute.html">Contribute</a>
+            <p class="cta-microcopy">Let it rise into the atmosphere.</p>
+            <p class="trust-microcopy">No account. No exact pin. Not weather, just shared moments.</p>
           </div>
-          <p id="conditionLine" class="condition-line" role="status" aria-live="polite">Señal global pendiente.</p>
-          <div id="climateInstrument" class="climate-instrument" role="status" aria-live="polite" aria-label="Lectura del instrumento: ventana y métricas">
-            <p class="climate-instrument-scope">Ventana 48 h</p>
-            <p id="climateMetricsLine" class="climate-metrics-line"></p>
-          </div>
-          <p id="climateSummaryLine" class="climate-summary-line" role="status" aria-live="polite"></p>
-          <p id="warmupHint" class="warmup-hint hidden" aria-live="polite"></p>
-          <p id="transientReadingLine" class="transient-reading-line hidden" aria-live="polite"></p>
-          <p id="atmosphere-pattern-line" class="atmosphere-pattern-line hidden" aria-live="polite"></p>
-          <a class="cta cta-observatory" href="./contribute.html">Contribute</a>
-          <p class="cta-microcopy">Let it rise into the atmosphere.</p>
-          <p class="trust-microcopy">No account. No exact pin. Not weather, just shared moments.</p>
         </section>
       </section>
 
