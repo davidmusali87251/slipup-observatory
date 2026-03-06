@@ -29,7 +29,7 @@
     <link rel="shortcut icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="./favicon.svg" sizes="any" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="./favicon.svg" />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles.css?v={{BUILD_ID}}" />
   </head>
   <body>
     <aside id="observatory-strip" class="observatory-strip" aria-label="Reading strip" role="status" aria-live="polite">
@@ -156,6 +156,6 @@
       <p id="shared-sheet-empty" class="shared-sheet-empty hidden">No shared moments yet.</p>
     </section>
 
-    <script src="./app.js" type="module"></script>
+    <script src="./app.js?v={{BUILD_ID}}" type="module"></script>
   </body>
 </html>
