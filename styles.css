@@ -17,6 +17,7 @@
   --section-gap: 2.35rem;
   --block-gap: 0.85rem;
   --layer-transition: 1.15rem;
+  --site-legal-height: 2.75rem;
 }
 
 * {
@@ -60,19 +61,9 @@ body {
   overscroll-behavior-y: none;
 }
 
+/* Sin salto visual: solo cambio de scroll para sensación de rueda continua */
 body.loop-warp .page {
-  transition: transform 180ms ease, filter 180ms ease, opacity 180ms ease;
-  filter: saturate(0.98);
-}
-
-body.loop-warp-up .page {
-  transform: translateY(-6px);
-  opacity: 0.985;
-}
-
-body.loop-warp-down .page {
-  transform: translateY(6px);
-  opacity: 0.985;
+  transition: none;
 }
 
 html {
@@ -88,6 +79,10 @@ body.sheet-open {
   margin: 0 auto;
   padding: 0 0 var(--page-pad-bottom);
   position: relative;
+}
+
+.page:has(.site-legal) {
+  padding-bottom: calc(var(--page-pad-bottom) + var(--site-legal-height));
 }
 
 /* Degradado por capas: más claro arriba (atmósfera), más denso hacia strata */
@@ -595,6 +590,28 @@ h2 {
   position: relative;
 }
 
+.climate-metrics-line .metric {
+  white-space: nowrap;
+}
+
+.climate-metrics-line .metric-label {
+  font-variant-numeric: normal;
+  opacity: 0.88;
+}
+
+.climate-metrics-line .metric-value {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: color-mix(in oklab, var(--text) 35%, var(--muted));
+}
+
+.climate-metrics-line .metric-sep {
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
+  margin: 0 0.2em;
+}
+
 .climate-metrics-line.hidden {
   display: none;
 }
@@ -724,6 +741,25 @@ h2 {
   width: 100%;
   margin: 1.25rem 0 0;
   text-align: center;
+}
+
+.page .site-legal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  margin: 0;
+  padding: 0.4rem 1rem;
+  min-height: var(--site-legal-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  background: color-mix(in oklab, var(--bg) 97%, var(--bg-deep));
+  border-top: 1px solid color-mix(in oklab, var(--line) 75%, transparent);
+  box-sizing: border-box;
 }
 
 .ai-page {

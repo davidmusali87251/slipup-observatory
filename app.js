@@ -493,6 +493,15 @@ const UI_COPY = {
     sheetEmpty: "No shared moments yet.",
     sheetCount: (n) => (n === 1 ? "Showing 1 moment." : `Showing ${n} moments.`),
     loading: "Loading…",
+    metrics: {
+      pressureCondensing: "condensing",
+      pressureClearing: "clearing",
+      pressureStable: "stable",
+      sharedUnit: "shared",
+      sharedCount: (n) => `${n} shared`,
+      stability: "stability",
+      density: "density",
+    },
   },
   es: {
     orientation: "Esta lectura reúne la ventana de abajo.",
@@ -511,6 +520,15 @@ const UI_COPY = {
     sheetEmpty: "Aún no hay momentos compartidos.",
     sheetCount: (n) => (n === 1 ? "Se muestra 1 momento." : `Se muestran ${n} momentos.`),
     loading: "Cargando…",
+    metrics: {
+      pressureCondensing: "condensando",
+      pressureClearing: "abriendo",
+      pressureStable: "estable",
+      sharedUnit: "compartidos",
+      sharedCount: (n) => `${n} compartidos`,
+      stability: "estabilidad",
+      density: "densidad",
+    },
   },
 };
 
@@ -937,7 +955,7 @@ function initInfiniteObservatoryScroll() {
   let touchStartY = null;
   const threshold = 18;
   const minDelta = 26;
-  const lockMs = 380;
+  const lockMs = 260;
 
   const canWrap = () => {
     if (Date.now() < wrapLockUntil) return false;
@@ -953,9 +971,9 @@ function initInfiniteObservatoryScroll() {
     wrapLockUntil = Date.now() + lockMs;
     document.body.classList.add("loop-warp", direction === "up" ? "loop-warp-up" : "loop-warp-down");
     window.scrollTo({ top: targetTop, behavior: "auto" });
-    window.setTimeout(() => {
+    requestAnimationFrame(() => {
       document.body.classList.remove("loop-warp", "loop-warp-up", "loop-warp-down");
-    }, 220);
+    });
   };
 
   const onWheel = (event) => {
@@ -966,13 +984,13 @@ function initInfiniteObservatoryScroll() {
 
     if (y <= threshold && event.deltaY < -minDelta) {
       event.preventDefault();
-      const carry = clamp(Math.abs(event.deltaY), 0, 120);
+      const carry = clamp(Math.abs(event.deltaY), 0, 140);
       wrapTo(Math.max(threshold, max - threshold - carry), "up");
       return;
     }
     if (y >= max - threshold && event.deltaY > minDelta) {
       event.preventDefault();
-      const carry = clamp(Math.abs(event.deltaY), 0, 120);
+      const carry = clamp(Math.abs(event.deltaY), 0, 140);
       wrapTo(Math.min(max - threshold, threshold + carry), "down");
     }
   };
@@ -991,13 +1009,13 @@ function initInfiniteObservatoryScroll() {
     if (max <= threshold * 2) return;
 
     if (y <= threshold && delta < -minDelta) {
-      const carry = clamp(Math.abs(delta), 0, 120);
+      const carry = clamp(Math.abs(delta), 0, 140);
       wrapTo(Math.max(threshold, max - threshold - carry), "up");
       touchStartY = currentY;
       return;
     }
     if (y >= max - threshold && delta > minDelta) {
-      const carry = clamp(Math.abs(delta), 0, 120);
+      const carry = clamp(Math.abs(delta), 0, 140);
       wrapTo(Math.min(max - threshold, threshold + carry), "down");
       touchStartY = currentY;
     }
@@ -2327,23 +2345,32 @@ async function boot() {
     const total = Number(canonicalState?.total) || 0;
     const pressure = canonicalState?.pressureMode || "";
     const stability = canonicalState?.stabilityIndex;
+    const ui = UI_COPY[LANG] || UI_COPY.en;
+    const m = ui.metrics || {};
     const pressureLabel =
       pressure === "condensing"
-        ? "presión condensando"
+        ? (m.pressureCondensing ?? "condensing")
         : pressure === "clearing"
-          ? "presión abriendo"
+          ? (m.pressureClearing ?? "clearing")
           : total > 0
-            ? "presión estable"
+            ? (m.pressureStable ?? "stable")
             : "";
     const densityPct = total > 0 ? Math.min(100, Math.round((total / 50) * 100)) : 0;
     const parts = [];
-    if (pressureLabel && total > 0) parts.push(`${pressureLabel} · ${total} compartidos`);
-    if (Number.isFinite(stability) && stability >= 0) {
-      parts.push(`estabilidad ${Math.round(stability * 100)}`);
+    if (pressureLabel && total > 0) {
+      const sharedText = m.sharedCount ? m.sharedCount(total) : `${total} ${m.sharedUnit || "shared"}`;
+      parts.push({ type: "pressure", html: `<span class="metric metric-pressure">${pressureLabel}</span><span class="metric metric-shared">${sharedText}</span>` });
     }
-    if (total > 0) parts.push(`densidad ${densityPct}`);
+    if (Number.isFinite(stability) && stability >= 0) {
+      const stabLabel = m.stability || "stability";
+      parts.push({ type: "stability", html: `<span class="metric metric-stability"><span class="metric-label">${stabLabel}</span> <span class="metric-value">${Math.round(stability * 100)}</span></span>` });
+    }
+    if (total > 0) {
+      const densLabel = m.density || "density";
+      parts.push({ type: "density", html: `<span class="metric metric-density"><span class="metric-label">${densLabel}</span> <span class="metric-value">${densityPct}</span></span>` });
+    }
     if (parts.length > 0) {
-      climateMetricsLine.textContent = parts.join(" · ");
+      climateMetricsLine.innerHTML = parts.map((p) => p.html).join('<span class="metric-sep" aria-hidden="true"> · </span>');
       climateMetricsLine.classList.remove("hidden");
       if (climateInstrument) climateInstrument.classList.remove("hidden");
     } else {
