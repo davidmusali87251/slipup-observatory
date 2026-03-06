@@ -88,48 +88,6 @@ body.sheet-open {
   position: relative;
 }
 
-/* Barra lateral tipo observatorio: solo en viewports muy estrechos */
-.observatory-strip {
-  display: none;
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 48px;
-  z-index: 100;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.5rem 0;
-  background: linear-gradient(180deg, color-mix(in oklab, var(--bg) 98%, #7f8fb2) 0%, color-mix(in oklab, var(--bg-deep) 96%, #7f8fb2) 100%);
-  border-right: 1px solid color-mix(in oklab, var(--text) 12%, transparent);
-  box-shadow: 1px 0 0 color-mix(in oklab, #fff 40%, transparent);
-}
-
-.observatory-strip .strip-degree {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text);
-  letter-spacing: 0.02em;
-  line-height: 1.2;
-}
-
-.observatory-strip .strip-condition {
-  margin: 0;
-  font-size: 0.52rem;
-  line-height: 1.25;
-  color: var(--muted);
-  max-width: 44px;
-  text-align: center;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-
 @media (min-width: 481px) and (max-width: 1024px) {
   .page {
     width: min(720px, 88vw);
@@ -438,7 +396,7 @@ h2 {
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 0.75rem;
+  gap: 1rem;
   max-width: 34ch;
   position: relative;
   padding-top: var(--atmo-ground);
@@ -684,6 +642,102 @@ h2 {
   }
 }
 
+/* Vista narrow: la página se muestra como strip (menos datos, más compacta, misma identidad observatorio) */
+@media (max-width: 420px) {
+  .page {
+    width: 96vw;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    --section-gap: 1.25rem;
+  }
+
+  .observatory-hero {
+    padding: 0.6rem 0 var(--page-pad-top);
+  }
+
+  .panel-observatory .telescope-scope {
+    opacity: 0.14;
+  }
+
+  .atmosphere-value-prop {
+    font-size: 0.6rem;
+    margin-bottom: 0.35rem;
+    opacity: 0.8;
+  }
+
+  .observatory-entry .eyebrow-layer,
+  .observatory-entry .eyebrow-context {
+    font-size: 0.62rem;
+  }
+
+  .atmosphere-air {
+    gap: 0.4rem;
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
+  }
+
+  .atmosphere-air .degree-wrap {
+    margin-top: 0.6rem;
+  }
+
+  .degree-value {
+    font-size: clamp(2.75rem, 18vw, 4rem);
+  }
+
+  .atmosphere-air .condition-line {
+    margin-top: 0.4rem;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    max-width: 28ch;
+  }
+
+  /* Instrumento en una línea, compacto (strip) */
+  .atmosphere-air .climate-instrument {
+    margin-top: 0.5rem;
+    padding: 0.45rem 0.6rem 0.5rem;
+    min-height: 0;
+  }
+
+  .atmosphere-air .climate-instrument .climate-metrics-row {
+    flex-wrap: nowrap;
+    justify-content: center;
+  }
+
+  .atmosphere-air .climate-instrument .climate-metrics-line {
+    font-size: 0.68rem;
+    line-height: 1.3;
+  }
+
+  .atmosphere-air .climate-instrument .instrument-info-btn,
+  .atmosphere-air .climate-instrument .instrument-info-text {
+    display: none !important;
+  }
+
+  .atmosphere-grounding {
+    padding-top: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .atmosphere-grounding .cta-observatory {
+    margin-top: 0;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.88rem;
+  }
+
+  .atmosphere-grounding .cta-microcopy,
+  .atmosphere-grounding .trust-microcopy {
+    font-size: 0.62rem;
+  }
+
+  .panel-recent,
+  .panel-horizon,
+  .local-climate,
+  .ground-strata {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+  }
+}
+
 .atmosphere-semantic-hint {
   margin-top: 0.35rem;
   font-size: 0.7rem;
@@ -766,38 +820,14 @@ h2 {
 
 .climate-instrument {
   margin-top: 0.75rem;
-  padding: 0.75rem 1.6rem 0.85rem 0.95rem;
-  border-radius: 10px;
+  padding: 0.5rem 0;
   position: relative;
   overflow: visible;
-  min-height: 4.5rem;
-  /* Panel ventana: solo paleta observatorio/atmósfera */
-  background:
-    linear-gradient(
-      165deg,
-      var(--bg) 0%,
-      color-mix(in oklab, var(--bg) 88%, var(--bg-deep)) 45%,
-      color-mix(in oklab, var(--bg-deep) 88%, var(--line)) 100%
-    );
-  border: 1px solid color-mix(in oklab, var(--text) 8%, var(--line));
-  box-shadow:
-    0 1px 0 0 color-mix(in oklab, var(--bg) 95%, var(--line)) inset,
-    0 2px 12px -4px color-mix(in oklab, var(--text) 10%, transparent),
-    0 0 0 1px color-mix(in oklab, var(--line) 70%, transparent);
+  min-height: 0;
 }
 
 .climate-instrument::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
-  background: linear-gradient(
-    180deg,
-    var(--layer-horizon) 0%,
-    transparent 45%
-  );
-  opacity: 0.85;
+  display: none;
 }
 
 .climate-instrument.hidden {
@@ -945,11 +975,13 @@ h2 {
 }
 
 .climate-summary-line {
-  margin-top: 0.15rem;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
   font-size: 0.88rem;
-  line-height: 1.5;
+  line-height: 1.7;
+  letter-spacing: 0.02em;
   color: var(--muted);
-  opacity: 0.88;
+  opacity: 0.9;
 }
 
 .climate-summary-line.hidden {
@@ -979,11 +1011,13 @@ h2 {
 }
 
 .atmosphere-pattern-line {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: #4c6179;
-  line-height: 1.62;
-  opacity: 0.82;
-  margin-top: 0.26rem;
+  line-height: 1.75;
+  letter-spacing: 0.03em;
+  opacity: 0.84;
+  margin-top: 0;
+  margin-bottom: 0.6rem;
 }
 
 .cta-observatory {
@@ -1689,14 +1723,11 @@ h2 {
 .panel-contribute {
   --contribute-accent: #7f8fb2;
   position: relative;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(248, 246, 252, 0.98) 100%);
-  background: linear-gradient(180deg, color-mix(in oklab, #ffffff 94%, var(--contribute-accent)) 0%, color-mix(in oklab, #f8f6fc 96%, var(--contribute-accent)) 100%);
-  border: 1px solid rgba(127, 143, 178, 0.28);
-  border: 1px solid color-mix(in oklab, var(--contribute-accent) 28%, transparent);
-  border-radius: 14px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   padding: 1.1rem 1.15rem 1.25rem;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.88) inset;
-  box-shadow: 0 1px 0 color-mix(in oklab, #ffffff 88%, transparent) inset;
+  box-shadow: none;
 }
 
 .contribute-layer-entry {
@@ -1845,6 +1876,7 @@ h2 {
   font-family: inherit;
   font-size: 0.92rem;
   line-height: 1.35;
+  text-transform: none;
   box-shadow:
     0 1px 0 #ffffffde inset,
     0 0 0 0 transparent;
@@ -1863,6 +1895,7 @@ h2 {
   letter-spacing: 0.01em;
   line-height: 1.25;
   color: #23384d;
+  text-transform: none;
 }
 
 .field select {
@@ -1881,6 +1914,31 @@ h2 {
 .field select:hover,
 .field input[type="text"]:hover {
   border-color: color-mix(in oklab, var(--text) 24%, #c8d6e7);
+}
+
+/* Capitalización normal: listas, datos y filtros en toda la página */
+.moment-item,
+#recentMoments .moment-item,
+.shared-sheet-list .moment-item,
+.panel-horizon .horizon-primary,
+.panel-horizon .horizon-secondary,
+.panel-horizon .horizon-pulse-line,
+.local-field-select,
+.local-climate-primary,
+.local-climate-secondary,
+.local-climate-echo,
+.local-climate-metrics-line,
+.local-climate-degree,
+.local-climate-mass,
+.ground-strata .strata-context,
+.ground-strata .strata-metrics-line,
+.ground-strata .strata-lines,
+.climate-metrics-line,
+.climate-summary-line,
+.atmosphere-pattern-line,
+.condition-line,
+.shared-sheet-count {
+  text-transform: none;
 }
 
 .field select:focus,
@@ -2017,14 +2075,8 @@ h2 {
 }
 
 @media (max-width: 360px) {
-  .observatory-strip {
-    display: flex;
-    left: env(safe-area-inset-left, 0);
-  }
-
   .page {
     width: 94vw;
-    margin-left: calc(48px + env(safe-area-inset-left, 0));
     padding-left: 0.5rem;
     padding-right: 0.5rem;
   }

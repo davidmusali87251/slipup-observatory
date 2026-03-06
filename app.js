@@ -589,7 +589,6 @@ function applyUICopy() {
   const nearbyTitleEl = document.querySelector(".local-climate-line");
   if (nearbyTitleEl) nearbyTitleEl.textContent = ui.nearbyTitle;
   if (conditionLine) conditionLine.textContent = ui.conditionPending;
-  if (stripCondition) stripCondition.textContent = ui.conditionPending || "";
   if (viewMoreButton) viewMoreButton.textContent = ui.viewMore;
   const closeBtn = document.getElementById("shared-sheet-close");
   if (closeBtn) closeBtn.textContent = ui.close;
@@ -898,8 +897,6 @@ function pickCopyFromState(entry, numericSeed) {
 
 const degreeValue = document.getElementById("degreeValue");
 const conditionLine = document.getElementById("conditionLine");
-const stripDegree = document.getElementById("stripDegree");
-const stripCondition = document.getElementById("stripCondition");
 const climateSummaryLine = document.getElementById("climateSummaryLine");
 const climateMetricsLine = document.getElementById("climateMetricsLine");
 const climateInstrument = document.getElementById("climateInstrument");
@@ -2326,7 +2323,6 @@ function animateDegree(from, to, ms) {
   if (prefersReducedMotion || ms <= 0) {
     const t = formatDegree(to);
     degreeValue.textContent = t;
-    if (stripDegree) stripDegree.textContent = t;
     return;
   }
   const start = performance.now();
@@ -2336,7 +2332,6 @@ function animateDegree(from, to, ms) {
     const current = from + (to - from) * eased;
     const txt = formatDegree(current);
     degreeValue.textContent = txt;
-    if (stripDegree) stripDegree.textContent = txt;
     if (t < 1) requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
@@ -2527,12 +2522,10 @@ async function boot() {
   if (hasStoredDisplay) {
     const d = formatDegree(optimisticStartDisplay);
     degreeValue.textContent = d;
-    if (stripDegree) stripDegree.textContent = d;
     document.body.style.setProperty("--atmo", String(optimisticStartDisplay));
   } else {
     // First load with no stored state: avoid flashing a temporary fixed number.
     degreeValue.textContent = String(BASELINE);
-    if (stripDegree) stripDegree.textContent = String(BASELINE);
     degreeValue.classList.add("is-pending");
     document.body.style.setProperty("--atmo", String(BASELINE));
     if (observatoryPanel) observatoryPanel.setAttribute("aria-busy", "true");
@@ -2644,7 +2637,6 @@ async function boot() {
     } else {
       conditionLine.textContent = canonicalState.condition;
     }
-    if (stripCondition) stripCondition.textContent = conditionLine.textContent;
   }
 
   // Instrumento observatorio: usa INSTRUMENT_REAL y helpers para traducir a unidades reales.
@@ -2782,7 +2774,6 @@ boot().catch((err) => {
   if (conditionLine) {
     const ui = UI_COPY[LANG] || UI_COPY.en;
     conditionLine.textContent = ui.conditionError || "Something went wrong. Refresh the page.";
-    if (stripCondition) stripCondition.textContent = conditionLine.textContent;
   }
   if (typeof console !== "undefined" && console.error) console.error("[Observatory] boot error", err);
 });
