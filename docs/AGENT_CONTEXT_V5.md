@@ -52,6 +52,11 @@ Esa evolución es la correcta para SlipUp: no rompe esencia, no introduce feed, 
 
 Al compartir, el peligro natural es que el sistema se convierta en: red social (feed), métrica, comparación o "clima emocional". La forma de mantenerlo como **Observatory** es la regla anterior: **shared = evidencia mínima**, no consumo infinito.
 
+### Criterio de coherencia (copy y UI)
+
+**Si suena a lectura atmosférica, se siente espacio.**  
+Lo que se muestra en la hero y en las capas debe sonar a *lectura* (grado, resumen, mezcla), no a panel ni telemetría. Las cifras y etiquetas de instrumento (Global, N moments, density, tone, stability) quedan en el panel "i" o en internos; en la vista principal solo ancla que es lectura agregada (p. ej. "Reading from the last 48 hours.") y el resultado (grado + frase de mezcla).
+
 ---
 
 ## Resumen para el agente

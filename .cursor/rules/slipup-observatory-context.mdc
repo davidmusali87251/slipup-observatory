@@ -14,6 +14,10 @@ El sistema es **local-first + canal shared**: no es "proyecto inicial" solo loca
 - **Shared = evidencia mínima:** Preview y sheet acotados (listas limitadas). Sin feed infinito, sin ranking, sin métricas de comparación. Sistema habitable, no panel consultable.
 - **ComputedDegree:** Puede migrar a servidor en Fase 2; el front sigue siendo render + fallback.
 
+## Coherencia copy/UI
+
+**Si suena a lectura atmosférica, se siente espacio.** En la hero y capas mostrar lectura (grado, resumen, mezcla), no panel ni telemetría. Cifras e internos del instrumento solo en el panel "i".
+
 ## Unidades
 
 - **Moment** = unidad mínima (no "error"). **Cielo** = instrumento (no dashboard).

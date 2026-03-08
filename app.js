@@ -67,38 +67,38 @@ const LANG = (typeof document !== "undefined" && document.documentElement?.lang?
  */
 const MIX_LINE_OBSERVATORY = {
   en: {
-    "observed|calm": ["A quiet line in the field.", "The read holds steady.", "Calm observation in the window."],
-    "observed|focus": ["Focused sight on the line.", "The field shows steady focus.", "A clear, focused read."],
-    "observed|stressed": ["Observation under strain.", "The line carries tension.", "Stressed but still watching."],
-    "observed|curious": ["The line tilts curious.", "Curiosity in the reading.", "A curious, steady watch."],
-    "observed|tired": ["A weary but steady read.", "The field rests.", "Tired observation holds the line."],
-    "avoidable|calm": ["Calm acknowledgment in the mix.", "The field notes what could shift.", "Quiet note on the avoidable."],
-    "avoidable|focus": ["Focus on what might have been otherwise.", "A sharp read on avoidable weight."],
-    "avoidable|stressed": ["Pressure in the avoidable band.", "The line bears repeated strain.", "Strain and recurrence."],
-    "avoidable|curious": ["Curiosity around the avoidable.", "The read questions the pattern."],
-    "avoidable|tired": ["Tired recurrence in the field.", "The line sags under repetition."],
-    "fertile|calm": ["Calm fertility in the read.", "The field opens quietly.", "A quiet opening."],
-    "fertile|focus": ["Focused growth in the mix.", "The line leans into possibility.", "Fertile focus in the window."],
-    "fertile|stressed": ["Fertile ground under stress.", "Tension and opening share the read."],
-    "fertile|curious": ["Curiosity and opening.", "The field tilts toward discovery.", "Fertile curiosity."],
-    "fertile|tired": ["Weary but open.", "The read holds space despite fatigue.", "Tired and opening."],
+    "observed|calm": ["A quiet line in the field.", "The read holds steady.", "Calm observation in the window.", "Calm in the mix.", "The reading holds steady."],
+    "observed|focus": ["Focused sight on the line.", "The field shows steady focus.", "A clear, focused read.", "Steady focus in the reading.", "The read stays clear."],
+    "observed|stressed": ["Observation under strain.", "The line carries tension.", "Stressed but still watching.", "Tension in the reading.", "Watching under strain."],
+    "observed|curious": ["The line tilts curious.", "Curiosity in the reading.", "A curious, steady watch.", "The read tilts toward curiosity.", "Curious watch in the mix."],
+    "observed|tired": ["A weary but steady read.", "The field rests.", "Tired observation holds the line.", "Steady despite fatigue.", "The reading rests."],
+    "avoidable|calm": ["Calm acknowledgment in the mix.", "The field notes what could shift.", "Quiet note on the avoidable.", "The mix acknowledges the avoidable.", "Quiet read on what could shift."],
+    "avoidable|focus": ["Focus on what might have been otherwise.", "A sharp read on avoidable weight.", "Sharp read on what might have shifted.", "Focus on the avoidable band.", "The read stays sharp on the avoidable."],
+    "avoidable|stressed": ["Pressure in the avoidable band.", "The line bears repeated strain.", "Strain and recurrence.", "Recurrence and strain in the read.", "The reading bears repeated weight."],
+    "avoidable|curious": ["Curiosity around the avoidable.", "The read questions the pattern.", "The pattern questioned.", "Curiosity around recurrence.", "The mix questions the avoidable."],
+    "avoidable|tired": ["Tired recurrence in the field.", "The line sags under repetition.", "Repetition and fatigue in the mix.", "The read sags with recurrence."],
+    "fertile|calm": ["Calm fertility in the read.", "The field opens quietly.", "A quiet opening.", "Quiet opening in the read.", "The mix opens calmly."],
+    "fertile|focus": ["Focused growth in the mix.", "The line leans into possibility.", "Fertile focus in the window.", "Possibility in focus.", "The reading leans into growth."],
+    "fertile|stressed": ["Tension and opening share the read.", "Moments mix tension and openness.", "Opening under tension.", "Tension and openness in the mix.", "The read holds tension and opening."],
+    "fertile|curious": ["Curiosity and opening.", "The field tilts toward discovery.", "Fertile curiosity.", "Discovery in the mix.", "Opening and curiosity."],
+    "fertile|tired": ["Weary but open.", "The read holds space despite fatigue.", "Tired and opening.", "Open despite weariness.", "Fatigue and opening share the read."],
   },
   es: {
-    "observed|calm": ["Una línea quieta en el campo.", "La lectura se mantiene estable.", "Observación calmada en la ventana."],
-    "observed|focus": ["Mirada enfocada en la línea.", "El campo muestra un foco estable.", "Una lectura clara y atenta."],
-    "observed|stressed": ["Observación bajo tensión.", "La línea lleva carga.", "Atento aunque con tensión."],
-    "observed|curious": ["La línea se inclina curiosa.", "Curiosidad en la lectura.", "Una mirada curiosa y estable."],
-    "observed|tired": ["Una lectura cansada pero estable.", "El campo descansa.", "Observación cansada sostiene la línea."],
-    "avoidable|calm": ["Reconocimiento calmado en la mezcla.", "El campo anota lo que podría cambiar.", "Nota tranquila sobre lo evitable."],
-    "avoidable|focus": ["Foco en lo que pudo ser distinto.", "Una lectura aguda del peso evitable."],
-    "avoidable|stressed": ["Presión en la banda evitable.", "La línea soporta repetición.", "Tensión y recurrencia."],
-    "avoidable|curious": ["Curiosidad en torno a lo evitable.", "La lectura cuestiona el patrón."],
-    "avoidable|tired": ["Recurrencia cansada en el campo.", "La línea cede bajo la repetición."],
-    "fertile|calm": ["Fertilidad calmada en la lectura.", "El campo se abre en silencio.", "Una apertura tranquila."],
-    "fertile|focus": ["Crecimiento enfocado en la mezcla.", "La línea se inclina a la posibilidad.", "Foco fértil en la ventana."],
-    "fertile|stressed": ["Suelo fértil bajo estrés.", "Tensión y apertura comparten la lectura."],
-    "fertile|curious": ["Curiosidad y apertura.", "El campo se inclina al descubrimiento.", "Curiosidad fértil."],
-    "fertile|tired": ["Cansado pero abierto.", "La lectura guarda espacio pese al cansancio.", "Cansancio y apertura."],
+    "observed|calm": ["Una línea quieta en el campo.", "La lectura se mantiene estable.", "Observación calmada en la ventana.", "Calma en la mezcla.", "La lectura se sostiene estable."],
+    "observed|focus": ["Mirada enfocada en la línea.", "El campo muestra un foco estable.", "Una lectura clara y atenta.", "Foco estable en la lectura.", "La lectura se mantiene clara."],
+    "observed|stressed": ["Observación bajo tensión.", "La línea lleva carga.", "Atento aunque con tensión.", "Tensión en la lectura.", "Atento bajo la carga."],
+    "observed|curious": ["La línea se inclina curiosa.", "Curiosidad en la lectura.", "Una mirada curiosa y estable.", "La lectura se inclina a la curiosidad.", "Mirada curiosa en la mezcla."],
+    "observed|tired": ["Una lectura cansada pero estable.", "El campo descansa.", "Observación cansada sostiene la línea.", "Estable pese al cansancio.", "La lectura descansa."],
+    "avoidable|calm": ["Reconocimiento calmado en la mezcla.", "El campo anota lo que podría cambiar.", "Nota tranquila sobre lo evitable.", "La mezcla reconoce lo evitable.", "Lectura tranquila sobre lo que podría cambiar."],
+    "avoidable|focus": ["Foco en lo que pudo ser distinto.", "Una lectura aguda del peso evitable.", "Lectura aguda de lo que pudo cambiar.", "Foco en la banda evitable.", "La lectura se mantiene enfocada en lo evitable."],
+    "avoidable|stressed": ["Presión en la banda evitable.", "La línea soporta repetición.", "Tensión y recurrencia.", "Recurrencia y tensión en la lectura.", "La lectura soporta peso repetido."],
+    "avoidable|curious": ["Curiosidad en torno a lo evitable.", "La lectura cuestiona el patrón.", "El patrón cuestionado.", "Curiosidad en torno a la recurrencia.", "La mezcla cuestiona lo evitable."],
+    "avoidable|tired": ["Recurrencia cansada en el campo.", "La línea cede bajo la repetición.", "Repetición y cansancio en la mezcla.", "La lectura cede con la recurrencia."],
+    "fertile|calm": ["Fertilidad calmada en la lectura.", "El campo se abre en silencio.", "Una apertura tranquila.", "Apertura tranquila en la lectura.", "La mezcla se abre con calma."],
+    "fertile|focus": ["Crecimiento enfocado en la mezcla.", "La línea se inclina a la posibilidad.", "Foco fértil en la ventana.", "Posibilidad en foco.", "La lectura se inclina al crecimiento."],
+    "fertile|stressed": ["Tensión y apertura comparten la lectura.", "Los momentos mezclan tensión y apertura.", "Apertura bajo tensión.", "Tensión y apertura en la mezcla.", "La lectura sostiene tensión y apertura."],
+    "fertile|curious": ["Curiosidad y apertura.", "El campo se inclina al descubrimiento.", "Curiosidad fértil.", "Descubrimiento en la mezcla.", "Apertura y curiosidad."],
+    "fertile|tired": ["Cansado pero abierto.", "La lectura guarda espacio pese al cansancio.", "Cansancio y apertura.", "Abierto pese al cansancio.", "Cansancio y apertura comparten la lectura."],
   },
 };
 
@@ -958,6 +958,7 @@ const climateSummaryLine = document.getElementById("climateSummaryLine");
 const climateMetricsLine = document.getElementById("climateMetricsLine");
 const climateInstrument = document.getElementById("climateInstrument");
 const observatoryScopeRange = document.getElementById("observatoryScopeRange");
+const instrumentInfoTechnical = document.getElementById("instrumentInfoTechnical");
 // FUTURE: kept as scaffold for a possible hero confidence line return.
 const readingConfidenceLine = document.getElementById("readingConfidenceLine");
 const observatoryPanel = document.getElementById("observatory");
@@ -1080,8 +1081,10 @@ function instrumentToDensityKgM3(signalPct) {
 /**
  * Construye los fragmentos HTML de la línea de métricas (tendency · balance · concentration)
  * para cualquier capa (atmosphere, horizon, nearby). state = { pressureMode, stabilityIndex }; total = número de momentos.
+ * opts.includeDensity = false para no mostrar densidad en la vista principal (solo en panel "i").
  */
-function buildMetricsLineParts(state, total, lang = "en") {
+function buildMetricsLineParts(state, total, lang = "en", opts = {}) {
+  const includeDensity = opts.includeDensity !== false;
   const ui = UI_COPY[lang] || UI_COPY.en;
   const m = ui.metrics || {};
   const pressureMode = state?.pressureMode || "";
@@ -1100,7 +1103,7 @@ function buildMetricsLineParts(state, total, lang = "en") {
   const parts = [];
   const showTendency = total >= OBSERVABILITY_MIN.tendency && toneReading != null;
   const showBalance = total >= OBSERVABILITY_MIN.balance && stabilityPct != null;
-  const showConcentration = total >= OBSERVABILITY_MIN.concentration;
+  const showConcentration = includeDensity && total >= OBSERVABILITY_MIN.concentration && total > 0;
   if (showTendency) {
     const pressureVal = pressureUnit ? `${toneReading} ${pressureUnit}` : String(toneReading);
     parts.push({ type: "pressure", html: `<span class="metric metric-pressure"><span class="metric-label">${pressureLabel}</span> <span class="metric-value">${pressureVal}</span></span>` });
@@ -1110,7 +1113,7 @@ function buildMetricsLineParts(state, total, lang = "en") {
     const stabUnit = m.stabilityUnit ?? "%";
     parts.push({ type: "stability", html: `<span class="metric metric-stability"><span class="metric-label">${stabLabel}</span> <span class="metric-value">${stabilityPct}${stabUnit}</span></span>` });
   }
-  if (showConcentration && total > 0) {
+  if (showConcentration) {
     const densityVal = densUnit ? `${densityFormatted} ${densUnit}` : densityFormatted;
     parts.push({ type: "density", html: `<span class="metric metric-density"><span class="metric-label">${densLabel}</span> <span class="metric-value">${densityVal}</span></span>` });
   }
@@ -2869,7 +2872,7 @@ async function boot() {
   }
   if (climateMetricsLine) {
     const total = Number(canonicalState?.total) || 0;
-    const parts = buildMetricsLineParts(canonicalState, total, LANG);
+    const parts = buildMetricsLineParts(canonicalState, total, LANG, { includeDensity: false });
     if (parts.length > 0) {
       climateMetricsLine.innerHTML = parts.map((p) => p.html).join('<span class="metric-sep" aria-hidden="true"> · </span>');
       climateMetricsLine.classList.remove("hidden");
@@ -2880,7 +2883,32 @@ async function boot() {
         const scopeLabel = ui.instrumentScopeLabel || "Global";
         const rangeText = ui.scopeRangeLine ? ui.scopeRangeLine(total) : `${total} moments`;
         observatoryScopeRange.textContent = `${layerLabel} · ${scopeLabel} · ${rangeText}`;
-        observatoryScopeRange.classList.remove("hidden");
+        observatoryScopeRange.classList.add("hidden");
+      }
+      if (instrumentInfoTechnical) {
+        const ui = UI_COPY[LANG] || UI_COPY.en;
+        const m = ui.metrics || {};
+        const windowLabel = LANG === "es" ? "Ventana: 48 h" : "Window: 48h";
+        const signalsLabel = LANG === "es" ? (total === 1 ? "1 señal" : `${total} señales`) : (total === 1 ? "1 signal" : `${total} signals`);
+        const densityPct = instrumentToDensitySignalPct(total, getDensitySignalRef(total));
+        const densityKgM3 = instrumentToDensityKgM3(densityPct);
+        const densityFormatted = densityKgM3.toFixed(2).replace(".", LANG === "es" ? "," : ".");
+        const densLabel = m.density || (LANG === "es" ? "densidad" : "density");
+        const techParts = [`${windowLabel} · ${signalsLabel} · ${densLabel} ${densityFormatted}`];
+        const toneReading = canonicalState?.toneReading != null && Number.isFinite(canonicalState.toneReading)
+          ? Math.round(canonicalState.toneReading)
+          : (total > 0 ? instrumentToPressureHpa(canonicalState?.pressureMode || "") : null);
+        const stabilityPct = instrumentToStabilityPercent(canonicalState?.stabilityIndex);
+        if (total >= OBSERVABILITY_MIN.tendency && toneReading != null) {
+          const pressureUnit = m.pressureUnit ?? "";
+          const toneVal = pressureUnit ? `${toneReading} ${pressureUnit}` : String(toneReading);
+          techParts.push(`${m.pressureLabel || "tone"} ${toneVal}`);
+        }
+        if (total >= OBSERVABILITY_MIN.balance && stabilityPct != null) {
+          const stabUnit = m.stabilityUnit ?? "%";
+          techParts.push(`${m.stability || "stability"} ${stabilityPct}${stabUnit}`);
+        }
+        instrumentInfoTechnical.textContent = techParts.join(" · ");
       }
     } else {
       climateMetricsLine.textContent = "";
@@ -2890,6 +2918,7 @@ async function boot() {
         observatoryScopeRange.textContent = "";
         observatoryScopeRange.classList.add("hidden");
       }
+      if (instrumentInfoTechnical) instrumentInfoTechnical.textContent = "";
     }
   }
 
@@ -2956,9 +2985,11 @@ async function boot() {
 
   const instrumentInfoBtn = document.getElementById("instrumentInfoBtn");
   const instrumentInfoTextEl = document.getElementById("instrumentInfoText");
+  const instrumentInfoTechnicalEl = document.getElementById("instrumentInfoTechnical");
   if (instrumentInfoBtn && instrumentInfoTextEl) {
     instrumentInfoBtn.addEventListener("click", () => {
       instrumentInfoTextEl.classList.toggle("hidden");
+      if (instrumentInfoTechnicalEl) instrumentInfoTechnicalEl.classList.toggle("hidden");
       instrumentInfoBtn.setAttribute("aria-expanded", String(!instrumentInfoTextEl.classList.contains("hidden")));
     });
   }

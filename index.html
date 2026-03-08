@@ -42,6 +42,16 @@
         <p class="upper-cue" aria-hidden="true">Upper view</p>
         <a class="space-cue space-cue-link" href="./ai.html">AI sector ↑</a>
 
+        <div id="climateInstrument" class="climate-instrument" role="status" aria-live="polite" aria-label="Reading metrics">
+          <button type="button" id="instrumentInfoBtn" class="instrument-info-btn" aria-label="About these values" aria-expanded="false" aria-controls="instrumentInfoText">i</button>
+          <p id="observatoryScopeRange" class="observatory-scope-range hidden" aria-live="polite"></p>
+          <div class="climate-metrics-row">
+            <p id="climateMetricsLine" class="climate-metrics-line"></p>
+          </div>
+          <p id="instrumentInfoText" class="instrument-info-text hidden" role="status"></p>
+          <p id="instrumentInfoTechnical" class="instrument-info-technical hidden" role="status"></p>
+        </div>
+
         <section id="observatory" class="panel panel-observatory" aria-label="Observatory">
           <div class="atmosphere-air" aria-label="Reading in the air">
             <div class="observatory-entry">
@@ -64,14 +74,6 @@
                 <span id="degreeScaleLabel" class="degree-scale-label" aria-hidden="true">0–100 scale</span>
               </div>
               <p id="atmosphere-pattern-line" class="atmosphere-pattern-line degree-pattern-line hidden" aria-live="polite"></p>
-            </div>
-            <div id="climateInstrument" class="climate-instrument" role="status" aria-live="polite" aria-label="Reading metrics">
-              <button type="button" id="instrumentInfoBtn" class="instrument-info-btn" aria-label="About these values" aria-expanded="false" aria-controls="instrumentInfoText">i</button>
-              <p id="observatoryScopeRange" class="observatory-scope-range hidden" aria-live="polite"></p>
-              <div class="climate-metrics-row">
-                <p id="climateMetricsLine" class="climate-metrics-line"></p>
-              </div>
-              <p id="instrumentInfoText" class="instrument-info-text hidden" role="status"></p>
             </div>
           </div>
           <div class="atmosphere-grounding" aria-label="Toward the horizon">
