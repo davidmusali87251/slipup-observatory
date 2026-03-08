@@ -113,6 +113,20 @@ function getMixLinePhrase(lang, type, mood, seed) {
   return variants[index];
 }
 
+/**
+ * Línea de lectura neutral para el hero: fenómeno, no telemetría.
+ * total < 3 → cielo quieto; total >= 3 → movimiento estable / atmósfera estable.
+ * Solo para la línea visible bajo el grado; la telemetría va a console.debug o panel "i".
+ */
+function getReadingStatusLine(lang, total, seed = 0) {
+  const lines = lang === "es"
+    ? { quiet: "El cielo está en calma.", steady: ["El movimiento se mantiene estable.", "La atmósfera se mantiene estable."] }
+    : { quiet: "The sky is quiet.", steady: ["Movement appears steady.", "The atmosphere holds steady."] };
+  if (total < 3) return lines.quiet;
+  const idx = Math.abs(seed) % lines.steady.length;
+  return lines.steady[idx];
+}
+
 /** Hook opcional para métricas/servicio externo (Sentry, Analytics). Si window.__observatoryReportEvent es una función, se llama con el nombre del evento; sin payload de usuario. */
 function reportObservatoryEvent(eventName) {
   try {
@@ -2909,6 +2923,10 @@ async function boot() {
           techParts.push(`${m.stability || "stability"} ${stabilityPct}${stabUnit}`);
         }
         instrumentInfoTechnical.textContent = techParts.join(" · ");
+        // Telemetría para calibración: no en el hero, solo consola y panel "i"
+        const scopeLabel = ui.instrumentScopeLabel || "Global";
+        const rangeText = ui.scopeRangeLine ? ui.scopeRangeLine(total) : `${total} moments`;
+        console.debug("[observatory]", { scope: `${ui.instrumentLayerLabel || "Atmosphere"} · ${scopeLabel} · ${rangeText}`, density: densityFormatted });
       }
     } else {
       climateMetricsLine.textContent = "";
@@ -2923,20 +2941,11 @@ async function boot() {
   }
 
   if (climateSummaryLine) {
-    const latest = sharedMoments.slice(0, 12);
-    if (latest.length >= 2) {
-      const byType = { avoidable: 0, fertile: 0, observed: 0 };
-      const byMood = { calm: 0, focus: 0, stressed: 0, curious: 0, tired: 0 };
-      latest.forEach((m) => {
-        if (byType[m.type] !== undefined) byType[m.type] += 1;
-        if (byMood[m.mood] !== undefined) byMood[m.mood] += 1;
-      });
-      const topType = Object.entries(byType).sort((a, b) => b[1] - a[1])[0];
-      const topMood = Object.entries(byMood).sort((a, b) => b[1] - a[1])[0];
-      const typeLabel = topType ? topType[0] : "observed";
-      const moodLabel = topMood ? topMood[0] : "calm";
-      const seed = (latest.length * 7 + (topType?.[1] ?? 0) + (topMood?.[1] ?? 0)) | 0;
-      climateSummaryLine.textContent = getMixLinePhrase(LANG, typeLabel, moodLabel, seed);
+    const total = Number(canonicalState?.total) || 0;
+    const degree = Number(canonicalState?.computedDegree) || BASELINE;
+    const seed = (total * 7 + Math.round(degree)) | 0;
+    if (total > 0) {
+      climateSummaryLine.textContent = getReadingStatusLine(LANG, total, seed);
       climateSummaryLine.classList.remove("hidden");
     } else {
       climateSummaryLine.textContent = "";
