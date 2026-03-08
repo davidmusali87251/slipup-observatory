@@ -2045,6 +2045,13 @@ function createMomentItemElement(m) {
       relateBtn.disabled = false;
       if (res.ok && typeof res.count === "number") {
         relateBtn.dataset.relateCount = String(res.count);
+        relateBtn.removeAttribute("title");
+      } else {
+        const prev = parseInt(relateBtn.dataset.relateCount, 10) || 0;
+        relateBtn.dataset.relateCount = String(Math.max(1, prev + 1));
+        relateBtn.setAttribute("title", LANG === "es"
+          ? "Guardado aquí. El total global aparecerá cuando el servicio esté disponible."
+          : "Saved locally. Global count will appear when the service is available.");
       }
     } else {
       const prev = parseInt(relateBtn.dataset.relateCount, 10) || 0;
@@ -2914,7 +2921,7 @@ async function boot() {
   });
   if (atmosphereSemanticHint) {
     atmosphereSemanticHint.textContent = hasSemanticSignal
-      ? "Intention wording in shared moments can nudge the reading."
+      ? "Wording in shared moments can nudge the reading."
       : "";
     atmosphereSemanticHint.classList.toggle("hidden", !hasSemanticSignal);
   }

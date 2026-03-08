@@ -21,8 +21,17 @@ alwaysApply: true
 
 - Con `?debug=1` la app puede hacer `console.warn` con códigos genéricos (ej. `REMOTE_GET_FAILED`) cuando falle el remoto; no loguear ni incluir en mensajes el valor de `REMOTE_ANON_KEY` ni datos de usuarios.
 
+## Commit y push
+
+Antes de sugerir o ejecutar **commit** y **push**:
+
+- **No incluir** en el commit: `remote.local.js`, `PLAN_MASTER.md`, `supabase/.temp/` (ya están en `.gitignore`; si en el pasado se commitearon, usar `git rm --cached <ruta>` y luego commit).
+- **remote.js:** si va en el commit, debe llevar **solo placeholders** (`USE_REMOTE_SHARED = false`, `YOUR_PROJECT_REF`, `REMOTE_ANON_KEY = ""`). Si el usuario generó `remote.js` en local con valores reales, recordar que **no** debe commitear ese archivo hasta revertirlo a placeholders (o no añadirlo al stage).
+- Al proponer `git add` o `git commit`, no añadir `remote.local.js` ni archivos con secretos; en mensajes de commit no poner URLs reales ni claves.
+
 ## Resumen
 
 - Repo: placeholders en `remote.js`; `remote.local.js` ignorado.
 - Frontend: solo anon key si hace falta; nunca service_role ni secretos de backend.
 - CI: generar `remote.js` con secrets; comprobar que no queden placeholders cuando los secrets están seteados.
+- Commit/push: respetar `.gitignore`; no commitear `remote.js` con valores reales.

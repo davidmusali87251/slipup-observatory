@@ -29,7 +29,7 @@ function updateNoteAnalysisLine() {
   if (b.unmatchedWords.length) parts.push(`Not in lists: ${b.unmatchedWords.join(", ")}`);
   noteAnalysisLine.textContent = parts.length
     ? parts.join(" · ")
-    : "No token match — only type and mood shape the reading.";
+    : "Only type and mood shape the reading.";
   noteAnalysisLine.hidden = false;
 }
 
@@ -90,7 +90,7 @@ function syncSaveState() {
 }
 
 noteInput.addEventListener("input", () => {
-  if (formStatus.textContent === "Let one intention rise before saving.") {
+  if (formStatus.textContent === "Complete this field before saving.") {
     formStatus.textContent = "";
   }
   syncSaveState();
@@ -117,7 +117,7 @@ form.addEventListener("submit", async (event) => {
     return;
   }
   if (!hasValidNote()) {
-    formStatus.textContent = "Let one intention rise before saving.";
+    formStatus.textContent = "Complete this field before saving.";
     syncSaveState();
     noteInput.focus();
     return;
@@ -150,7 +150,7 @@ form.addEventListener("submit", async (event) => {
 
   setTimeout(() => {
     window.location.href = sharedInput.checked ? "./index.html?contributed=1" : "./index.html";
-  }, 220);
+  }, 1400);
 });
 
 syncSaveState();

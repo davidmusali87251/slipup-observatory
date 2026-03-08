@@ -1,0 +1,21 @@
+---
+description: Contrato del proyecto SlipUp Observatory — híbrido local + shared, sin feed.
+alwaysApply: true
+---
+
+# SlipUp Observatory — contrato del proyecto
+
+El sistema es **local-first + canal shared**: no es "proyecto inicial" solo local.
+
+## Reglas
+
+- **Canal shared con fallback local:** Con red se usan Edge Functions (moments, climate, relate); sin red o si fallan, fallback local. El front es render/animación + fallback.
+- **El cliente nunca toca tablas:** Toda lectura/escritura compartida va por Edge Functions; no queries directas a Supabase desde el front.
+- **Shared = evidencia mínima:** Preview y sheet acotados (listas limitadas). Sin feed infinito, sin ranking, sin métricas de comparación. Sistema habitable, no panel consultable.
+- **ComputedDegree:** Puede migrar a servidor en Fase 2; el front sigue siendo render + fallback.
+
+## Unidades
+
+- **Moment** = unidad mínima (no "error"). **Cielo** = instrumento (no dashboard).
+
+Detalle en `docs/AGENT_CONTEXT_V5.md`.
