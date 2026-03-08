@@ -2947,7 +2947,6 @@ async function boot() {
   );
   renderStrata(moments, canonicalState);
   initSilentDescentTransitions();
-  initInfiniteObservatoryScroll();
   applyDeepLinkIfPresent();
   if (observatoryPanel) observatoryPanel.removeAttribute("aria-busy");
 

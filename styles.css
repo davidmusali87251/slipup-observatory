@@ -870,7 +870,7 @@ h2 {
 
 .climate-instrument {
   margin-top: 0.75rem;
-  padding: 0.5rem 0;
+  padding: 0.5rem 2.25rem 0.5rem 0;
   position: relative;
   overflow: visible;
   min-height: 0;
@@ -925,20 +925,20 @@ h2 {
   max-width: 100%;
 }
 
-/* Botón info: pequeño, en esquina del instrumento para no romper el flujo */
+/* Botón info: área de click generosa, centrado; no solapa con el texto */
 .instrument-info-btn {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-  width: 1rem;
-  height: 1rem;
-  min-width: 1rem;
-  min-height: 1rem;
+  top: 0.35rem;
+  right: 0.35rem;
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+  min-height: 2rem;
   border-radius: 50%;
   border: 1px solid color-mix(in oklab, var(--muted) 50%, transparent);
   background: color-mix(in oklab, var(--bg) 92%, var(--line));
   color: var(--muted);
-  font-size: 0.6rem;
+  font-size: 0.7rem;
   font-weight: 600;
   line-height: 1;
   padding: 0;
@@ -949,6 +949,7 @@ h2 {
   opacity: 0.7;
   transition: opacity 0.15s ease, border-color 0.15s ease;
   flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .instrument-info-btn:hover {
@@ -963,13 +964,13 @@ h2 {
 
 @media (max-width: 480px) {
   .instrument-info-btn {
-    width: 1.15rem;
-    height: 1.15rem;
-    min-width: 1.15rem;
-    min-height: 1.15rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    min-width: 1.75rem;
+    min-height: 1.75rem;
     top: 0.4rem;
     right: 0.4rem;
-    font-size: 0.58rem;
+    font-size: 0.65rem;
   }
 }
 
@@ -1217,6 +1218,26 @@ h2 {
   margin: 1.25rem 0 0;
   text-align: center;
   font-family: var(--font-sans);
+}
+
+.page-footer-contribute {
+  margin: 1.5rem 0 0;
+  text-align: center;
+  font-family: var(--font-sans);
+}
+
+.contribute-footer-link {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  opacity: 0.88;
+  text-decoration: none;
+  transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.contribute-footer-link:hover {
+  opacity: 1;
+  color: var(--text);
 }
 
 .page .site-legal {
@@ -2318,7 +2339,7 @@ h2 {
   }
 
   .climate-instrument {
-    padding: 0.6rem 0.65rem 0.7rem;
+    padding: 0.6rem 2.25rem 0.7rem 0.65rem;
     margin-left: 0.15rem;
     margin-right: 0.15rem;
   }
@@ -2422,7 +2443,7 @@ h2 {
   }
 
   .climate-instrument {
-    padding: 0.5rem 0.5rem 0.6rem;
+    padding: 0.5rem 2rem 0.5rem 0.5rem;
   }
 
   .climate-metrics-line {
@@ -2435,10 +2456,10 @@ h2 {
   }
 
   .instrument-info-btn {
-    width: 1rem;
-    height: 1rem;
-    min-width: 1rem;
-    min-height: 1rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    min-width: 1.5rem;
+    min-height: 1.5rem;
     top: 0.35rem;
     right: 0.35rem;
   }
