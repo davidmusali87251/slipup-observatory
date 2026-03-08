@@ -578,6 +578,17 @@ h2 {
   margin: 0;
 }
 
+.atmosphere-meta-line {
+  margin: 0.25rem 0 0;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  opacity: 0.82;
+  text-align: center;
+  line-height: 1.35;
+}
+
 .eyebrow {
   color: var(--muted);
   letter-spacing: 0.04em;
@@ -691,6 +702,11 @@ h2 {
   .observatory-entry .eyebrow-layer,
   .observatory-entry .eyebrow-context {
     font-size: 0.62rem;
+  }
+
+  .atmosphere-meta-line {
+    font-size: 0.6rem;
+    margin-top: 0.2rem;
   }
 
   .atmosphere-air {
@@ -1888,7 +1904,7 @@ h2 {
   font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.1em;
-  text-transform: uppercase;
+  text-transform: none;
   margin: 0;
 }
 
@@ -1917,15 +1933,15 @@ h2 {
 }
 
 .contribute-page .topbar {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 0.7rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
 }
 
 .contribute-page .topbar h1 {
-  grid-column: 2;
-  justify-self: center;
+  width: 100%;
+  text-align: center;
   font-size: clamp(1.08rem, 1.55vw, 1.32rem);
   font-weight: 560;
   line-height: 1.15;
@@ -1937,12 +1953,8 @@ h2 {
 }
 
 .contribute-page .topbar .text-link {
-  grid-column: 1;
-  justify-self: start;
-}
-
-.contribute-page .topbar .text-link {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
   border: 1px solid #a8b8ca;
@@ -2438,14 +2450,15 @@ h2 {
 
 @media (max-width: 520px) {
   .contribute-page .topbar {
-    grid-template-columns: 1fr auto 1fr;
+    flex-direction: column;
+    align-items: flex-start;
     column-gap: 0.44rem;
     margin-bottom: 0.56rem;
   }
 
   .contribute-page .topbar h1 {
-    grid-column: 2;
-    justify-self: center;
+    width: 100%;
+    text-align: center;
     min-width: 0;
     font-size: 0.98rem;
     letter-spacing: 0.01em;

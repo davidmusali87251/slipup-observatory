@@ -193,7 +193,7 @@ function detectStructuralPattern(entries: MomentInput[]): Repetition {
 
 export function conditionForDegree(value: number, total: number) {
   if (total < 3) return "Shared moments are still gathering.";
-  if (value < DEGREE_BAND_STEADY) return "Shared movement keeps a quiet line.";
+  if (value < DEGREE_BAND_STEADY) return "The shared field keeps a quiet line.";
   if (value < DEGREE_BAND_BALANCE) return "The shared field leans toward balance.";
   if (value < DEGREE_BAND_GATHERING) return "The shared field is becoming denser.";
   return "A compact shared front is taking shape.";

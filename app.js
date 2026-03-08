@@ -499,7 +499,7 @@ const COPY = COPY_VARIANTS[COPY_MODE === "narrative" ? "narrative_" + LANG : COP
 const UI_COPY = {
   en: {
     orientation: "",
-    valueProp: "Collective reading from shared moments · last 48 h",
+    valueProp: "Collective reading from shared moments",
     cta: "Let it rise into the atmosphere.",
     trust: "No account. No exact pin. Not weather, just shared moments.",
     scopeLabel: "48h",
@@ -520,7 +520,7 @@ const UI_COPY = {
     instrumentMetricsAriaNearby: "Nearby field metrics",
     instrumentMetricsAriaStrata: "Deep record metrics",
     instrumentInfoCopy: "Type, mood, note, recency — what shapes each moment.",
-    degreeScaleLabel: "0–100 · 48h",
+    degreeScaleLabel: "0–100 scale",
     strata: {
       mixLow: "low",
       mixModerate: "moderate",
@@ -564,7 +564,7 @@ const UI_COPY = {
   },
   es: {
     orientation: "",
-    valueProp: "Lectura colectiva de momentos compartidos · últimas 48 h",
+    valueProp: "Lectura colectiva de momentos compartidos",
     cta: "Que suba a la atmósfera.",
     trust: "Sin cuenta. Sin pin exacto. No es el tiempo; son momentos compartidos.",
     scopeLabel: "48 h",
@@ -585,7 +585,7 @@ const UI_COPY = {
     instrumentMetricsAriaNearby: "Métricas del campo cercano",
     instrumentMetricsAriaStrata: "Métricas del registro profundo",
     instrumentInfoCopy: "Tipo, humor, nota, recencia: lo que da forma a cada momento.",
-    degreeScaleLabel: "0–100 · 48 h",
+    degreeScaleLabel: "0–100 escala",
     strata: {
       mixLow: "bajo",
       mixModerate: "moderado",
