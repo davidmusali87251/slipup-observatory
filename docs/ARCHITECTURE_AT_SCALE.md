@@ -48,6 +48,38 @@ Future: optional path aliases (e.g. `/shared-preview`) that proxy to the same `m
 - **Client** never treats local `calculateClimate()` as global truth when remote is available. On remote failure only, client uses local fallback.
 - **Client** only animates `displayDegree` toward server `computedDegree`; it does not mix or recompute truth.
 
+### Contract: `GET /climate` response shape
+
+Do not invent alternative formats. The response must follow this contract:
+
+```ts
+GET /climate?windowHours=48&referenceTime=<iso>&scope=global|local&geo=<bucket>
+
+Response 200:
+{
+  modelVersion: string,
+  referenceTime: string,      // ISO
+  windowHours: number,
+  computedDegree: number,    // 0..100, clamped
+  total: number,
+  condition: string,          // prose from condition bands (quiet/steady/balance/gathering/dense)
+  repetition: { hasPattern: boolean, tag: ""|"pattern_a"|"pattern_b"|"pattern_c", strength: number },
+  pressureMode: "condensing"|"clearing"|"stabilizing",
+  toneReading?: number,
+  dominantMix?: string,
+  stabilityIndex?: number,
+  groundIndex?: number,
+  source?: "global"|"local"|"global_fallback",
+  geoBucketUsed?: string,
+  requestedGeo?: string,
+  minRequired?: number
+}
+```
+
+`computedDegree` is the only degree value the UI uses as truth; the client animates `displayDegree` toward it.
+
+**referenceTime:** Must be server-generated. Never trust client-provided time for climate computation. Server uses its own clock (or `referenceTime` query param only when explicitly required for testing); this avoids drift, cross-client inconsistencies, and timestamp manipulation.
+
 ---
 
 ## 4. Ingest: append-only moments
@@ -62,6 +94,8 @@ Future: optional path aliases (e.g. `/shared-preview`) that proxy to the same `m
 
 - **Today:** `climate_5m_bucket` + `combo_5m_bucket` / `marker_5m_bucket`. Climate function can read from 5m buckets when `CLIMATE_USE_BUCKETS=true`.
 - **Hourly path (ready):** `climate_buckets_hourly` — same shape as 5m but `bucket_start` truncated to hour. For 48h window, climate reads **48 rows** instead of 576. Job contract: aggregate from 5m (or raw) into hourly; see migration and comments in `supabase/migrations/`.
+
+**Bucket contract:** Climate computation must read the **last 48 buckets** (hourly) for a 48h window, not raw moments. Bucket columns: `bucket_start`, `geo_bucket`, `shared_count`, `reflective_sum`, `reactive_sum`, plus type×mood counts (`avoidable_calm`, `avoidable_focus`, `avoidable_stressed`, … `observed_tired`). Do not implement full-table scans of raw moments at scale.
 
 ---
 
@@ -84,6 +118,23 @@ Future: optional path aliases (e.g. `/shared-preview`) that proxy to the same `m
 - Consumes **snapshot** (computedDegree, repetition, dominant, drift, strata, aggregates).
 - Does **not** compute degree, change physical state, or prescribe.
 - **Physics leads. AI observes. UI reveals.**
+
+### Climate physics (deterministic mass)
+
+Climate must behave as **atmospheric mass**: more total mass (moments in window) → lower marginal impact per moment. Do not use a linear count model. Use mass inertia (e.g. factor `1 / (1 + √total / MASS_INERTIA_REF)`). Same input + same `referenceTime` + same `modelVersion` ⇒ same output. No score framing.
+
+**Example intuition (design, not sacred formula):** With low total mass, the same net pressure can move the climate visibly. With very high mass (e.g. millions of moments in 48h), the same pressure only nudges the degree slightly. This is intentional: the atmosphere should feel heavier and calmer at scale.
+
+*Numerical illustration — same net pressure P, different mass M; BASELINE = 28°, inertia = 1/(1 + √M/100), Δ ≈ P × inertia:*
+- **Small (M = 10):** √10 ≈ 3.16 → inertia ≈ 0.97 → Δ ≈ 11.6 → **~39.6°**. With little mass, the same push moves the climate a lot.
+- **Medium (M = 10,000):** √10k = 100 → inertia = 0.5 → Δ = 6 → **34°**. Already heavier.
+- **Massive (M = 10,000,000):** √10M ≈ 3162 → inertia ≈ 0.03 → Δ ≈ 0.37 → **~28.4°**. With millions of moments, the same push barely moves the number.
+
+The idea that must not change: **same pressure, more mass → smaller visible movement.** The exact formula may be recalibrated; the behaviour (heavier and calmer at scale) must stay.
+
+### UI: no telemetría en vista principal
+
+The main UI (hero, sky, reading line) must **never** display: number of moments, density, signal counts, mass metrics, stability index or ground index as primary copy. These remain internal; only in the instrument panel ("i") or debug.
 
 ---
 
@@ -119,6 +170,29 @@ Future: optional path aliases (e.g. `/shared-preview`) that proxy to the same `m
 
 At scale, the system should feel: heavier, calmer, less reactive, more physical.  
 The user looks at **weather made from moments**, not analytics.
+
+---
+
+## 12b. Contribute panel at scale
+
+When SlipUp has thousands of users, the Contribute panel must **not** become social. It must stay **intimate, minimal, instrumental**. Evolution = make the field feel more real, not add features.
+
+**Evolution rule in one line:** *Less alone, not more social.*
+
+### Three evolution rules
+
+1. **More field context, not more visible community.**  
+   Use subtle copy (e.g. “Shared moments enter the reading.”). Never add: “X people shared today”, “Trending now”, “Recent community activity”, counters, badges, usernames, or public exposure of Rise.
+
+2. **More trust, not more explanation.**  
+   Keep “No account. No exact pin. Sharing off keeps this moment on your device.” central. Reinforce trust; don’t add legalistic or aspirational copy. The share checkbox is a **destination decision** (into the field or only on device), not a “settings” control — keep it clear, calm, visible.
+
+3. **More shared reality, not more features.**  
+   Keep Rise short and everyday (rotating placeholders, name-the-moment). No “performance posting”, no therapeutic/literary tone. Post-submit: brief micro-reinforcement only (“The reading adjusts.” / “The atmosphere shifts.”). No celebration, no counts. The panel stays a **small portal into the field**, not a social composer.
+
+### What NOT to add at scale
+
+No counters, “active now”, badges, profiles, usernames, public Rise exposure, “others are posting”, or composer-style UI.
 
 ---
 

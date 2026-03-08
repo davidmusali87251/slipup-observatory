@@ -2176,6 +2176,15 @@ h2 {
   font-size: 0.84rem;
 }
 
+.contribute-page .contribute-rise-label-hint {
+  display: block;
+  margin-top: 0.05rem;
+  margin-bottom: 0.2rem;
+  font-size: 0.8rem;
+  color: #5a6d82;
+  opacity: 0.9;
+}
+
 .field select,
 .field input[type="text"] {
   padding: 0.6rem 0.7rem;
@@ -2294,6 +2303,32 @@ h2 {
   line-height: 1.38;
   color: #607189;
   opacity: 0.8;
+}
+
+.contribute-page .contribute-rise-from {
+  margin: 0.15rem 0 0.6rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: #5a6d82;
+  opacity: 0.85;
+  font-style: italic;
+}
+
+.contribute-page .contribute-shared-hint {
+  margin: 0.2rem 0 0.08rem;
+  font-size: 0.72rem;
+  line-height: 1.38;
+  color: #607189;
+  opacity: 0.82;
+}
+
+.contribute-page .legal-bucket-note {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: #607189;
+  opacity: 0.85;
 }
 
 .field-hint {

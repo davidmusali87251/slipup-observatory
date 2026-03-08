@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>A Moment — SlipUp Observatory</title>
+    <title>A moment — SlipUp Observatory</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="shortcut icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="./favicon.svg" sizes="any" type="image/svg+xml" />
@@ -17,14 +17,15 @@
           <span class="back-link-full">Back to Observatory</span>
           <span class="back-link-short">Back</span>
         </a>
-        <h1>A Moment</h1>
+        <h1>A moment</h1>
       </header>
 
       <section class="panel panel-contribute" aria-label="Contribute a moment — Atmosphere rise" data-layer="atmosphere-rise">
         <div class="contribute-layer-entry" aria-hidden="true">
-          <p class="contribute-layer-eyebrow">To the atmosphere</p>
+          <p class="contribute-layer-eyebrow">Into the atmosphere</p>
         </div>
-        <p class="contribute-layer-hint" aria-hidden="true">Where your moment enters the reading.</p>
+        <p class="contribute-layer-hint" aria-hidden="true">Where a moment enters the reading.</p>
+        <p class="contribute-rise-from" aria-hidden="true">Moments rise across the atmosphere.</p>
         <form id="contributeForm" class="contribute-rise-form" novalidate>
           <label class="field">
             <span>Type</span>
@@ -47,13 +48,14 @@
           </label>
 
           <label class="field">
-            <span>Huella</span>
+            <span>Rise</span>
+            <span class="contribute-rise-label-hint">Name the moment</span>
             <input
               id="noteInput"
               name="note"
               type="text"
               maxlength="19"
-              placeholder="What rises from this moment?"
+              placeholder=""
               required
             />
             <small class="field-hint" aria-hidden="true">max 19</small>
@@ -62,12 +64,14 @@
 
           <label class="field field-inline" for="sharedInput">
             <input id="sharedInput" name="shared" type="checkbox" checked />
-            <span>Share this moment (shared field)</span>
+            <span>Share to the atmosphere</span>
           </label>
+          <p class="contribute-shared-hint">Shared moments enter the atmosphere reading.</p>
           <p class="contribute-trust-note">No account. No exact pin. Sharing off keeps this moment on your device.</p>
           <label class="field field-inline" for="consentInput">
             <input id="consentInput" name="consent" type="checkbox" required />
-            <span>I accept Privacy and Terms, including coarse regional bucket use for shared moments.</span>
+            <span>I accept Privacy and Terms.</span>
+            <span class="legal-bucket-note">Shared moments may use a coarse regional bucket.</span>
           </label>
           <p class="legal-links">
             <a class="text-link" href="./privacy.html">Privacy</a>

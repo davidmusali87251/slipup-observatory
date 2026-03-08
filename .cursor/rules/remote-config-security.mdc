@@ -29,6 +29,13 @@ Antes de sugerir o ejecutar **commit** y **push**:
 - **remote.js:** si va en el commit, debe llevar **solo placeholders** (`USE_REMOTE_SHARED = false`, `YOUR_PROJECT_REF`, `REMOTE_ANON_KEY = ""`). Si el usuario generó `remote.js` en local con valores reales, recordar que **no** debe commitear ese archivo hasta revertirlo a placeholders (o no añadirlo al stage).
 - Al proponer `git add` o `git commit`, no añadir `remote.local.js` ni archivos con secretos; en mensajes de commit no poner URLs reales ni claves.
 
+### Checklist obligatorio antes de cualquier `git add` o push
+
+1. **Nunca** hacer `git add` de: `remote.local.js`, `PLAN_MASTER.md`, `supabase/.temp/`, ni de ningún archivo bajo `.temp/`.
+2. Si se va a incluir `remote.js`: comprobar que tenga **solo placeholders** (no URLs reales, no anon key real). Si tiene valores reales, **no** añadirlo al stage.
+3. Revisar `git status` antes de `git add`: excluir explícitamente los archivos de la lista anterior al construir el comando `git add`.
+4. No poner en mensajes de commit URLs, claves ni referencias a proyectos reales.
+
 ## Resumen
 
 - Repo: placeholders en `remote.js`; `remote.local.js` ignorado.

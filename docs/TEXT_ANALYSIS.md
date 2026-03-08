@@ -1,6 +1,6 @@
 # Análisis de texto en el Observatorio
 
-El único texto que influye en el modelo es el campo **note** (Huella) de cada momento (máx. 19 caracteres). Hoy **toda la relación** entre ese texto y el clima se basa en **listas de tokens**: si una subcadena del texto coincide con un token, se cuenta; si no, se ignora.
+El único texto que influye en el modelo es el campo **note** (Rise en la UI) de cada momento (máx. 19 caracteres). Hoy **toda la relación** entre ese texto y el clima se basa en **listas de tokens**: si una subcadena del texto coincide con un token, se cuenta; si no, se ignora.
 
 ---
 

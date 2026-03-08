@@ -5,7 +5,7 @@ Clean rebuild aligned with the Observatory model.
 ## Included in this baseline
 
 - `Observatory` landing as primary atmospheric view.
-- `A Moment` (Contribute) on a separate page.
+- `A moment` (Contribute) on a separate page.
 - Layered reading model:
   - `Horizon Line` (shared/global transition)
   - `Nearby Field` (regional reading with fallback)

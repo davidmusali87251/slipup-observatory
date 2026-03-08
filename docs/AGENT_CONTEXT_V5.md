@@ -1,5 +1,7 @@
 # Contexto agente V5 — SlipUp Observatory
 
+**Supersedido por:** `docs/AGENT_CONTEXT_V6.md` (identidad, física, arquitectura, UI y guardrails consolidados). Este archivo se mantiene por historial.
+
 Documento de referencia para que el agente (y quien mantenga el proyecto) no confunda el estado actual con el "proyecto inicial". El sistema evolucionó de forma estructural.
 
 ---

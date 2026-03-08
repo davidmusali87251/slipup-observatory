@@ -14,6 +14,31 @@ const formStatus = document.getElementById("formStatus");
 const noteAnalysisLine = document.getElementById("noteAnalysisLine");
 const ALLOWED_MOODS = new Set(["calm", "focus", "stressed", "curious", "tired"]);
 
+/** Short, everyday examples for Rise placeholder (all ≤19 chars). Rotates on load to model naming, not explaining. */
+const RISE_EXAMPLES = [
+  "Going to the gym",
+  "Late for the bus",
+  "Work all the day",
+  "Missed the call",
+  "Too much coffee",
+  "Thinking again",
+  "Rain on the way",
+  "Running late",
+  "Need fresh air",
+  "Another try",
+  "Pause before reply",
+  "Traffic again",
+  "Early morning",
+  "Long day done",
+  "One step back",
+];
+
+function setRisePlaceholder() {
+  if (!noteInput) return;
+  const example = RISE_EXAMPLES[Math.floor(Math.random() * RISE_EXAMPLES.length)];
+  noteInput.placeholder = example;
+}
+
 function updateNoteAnalysisLine() {
   if (!noteAnalysisLine) return;
   const raw = noteInput?.value?.trim() ?? "";
@@ -134,11 +159,11 @@ form.addEventListener("submit", async (event) => {
   saveMoments(moments);
 
   if (!sharedInput.checked) {
-    formStatus.textContent = "Moment stored locally.";
+    formStatus.textContent = "The reading adjusts.";
   } else {
     const remoteResult = await postMomentRemote(makeRemoteMomentPayload());
     if (remoteResult.ok) {
-      formStatus.textContent = "Moment stored.";
+      formStatus.textContent = "The reading adjusts.";
     } else if (remoteResult.status === 422) {
       formStatus.textContent = "Saved locally. Shared sync couldn't accept this moment.";
     } else if (remoteResult.status === 429) {
@@ -155,3 +180,4 @@ form.addEventListener("submit", async (event) => {
 
 syncSaveState();
 updateNoteAnalysisLine();
+setRisePlaceholder();

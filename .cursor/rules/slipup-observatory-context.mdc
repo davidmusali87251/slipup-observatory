@@ -22,4 +22,13 @@ El sistema es **local-first + canal shared**: no es "proyecto inicial" solo loca
 
 - **Moment** = unidad mínima (no "error"). **Cielo** = instrumento (no dashboard).
 
-Detalle en `docs/AGENT_CONTEXT_V5.md`.
+## Contratos técnicos y física
+
+- **GET /climate:** No inventar formatos. Respuesta debe incluir `modelVersion`, `referenceTime`, `windowHours`, `computedDegree` (0..100), `total`, `condition`, `repetition` (hasPattern, tag, strength), `pressureMode`. Ver shape exacta en `docs/ARCHITECTURE_AT_SCALE.md`. **referenceTime** debe ser generado en servidor; no confiar en tiempo del cliente (evita drift y manipulación).
+- **Agregación:** El clima debe leerse de **últimos 48 buckets** (horarios) para ventana 48h, no de momentos crudos a escala. No full-table scan.
+- **Física del clima:** Comportamiento de masa atmosférica: más masa total → menor impacto marginal por momento. Usar inercia por masa (p. ej. MASS_INERTIA_REF). No modelo lineal de conteo. Misma entrada ⇒ misma salida.
+- **UI principal:** Nunca mostrar en hero/cielo/línea de lectura: número de momentos, density, signal counts, mass metrics, stability/ground index como copy principal. Solo en panel "i" o debug.
+
+**Physics leads. AI observes. UI reveals.**
+
+Detalle en `docs/AGENT_CONTEXT_V6.md` y `docs/ARCHITECTURE_AT_SCALE.md`.

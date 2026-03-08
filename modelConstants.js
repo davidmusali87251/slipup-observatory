@@ -119,7 +119,7 @@ export function chooseAlpha(mass) {
   return ALPHA_TIER3;
 }
 
-/* ----- Note analysis (Huella): same logic as backend, single source with REFLECTIVE/REACTIVE tokens ----- */
+/* ----- Note analysis (Rise): same logic as backend, single source with REFLECTIVE/REACTIVE tokens ----- */
 
 export function normalizeNoteText(text) {
   return String(text || "")
