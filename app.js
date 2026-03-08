@@ -2255,6 +2255,11 @@ async function openSharedSheet(sharedMoments) {
     listToShow = sharedMoments;
   }
 
+  if (observatoryState) {
+    observatoryState.sharedMoments = listToShow;
+    refreshObservatoryLists(listToShow);
+  }
+
   const n = listToShow.length;
   const ui = UI_COPY[LANG] || UI_COPY.en;
   const countLabel = n === 0 ? "" : (ui.sheetCount ? ui.sheetCount(n) : `Showing ${n} moments.`);
@@ -2638,6 +2643,23 @@ async function loadSharedMoments(localMoments) {
   }
 }
 
+/** Estado actual del observatorio para re-renderizar listas (Across the atmosphere + Nearby) con datos frescos sin recargar. */
+let observatoryState = null;
+
+/** Actualiza solo las listas de momentos (recent + nearby) con el array indicado. */
+function refreshObservatoryLists(sharedMoments) {
+  if (!observatoryState || !Array.isArray(sharedMoments)) return;
+  renderRecent(sharedMoments);
+  renderLocalClimate(
+    observatoryState.localClimateTruth,
+    observatoryState.canonicalState,
+    observatoryState.activeFieldScope?.label || "Nearby",
+    observatoryState.observatoryPipeline,
+    observatoryState.activeFieldScope,
+    sharedMoments
+  );
+}
+
 function normalizeRepetition(repetition) {
   return {
     hasPattern: Boolean(repetition?.hasPattern),
@@ -2813,6 +2835,10 @@ async function boot() {
         activeFieldScope,
         sharedMoments
       );
+      if (observatoryState) {
+        observatoryState.localClimateTruth = localClimateTruth;
+        observatoryState.observatoryPipeline = pipeline;
+      }
     })
     .catch(() => {
       reportObservatoryEvent("remote_fallback_nearby");
@@ -2988,7 +3014,26 @@ async function boot() {
   applyDeepLinkIfPresent();
   if (observatoryPanel) observatoryPanel.removeAttribute("aria-busy");
 
-  viewMoreButton.onclick = () => openSharedSheet(sharedMoments);
+  observatoryState = {
+    sharedMoments,
+    canonicalState,
+    activeFieldScope,
+    localClimateTruth,
+    observatoryPipeline,
+  };
+
+  viewMoreButton.onclick = () => openSharedSheet(observatoryState?.sharedMoments ?? []);
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible" || !observatoryState) return;
+    fetchSharedMomentsRemote(SHARED_SHEET_MAX_ITEMS, 48, { skipCache: true })
+      .then((raw) => {
+        const list = raw.filter((m) => m.shared && !m.hidden);
+        observatoryState.sharedMoments = list;
+        refreshObservatoryLists(list);
+      })
+      .catch(() => {});
+  });
   sheetBackdrop.onclick = closeSharedSheet;
   sharedSheetCloseButton.onclick = closeSharedSheet;
 
@@ -3032,6 +3077,11 @@ async function boot() {
           activeFieldScope,
           sharedMoments
         );
+        if (observatoryState) {
+          observatoryState.activeFieldScope = activeFieldScope;
+          observatoryState.localClimateTruth = localClimateTruth;
+          observatoryState.observatoryPipeline = observatoryPipeline;
+        }
       } finally {
         fieldScopeSelect.disabled = false;
       }
