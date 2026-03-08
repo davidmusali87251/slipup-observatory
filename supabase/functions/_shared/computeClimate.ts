@@ -18,6 +18,7 @@ import {
   REPETITION_DAMPING_MIN,
   REPETITION_DAMPING_MAX,
   SINGLE_MOMENT_DEGREE_DELTA,
+  MASS_INERTIA_REF,
   DEGREE_BAND_STEADY,
   DEGREE_BAND_BALANCE,
   DEGREE_BAND_GATHERING,
@@ -259,6 +260,9 @@ export function computeClimate(
   const repetitionNudge = clamp(repetition.strength * REPETITION_NUDGE_FACTOR * repetitionDamping, 0, REPETITION_NUDGE_MAX);
   let computedDegree = clamp(warmBase + repetitionNudge, 0, SCALE);
   if (total === 1) computedDegree = Math.min(computedDegree, BASELINE + SINGLE_MOMENT_DEGREE_DELTA);
+  const deltaFromBaseline = computedDegree - BASELINE;
+  const massInertiaFactor = 1 / (1 + Math.sqrt(total) / MASS_INERTIA_REF);
+  computedDegree = clamp(BASELINE + deltaFromBaseline * massInertiaFactor, 0, SCALE);
   const counts = compositionCounts(windowed);
   const totalSafe = Math.max(1, total);
   const observedRatio = counts.byType.observed / totalSafe;

@@ -44,6 +44,9 @@ export const REPETITION_DAMPING_MAX = 1;
 /** When total === 1, degree is capped at BASELINE + SINGLE_MOMENT_DEGREE_DELTA */
 export const SINGLE_MOMENT_DEGREE_DELTA = 5;
 
+/** Inercia por masa: Δclima ∝ presión/masa. Factor = 1 / (1 + sqrt(total)/MASS_INERTIA_REF). Más momentos → menos movimiento. */
+export const MASS_INERTIA_REF = 100;
+
 /** Condition bands (degree thresholds): under steady = quiet, under balance = balance, under gathering = gathering, else dense */
 export const DEGREE_BAND_STEADY = 38;
 export const DEGREE_BAND_BALANCE = 60;

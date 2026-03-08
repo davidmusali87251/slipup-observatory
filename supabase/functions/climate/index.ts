@@ -32,6 +32,7 @@ import {
   STABILITY_CALM_FOCUS_WEIGHT,
   GROUND_AVOIDABLE_WEIGHT,
   GROUND_FERTILE_WEIGHT,
+  MASS_INERTIA_REF,
   PRESSURE_MODE_CONDENSING_DELTA,
   PRESSURE_MODE_CLEARING_DELTA,
 } from "../_shared/modelConstants.ts";
@@ -164,6 +165,7 @@ function makeHeaders(origin: string | null, extra: Record<string, string> = {}) 
     ...extra,
   };
 }
+// Cache 15–30s for /climate at scale; reduces jitter and cost.
 
 function json(origin: string | null, status: number, body: unknown, extra: Record<string, string> = {}) {
   return new Response(JSON.stringify(body), { status, headers: makeHeaders(origin, extra) });
@@ -361,6 +363,9 @@ function computeFromBuckets(rows: BucketRow[], referenceIso: string, windowHours
   const repetitionNudge = clamp(repetition.strength * REPETITION_NUDGE_FACTOR * repetitionDamping, 0, REPETITION_NUDGE_MAX);
   let computedDegree = clamp(warmBase + repetitionNudge, 0, SCALE);
   if (total === 1) computedDegree = Math.min(computedDegree, BASELINE + SINGLE_MOMENT_DEGREE_DELTA);
+  const deltaFromBaseline = computedDegree - BASELINE;
+  const massInertiaFactor = 1 / (1 + Math.sqrt(total) / MASS_INERTIA_REF);
+  computedDegree = clamp(BASELINE + deltaFromBaseline * massInertiaFactor, 0, SCALE);
 
   let dominantMix = "";
   let maxCombo = 0;

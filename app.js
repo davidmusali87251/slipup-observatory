@@ -25,6 +25,7 @@ import {
   REPETITION_DAMPING_MIN,
   REPETITION_DAMPING_MAX,
   SINGLE_MOMENT_DEGREE_DELTA,
+  MASS_INERTIA_REF,
   DEGREE_BAND_STEADY,
   DEGREE_BAND_BALANCE,
   DEGREE_BAND_GATHERING,
@@ -120,8 +121,8 @@ function getMixLinePhrase(lang, type, mood, seed) {
  */
 function getReadingStatusLine(lang, total, seed = 0) {
   const lines = lang === "es"
-    ? { quiet: "El cielo está en calma.", steady: ["El movimiento se mantiene estable.", "La atmósfera se mantiene estable."] }
-    : { quiet: "The sky is quiet.", steady: ["Movement appears steady.", "The atmosphere holds steady."] };
+    ? { quiet: "Calma.", steady: ["Estable.", "Se mantiene."] }
+    : { quiet: "Quiet.", steady: ["Steady.", "Holds."] };
   if (total < 3) return lines.quiet;
   const idx = Math.abs(seed) % lines.steady.length;
   return lines.steady[idx];
@@ -452,24 +453,24 @@ const COPY_VARIANTS = {
       dense: ["The atmosphere is full.", "Dense with signal.", "Strong reading."],
     },
     horizon: {
-      empty: ["No horizon line yet.", "The horizon is still open.", "Add your moment to trace a line."],
-      early: ["A horizon is forming.", "The line is still light.", "Almost enough to read."],
+      empty: ["No horizon yet.", "Horizon open.", "Open."],
+      early: ["Forming.", "Light.", "Almost there."],
       dominant: [
-        (k) => `The mix leans to ${k}.`,
-        (k) => `Right now: ${k}.`,
-        (k) => `This window reads ${k}.`,
+        (k) => `Leans to ${k}.`,
+        (k) => `Mostly ${k}.`,
+        (k) => `Reads ${k}.`,
       ],
-      trendSteady: ["The line holds.", "No shift in sight.", "Steady across the window."],
-      trendShift: ["The line is shifting.", "Something is moving.", "The reading is changing."],
-      driftCondensing: ["Pressure tightening.", "The reading is condensing.", "Density rising."],
-      driftClearing: ["Pressure easing.", "The reading is opening.", "Clearing."],
-      driftStable: ["Pressure steady.", "No strong drift.", "Holding."],
+      trendSteady: ["Holds.", "Steady.", "No shift."],
+      trendShift: ["Shifting.", "Moving.", "Changing."],
+      driftCondensing: ["Tightening.", "Condensing.", "Rising."],
+      driftClearing: ["Easing.", "Opening.", "Clearing."],
+      driftStable: ["Steady.", "No drift.", "Holding."],
     },
     local: {
       condensing: ["This field is tightening.", "Local pressure rising.", "Denser here."],
       clearing: ["This field is opening.", "Local pressure easing.", "Lighter here."],
-      stable: ["This field holds steady.", "Local balance.", "Calm in this scope."],
-      fallback: ["Reading from the wider field.", "Not enough here yet; using the whole."],
+      stable: ["The local field remains near baseline.", "The local field holds steady.", "Calm in this scope."],
+      fallback: ["The local signal remains light within the wider field.", "Reading from the wider field."],
       regional: ["Reading from this region.", "This scope shapes the line."],
     },
     strataFallback: ["Moments settle into deeper layers.", "Your record deepens.", "Layers keep settling."],
@@ -484,24 +485,24 @@ const COPY_VARIANTS = {
       dense: ["La atmósfera está llena.", "Denso de señal.", "Lectura fuerte."],
     },
     horizon: {
-      empty: ["Aún no hay línea del horizonte.", "El horizonte sigue abierto.", "Añade tu momento para trazar una línea."],
-      early: ["Se está formando un horizonte.", "La línea sigue liviana.", "Casi suficiente para leer."],
+      empty: ["Aún no hay horizonte.", "Horizonte abierto.", "Abierto."],
+      early: ["Formándose.", "Liviano.", "Casi ahí."],
       dominant: [
-        (k) => `La mezcla se inclina a ${k}.`,
-        (k) => `Ahora mismo: ${k}.`,
-        (k) => `Esta ventana lee ${k}.`,
+        (k) => `Tiende a ${k}.`,
+        (k) => `Predomina ${k}.`,
+        (k) => `Lee ${k}.`,
       ],
-      trendSteady: ["La línea se mantiene.", "Sin cambio a la vista.", "Estable en la ventana."],
-      trendShift: ["La línea se mueve.", "Algo está cambiando.", "La lectura cambia."],
-      driftCondensing: ["Presión condensando.", "La lectura se condensa.", "Sube la densidad."],
-      driftClearing: ["Presión abriendo.", "La lectura se abre.", "Aclarando."],
-      driftStable: ["Presión estable.", "Sin deriva fuerte.", "Se mantiene."],
+      trendSteady: ["Se mantiene.", "Estable.", "Sin cambio."],
+      trendShift: ["Cambiando.", "En movimiento.", "Se mueve."],
+      driftCondensing: ["Condensando.", "Cerrando.", "Sube."],
+      driftClearing: ["Abriendo.", "Alivianando.", "Aclarando."],
+      driftStable: ["Estable.", "Sin deriva.", "Mantiene."],
     },
     local: {
       condensing: ["Este campo se condensa.", "Sube la presión local.", "Más denso aquí."],
       clearing: ["Este campo se abre.", "Baja la presión local.", "Más liviano aquí."],
-      stable: ["Este campo se mantiene.", "Balance local.", "Calma en este alcance."],
-      fallback: ["Leyendo desde el campo amplio.", "Aún no basta aquí; se usa el conjunto."],
+      stable: ["El campo local se mantiene cerca del baseline.", "El campo local se mantiene estable.", "Calma en este alcance."],
+      fallback: ["La señal local sigue liviana dentro del campo amplio.", "Leyendo desde el campo amplio."],
       regional: ["Leyendo esta región.", "Este alcance da forma a la línea."],
     },
     strataFallback: ["Los momentos se asientan en capas profundas.", "Tu registro se profundiza.", "Las capas siguen asentándose."],
@@ -515,7 +516,7 @@ const UI_COPY = {
     orientation: "",
     valueProp: "Collective reading from shared moments",
     cta: "Let it rise into the atmosphere.",
-    trust: "No account. No exact pin. Not weather, just shared moments.",
+    trust: "No account. No exact pin. Just shared moments.",
     scopeLabel: "48h",
     recentFromRemote: "Across the atmosphere.",
     recentFromLocal: "Moments from this device only.",
@@ -525,8 +526,9 @@ const UI_COPY = {
     mixLine: (type, mood) => `Mostly ${type}, ${mood}.`,
     eyebrowLayer: "Atmosphere",
     eyebrowContext: "Moments",
-    horizonTitle: "Horizon Line",
-    nearbyTitle: "Nearby Field",
+    horizonTitle: "Horizon",
+    horizonMoreLabel: "Deeper",
+    nearbyTitle: "Nearby",
     instrumentAriaLabel: "Reading metrics",
     instrumentLayerLabel: "Atmosphere",
     instrumentScopeLabel: "Global",
@@ -535,6 +537,7 @@ const UI_COPY = {
     instrumentMetricsAriaStrata: "Deep record metrics",
     instrumentInfoCopy: "Type, mood, note, recency — what shapes each moment.",
     degreeScaleLabel: "0–100 scale",
+    readingPrefix: "Reading:",
     strata: {
       mixLow: "low",
       mixModerate: "moderate",
@@ -558,9 +561,10 @@ const UI_COPY = {
     momentRelateLabel: "Not alone",
     momentRelateLabelYou: "Not alone · you",
     momentRelateAria: "Mark that this resonates with you too",
+    nearbyRelateLabel: (count) => (count === 1 ? "1 nearby" : `${count} nearby`),
     sheetCount: (n) => (n === 1 ? "Showing 1 moment." : `Showing ${n} moments.`),
     loading: "Loading…",
-    localFieldMomentsLabel: "In this field",
+    localFieldMomentsLabel: "In the nearby field",
     localFieldMomentsEmpty: "No shared moments in this scope yet.",
     metrics: {
       pressureCondensing: "condensing",
@@ -580,7 +584,7 @@ const UI_COPY = {
     orientation: "",
     valueProp: "Lectura colectiva de momentos compartidos",
     cta: "Que suba a la atmósfera.",
-    trust: "Sin cuenta. Sin pin exacto. No es el tiempo; son momentos compartidos.",
+    trust: "Sin cuenta. Sin pin exacto. Solo momentos compartidos.",
     scopeLabel: "48 h",
     recentFromRemote: "En la atmósfera.",
     recentFromLocal: "Solo momentos de este dispositivo.",
@@ -590,8 +594,9 @@ const UI_COPY = {
     mixLine: (type, mood) => `Sobre todo ${type}, ${mood}.`,
     eyebrowLayer: "Atmósfera",
     eyebrowContext: "Momentos",
-    horizonTitle: "Línea del horizonte",
-    nearbyTitle: "Campo cercano",
+    horizonTitle: "Horizonte",
+    horizonMoreLabel: "Más",
+    nearbyTitle: "Cercano",
     instrumentAriaLabel: "Métricas de lectura",
     instrumentLayerLabel: "Atmósfera",
     instrumentScopeLabel: "Global",
@@ -600,6 +605,7 @@ const UI_COPY = {
     instrumentMetricsAriaStrata: "Métricas del registro profundo",
     instrumentInfoCopy: "Tipo, humor, nota, recencia: lo que da forma a cada momento.",
     degreeScaleLabel: "0–100 escala",
+    readingPrefix: "Lectura:",
     strata: {
       mixLow: "bajo",
       mixModerate: "moderado",
@@ -620,11 +626,12 @@ const UI_COPY = {
     viewMore: "Ver más",
     close: "Cerrar",
     sheetEmpty: "Aún no hay momentos compartidos.",
-    localFieldMomentsLabel: "En este campo",
+    localFieldMomentsLabel: "En el campo cercano",
     localFieldMomentsEmpty: "Aún no hay momentos compartidos en este ámbito.",
     momentRelateLabel: "No estás solo",
     momentRelateLabelYou: "No estás solo · tú",
     momentRelateAria: "Señalar que esto también resuena contigo",
+    nearbyRelateLabel: (count) => (count === 1 ? "1 en el campo" : `${count} en el campo`),
     sheetCount: (n) => (n === 1 ? "Se muestra 1 momento." : `Se muestran ${n} momentos.`),
     loading: "Cargando…",
     metrics: {
@@ -663,6 +670,8 @@ function applyUICopy() {
   if (eyebrowContextEl) eyebrowContextEl.textContent = ui.eyebrowContext;
   const horizonTitleEl = document.querySelector(".horizon-line");
   if (horizonTitleEl) horizonTitleEl.textContent = ui.horizonTitle;
+  const horizonMoreBtn = document.getElementById("horizonMoreButton");
+  if (horizonMoreBtn && ui.horizonMoreLabel) horizonMoreBtn.textContent = ui.horizonMoreLabel;
   const nearbyTitleEl = document.querySelector(".local-climate-line");
   if (nearbyTitleEl) nearbyTitleEl.textContent = ui.nearbyTitle;
   if (conditionLine) conditionLine.textContent = ui.conditionPending;
@@ -839,22 +848,22 @@ const REGIONAL_LOCAL_COPY = {
   common: {
     condensing: [
       "Local density is tightening in this scope.",
-      "Local score is rising above baseline.",
+      "The local field is rising above baseline.",
       "Local repetition is adding pressure.",
     ],
     clearing: [
       "Local density is easing in this scope.",
-      "Local score is moving toward lower pressure.",
+      "The local field is moving toward lower pressure.",
       "Local repetition pressure is decreasing.",
     ],
     stable: [
-      "Local score remains near baseline.",
-      "Local variation stays in stable range.",
+      "The local field remains near baseline.",
+      "The local field stays close to baseline.",
       "Local rhythm remains balanced.",
     ],
     fallback: [
-      "Local signal is still light. It follows the wider field.",
-      "Local signal is still forming from the wider field.",
+      "The local signal remains light within the wider field.",
+      "The local signal remains light.",
       "Local signal is still emerging from shared flow.",
     ],
     regional: [
@@ -967,6 +976,30 @@ function pickCopyFromState(entry, numericSeed) {
 }
 
 const degreeValue = document.getElementById("degreeValue");
+let lastDisplayedDegreeStr = null;
+
+/** Inercia del instrumento: micro-desplazamiento vertical cuando el número cambia. Respeta prefers-reduced-motion. */
+function playDegreeSettle() {
+  if (!degreeValue || prefersReducedMotion) return;
+  degreeValue.classList.add("degree-settle-in");
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      degreeValue.classList.remove("degree-settle-in");
+    });
+  });
+}
+
+/** Actualiza el display del grado y, si cambió, reproduce la inercia del indicador. */
+function setDegreeDisplay(txt) {
+  if (!degreeValue) return;
+  if (txt !== lastDisplayedDegreeStr) {
+    lastDisplayedDegreeStr = txt;
+    degreeValue.textContent = txt;
+    playDegreeSettle();
+  } else {
+    degreeValue.textContent = txt;
+  }
+}
 const conditionLine = document.getElementById("conditionLine");
 const climateSummaryLine = document.getElementById("climateSummaryLine");
 const climateMetricsLine = document.getElementById("climateMetricsLine");
@@ -1670,6 +1703,9 @@ function calculateClimate(moments) {
   if (total === 1) {
     computedDegree = Math.min(computedDegree, BASELINE + SINGLE_MOMENT_DEGREE_DELTA);
   }
+  const deltaFromBaseline = computedDegree - BASELINE;
+  const massInertiaFactor = 1 / (1 + Math.sqrt(total) / MASS_INERTIA_REF);
+  computedDegree = clamp(BASELINE + deltaFromBaseline * massInertiaFactor, 0, SCALE);
   const toneReading = clamp(50 + 50 * Math.tanh(normalizedPressure * TANH_SENSITIVITY), 0, 100);
 
   return {
@@ -1727,8 +1763,8 @@ function setRelateState(momentId, value) {
 
 function formatDegree(value) {
   const n = Number(value);
-  if (!Number.isFinite(n)) return String(BASELINE);
-  return n.toFixed(1);
+  if (!Number.isFinite(n)) return String(BASELINE) + "°";
+  return Math.round(clamp(n, 0, SCALE)) + "°";
 }
 
 function conditionForDegree(value, total) {
@@ -2018,7 +2054,8 @@ function capitalizeNoteForDisplay(str) {
     .join(" ");
 }
 
-function createMomentItemElement(m) {
+function createMomentItemElement(m, options = {}) {
+  const inNearbyField = options.inNearbyField === true;
   const li = document.createElement("li");
   li.className = "moment-item";
   const note = m.note ? m.note.trim() : "(no note)";
@@ -2046,9 +2083,16 @@ function createMomentItemElement(m) {
   function updateRelateLabel() {
     const count = parseInt(relateBtn.dataset.relateCount, 10) || 0;
     const you = getRelateState(momentId);
-    let text = baseLabel;
-    if (count > 0) text += ` · ${count}`;
-    if (you) text += LANG === "es" ? " · tú" : " · you";
+    let text;
+    if (inNearbyField) {
+      const nearbyLabel = typeof ui.nearbyRelateLabel === "function" ? ui.nearbyRelateLabel(count) : (count === 1 ? "1 nearby" : `${count} nearby`);
+      text = count > 0 ? nearbyLabel : (LANG === "es" ? "en el campo" : "nearby");
+      if (you) text += LANG === "es" ? " · tú" : " · you";
+    } else {
+      text = baseLabel;
+      if (count > 0) text += ` · ${count}`;
+      if (you) text += LANG === "es" ? " · tú" : " · you";
+    }
     relateBtn.textContent = text;
     relateBtn.classList.toggle("is-active", you);
   }
@@ -2335,7 +2379,7 @@ function renderRegionalMomentsList(sharedMoments, fieldScope) {
   const ui = UI_COPY[LANG] || UI_COPY.en;
   const hasScope = fieldScope?.geo && fieldScope.scope !== "global";
   if (localClimateMomentsLabel) {
-    localClimateMomentsLabel.textContent = ui.localFieldMomentsLabel || "In this field";
+    localClimateMomentsLabel.textContent = ui.localFieldMomentsLabel || "In the nearby field";
     localClimateMomentsLabel.classList.toggle("visually-hidden", !hasScope);
   }
   localClimateMoments.classList.toggle("hidden", !hasScope);
@@ -2353,7 +2397,7 @@ function renderRegionalMomentsList(sharedMoments, fieldScope) {
     localClimateMoments.appendChild(li);
     return;
   }
-  list.forEach((m) => localClimateMoments.appendChild(createMomentItemElement(m)));
+  list.forEach((m) => localClimateMoments.appendChild(createMomentItemElement(m, { inNearbyField: true })));
 }
 
 function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby", pipeline = null, fieldScope = null, sharedMoments = null) {
@@ -2382,9 +2426,13 @@ function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby", p
   if (localClimateMass) {
     localClimateMass.textContent = `${total} shared · ${confidenceMode}`;
   }
+  /* Echo line removed: repetía la línea anterior y no aportaba ontología clara. */
+  if (localClimateEcho) {
+    localClimateEcho.textContent = "";
+    localClimateEcho.classList.add("hidden");
+  }
   if (localState?.source === "global_view") {
     localClimateSecondary.textContent = "Reading shared moments across the wider field.";
-    localClimateEcho.textContent = "Wider field lens selected.";
     if (localClimateMetricsLine) {
       const parts = buildMetricsLineParts(localState, total, LANG);
       const uiAria = UI_COPY[LANG] || UI_COPY.en;
@@ -2401,7 +2449,10 @@ function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby", p
     return;
   }
   const echoMode = pipeline?.signalModes?.echo || classifyEcho(localState, canonicalState);
-  localClimateEcho.textContent = pickCopy(SIGNALS.echo[echoMode], seed + 5);
+  if (localClimateEcho) {
+    localClimateEcho.textContent = "";
+    localClimateEcho.classList.add("hidden");
+  }
   if (localState?.source === "global_fallback") {
     localClimateSecondary.textContent =
       pickRegionalLocalCopy("fallback", fieldScope, seed + 3) || pickCopy(COPY.local.fallback, seed);
@@ -2561,18 +2612,23 @@ function escapeHtml(text) {
 
 function animateDegree(from, to, ms) {
   if (prefersReducedMotion || ms <= 0) {
-    const t = formatDegree(to);
-    degreeValue.textContent = t;
+    setDegreeDisplay(formatDegree(to));
     return;
   }
   const start = performance.now();
+  const finalTxt = formatDegree(to);
   function frame(now) {
     const t = clamp((now - start) / ms, 0, 1);
     const eased = 1 - (1 - t) * (1 - t);
     const current = from + (to - from) * eased;
     const txt = formatDegree(current);
     degreeValue.textContent = txt;
-    if (t < 1) requestAnimationFrame(frame);
+    if (t < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      lastDisplayedDegreeStr = finalTxt;
+      playDegreeSettle();
+    }
   }
   requestAnimationFrame(frame);
 }
@@ -2669,6 +2725,7 @@ function normalizeRepetition(repetition) {
 }
 
 async function loadClimateTruth(localMoments) {
+  // Server is canonical truth for computedDegree when remote is available; client only animates displayDegree.
   const localSharedMoments = getSharedMoments(localMoments);
   try {
     const remoteClimate = await fetchClimateRemote(48);
@@ -2782,10 +2839,12 @@ async function boot() {
   if (hasStoredDisplay) {
     const d = formatDegree(optimisticStartDisplay);
     degreeValue.textContent = d;
+    lastDisplayedDegreeStr = d;
     document.body.style.setProperty("--atmo", String(optimisticStartDisplay));
   } else {
     // First load with no stored state: avoid flashing a temporary fixed number.
-    degreeValue.textContent = String(BASELINE);
+    degreeValue.textContent = String(BASELINE) + "°";
+    lastDisplayedDegreeStr = String(BASELINE) + "°";
     degreeValue.classList.add("is-pending");
     document.body.style.setProperty("--atmo", String(BASELINE));
     if (observatoryPanel) observatoryPanel.setAttribute("aria-busy", "true");
@@ -2971,7 +3030,9 @@ async function boot() {
     const degree = Number(canonicalState?.computedDegree) || BASELINE;
     const seed = (total * 7 + Math.round(degree)) | 0;
     if (total > 0) {
-      climateSummaryLine.textContent = getReadingStatusLine(LANG, total, seed);
+      const ui = UI_COPY[LANG] || UI_COPY.en;
+      const prefix = ui.readingPrefix || "Reading:";
+      climateSummaryLine.textContent = `${prefix} ${getReadingStatusLine(LANG, total, seed)}`;
       climateSummaryLine.classList.remove("hidden");
     } else {
       climateSummaryLine.textContent = "";
@@ -2991,11 +3052,8 @@ async function boot() {
   }
   const totalForWarmup = canonicalState.total || 0;
   if (warmupHint) {
-    const showWarmup = totalForWarmup > 0 && totalForWarmup < 6;
-    warmupHint.textContent = showWarmup
-      ? "The reading stays cautious with few shared moments."
-      : "";
-    warmupHint.classList.toggle("hidden", !showWarmup);
+    warmupHint.textContent = "";
+    warmupHint.classList.add("hidden");
   }
   renderFutureConfidenceLine(canonicalState, observatoryPipeline);
   renderPatternLayer(canonicalState);
