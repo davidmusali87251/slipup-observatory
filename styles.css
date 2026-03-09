@@ -1641,9 +1641,28 @@ h2 {
     ),
     color-mix(in srgb, var(--card) calc(92% - var(--atmo) * 0.2%), var(--layer-horizon-soft));
   border-color: color-mix(in oklab, var(--card) 26%, transparent);
-  border-bottom: 1px solid color-mix(in oklab, var(--line) 10%, transparent);
+  border-bottom: none;
   position: relative;
   overflow: hidden;
+}
+
+/* Transición observatorio: Horizon se funde hacia la tierra (sin corte) */
+.panel-horizon::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 56%;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    #ffffff00 0%,
+    color-mix(in oklab, var(--layer-horizon-soft) 22%, transparent) 35%,
+    color-mix(in srgb, var(--layer-ground) calc(32% + var(--atmo) * 0.12%), transparent) 70%,
+    color-mix(in oklab, var(--layer-ground-soft) 58%, transparent) 100%
+  );
+  opacity: 0.92;
 }
 
 /* Lectura: contraste un poco más suave que el cielo (luz que se amortigua) */
@@ -1661,22 +1680,6 @@ h2 {
   background: linear-gradient(180deg, transparent 0%, color-mix(in oklab, var(--layer-horizon-soft) 27%, transparent) 100%);
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
-}
-
-.panel-horizon::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 36%;
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    #ffffff00 0%,
-    color-mix(in srgb, var(--layer-ground) calc(38% + var(--atmo) * 0.18%), transparent) 100%
-  );
-  opacity: 0.9;
 }
 
 .local-climate {
@@ -1946,11 +1949,16 @@ h2 {
   position: absolute;
   left: 0;
   right: 0;
-  top: -28px;
-  height: 34px;
+  top: -72px;
+  height: 80px;
   pointer-events: none;
-  background: linear-gradient(180deg, transparent 0%, color-mix(in oklab, var(--layer-ground-soft) 42%, transparent) 100%);
-  opacity: 0.82;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in oklab, var(--layer-ground-soft) 18%, transparent) 35%,
+    color-mix(in oklab, var(--layer-ground-soft) 48%, transparent) 100%
+  );
+  opacity: 0.88;
 }
 
 @media (min-width: 900px) {
