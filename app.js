@@ -48,7 +48,7 @@ import {
 } from "./modelConstants.js";
 
 const STORAGE_KEY = "slipup_v2_moments";
-const RENDER_LIMIT = 6;
+const RENDER_LIMIT = 6; // Recent: lista acotada, muy ligera. Sin infinite scroll (docs/OBSERVATORY_GROWTH_PITFALLS.md).
 const COMPUTED_DEGREE_KEY = "slipup_v2_computed_degree";
 const DISPLAY_DEGREE_KEY = "slipup_v2_display_degree";
 const FIELD_SCOPE_KEY = "slipup_v2_field_scope";
@@ -2950,19 +2950,15 @@ async function boot() {
   if (climateMetricsLine) {
     const total = Number(canonicalState?.total) || 0;
     const parts = buildMetricsLineParts(canonicalState, total, LANG, { includeDensity: false });
-    if (parts.length > 0) {
-      climateMetricsLine.innerHTML = parts.map((p) => p.html).join('<span class="metric-sep" aria-hidden="true"> · </span>');
-      climateMetricsLine.classList.remove("hidden");
-      if (climateInstrument) climateInstrument.classList.remove("hidden");
-      if (observatoryScopeRange) {
-        const ui = UI_COPY[LANG] || UI_COPY.en;
-        const layerLabel = ui.instrumentLayerLabel || "Atmosphere";
-        const scopeLabel = ui.instrumentScopeLabel || "Global";
-        const rangeText = ui.scopeRangeLine ? ui.scopeRangeLine(total) : `${total} moments`;
-        observatoryScopeRange.textContent = `${layerLabel} · ${scopeLabel} · ${rangeText}`;
-        observatoryScopeRange.classList.add("hidden");
-      }
-      if (instrumentInfoTechnical) {
+    // Hero: solo lectura (grado), sin telemetría visible. Métricas solo en panel "i" (instrumentInfoTechnical).
+    climateMetricsLine.textContent = "";
+    climateMetricsLine.classList.add("hidden");
+    if (observatoryScopeRange) {
+      observatoryScopeRange.textContent = "";
+      observatoryScopeRange.classList.add("hidden");
+    }
+    if (parts.length > 0 && instrumentInfoTechnical) {
+        if (climateInstrument) climateInstrument.classList.remove("hidden");
         const ui = UI_COPY[LANG] || UI_COPY.en;
         const m = ui.metrics || {};
         const windowLabel = LANG === "es" ? "Ventana: 48 h" : "Window: 48h";

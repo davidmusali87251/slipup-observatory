@@ -48,3 +48,9 @@ Cada capa **explica menos** y tiene **más tiempo** hacia abajo.
 3. **El sistema respira**: aire, campo humano, línea de lectura, estructura.
 
 El Observatory debe sentirse como **un clima hecho de momentos humanos**, no como una app.
+
+---
+
+Ver también:
+- **OBSERVATORY_ALIVE_THRESHOLD.md** — cuándo el sistema empieza a sentirse vivo (~300–500 momentos en 48 h) y fases por masa.
+- **OBSERVATORY_GROWTH_PITFALLS.md** — riesgos al crecer (feed, telemetría, contenido, sobre-interpretación, inercia) y paradoja del crecimiento.
