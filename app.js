@@ -584,7 +584,7 @@ const UI_COPY = {
     momentRelateLabel: "Not alone",
     momentRelateLabelYou: "Not alone · you",
     momentRelateAria: "Mark that this resonates with you too",
-    momentRelateInfoTitle: "Not alone. Part of the field.",
+    momentRelateInfoTitle: "Not alone",
     nearbyRelateLabel: (count) => (count === 1 ? "1 nearby" : `${count} nearby`),
     sheetCount: () => "Showing recent.",
     loading: "Loading…",
@@ -693,7 +693,7 @@ const UI_COPY = {
     momentRelateLabel: "No estás solo",
     momentRelateLabelYou: "No estás solo · tú",
     momentRelateAria: "Señalar que esto también resuena contigo",
-    momentRelateInfoTitle: "No estás solo. Parte del campo.",
+    momentRelateInfoTitle: "No estás solo",
     nearbyRelateLabel: (count) => (count === 1 ? "1 en el campo" : `${count} en el campo`),
     sheetCount: () => "Se muestran recientes.",
     loading: "Cargando…",
@@ -1037,7 +1037,6 @@ const horizonMoreButton = document.getElementById("horizonMoreButton");
 const heroEl = document.getElementById("observatory-hero");
 const atmospherePatternLine = document.getElementById("atmosphere-pattern-line");
 const transientReadingLine = document.getElementById("transientReadingLine");
-const atmosphereSemanticHint = document.getElementById("atmosphereSemanticHint");
 const warmupHint = document.getElementById("warmupHint");
 const sheetBackdrop = document.getElementById("sheet-backdrop");
 const sharedSheet = document.getElementById("shared-sheet");
@@ -2139,8 +2138,8 @@ function createMomentItemElement(m, options = {}) {
   const infoBtn = document.createElement("button");
   infoBtn.type = "button";
   infoBtn.className = "moment-relate-info-btn";
-  infoBtn.setAttribute("aria-label", LANG === "es" ? "Qué significa No estás solo" : "What Not alone means");
-  infoBtn.title = ui.momentRelateInfoTitle || (LANG === "es" ? "No estás solo. Parte del campo." : "Not alone. Part of the field.");
+  infoBtn.setAttribute("aria-label", LANG === "es" ? "No estás solo" : "Not alone");
+  infoBtn.title = ui.momentRelateInfoTitle || (LANG === "es" ? "No estás solo" : "Not alone");
   infoBtn.textContent = "i";
 
   const wrap = document.createElement("div");
@@ -3099,16 +3098,6 @@ async function boot() {
     }
   }
 
-  const hasSemanticSignal = sharedMoments.slice(0, 48).some((m) => {
-    const s = noteSignal(m.note || "");
-    return s.reflective > 0 || s.reactive > 0;
-  });
-  if (atmosphereSemanticHint) {
-    atmosphereSemanticHint.textContent = hasSemanticSignal
-      ? "Wording in shared moments can nudge the reading."
-      : "";
-    atmosphereSemanticHint.classList.toggle("hidden", !hasSemanticSignal);
-  }
   const totalForWarmup = canonicalState.total || 0;
   if (warmupHint) {
     warmupHint.textContent = "";

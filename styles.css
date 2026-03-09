@@ -877,15 +877,6 @@ h2 {
   }
 }
 
-.atmosphere-semantic-hint {
-  margin-top: 0.35rem;
-  font-size: 0.7rem;
-  color: #6d7d94;
-  opacity: 0.78;
-  line-height: 1.5;
-  max-width: 32ch;
-}
-
 .warmup-hint {
   margin-top: 0.28rem;
   font-size: 0.78rem;
@@ -1918,6 +1909,7 @@ h2 {
   padding: 0;
   list-style: none;
   max-width: 48ch;
+  text-align: left;
 }
 
 .local-climate-moments .moment-item {
@@ -2052,10 +2044,31 @@ h2 {
   background: linear-gradient(
     180deg,
     transparent 0%,
-    color-mix(in oklab, #5B4B8A 20%, transparent) 35%,
-    color-mix(in oklab, #4a3a72 50%, transparent) 100%
+    color-mix(in oklab, #5B4B8A 12%, transparent) 25%,
+    color-mix(in oklab, #5B4B8A 22%, transparent) 50%,
+    color-mix(in oklab, #4a3a72 48%, transparent) 100%
   );
   opacity: 0.88;
+}
+
+/* Cierre de capas: transición de color al final de Strata (estilo observatory) */
+.ground-strata::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 120px;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 45%,
+    color-mix(in oklab, #2d1b4e 22%, transparent) 70%,
+    color-mix(in oklab, #1a0a2e 50%, transparent) 88%,
+    color-mix(in oklab, #0d0518 38%, transparent) 100%
+  );
+  opacity: 0.92;
 }
 
 /* Strata: efecto raíces blancas — texto blanco sobre violeta royal */
@@ -2275,6 +2288,31 @@ h2 {
   border-radius: 0;
   padding: 1.1rem 1.15rem 1.25rem;
   box-shadow: none;
+  overflow: hidden;
+}
+
+/* Brillo de fondo: glow sutil para la capa contribute */
+.panel-contribute::before {
+  content: "";
+  position: absolute;
+  inset: -20% -15% -30% -15%;
+  top: -40%;
+  pointer-events: none;
+  z-index: -1;
+  background:
+    radial-gradient(
+      ellipse 90% 70% at 50% -15%,
+      color-mix(in oklab, var(--contribute-accent) 14%, transparent) 0%,
+      color-mix(in oklab, var(--contribute-accent) 6%, transparent) 35%,
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 100% 80% at 50% 20%,
+      color-mix(in oklab, #e8ecf4 22%, transparent) 0%,
+      color-mix(in oklab, #dde4f0 8%, transparent) 45%,
+      transparent 70%
+    );
+  opacity: 0.92;
 }
 
 .contribute-layer-entry {
@@ -3006,6 +3044,7 @@ section.panel.panel-recent {
   padding: 0;
   list-style: none;
   max-width: 48ch;
+  text-align: left;
 }
 
 #recentMoments.moment-list .moment-item {
