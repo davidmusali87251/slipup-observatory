@@ -199,7 +199,7 @@ body.sheet-open {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 1.5rem 0 calc(var(--page-pad-top) + 0.5rem);
+  padding: 2.75rem 0 calc(var(--page-pad-top) + 0.5rem);
   position: relative;
   isolation: isolate;
   /* Capas de profundidad: aire arriba, horizonte abajo — sensación de espacio */
@@ -3119,8 +3119,50 @@ section.panel.panel-recent {
   }
 }
 
+/* Contenedor: botón de acción + botón "i" (modo observatorio: centrado en pantallas grandes) */
+.moment-relate-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+}
+
+#recentMoments.moment-list .moment-item .moment-relate-controls {
+  align-self: center;
+}
+
+.moment-relate-info-btn {
+  flex: 0 0 auto;
+  width: 1.35rem;
+  height: 1.35rem;
+  padding: 0;
+  border: 1px solid color-mix(in oklab, var(--muted) 28%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--bg) 90%, var(--line));
+  color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-style: italic;
+  line-height: 1;
+  cursor: help;
+  opacity: 0.78;
+  transition: opacity 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+.moment-relate-info-btn:hover {
+  opacity: 1;
+  color: color-mix(in oklab, var(--relate-accent) 75%, var(--muted));
+  border-color: color-mix(in oklab, var(--relate-accent) 35%, transparent);
+}
+.moment-relate-info-btn:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--relate-accent) 50%, transparent);
+  outline-offset: 2px;
+}
+
 /* Botón "Not alone" / "No estás solo": indicar que también resuena contigo (contador local).
    Violeta-lila que compone con nubes/horizon/Strata; reconocimiento y compasión. */
+.moment-relate-controls .moment-relate-btn {
+  margin-top: 0;
+}
 .moment-relate-btn {
   align-self: flex-start;
   margin-top: 0.25rem;
@@ -3157,10 +3199,14 @@ section.panel.panel-recent {
   opacity: 1;
 }
 
+.local-climate-moments .moment-item-nearby .moment-relate-controls {
+  align-self: center;
+  margin-top: 0.35rem;
+}
 .local-climate-moments .moment-item-nearby .moment-relate-btn {
   font-size: 0.65rem;
   opacity: 0.78;
-  margin-top: 0.35rem;
+  margin-top: 0;
 }
 .local-climate-moments .moment-item-nearby .moment-relate-btn:hover {
   opacity: 0.95;

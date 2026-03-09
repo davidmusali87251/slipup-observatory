@@ -584,6 +584,7 @@ const UI_COPY = {
     momentRelateLabel: "Not alone",
     momentRelateLabelYou: "Not alone · you",
     momentRelateAria: "Mark that this resonates with you too",
+    momentRelateInfoTitle: "Not alone. Part of the field.",
     nearbyRelateLabel: (count) => (count === 1 ? "1 nearby" : `${count} nearby`),
     sheetCount: () => "Showing recent.",
     loading: "Loading…",
@@ -692,6 +693,7 @@ const UI_COPY = {
     momentRelateLabel: "No estás solo",
     momentRelateLabelYou: "No estás solo · tú",
     momentRelateAria: "Señalar que esto también resuena contigo",
+    momentRelateInfoTitle: "No estás solo. Parte del campo.",
     nearbyRelateLabel: (count) => (count === 1 ? "1 en el campo" : `${count} en el campo`),
     sheetCount: () => "Se muestran recientes.",
     loading: "Cargando…",
@@ -2145,7 +2147,19 @@ function createMomentItemElement(m, options = {}) {
     setRelateState(momentId, true);
     updateRelateLabel();
   });
-  li.appendChild(relateBtn);
+
+  const infoBtn = document.createElement("button");
+  infoBtn.type = "button";
+  infoBtn.className = "moment-relate-info-btn";
+  infoBtn.setAttribute("aria-label", LANG === "es" ? "Qué significa No estás solo" : "What Not alone means");
+  infoBtn.title = ui.momentRelateInfoTitle || (LANG === "es" ? "No estás solo. Parte del campo." : "Not alone. Part of the field.");
+  infoBtn.textContent = "i";
+
+  const wrap = document.createElement("div");
+  wrap.className = "moment-relate-controls";
+  wrap.appendChild(relateBtn);
+  wrap.appendChild(infoBtn);
+  li.appendChild(wrap);
   return li;
 }
 
