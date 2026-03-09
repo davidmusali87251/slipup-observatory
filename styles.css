@@ -199,7 +199,7 @@ body.sheet-open {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: 2.75rem 0 calc(var(--page-pad-top) + 0.5rem);
+  padding: calc(2.75rem + 1cm) 0 calc(var(--page-pad-top) + 0.5rem);
   position: relative;
   isolation: isolate;
   /* Capas de profundidad: aire arriba, horizonte abajo — sensación de espacio */
@@ -1491,6 +1491,21 @@ h2 {
   margin-bottom: 0.6rem;
 }
 
+.panel-recent .section-row {
+  max-width: 48ch;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: flex-end;
+}
+
+.local-climate .section-row.nearby-view-more-wrap {
+  max-width: 48ch;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: flex-end;
+  margin-bottom: 0.6rem;
+}
+
 .moment-list {
   list-style: none;
   margin: 0;
@@ -1911,6 +1926,9 @@ h2 {
 }
 
 .local-climate-moments .moment-item-nearby {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   border-top: none;
   margin-top: 0.85rem;
   padding-top: 0.6rem;
@@ -3139,16 +3157,16 @@ section.panel.panel-recent {
   }
 }
 
-/* Contenedor: botón de acción + botón "i" (modo observatorio: centrado en pantallas grandes) */
+/* Contenedor: botón de acción + botón "i". Observatorio: anotación a la derecha, misma columna en cada fila. */
 .moment-relate-controls {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.3rem;
+  gap: 0.35rem;
+  margin-top: 0.28rem;
 }
 
 #recentMoments.moment-list .moment-item .moment-relate-controls {
-  align-self: center;
+  align-self: flex-end;
 }
 
 .moment-relate-info-btn {
@@ -3229,8 +3247,8 @@ section.panel.panel-recent {
 }
 
 .local-climate-moments .moment-item-nearby .moment-relate-controls {
-  align-self: center;
-  margin-top: 0.35rem;
+  align-self: flex-end;
+  margin-top: 0.28rem;
 }
 .local-climate-moments .moment-item-nearby .moment-relate-btn {
   font-size: 0.65rem;
