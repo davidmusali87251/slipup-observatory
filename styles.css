@@ -2580,6 +2580,22 @@ h2 {
   opacity: 0.85;
 }
 
+.contribute-back-wrap {
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+.contribute-page .contribute-back-link {
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  opacity: 0.88;
+}
+.contribute-page .contribute-back-link:hover {
+  color: var(--text);
+  opacity: 1;
+}
+
 .field-hint {
   margin-top: -0.08rem;
   font-size: 0.7rem;
@@ -3158,33 +3174,39 @@ section.panel.panel-recent {
   outline-offset: 2px;
 }
 
-/* Botón "Not alone" / "No estás solo": indicar que también resuena contigo (contador local).
-   Violeta-lila que compone con nubes/horizon/Strata; reconocimiento y compasión. */
+/* Botón "+" agregación: marco que lo define sin romper el estilo observatorio. */
 .moment-relate-controls .moment-relate-btn {
   margin-top: 0;
 }
 .moment-relate-btn {
   align-self: flex-start;
   margin-top: 0.25rem;
-  padding: 0.28rem 0.6rem;
-  font-size: 0.7rem;
-  line-height: 1.3;
-  letter-spacing: 0.03em;
+  padding: 0.32rem 0.65rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
   font-family: var(--font-sans);
-  color: color-mix(in oklab, var(--relate-accent) 72%, var(--text));
-  background: color-mix(in oklab, var(--relate-accent-soft) 18%, var(--bg));
-  border: 1px solid color-mix(in oklab, var(--relate-accent) 32%, transparent);
+  color: color-mix(in oklab, var(--relate-accent) 78%, var(--text));
+  background: color-mix(in oklab, var(--relate-accent-soft) 14%, var(--bg));
+  border: 1px solid color-mix(in oklab, var(--relate-accent) 38%, transparent);
   border-radius: 999px;
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--relate-accent) 18%, transparent),
+    inset 0 1px 0 color-mix(in oklab, #fff 50%, transparent);
   cursor: pointer;
-  opacity: 0.9;
-  transition: opacity 0.2s ease, border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+  opacity: 0.92;
+  transition: opacity 0.2s ease, border-color 0.2s ease, color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .moment-relate-btn:hover {
   opacity: 1;
-  color: color-mix(in oklab, var(--relate-accent) 85%, var(--text));
-  border-color: color-mix(in oklab, var(--relate-accent) 50%, transparent);
+  color: color-mix(in oklab, var(--relate-accent) 88%, var(--text));
+  border-color: color-mix(in oklab, var(--relate-accent) 52%, transparent);
   background: color-mix(in oklab, var(--relate-accent-soft) 28%, var(--bg));
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--relate-accent) 28%, transparent),
+    inset 0 1px 0 color-mix(in oklab, #fff 55%, transparent);
 }
 
 .moment-relate-btn:focus-visible {
@@ -3193,10 +3215,13 @@ section.panel.panel-recent {
 }
 
 .moment-relate-btn.is-active {
-  color: color-mix(in oklab, var(--relate-accent) 92%, var(--text));
-  border-color: color-mix(in oklab, var(--relate-accent) 55%, transparent);
-  background: color-mix(in oklab, var(--relate-accent-soft) 32%, var(--bg));
+  color: color-mix(in oklab, var(--relate-accent) 95%, var(--text));
+  border-color: color-mix(in oklab, var(--relate-accent) 58%, transparent);
+  background: color-mix(in oklab, var(--relate-accent-soft) 36%, var(--bg));
   opacity: 1;
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--relate-accent) 32%, transparent),
+    inset 0 1px 0 color-mix(in oklab, #fff 60%, transparent);
 }
 
 .local-climate-moments .moment-item-nearby .moment-relate-controls {

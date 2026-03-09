@@ -2067,10 +2067,7 @@ function capitalizeForDisplay(str) {
 function capitalizeNoteForDisplay(str) {
   const s = String(str).trim();
   if (!s) return s;
-  return s
-    .split(/\s+/)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
+  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 }
 
 function createMomentItemElement(m, options = {}) {
@@ -2099,7 +2096,6 @@ function createMomentItemElement(m, options = {}) {
   const momentId = m.id || `${m.timestamp || ""}-${(m.note || "").slice(0, 10)}`;
 
   const ui = UI_COPY[LANG] || UI_COPY.en;
-  const baseLabel = ui.momentRelateLabel || "Not alone";
   const relateBtn = document.createElement("button");
   relateBtn.type = "button";
   relateBtn.className = "moment-relate-btn";
@@ -2109,16 +2105,8 @@ function createMomentItemElement(m, options = {}) {
   function updateRelateLabel() {
     const count = parseInt(relateBtn.dataset.relateCount, 10) || 0;
     const you = getRelateState(momentId);
-    let text;
-    if (inNearbyField) {
-      const nearbyLabel = typeof ui.nearbyRelateLabel === "function" ? ui.nearbyRelateLabel(count) : (count === 1 ? "1 nearby" : `${count} nearby`);
-      text = count > 0 ? nearbyLabel : (LANG === "es" ? "en el campo" : "nearby");
-      if (you) text += LANG === "es" ? " · tú" : " · you";
-    } else {
-      text = baseLabel;
-      if (count > 0) text += ` · ${count}`;
-      if (you) text += LANG === "es" ? " · tú" : " · you";
-    }
+    const symbol = "+";
+    const text = count > 0 ? `${symbol} ${count}` : symbol;
     relateBtn.textContent = text;
     relateBtn.classList.toggle("is-active", you);
   }
