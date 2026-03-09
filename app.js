@@ -2074,20 +2074,27 @@ function capitalizeNoteForDisplay(str) {
 function createMomentItemElement(m, options = {}) {
   const inNearbyField = options.inNearbyField === true;
   const li = document.createElement("li");
-  li.className = "moment-item";
+  li.className = "moment-item" + (inNearbyField ? " moment-item-nearby" : "");
   const note = m.note ? m.note.trim() : "(no note)";
   const typeLabel = capitalizeForDisplay(m.type);
   const moodLabel = capitalizeForDisplay(m.mood);
   const noteLabel = note === "(no note)" ? note : capitalizeNoteForDisplay(note);
-  const left = `${typeLabel} · ${moodLabel} · ${noteLabel}`;
   const timeStr = new Date(m.timestamp).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
   });
   const regionLabel = formatGeoForDisplay(m.geo_bucket);
-  const meta = regionLabel ? `${timeStr} · ${regionLabel}` : timeStr;
+
+  if (inNearbyField) {
+    const context = regionLabel ? `${typeLabel} · ${moodLabel} · ${regionLabel}` : `${typeLabel} · ${moodLabel}`;
+    li.innerHTML = `<span class="moment-note">${escapeHtml(noteLabel)}</span><span class="moment-context">${escapeHtml(context)}</span>`;
+  } else {
+    const left = `${typeLabel} · ${moodLabel} · ${noteLabel}`;
+    const meta = regionLabel ? `${timeStr} · ${regionLabel}` : timeStr;
+    li.innerHTML = `<span>${escapeHtml(left)}</span><span class="moment-meta">${escapeHtml(meta)}</span>`;
+  }
+
   const momentId = m.id || `${m.timestamp || ""}-${(m.note || "").slice(0, 10)}`;
-  li.innerHTML = `<span>${escapeHtml(left)}</span><span class="moment-meta">${escapeHtml(meta)}</span>`;
 
   const ui = UI_COPY[LANG] || UI_COPY.en;
   const baseLabel = ui.momentRelateLabel || "Not alone";

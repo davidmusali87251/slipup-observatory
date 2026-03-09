@@ -114,6 +114,8 @@ Devuelve **escala humana** cuando el cielo ya es muy pesado y abstracto.
 * **Moments nearby**
 * 6–10 momentos cercanos reales (ubicación gruesa: Jerusalem, coarse bucket)
 
+**Diseño:** Nearby debe sentirse como **campo**, no como lista. La señal principal es el momento (ej. *Working alone*); debajo, más suave: type · mood · ubicación. Aire entre ítems, sin separadores rígidos. Los momentos deben parecer *encontrados*, no publicados — como escuchar voces en el aire.
+
 ### Qué no debe mostrar
 
 * density
@@ -123,7 +125,7 @@ Devuelve **escala humana** cuando el cielo ya es muy pesado y abstracto.
 
 ### Sensación
 
-**Escuchar el aire alrededor.** No analytics regionales.
+**Escuchar el aire alrededor.** No analytics regionales. Nearby crea **presencia** (personas respirando el mismo aire); Atmosphere crea clima. Con escala, Nearby puede ser lo que hace que la gente se quede.
 
 ---
 

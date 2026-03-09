@@ -1861,11 +1861,41 @@ h2 {
 }
 
 .local-climate-moments .moment-item {
-  padding: 0.4rem 0 0.4rem 0.75rem;
-  border-top: 1px solid color-mix(in oklab, var(--text) 8%, transparent);
+  padding: 0.5rem 0 0.6rem 0;
   font-size: 0.8rem;
 }
 
+.local-climate-moments .moment-item-nearby {
+  border-top: none;
+  margin-top: 0.85rem;
+  padding-top: 0.6rem;
+  padding-bottom: 0;
+}
+.local-climate-moments .moment-item-nearby:first-child {
+  margin-top: 0;
+  padding-top: 0;
+}
+.local-climate-moments .moment-item-nearby .moment-note {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.35;
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+.local-climate-moments .moment-item-nearby .moment-context {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  color: var(--muted);
+  opacity: 0.82;
+  letter-spacing: 0.02em;
+}
+
+.local-climate-moments .moment-item:not(.moment-item-nearby) {
+  border-top: 1px solid color-mix(in oklab, var(--text) 8%, transparent);
+  padding: 0.4rem 0 0.4rem 0.75rem;
+}
 .local-climate-moments .moment-item:first-child {
   border-top: 0;
 }
@@ -3060,6 +3090,15 @@ section.panel.panel-recent {
   color: color-mix(in oklab, var(--text) 88%, var(--muted));
   border-color: color-mix(in oklab, var(--muted) 60%, transparent);
   opacity: 1;
+}
+
+.local-climate-moments .moment-item-nearby .moment-relate-btn {
+  font-size: 0.65rem;
+  opacity: 0.78;
+  margin-top: 0.35rem;
+}
+.local-climate-moments .moment-item-nearby .moment-relate-btn:hover {
+  opacity: 0.95;
 }
 
 #viewMoreButton.text-button {
