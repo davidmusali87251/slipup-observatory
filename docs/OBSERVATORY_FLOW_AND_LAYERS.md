@@ -17,6 +17,8 @@ cielo → campo cercano → horizonte → sedimento
 
 Cada capa **explica menos** y tiene **más tiempo** hacia abajo.
 
+**Viaje vertical:** El scroll debe sentirse como **descender del cielo a la tierra**. Variables CSS `--descent-gap-nearby`, `--descent-gap-horizon`, `--descent-gap-strata` aumentan el espacio entre capas; Horizon y Strata suavizan el contraste (menos ruido); Strata usa tinte más cálido/oscuro y más aire. Arriba = clima humano; abajo = mi propia tierra.
+
 **Regla de oro:** *Interpretation must never appear before human signals.* El orden Nearby → Horizon queda protegido: el usuario ve primero los momentos cercanos y después la lectura que se forma; nunca la interpretación antes que la evidencia humana.
 
 ## Reglas de diseño por capa
@@ -54,3 +56,4 @@ El Observatory debe sentirse como **un clima hecho de momentos humanos**, no com
 Ver también:
 - **OBSERVATORY_ALIVE_THRESHOLD.md** — cuándo el sistema empieza a sentirse vivo (~300–500 momentos en 48 h) y fases por masa.
 - **OBSERVATORY_GROWTH_PITFALLS.md** — riesgos al crecer (feed, telemetría, contenido, sobre-interpretación, inercia) y paradoja del crecimiento.
+- **STRATA_AT_SCALE.md** — ley de Strata a escala: más silencio, menos líneas, lenguaje sedimentario, sin métricas visibles.

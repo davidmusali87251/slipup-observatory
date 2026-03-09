@@ -554,7 +554,27 @@ const UI_COPY = {
       fertileDominant: "Fertile ratio is dominant in the 30-day mix.",
       deepConfidence: "Deep confidence is stronger with sustained 30-day volume.",
       stillBuilding: "Deep read is still building from recurring entries.",
+      sedimentObservedCalmAfterStress: "Observed calm appears often after stress.",
+      sedimentAvoidableTensionLate: "Avoidable tension repeats late in the day.",
+      sedimentFertileAfterFatigue: "Fertile moments follow fatigue.",
+      sedimentObservedStability: "Observed calm appears often under stress.",
+      sedimentAvoidableReturnsLate: "Avoidable tension returns late.",
+      sedimentFertileDominant: "Fertile moments show up in the mix.",
+      sedimentStillForming: "Your deep record is still forming.",
+      sedimentFirstLayers: "First layers only.",
+      sedimentPatternBeginning: "A pattern is beginning to settle.",
+      sedimentTentativePatternForming: "A pattern may be forming.",
+      sedimentTentativeObservedCalm: "Observed calm appears after stress.",
+      sedimentTentativeTensionGathers: "Some tension gathers late.",
+      sedimentRecurrenceObservedCalm: "Observed calm often follows stress.",
+      sedimentRecurrenceAvoidableLate: "Avoidable tension returns late.",
+      sedimentRecurrenceFertileAfterFatigue: "Fertile moments appear after fatigue.",
+      sedimentMatureObservedCalm: "Observed calm returns after stress.",
+      sedimentMatureAvoidableLate: "Avoidable tension gathers late in the day.",
+      sedimentMatureFertileAfterFatigue: "Fertile openings follow fatigue.",
+      sedimentMatureOpeningsAfterDense: "Openings appear after dense periods.",
     },
+    strataContextLine: "Below the surface, your moments settle into deeper record.",
     viewMore: "View more",
     close: "Close",
     sheetEmpty: "No shared moments yet.",
@@ -630,7 +650,27 @@ const UI_COPY = {
       fertileDominant: "El ratio fértil domina en la mezcla de 30 días.",
       deepConfidence: "Confianza profunda mayor con volumen sostenido de 30 días.",
       stillBuilding: "La lectura profunda sigue construyéndose con entradas recurrentes.",
+      sedimentObservedCalmAfterStress: "La calma observada aparece a menudo tras el estrés.",
+      sedimentAvoidableTensionLate: "La tensión evitable se repite al final del día.",
+      sedimentFertileAfterFatigue: "Los momentos fértiles siguen al cansancio.",
+      sedimentObservedStability: "La calma observada aparece a menudo bajo estrés.",
+      sedimentAvoidableReturnsLate: "La tensión evitable vuelve tarde.",
+      sedimentFertileDominant: "Los momentos fértiles aparecen en la mezcla.",
+      sedimentStillForming: "Tu registro profundo sigue formándose.",
+      sedimentFirstLayers: "Solo las primeras capas.",
+      sedimentPatternBeginning: "Un patrón empieza a asentarse.",
+      sedimentTentativePatternForming: "Puede que se esté formando un patrón.",
+      sedimentTentativeObservedCalm: "La calma observada aparece tras el estrés.",
+      sedimentTentativeTensionGathers: "Algo de tensión se acumula tarde.",
+      sedimentRecurrenceObservedCalm: "La calma observada sigue a menudo al estrés.",
+      sedimentRecurrenceAvoidableLate: "La tensión evitable vuelve tarde.",
+      sedimentRecurrenceFertileAfterFatigue: "Los momentos fértiles aparecen tras el cansancio.",
+      sedimentMatureObservedCalm: "La calma observada vuelve tras el estrés.",
+      sedimentMatureAvoidableLate: "La tensión evitable se acumula al final del día.",
+      sedimentMatureFertileAfterFatigue: "Las aperturas fértiles siguen al cansancio.",
+      sedimentMatureOpeningsAfterDense: "Las aperturas aparecen tras periodos densos.",
     },
+    strataContextLine: "Bajo la superficie, tus momentos se asientan en un registro más profundo.",
     viewMore: "Ver más",
     close: "Cerrar",
     sheetEmpty: "Aún no hay momentos compartidos.",
@@ -2477,73 +2517,97 @@ function buildStrataLines(longWindowMoments, canonicalState) {
   const total = longWindowMoments.length;
   const ui = UI_COPY[LANG] || UI_COPY.en;
   const s = ui.strata || {};
+  const STRATA_TENTATIVE_MAX = 99;
+  const STRATA_RECURRENCE_MIN = 100;
+  const STRATA_STRUCTURAL_MIN = 300;
+  const phase = total < STRATA_RECURRENCE_MIN ? "tentative" : total < STRATA_STRUCTURAL_MIN ? "recurrence" : "structural";
+  const STRATA_MAX_LINES = 3;
+
   if (total === 0) {
-    return [pickCopy(COPY.strataEarly, 0)];
+    return [s.sedimentStillForming || pickCopy(COPY.strataEarly, 0)];
   }
 
   const counts = { avoidable: 0, fertile: 0, observed: 0 };
   const moods = { calm: 0, focus: 0, stressed: 0, curious: 0, tired: 0 };
-
   longWindowMoments.forEach((m) => {
     if (counts[m.type] !== undefined) counts[m.type] += 1;
     if (moods[m.mood] !== undefined) moods[m.mood] += 1;
   });
 
   const lines = [];
-  const groundLevel = canonicalState.groundIndex ?? 0;
-  const mixLabel = groundLevel < 0.33 ? (s.mixLow || "low") : groundLevel < 0.66 ? (s.mixModerate || "moderate") : (s.mixHigh || "high");
-  lines.push(s.deepMix ? s.deepMix(mixLabel) : `Deep mix: ${mixLabel}.`);
+  const avoidableRatio = total > 0 ? counts.avoidable / total : 0;
+  const fertileRatio = total > 0 ? counts.fertile / total : 0;
 
-  if (canonicalState.pressureMode === "condensing") {
-    lines.push(s.pressureTrendCondensing || "30-day pressure trend: condensing.");
-  } else if (canonicalState.pressureMode === "clearing") {
-    lines.push(s.pressureTrendClearing || "30-day pressure trend: clearing.");
+  if (phase === "tentative") {
+    if (total < 12) {
+      lines.push(s.sedimentTentativePatternForming || "A pattern may be forming.");
+    }
+    if (counts.observed >= 3 && moods.stressed >= 2) {
+      lines.push(s.sedimentTentativeObservedCalm || "Observed calm appears after stress.");
+    }
+    if (counts.avoidable >= 3 && moods.stressed >= 2) {
+      lines.push(s.sedimentTentativeTensionGathers || "Some tension gathers late.");
+    }
+    if (counts.fertile >= 3 && moods.tired >= 1 && lines.length < STRATA_MAX_LINES) {
+      lines.push(s.sedimentFertileAfterFatigue || "Fertile moments follow fatigue.");
+    }
+    if (lines.length < 2) {
+      lines.push(s.sedimentStillForming || "Your deep record is still forming.");
+    }
+    if (lines.length < 2) {
+      lines.push(s.sedimentFirstLayers || "First layers only.");
+    }
+  } else if (phase === "recurrence") {
+    if (counts.observed >= 4 && moods.stressed >= 3) {
+      lines.push(s.sedimentRecurrenceObservedCalm || "Observed calm often follows stress.");
+    }
+    if (counts.avoidable >= 4 && moods.stressed >= 3) {
+      lines.push(s.sedimentRecurrenceAvoidableLate || "Avoidable tension returns late.");
+    }
+    if (counts.fertile >= 4 && moods.tired >= 2) {
+      lines.push(s.sedimentRecurrenceFertileAfterFatigue || "Fertile moments appear after fatigue.");
+    }
+    if (counts.observed >= 4 && lines.length < STRATA_MAX_LINES) {
+      lines.push(s.sedimentObservedStability || "Observed calm appears often under stress.");
+    }
+    if (counts.avoidable >= 4 && lines.length < STRATA_MAX_LINES) {
+      lines.push(s.sedimentAvoidableReturnsLate || "Avoidable tension returns late.");
+    }
+    if (fertileRatio > 0.3 && lines.length < STRATA_MAX_LINES) {
+      lines.push(s.sedimentFertileDominant || "Fertile moments show up in the mix.");
+    }
+    if (lines.length < 2) {
+      lines.push(s.sedimentStillForming || "Your deep record is still forming.");
+    }
   } else {
-    lines.push(s.pressureTrendStabilizing || "30-day pressure trend: stabilizing.");
+    if (counts.observed >= 4 && moods.stressed >= 3) {
+      lines.push(s.sedimentMatureObservedCalm || "Observed calm returns after stress.");
+    }
+    if (counts.avoidable >= 5 && moods.stressed >= 3) {
+      lines.push(s.sedimentMatureAvoidableLate || "Avoidable tension gathers late in the day.");
+    }
+    if (counts.fertile >= 4 && moods.tired >= 2) {
+      lines.push(s.sedimentMatureFertileAfterFatigue || "Fertile openings follow fatigue.");
+    }
+    if (lines.length < STRATA_MAX_LINES && counts.observed >= 4) {
+      lines.push(s.sedimentMatureOpeningsAfterDense || "Openings appear after dense periods.");
+    }
+    if (lines.length < 2) {
+      lines.push(s.sedimentStillForming || "Your deep record is still forming.");
+    }
   }
 
-  if (counts.avoidable >= 5 && moods.stressed >= 3) {
-    lines.push(s.avoidableStressed || "Avoidable + stressed recurrence is high in 30-day data.");
-  }
-  if (counts.fertile >= 4 && moods.calm >= 3) {
-    lines.push(s.fertileCalm || "Fertile + calm recurrence is visible in 30-day data.");
-  }
-  if (counts.observed >= 4) {
-    lines.push(s.observedStability || "Observed entries are adding stability to the deep read.");
-  }
-
-  const moodDiversity = Object.values(moods).filter((count) => count > 0).length;
-  if (moodDiversity >= 4) {
-    lines.push(s.moodDiversity || "Mood diversity is high across the 30-day window.");
-  }
-
-  const avoidableRatio = counts.avoidable / total;
-  const fertileRatio = counts.fertile / total;
-  if (avoidableRatio > 0.42 && fertileRatio > 0.22) {
-    lines.push(s.mixedSignal || "Avoidable and fertile ratios are both significant (mixed signal).");
-  } else if (fertileRatio > 0.38) {
-    lines.push(s.fertileDominant || "Fertile ratio is dominant in the 30-day mix.");
-  }
-
-  if (total >= 24) {
-    lines.push(s.deepConfidence || "Deep confidence is stronger with sustained 30-day volume.");
-  }
-
-  if (lines.length < 2) {
-    lines.push(s.stillBuilding || "Deep read is still building from recurring entries.");
-    lines.push(pickCopy(COPY.strataFallback, total + lines.length));
-  }
-
-  if (total < 12) {
-    return [lines[1], lines[0]];
-  }
-
-  return lines.slice(0, 5);
+  return lines.slice(0, STRATA_MAX_LINES);
 }
 
 function renderStrata(moments, canonicalState) {
   const longWindow = getLongWindow(moments, 30);
   const lines = buildStrataLines(longWindow, canonicalState);
+  const strataContextEl = document.getElementById("strataContext");
+  const ui = UI_COPY[LANG] || UI_COPY.en;
+  if (strataContextEl) {
+    strataContextEl.textContent = ui.strataContextLine || "Below the surface, your moments settle into deeper record.";
+  }
   if (!lines.length) {
     groundStrata.classList.remove("is-active");
     groundStrata.hidden = true;
@@ -2559,20 +2623,10 @@ function renderStrata(moments, canonicalState) {
     strataLines.appendChild(li);
   });
 
-  // Clima en capa strata: tendency · balance · concentration (canonicalState; total = ventana 30 días). Texto e idioma coherentes.
   if (strataMetricsLine) {
-    const total = longWindow.length;
-    const parts = buildMetricsLineParts(canonicalState, total, LANG);
-    const uiAria = UI_COPY[LANG] || UI_COPY.en;
-    if (parts.length > 0) {
-      strataMetricsLine.innerHTML = parts.map((p) => p.html).join('<span class="metric-sep" aria-hidden="true"> · </span>');
-      strataMetricsLine.setAttribute("aria-label", uiAria.instrumentMetricsAriaStrata || "Deep record metrics");
-      strataMetricsLine.classList.remove("hidden");
-    } else {
-      strataMetricsLine.textContent = "";
-      strataMetricsLine.removeAttribute("aria-label");
-      strataMetricsLine.classList.add("hidden");
-    }
+    strataMetricsLine.textContent = "";
+    strataMetricsLine.classList.add("hidden");
+    strataMetricsLine.classList.add("strata-panel-hidden");
   }
 
   groundStrata.hidden = false;
