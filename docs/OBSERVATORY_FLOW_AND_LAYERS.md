@@ -57,3 +57,4 @@ Ver también:
 - **OBSERVATORY_ALIVE_THRESHOLD.md** — cuándo el sistema empieza a sentirse vivo (~300–500 momentos en 48 h) y fases por masa.
 - **OBSERVATORY_GROWTH_PITFALLS.md** — riesgos al crecer (feed, telemetría, contenido, sobre-interpretación, inercia) y paradoja del crecimiento.
 - **STRATA_AT_SCALE.md** — ley de Strata a escala: más silencio, menos líneas, lenguaje sedimentario, sin métricas visibles.
+- **OBSERVATORY_AT_SCALE_MOMENTS.md** — comportamiento a 100k–1M momentos: inercia por masa, Nearby limitado, más datos → menos ruido → más calma.

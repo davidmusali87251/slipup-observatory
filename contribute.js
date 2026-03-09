@@ -33,6 +33,15 @@ const RISE_EXAMPLES = [
   "One step back",
 ];
 
+/** Optional hook for metrics: if window.__observatoryReportEvent is set, events are reported (e.g. for funnel % visitas → Contribute). No payload; no built-in analytics. */
+function reportObservatoryEvent(eventName) {
+  try {
+    if (typeof window !== "undefined" && typeof window.__observatoryReportEvent === "function") {
+      window.__observatoryReportEvent(eventName);
+    }
+  } catch (_) {}
+}
+
 function setRisePlaceholder() {
   if (!noteInput) return;
   const example = RISE_EXAMPLES[Math.floor(Math.random() * RISE_EXAMPLES.length)];
@@ -173,6 +182,8 @@ form.addEventListener("submit", async (event) => {
     }
   }
 
+  reportObservatoryEvent("contribute_done");
+
   setTimeout(() => {
     window.location.href = sharedInput.checked ? "./index.html?contributed=1" : "./index.html";
   }, 1400);
@@ -181,3 +192,4 @@ form.addEventListener("submit", async (event) => {
 syncSaveState();
 updateNoteAnalysisLine();
 setRisePlaceholder();
+reportObservatoryEvent("contribute_view");

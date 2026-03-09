@@ -384,7 +384,9 @@ At that point:
 * the climate gains inertia
 * the system feels atmospheric rather than empty
 
-Growth should emphasize **weight and calm**, not activity.
+The key behavioral metric is **moment density**: moments per active contributor in a short window. When it reaches roughly **3–5 moments per person in 48h**, the product starts to feel alive. Growth should emphasize **weight and calm**, not activity.
+
+See `docs/SLIPUP_METRICS_AND_SIGNALS.md` for the full framework (density, return rate, what not to measure, and leading signals).
 
 ---
 
@@ -396,4 +398,4 @@ The system should feel less like an app and more like **standing under a shared 
 
 ---
 
-See also: `docs/OBSERVATORY_FLOW_AND_LAYERS.md`, `docs/OBSERVATORY_ALIVE_THRESHOLD.md`, `docs/OBSERVATORY_GROWTH_PITFALLS.md`, `docs/ARCHITECTURE_AT_SCALE.md`, `.cursor/rules/slipup-observatory-context.mdc`.
+See also: `docs/OBSERVATORY_FLOW_AND_LAYERS.md`, `docs/OBSERVATORY_ALIVE_THRESHOLD.md`, `docs/OBSERVATORY_GROWTH_PITFALLS.md`, `docs/SLIPUP_METRICS_AND_SIGNALS.md`, `docs/ARCHITECTURE_AT_SCALE.md`, `.cursor/rules/slipup-observatory-context.mdc`.

@@ -34,7 +34,8 @@ export const REPETITION_DAMPING_MAX = 1;
 
 export const SINGLE_MOMENT_DEGREE_DELTA = 5;
 
-/** Inercia por masa: Δclima ∝ presión/masa. Factor = 1 / (1 + sqrt(total)/MASS_INERTIA_REF). Más momentos → menos movimiento. */
+/** Inercia por masa: Δclima ∝ presión/masa. Factor = 1 / (1 + sqrt(total)/MASS_INERTIA_REF). Más momentos → menos movimiento.
+ *  Crítico para escala (100k–1M): no reducir; con más masa el clima debe sentirse más pesado y estable. Ver docs/OBSERVATORY_AT_SCALE_MOMENTS.md. */
 export const MASS_INERTIA_REF = 100;
 
 export const DEGREE_BAND_STEADY = 38;

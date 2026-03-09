@@ -1,12 +1,32 @@
-node_modules/
+# ─── Seguridad y secretos (nunca commitear) ───
+# Config local con URLs y claves reales; generar remote.js con scripts/generate-remote.js
+remote.local.js
 
-# Supabase CLI: generados en local, no commitear
-supabase/.temp/
+# Variables de entorno (claves, URLs, API keys)
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+*.env
 
-# No incluir en deployments (solo uso interno)
+# Supabase: secretos locales
+supabase/.env
+supabase/.env.local
+
+# Certificados y claves
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# ─── Información interna del proyecto (solo uso local) ───
+# Planes y contexto de agente
 PLAN_MASTER.md
+docs/AGENT_CONTEXT_*.md
 
-# Docs internos: procedimientos, calibración, análisis de texto (mantener solo en local/copia privada)
+# Procedimientos, calibración, análisis interno (exponen cómo funciona el sistema)
 docs/INCIDENT_PROCEDURES.md
 docs/TECHNICAL_OPERATIONS_RECOMMENDATIONS.md
 docs/MODEL_DESIGN_AND_CALIBRATION.md
@@ -14,8 +34,35 @@ docs/TEXT_ANALYSIS.md
 docs/GUIA_CONTADOR_NOT_ALONE.md
 docs/OBSERVATORY_COMPLEXITY.md
 
-# Valores reales solo en local (generar remote.js con: node scripts/generate-remote.js)
-remote.local.js
+# ─── No necesarios para que funcione la página ───
+# Dependencias (se instalan con npm install)
+node_modules/
 
-# Screenshots y assets locales no necesarios en repo
+# Supabase CLI: generados en local
+supabase/.temp/
+
+# Build y caché
+dist/
+build/
+.cache/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / IDE (opcional; descomenta si no quieres compartir tu config)
+# .vscode/
+# .idea/
+
+# Screenshots y assets locales (no forman parte del código)
+*.png
+*.jpg
+*.jpeg
+*.gif
+!favicon.svg
 Silpupobservatory.png

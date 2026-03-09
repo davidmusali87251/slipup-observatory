@@ -128,7 +128,7 @@ function getReadingStatusLine(lang, total, seed = 0) {
   return lines.steady[idx];
 }
 
-/** Hook opcional para métricas/servicio externo (Sentry, Analytics). Si window.__observatoryReportEvent es una función, se llama con el nombre del evento; sin payload de usuario. */
+/** Hook opcional para métricas/servicio externo (Sentry, Analytics). Si window.__observatoryReportEvent es una función, se llama con el nombre del evento; sin payload de usuario. Eventos: observatory_view (boot), contribute_view/contribute_done (contribute.js). Ver docs/SLIPUP_METRICS_AND_SIGNALS.md. */
 function reportObservatoryEvent(eventName) {
   try {
     if (typeof window !== "undefined" && typeof window.__observatoryReportEvent === "function") {
@@ -575,6 +575,8 @@ const UI_COPY = {
       sedimentMatureOpeningsAfterDense: "Openings appear after dense periods.",
     },
     strataContextLine: "Below the surface, your moments settle into deeper record.",
+    strataShareLine: "Share this line",
+    strataShareCopied: "Copied",
     viewMore: "View more",
     close: "Close",
     sheetEmpty: "No shared moments yet.",
@@ -671,6 +673,8 @@ const UI_COPY = {
       sedimentMatureOpeningsAfterDense: "Las aperturas aparecen tras periodos densos.",
     },
     strataContextLine: "Bajo la superficie, tus momentos se asientan en un registro más profundo.",
+    strataShareLine: "Compartir esta línea",
+    strataShareCopied: "Copiado",
     viewMore: "Ver más",
     close: "Cerrar",
     sheetEmpty: "Aún no hay momentos compartidos.",
@@ -2373,6 +2377,7 @@ function renderHorizon(canonicalState, sharedMoments, pipeline = null) {
   };
 }
 
+/** Nearby: máximo intencionado para escala. No aumentar; evita convertir el campo en feed (docs/OBSERVATORY_AT_SCALE_MOMENTS.md). */
 const LOCAL_FIELD_MOMENTS_LIMIT = 6;
 const NEARBY_VISIBLE_INITIAL = 3;
 
@@ -2612,6 +2617,8 @@ function renderStrata(moments, canonicalState) {
     groundStrata.classList.remove("is-active");
     groundStrata.hidden = true;
     strataLines.innerHTML = "";
+    const wrap = document.getElementById("strataShareWrap");
+    if (wrap) { wrap.classList.add("hidden"); wrap.hidden = true; }
     return;
   }
 
@@ -2622,6 +2629,24 @@ function renderStrata(moments, canonicalState) {
     li.textContent = line;
     strataLines.appendChild(li);
   });
+
+  const strataShareWrap = document.getElementById("strataShareWrap");
+  const strataShareBtn = strataShareWrap?.querySelector(".strata-share-btn");
+  if (strataShareWrap && strataShareBtn) {
+    strataShareWrap.classList.remove("hidden");
+    strataShareWrap.hidden = false;
+    strataShareBtn.textContent = ui.strataShareLine || "Share this line";
+    const lineToShare = lines[0] || "";
+    strataShareBtn.onclick = () => {
+      if (!lineToShare) return;
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(lineToShare).then(
+          () => { strataShareBtn.textContent = (UI_COPY[LANG]?.strataShareCopied) || "Copied"; setTimeout(() => { strataShareBtn.textContent = ui.strataShareLine || "Share this line"; }, 1200); },
+          () => {}
+        );
+      }
+    };
+  }
 
   if (strataMetricsLine) {
     strataMetricsLine.textContent = "";
@@ -3132,6 +3157,8 @@ async function boot() {
       instrumentInfoBtn.setAttribute("aria-expanded", String(!instrumentInfoTextEl.classList.contains("hidden")));
     });
   }
+
+  reportObservatoryEvent("observatory_view");
 
   if (fieldScopeSelect) {
     let requestToken = 0;

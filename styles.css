@@ -2023,6 +2023,31 @@ h2 {
   border-top: 0;
 }
 
+.strata-share-wrap {
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+.strata-share-wrap.hidden {
+  display: none;
+}
+
+.strata-share-btn {
+  font-size: 0.75rem;
+  color: color-mix(in oklab, var(--text) 55%, var(--muted));
+  opacity: 0.85;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0.2rem 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.strata-share-btn:hover {
+  color: color-mix(in oklab, var(--text) 75%, var(--muted));
+}
+
 .sheet-backdrop {
   position: fixed;
   inset: 0;
@@ -2271,6 +2296,15 @@ h2 {
   font-size: 0.8rem;
   color: #5a6d82;
   opacity: 0.9;
+}
+
+.contribute-page .contribute-rise-examples {
+  margin-top: 0.35rem;
+  margin-bottom: 0;
+  font-size: 0.78rem;
+  color: #6b7d8f;
+  opacity: 0.85;
+  line-height: 1.4;
 }
 
 .field select,
