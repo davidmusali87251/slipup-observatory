@@ -96,32 +96,34 @@
         <ul id="recentMoments" class="moment-list"></ul>
       </section>
 
-      <section id="horizon" class="panel panel-horizon" aria-label="Horizon line" data-layer="horizon">
-        <p class="horizon-line">Horizon Line</p>
-        <p id="horizonPrimary" class="horizon-primary"></p>
-        <p id="horizonPulseLine" class="horizon-pulse-line"></p>
-        <div id="horizonSecondary" class="horizon-secondary hidden"></div>
-        <button id="horizonMoreButton" class="text-button hidden" type="button">Deeper</button>
-      </section>
-
       <section id="local-climate" class="local-climate" aria-label="Nearby field" data-layer="nearby">
         <h2 class="visually-hidden">Nearby field</h2>
-        <p class="local-climate-line">Nearby Field</p>
-        <p class="local-climate-context" aria-hidden="true">Signals from the nearby field.</p>
-        <div class="local-field-controls">
-          <label class="local-field-label visually-hidden" for="fieldScopeSelect">Field scope</label>
-          <select id="fieldScopeSelect" class="local-field-select" aria-label="Field scope"></select>
+        <p class="local-climate-line">Nearby</p>
+        <p id="localClimateIntro" class="local-climate-intro">Local field reading.</p>
+        <p id="localClimatePrimary" class="local-climate-primary"></p>
+        <p id="localClimateMomentsLabel" class="local-climate-moments-label"></p>
+        <ul id="localClimateMoments" class="moment-list local-climate-moments" aria-labelledby="localClimateMomentsLabel"></ul>
+        <p id="nearbyViewMoreWrap" class="nearby-view-more-wrap hidden"><button type="button" class="text-button nearby-view-more-btn" aria-label="View more">View more</button></p>
+        <!-- Hidden: scope selector and metrics kept for state/default scope; not shown in simplified panel -->
+        <div class="local-field-controls nearby-panel-hidden" aria-hidden="true">
+          <label class="local-field-label visually-hidden" for="fieldScopeSelect">Scope</label>
+          <select id="fieldScopeSelect" class="local-field-select" aria-label="Nearby scope"></select>
         </div>
-        <div class="local-climate-meta">
+        <div class="local-climate-meta nearby-panel-hidden" aria-hidden="true">
           <p id="localClimateDegree" class="local-climate-degree"></p>
           <p id="localClimateMass" class="local-climate-mass"></p>
           <p id="localClimateMetricsLine" class="local-climate-metrics-line climate-metrics-line" role="status" aria-live="polite"></p>
         </div>
-        <p id="localClimatePrimary" class="local-climate-primary"></p>
-        <p id="localClimateSecondary" class="local-climate-secondary"></p>
-        <p id="localClimateEcho" class="local-climate-echo"></p>
-        <p id="localClimateMomentsLabel" class="local-climate-moments-label" aria-hidden="true"></p>
-        <ul id="localClimateMoments" class="moment-list local-climate-moments" aria-labelledby="localClimateMomentsLabel"></ul>
+        <p id="localClimateSecondary" class="local-climate-secondary nearby-panel-hidden" aria-hidden="true"></p>
+        <p id="localClimateEcho" class="local-climate-echo nearby-panel-hidden" aria-hidden="true"></p>
+      </section>
+
+      <section id="horizon" class="panel panel-horizon" aria-label="Horizon line" data-layer="horizon">
+        <p class="horizon-line">Horizon</p>
+        <p id="horizonPrimary" class="horizon-primary"></p>
+        <p id="horizonPulseLine" class="horizon-pulse-line"></p>
+        <div id="horizonSecondary" class="horizon-secondary hidden"></div>
+        <button id="horizonMoreButton" class="text-button hidden" type="button">Deeper</button>
       </section>
 
       <section id="ground-strata" class="ground-strata" aria-label="Deep record" data-layer="strata" hidden>

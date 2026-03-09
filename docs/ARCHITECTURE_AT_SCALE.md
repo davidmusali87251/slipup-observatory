@@ -123,6 +123,8 @@ Response 200:
 
 Climate must behave as **atmospheric mass**: more total mass (moments in window) → lower marginal impact per moment. Do not use a linear count model. Use mass inertia (e.g. factor `1 / (1 + √total / MASS_INERTIA_REF)`). Same input + same `referenceTime` + same `modelVersion` ⇒ same output. No score framing.
 
+*Concrete form (for implementation reference):* pressure S = Σ(weight_i × decay_i), mass M = Σ(decay_i); then targetDegree = BASELINE + A × tanh(S / (c×√M + C)) with mass-inertia scaling. Exact constants in modelConstants; the behaviour (heavier at scale) must stay.
+
 **Example intuition (design, not sacred formula):** With low total mass, the same net pressure can move the climate visibly. With very high mass (e.g. millions of moments in 48h), the same pressure only nudges the degree slightly. This is intentional: the atmosphere should feel heavier and calmer at scale.
 
 *Numerical illustration — same net pressure P, different mass M; BASELINE = 28°, inertia = 1/(1 + √M/100), Δ ≈ P × inertia:*

@@ -1721,6 +1721,19 @@ h2 {
   text-align: center;
 }
 
+.local-climate-intro {
+  margin: -0.35rem 0 0.4rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  opacity: 0.78;
+  text-align: center;
+}
+
+.nearby-panel-hidden {
+  display: none !important;
+}
+
 .local-field-controls {
   display: flex;
   align-items: center;
@@ -1839,11 +1852,45 @@ h2 {
   border-top: 0;
 }
 
+.local-climate-moments .moment-item-empty {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.local-climate-moments .moment-item-empty .empty-message {
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+.local-climate-moments .moment-item-empty .empty-examples {
+  font-size: 0.78rem;
+  color: var(--muted);
+  opacity: 0.88;
+}
+
 .local-climate-moments.hidden {
   display: none;
 }
 
-/* Seed hook for future lower strata (inactive by default). */
+.nearby-view-more-wrap {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+.nearby-view-more-wrap.hidden {
+  display: none;
+}
+.nearby-view-more-wrap .nearby-view-more-btn {
+  font-size: 0.8rem;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  text-decoration: underline;
+}
+.nearby-view-more-wrap .nearby-view-more-btn:hover {
+  color: var(--text);
+}
+
 .ground-strata {
   height: 0;
   overflow: hidden;
@@ -2849,6 +2896,25 @@ section.panel.panel-recent {
   line-height: 1.2;
   letter-spacing: 0.02em;
   opacity: 0.88;
+  flex-shrink: 0;
+  min-width: 7.5rem;
+  text-align: right;
+}
+
+/* En viewports estrechos el meta no compite con el texto: va debajo */
+@media (max-width: 480px) {
+  .shared-sheet-list .moment-item,
+  #recentMoments.moment-list .moment-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
+  .shared-sheet-list .moment-item > span.moment-meta,
+  #recentMoments.moment-list .moment-item > span.moment-meta {
+    min-width: 0;
+    text-align: left;
+    margin-top: 0.15rem;
+  }
 }
 
 /* Botón "Not alone" / "No estás solo": indicar que también resuena contigo (contador local) */

@@ -469,9 +469,9 @@ const COPY_VARIANTS = {
     local: {
       condensing: ["This field is tightening.", "Local pressure rising.", "Denser here."],
       clearing: ["This field is opening.", "Local pressure easing.", "Lighter here."],
-      stable: ["The local field remains near baseline.", "The local field holds steady.", "Calm in this scope."],
-      fallback: ["The local signal remains light within the wider field.", "Reading from the wider field."],
-      regional: ["Reading from this region.", "This scope shapes the line."],
+      stable: ["Near baseline.", "Holds.", "Steady."],
+      fallback: ["Light signal.", "Wider field."],
+      regional: ["Reading from this zone.", "This scope shapes the line."],
     },
     strataFallback: ["Moments settle into deeper layers.", "Your record deepens.", "Layers keep settling."],
     strataEarly: ["Your deep record is still forming.", "First layers only.", "The deep is still open."],
@@ -501,9 +501,9 @@ const COPY_VARIANTS = {
     local: {
       condensing: ["Este campo se condensa.", "Sube la presión local.", "Más denso aquí."],
       clearing: ["Este campo se abre.", "Baja la presión local.", "Más liviano aquí."],
-      stable: ["El campo local se mantiene cerca del baseline.", "El campo local se mantiene estable.", "Calma en este alcance."],
-      fallback: ["La señal local sigue liviana dentro del campo amplio.", "Leyendo desde el campo amplio."],
-      regional: ["Leyendo esta región.", "Este alcance da forma a la línea."],
+      stable: ["Cerca del baseline.", "Se mantiene.", "Estable."],
+      fallback: ["Señal liviana.", "Campo amplio."],
+      regional: ["Leyendo esta zona.", "Este alcance da forma a la línea."],
     },
     strataFallback: ["Los momentos se asientan en capas profundas.", "Tu registro se profundiza.", "Las capas siguen asentándose."],
     strataEarly: ["Tu registro profundo sigue formándose.", "Solo las primeras capas.", "Lo profundo sigue abierto."],
@@ -562,10 +562,18 @@ const UI_COPY = {
     momentRelateLabelYou: "Not alone · you",
     momentRelateAria: "Mark that this resonates with you too",
     nearbyRelateLabel: (count) => (count === 1 ? "1 nearby" : `${count} nearby`),
-    sheetCount: (n) => (n === 1 ? "Showing 1 moment." : `Showing ${n} moments.`),
+    sheetCount: () => "Showing recent.",
     loading: "Loading…",
     localFieldMomentsLabel: "In the nearby field",
+    nearbyIntroLine: "Local field reading.",
+    nearbyMomentsLabel: "Moments nearby",
+    nearbyReadingStable: ["Quiet.", "Steady.", "Holds."],
+    nearbyReadingClearing: ["Light movement.", "Easing.", "Opening."],
+    nearbyReadingCondensing: ["Forming.", "Tightening.", "Rising."],
+    nearbyReadingFallback: ["Quiet.", "Light signal."],
     localFieldMomentsEmpty: "No shared moments in this scope yet.",
+    localFieldMomentsEmptyExamples: "Examples of moments that rise: Working alone · Running late · Too much coffee · Missed the call · Need fresh air.",
+    nearbyViewMoreLabel: "View more",
     metrics: {
       pressureCondensing: "condensing",
       pressureClearing: "clearing",
@@ -627,12 +635,20 @@ const UI_COPY = {
     close: "Cerrar",
     sheetEmpty: "Aún no hay momentos compartidos.",
     localFieldMomentsLabel: "En el campo cercano",
+    nearbyIntroLine: "Lectura del campo cercano.",
+    nearbyMomentsLabel: "Momentos cercanos",
+    nearbyReadingStable: ["Tranquilo.", "Estable.", "Se mantiene."],
+    nearbyReadingClearing: ["Movimiento suave.", "Aflojando.", "Abriendo."],
+    nearbyReadingCondensing: ["Formando.", "Apretando.", "Subiendo."],
+    nearbyReadingFallback: ["Tranquilo.", "Señal ligera."],
     localFieldMomentsEmpty: "Aún no hay momentos compartidos en este ámbito.",
+    localFieldMomentsEmptyExamples: "Ejemplos de momentos que suben: Solo · Corriendo tarde · Café de más · Llamada perdida · Aire fresco.",
+    nearbyViewMoreLabel: "Ver más",
     momentRelateLabel: "No estás solo",
     momentRelateLabelYou: "No estás solo · tú",
     momentRelateAria: "Señalar que esto también resuena contigo",
     nearbyRelateLabel: (count) => (count === 1 ? "1 en el campo" : `${count} en el campo`),
-    sheetCount: (n) => (n === 1 ? "Se muestra 1 momento." : `Se muestran ${n} momentos.`),
+    sheetCount: () => "Se muestran recientes.",
     loading: "Cargando…",
     metrics: {
       pressureCondensing: "condensando",
@@ -847,101 +863,56 @@ const SIGNALS = SIGNAL_VARIANTS[COPY_MODE === "narrative" ? "narrative_" + LANG 
 const REGIONAL_LOCAL_COPY = {
   common: {
     condensing: [
-      "Local density is tightening in this scope.",
-      "The local field is rising above baseline.",
-      "Local repetition is adding pressure.",
+      "Tightening.",
+      "Rising.",
+      "Denser here.",
     ],
     clearing: [
-      "Local density is easing in this scope.",
-      "The local field is moving toward lower pressure.",
-      "Local repetition pressure is decreasing.",
+      "Easing.",
+      "Opening.",
+      "Lighter here.",
     ],
     stable: [
-      "The local field remains near baseline.",
-      "The local field stays close to baseline.",
-      "Local rhythm remains balanced.",
+      "Near baseline.",
+      "Holds.",
+      "Steady.",
     ],
     fallback: [
-      "The local signal remains light within the wider field.",
-      "The local signal remains light.",
-      "Local signal is still emerging from shared flow.",
+      "Light signal.",
+      "Wider field.",
+      "Reading wider.",
     ],
     regional: [
-      "Local reading is shaped by shared moments in this zone.",
-      "Shared moments in this zone shape this local line.",
-      "This local read follows shared signal from this zone.",
+      "Reading from this zone.",
+      "Local read.",
+      "This zone.",
     ],
   },
   continents: {
     america: {
-      condensing: [
-        "American scope shows rising local density.",
-        "American local score is in condensing mode.",
-      ],
-      clearing: [
-        "American scope shows easing local density.",
-        "American local score is in clearing mode.",
-      ],
-      stable: [
-        "American scope stays in stable local range.",
-        "American local rhythm remains balanced.",
-      ],
+      condensing: ["Tightening.", "Rising."],
+      clearing: ["Easing.", "Opening."],
+      stable: ["Near baseline.", "Steady."],
     },
     europe: {
-      condensing: [
-        "European scope shows rising local density.",
-        "European local score is in condensing mode.",
-      ],
-      clearing: [
-        "European scope shows easing local density.",
-        "European local score is in clearing mode.",
-      ],
-      stable: [
-        "European scope stays in stable local range.",
-        "European local rhythm remains balanced.",
-      ],
+      condensing: ["Tightening.", "Rising."],
+      clearing: ["Easing.", "Opening."],
+      stable: ["Near baseline.", "Steady."],
     },
     africa: {
-      condensing: [
-        "African scope shows rising local density.",
-        "African local score is in condensing mode.",
-      ],
-      clearing: [
-        "African scope shows easing local density.",
-        "African local score is in clearing mode.",
-      ],
-      stable: [
-        "African scope stays in stable local range.",
-        "African local rhythm remains balanced.",
-      ],
+      condensing: ["Tightening.", "Rising."],
+      clearing: ["Easing.", "Opening."],
+      stable: ["Near baseline.", "Steady."],
     },
     asia: {
-      condensing: [
-        "Asian scope shows rising local density.",
-        "Asian local score is in condensing mode.",
-      ],
-      clearing: [
-        "Asian scope shows easing local density.",
-        "Asian local score is in clearing mode.",
-      ],
-      stable: [
-        "Asian scope stays in stable local range.",
-        "Asian local rhythm remains balanced.",
-      ],
+      condensing: ["Tightening.", "Rising."],
+      clearing: ["Easing.", "Opening."],
+      stable: ["Near baseline.", "Steady."],
     },
     australia: {
-      condensing: [
-        "Oceanian scope shows rising local density.",
-        "Oceanian local score is in condensing mode.",
-      ],
-      clearing: [
-        "Oceanian scope shows easing local density.",
-        "Oceanian local score is in clearing mode.",
-      ],
-      stable: [
-        "Oceanian scope stays in stable local range.",
-        "Oceanian local rhythm remains balanced.",
-      ],
+      condensing: ["Tightening.", "Rising."],
+      clearing: ["Easing.", "Opening."],
+      stable: ["Near baseline.", "Steady."],
     },
   },
 };
@@ -1031,6 +1002,7 @@ const fieldScopeSelect = document.getElementById("fieldScopeSelect");
 const localClimateDegree = document.getElementById("localClimateDegree");
 const localClimateMass = document.getElementById("localClimateMass");
 const localClimateMetricsLine = document.getElementById("localClimateMetricsLine");
+const localClimateIntro = document.getElementById("localClimateIntro");
 const localClimatePrimary = document.getElementById("localClimatePrimary");
 const localClimateSecondary = document.getElementById("localClimateSecondary");
 const localClimateEcho = document.getElementById("localClimateEcho");
@@ -2306,7 +2278,7 @@ async function openSharedSheet(sharedMoments) {
 
   const n = listToShow.length;
   const ui = UI_COPY[LANG] || UI_COPY.en;
-  const countLabel = n === 0 ? "" : (ui.sheetCount ? ui.sheetCount(n) : `Showing ${n} moments.`);
+  const countLabel = n === 0 ? "" : (ui.sheetCount ? ui.sheetCount(n) : "Showing recent.");
   renderSharedSheetList(listToShow, countLabel);
 
   sharedSheetCloseButton.focus();
@@ -2362,6 +2334,9 @@ function renderHorizon(canonicalState, sharedMoments, pipeline = null) {
 }
 
 const LOCAL_FIELD_MOMENTS_LIMIT = 6;
+const NEARBY_VISIBLE_INITIAL = 3;
+
+let nearbyListExpanded = false;
 
 function filterMomentsByScope(sharedMoments, fieldScope) {
   if (!Array.isArray(sharedMoments) || !fieldScope?.geo) return [];
@@ -2379,7 +2354,7 @@ function renderRegionalMomentsList(sharedMoments, fieldScope) {
   const ui = UI_COPY[LANG] || UI_COPY.en;
   const hasScope = fieldScope?.geo && fieldScope.scope !== "global";
   if (localClimateMomentsLabel) {
-    localClimateMomentsLabel.textContent = ui.localFieldMomentsLabel || "In the nearby field";
+    localClimateMomentsLabel.textContent = ui.nearbyMomentsLabel || "Moments nearby";
     localClimateMomentsLabel.classList.toggle("visually-hidden", !hasScope);
   }
   localClimateMoments.classList.toggle("hidden", !hasScope);
@@ -2387,105 +2362,108 @@ function renderRegionalMomentsList(sharedMoments, fieldScope) {
     localClimateMoments.innerHTML = "";
     return;
   }
-  const list = filterMomentsByScope(sharedMoments || [], fieldScope).slice(0, LOCAL_FIELD_MOMENTS_LIMIT);
+  const list = filterMomentsByScope(sharedMoments || [], fieldScope);
+  const fullList = list.slice(0, LOCAL_FIELD_MOMENTS_LIMIT);
+  const showViewMore = fullList.length > NEARBY_VISIBLE_INITIAL && !nearbyListExpanded;
+  const listToShow = showViewMore ? fullList.slice(0, NEARBY_VISIBLE_INITIAL) : fullList;
+
   localClimateMoments.innerHTML = "";
   localClimateMoments.classList.remove("hidden");
-  if (list.length === 0) {
+  if (fullList.length === 0) {
     const li = document.createElement("li");
-    li.className = "moment-item";
-    li.textContent = ui.localFieldMomentsEmpty || "No shared moments in this scope yet.";
+    li.className = "moment-item moment-item-empty";
+    const emptyMsg = ui.localFieldMomentsEmpty || "No shared moments in this scope yet.";
+    const examplesLine = ui.localFieldMomentsEmptyExamples || "";
+    const msgSpan = document.createElement("span");
+    msgSpan.className = "empty-message";
+    msgSpan.textContent = emptyMsg;
+    li.appendChild(msgSpan);
+    if (examplesLine) {
+      const exSpan = document.createElement("span");
+      exSpan.className = "empty-examples";
+      exSpan.textContent = examplesLine;
+      li.appendChild(exSpan);
+    }
     localClimateMoments.appendChild(li);
+    const viewMoreWrapEmpty = document.getElementById("nearbyViewMoreWrap");
+    if (viewMoreWrapEmpty) viewMoreWrapEmpty.classList.add("hidden");
     return;
   }
-  list.forEach((m) => localClimateMoments.appendChild(createMomentItemElement(m, { inNearbyField: true })));
+  listToShow.forEach((m) => localClimateMoments.appendChild(createMomentItemElement(m, { inNearbyField: true })));
+
+  const viewMoreWrap = document.getElementById("nearbyViewMoreWrap");
+  if (viewMoreWrap) {
+    if (showViewMore) {
+      viewMoreWrap.classList.remove("hidden");
+      const btn = viewMoreWrap.querySelector(".nearby-view-more-btn");
+      if (btn && !btn.dataset.bound) {
+        btn.dataset.bound = "1";
+        const viewMoreLabel = (UI_COPY[LANG] || UI_COPY.en).nearbyViewMoreLabel || "View more";
+        btn.textContent = viewMoreLabel;
+        btn.setAttribute("aria-label", viewMoreLabel);
+        btn.onclick = () => {
+          nearbyListExpanded = true;
+          if (observatoryState) {
+            renderLocalClimate(
+              observatoryState.localClimateTruth,
+              observatoryState.canonicalState,
+              observatoryState.activeFieldScope?.label || "Nearby",
+              observatoryState.observatoryPipeline,
+              observatoryState.activeFieldScope,
+              observatoryState.sharedMoments
+            );
+          }
+        };
+      }
+    } else {
+      viewMoreWrap.classList.add("hidden");
+    }
+  }
 }
 
 function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby", pipeline = null, fieldScope = null, sharedMoments = null) {
   renderRegionalMomentsList(sharedMoments || [], fieldScope);
+  const ui = UI_COPY[LANG] || UI_COPY.en;
+  if (localClimateIntro) localClimateIntro.textContent = ui.nearbyIntroLine || "Local field reading.";
+
   const pressureMode = localState?.pressureMode || "stabilizing";
   const seed = Math.round((localState?.computedDegree || BASELINE) * 10) + (localState?.total || 0);
-  const pressureText = pickRegionalLocalCopy(
-    pressureMode === "condensing" ? "condensing" : pressureMode === "clearing" ? "clearing" : "stable",
-    fieldScope,
-    seed
-  ) ||
-    (pressureMode === "condensing"
-      ? pickCopy(COPY.local.condensing, seed)
-      : pressureMode === "clearing"
-        ? pickCopy(COPY.local.clearing, seed)
-        : pickCopy(COPY.local.stable, seed));
+  const source = localState?.source;
+  let readingLine = "";
+  if (source === "global_view" || source === "global_fallback") {
+    const arr = ui.nearbyReadingFallback || ["Quiet.", "Light signal."];
+    readingLine = pickCopy(arr, seed);
+  } else {
+    const arr =
+      pressureMode === "condensing"
+        ? (ui.nearbyReadingCondensing || ["Forming.", "Tightening.", "Rising."])
+        : pressureMode === "clearing"
+          ? (ui.nearbyReadingClearing || ["Light movement.", "Easing.", "Opening."])
+          : (ui.nearbyReadingStable || ["Quiet.", "Steady.", "Holds."]);
+    readingLine = pickCopy(arr, seed);
+  }
+  if (localClimatePrimary) localClimatePrimary.textContent = readingLine;
 
-  localClimatePrimary.textContent = pressureText;
+  /* Hidden panel elements: keep state for default scope / future use */
   const exactDegree = Number(localState?.computedDegree);
   const degreeStr = Number.isFinite(exactDegree) ? exactDegree.toFixed(1) : String(BASELINE);
   const total = Number(localState?.total) || 0;
   const confidenceMode = pipeline?.signalModes?.confidence || classifyConfidence(total);
-  if (localClimateDegree) {
-    localClimateDegree.textContent = `${degreeStr}° ${scopeLabel.toLowerCase()}`;
-  }
-  if (localClimateMass) {
-    localClimateMass.textContent = `${total} shared · ${confidenceMode}`;
-  }
-  /* Echo line removed: repetía la línea anterior y no aportaba ontología clara. */
-  if (localClimateEcho) {
-    localClimateEcho.textContent = "";
-    localClimateEcho.classList.add("hidden");
-  }
-  if (localState?.source === "global_view") {
-    localClimateSecondary.textContent = "Reading shared moments across the wider field.";
-    if (localClimateMetricsLine) {
-      const parts = buildMetricsLineParts(localState, total, LANG);
-      const uiAria = UI_COPY[LANG] || UI_COPY.en;
-      if (parts.length > 0) {
-        localClimateMetricsLine.innerHTML = parts.map((p) => p.html).join('<span class="metric-sep" aria-hidden="true"> · </span>');
-        localClimateMetricsLine.setAttribute("aria-label", uiAria.instrumentMetricsAriaNearby || "Nearby field metrics");
-        localClimateMetricsLine.classList.remove("hidden");
-      } else {
-        localClimateMetricsLine.textContent = "";
-        localClimateMetricsLine.removeAttribute("aria-label");
-        localClimateMetricsLine.classList.add("hidden");
-      }
-    }
-    return;
-  }
-  const echoMode = pipeline?.signalModes?.echo || classifyEcho(localState, canonicalState);
-  if (localClimateEcho) {
-    localClimateEcho.textContent = "";
-    localClimateEcho.classList.add("hidden");
-  }
-  if (localState?.source === "global_fallback") {
-    localClimateSecondary.textContent =
-      pickRegionalLocalCopy("fallback", fieldScope, seed + 3) || pickCopy(COPY.local.fallback, seed);
-    if (localClimateMetricsLine) {
-      const parts = buildMetricsLineParts(localState, total, LANG);
-      const uiAria = UI_COPY[LANG] || UI_COPY.en;
-      if (parts.length > 0) {
-        localClimateMetricsLine.innerHTML = parts.map((p) => p.html).join('<span class="metric-sep" aria-hidden="true"> · </span>');
-        localClimateMetricsLine.setAttribute("aria-label", uiAria.instrumentMetricsAriaNearby || "Nearby field metrics");
-        localClimateMetricsLine.classList.remove("hidden");
-      } else {
-        localClimateMetricsLine.textContent = "";
-        localClimateMetricsLine.removeAttribute("aria-label");
-        localClimateMetricsLine.classList.add("hidden");
-      }
-    }
-    return;
-  }
-  localClimateSecondary.textContent =
-    pickRegionalLocalCopy("regional", fieldScope, seed + 7) || pickCopy(COPY.local.regional, seed);
-  // Nearby: incorporar tendency · balance · concentration en la capa (texto e idioma coherentes con la capa).
+  if (localClimateDegree) localClimateDegree.textContent = `${degreeStr}° ${scopeLabel.toLowerCase()}`;
+  if (localClimateMass) localClimateMass.textContent = `${total} shared · ${confidenceMode}`;
   if (localClimateMetricsLine) {
-    const parts = buildMetricsLineParts(localState, total, LANG);
-    const uiAria = UI_COPY[LANG] || UI_COPY.en;
-    if (parts.length > 0) {
-      localClimateMetricsLine.innerHTML = parts.map((p) => p.html).join('<span class="metric-sep" aria-hidden="true"> · </span>');
-      localClimateMetricsLine.setAttribute("aria-label", uiAria.instrumentMetricsAriaNearby || "Nearby field metrics");
-      localClimateMetricsLine.classList.remove("hidden");
-    } else {
-      localClimateMetricsLine.textContent = "";
-      localClimateMetricsLine.removeAttribute("aria-label");
-      localClimateMetricsLine.classList.add("hidden");
-    }
+    localClimateMetricsLine.textContent = "";
+    localClimateMetricsLine.removeAttribute("aria-label");
+    localClimateMetricsLine.classList.add("hidden");
+  }
+  if (localClimateEcho) {
+    localClimateEcho.textContent = "";
+    localClimateEcho.classList.add("hidden");
+  }
+  if (localClimateSecondary) {
+    if (source === "global_view") localClimateSecondary.textContent = "Reading shared moments across the wider field.";
+    else if (source === "global_fallback") localClimateSecondary.textContent = pickRegionalLocalCopy("fallback", fieldScope, seed + 3) || pickCopy(COPY.local.fallback, seed);
+    else localClimateSecondary.textContent = pickRegionalLocalCopy("regional", fieldScope, seed + 7) || pickCopy(COPY.local.regional, seed);
   }
 }
 
@@ -3109,6 +3087,7 @@ async function boot() {
   if (fieldScopeSelect) {
     let requestToken = 0;
     fieldScopeSelect.onchange = async () => {
+      nearbyListExpanded = false;
       const nextScope = fieldLensModel.byValue.get(fieldScopeSelect.value) || activeFieldScope;
       activeFieldScope = nextScope;
       selectedScopeValue = fieldScopeSelect.value;
