@@ -248,6 +248,36 @@ Lo diseñado sin buscarlo explícitamente es **un ecosistema de experiencia huma
 
 ---
 
+# El ritmo del cielo
+
+Con suficiente masa de momentos, el **ritmo** de SlipUp no se ve como gráfico ni tendencia. Se percibe como **micro-variaciones lentas del cielo**, igual que un barómetro real que registra cambios atmosféricos muy sutiles. Los instrumentos científicos agregan muchas señales débiles hasta que aparece un patrón del campo completo.
+
+## 1. Ritmo diario (el más visible)
+
+El cielo empieza a moverse con el **ritmo circadiano humano**. Mañana: momentos como *Running late*, *Missed the bus*, *Too much coffee* → cielo más **condensado** (*28.3°, Condensing.*). Mediodía: *Working alone*, *Focus mode* → **Holds.** Tarde: *Long day done*, *Need fresh air* → **Opening.** Noche: *Thinking again*, *Pause before reply* → **Quiet.**
+
+## 2. Ritmo semanal
+
+Ciclo suave: lunes (*Running late*, *Back to work*), miércoles (*Working alone*, *Focus*), viernes (*Long day done*, *Going to the gym*), domingo noche más reflexivo. El cielo puede sentirse un poco más quieto o más abierto según el día.
+
+## 3. Ritmo colectivo invisible
+
+Con mucha masa, el cielo se comporta como **sistema físico pesado**: 27.9 → 28.0 → 28.1 → 28.0 → 27.9. Cambios mínimos. Con el tiempo el usuario siente: *el aire humano tiene ritmo*.
+
+## 4. Cómo se percibe realmente
+
+La mayoría no dirá *veo el patrón semanal*. Sentirán algo más simple: *hoy el aire está pesado* o *hoy el aire está tranquilo*.
+
+## 5. Por qué es interesante
+
+No es un algoritmo que diga *es lunes*, *es noche*. El sistema deja que **los ritmos naturales de la vida humana aparezcan en el campo**.
+
+## 6. La sensación final
+
+Con suficiente masa, el cielo puede sentirse como **una respiración colectiva muy lenta**. Pequeña, casi imperceptible, pero real.
+
+---
+
 # Primera propiedad emergente: barómetro del estado humano del tiempo
 
 ## Lo que SlipUp puede llegar a ser

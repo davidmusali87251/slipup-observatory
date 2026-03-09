@@ -318,6 +318,7 @@ Al modificar el Observatory, respetar:
 6. **Lenguaje:** preferir reading, field, atmosphere, mix, signal, settle, gather; evitar score, performance, trend, optimize, analytics en narrativa.
 7. **Números:** solo en el grado atmosférico; nunca en Horizon, Strata ni en líneas de lectura narrativas.
 8. **Cielo como lectura colectiva:** no atribución de autor en Atmosphere ni en la lectura principal de Nearby (quién dijo qué). Los momentos son señales anónimas; el observatorio lee **estado colectivo**. Ver `EMERGENT_PHENOMENOLOGY.md` (cuarta propiedad emergente).
+9. **Ritmo del cielo:** el grado y la línea de lectura (Quiet., Holds., Condensing., Opening.) deben comportarse como un barómetro lento — micro-variaciones, no saltos. Con masa suficiente emerge ritmo circadiano/semanal; no añadir lógica que fuerce cambios rápidos ni etiquetas explícitas de ritmo ("es lunes", "es noche"). Ver `EMERGENT_PHENOMENOLOGY.md` (El ritmo del cielo).
 
 Ver también: `OBSERVATORY_FLOW_AND_LAYERS.md`, `OBSERVATORY_ALIVE_THRESHOLD.md`, `OBSERVATORY_GROWTH_PITFALLS.md`, `EMERGENT_PHENOMENOLOGY.md`, `SLIPUP_MASTER_CONTEXT.md`, `RESPONSIVE_BREAKPOINTS.md`, `LAYER_BACKGROUNDS_COHERENCE.md`.
 
@@ -325,4 +326,4 @@ Ver también: `OBSERVATORY_FLOW_AND_LAYERS.md`, `OBSERVATORY_ALIVE_THRESHOLD.md`
 
 # Appendix: Cursor prompt (at-scale)
 
-Resumen para Cursor/agentes: SlipUp debe escalar a millones de momentos sin volverse dashboard ni feed. Principio: más datos → más masa → menos ruido visible. Estructura: Atmosphere → Recent → Nearby → Horizon → Strata. No telemetría en hero; listas 6–10 ítems, View more, sin infinite scroll; Strata 2–4 líneas, sin métricas. Prohibido: dashboards, insights, trending, infinite scroll. Lenguaje: preferir reading, field, atmosphere, signal, settle; evitar score, trend, optimize, analytics. Números solo en el grado; no en Horizon, Strata ni líneas narrativas. Frase: "A shared sky above, a personal earth below."
+Resumen para Cursor/agentes: SlipUp debe escalar a millones de momentos sin volverse dashboard ni feed. Principio: más datos → más masa → menos ruido visible. Estructura: Atmosphere → Recent → Nearby → Horizon → Strata. No telemetría en hero; listas 6–10 ítems, View more, sin infinite scroll; Strata 2–4 líneas, sin métricas. Prohibido: dashboards, insights, trending, infinite scroll. Lenguaje: preferir reading, field, atmosphere, signal, settle; evitar score, trend, optimize, analytics. Números solo en el grado; no en Horizon, Strata ni líneas narrativas. Ritmo: grado y lectura como barómetro lento (micro-variaciones); no forzar cambios rápidos ni etiquetar ritmo explícitamente. Frase: "A shared sky above, a personal earth below."

@@ -246,7 +246,7 @@ Example rule:
 more total mass → lower marginal impact per moment
 ```
 
-This ensures the atmosphere feels **heavy and physical** at scale.
+This ensures the atmosphere feels **heavy and physical** at scale. The degree and reading line should change slowly (micro-variations), so that with enough mass, natural human rhythm can emerge — like a slow collective breath. See `docs/EMERGENT_PHENOMENOLOGY.md` (El ritmo del cielo).
 
 ---
 
