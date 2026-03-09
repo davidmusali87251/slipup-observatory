@@ -181,7 +181,7 @@ Example structure:
 A moment
 Into the atmosphere
 
-Where a moment enters the reading.
+Where the reading begins.
 
 Type
 Mood
@@ -190,7 +190,7 @@ Rise
 Name the moment
 
 Share to the atmosphere
-Shared moments enter the atmosphere reading.
+Shared moments shape the atmosphere.
 
 No account.
 No exact pin.
@@ -346,7 +346,7 @@ The user senses that moments exist beyond them.
 Example line:
 
 ```
-Moments rise across the atmosphere.
+Moments rising across the atmosphere.
 ```
 
 ## Contribution
@@ -398,4 +398,4 @@ The system should feel less like an app and more like **standing under a shared 
 
 ---
 
-See also: `docs/OBSERVATORY_FLOW_AND_LAYERS.md`, `docs/OBSERVATORY_ALIVE_THRESHOLD.md`, `docs/OBSERVATORY_GROWTH_PITFALLS.md`, `docs/SLIPUP_METRICS_AND_SIGNALS.md`, `docs/ARCHITECTURE_AT_SCALE.md`, `.cursor/rules/slipup-observatory-context.mdc`.
+See also: `docs/OBSERVATORY_FLOW_AND_LAYERS.md`, `docs/OBSERVATORY_ALIVE_THRESHOLD.md`, `docs/OBSERVATORY_GROWTH_PITFALLS.md`, `docs/OBSERVATORY_VISUAL_ARCHITECTURE_AT_SCALE.md`, `docs/SLIPUP_METRICS_AND_SIGNALS.md`, `docs/ARCHITECTURE_AT_SCALE.md`, `.cursor/rules/slipup-observatory-context.mdc`.

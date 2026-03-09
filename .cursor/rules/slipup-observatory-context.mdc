@@ -30,7 +30,7 @@ El sistema es **local-first + canal shared**: no es "proyecto inicial" solo loca
 - **UI principal:** Nunca mostrar en hero/cielo/línea de lectura: número de momentos, density, signal counts, mass metrics, stability/ground index como copy principal. Solo en panel "i" o debug.
 - **Panel Nearby:** Mostrar **solo momentos reales**. No poner ejemplos fijos en la lista (el campo debe sentirse vivo; los ejemplos van en placeholder Rise, estado vacío o microcopy).
 
-**Crecimiento y masa:** Ver `docs/OBSERVATORY_ALIVE_THRESHOLD.md` (cuándo el sistema cobra vida ~300–500 momentos) y `docs/OBSERVATORY_GROWTH_PITFALLS.md` (riesgos: feed, telemetría, contenido). La capa Recent debe mantenerse **muy ligera** (lista acotada, sin infinite scroll). Orden de capas: Nearby antes que Horizon; interpretación nunca antes de señales humanas (`docs/OBSERVATORY_FLOW_AND_LAYERS.md`).
+**Crecimiento y masa:** Ver `docs/OBSERVATORY_ALIVE_THRESHOLD.md` (cuándo el sistema cobra vida ~300–500 momentos) y `docs/OBSERVATORY_GROWTH_PITFALLS.md` (riesgos: feed, telemetría, contenido). La capa Recent debe mantenerse **muy ligera** (lista acotada, sin infinite scroll). Orden de capas: Nearby antes que Horizon; interpretación nunca antes de señales humanas (`docs/OBSERVATORY_FLOW_AND_LAYERS.md`). **Arquitectura visual a escala:** `docs/OBSERVATORY_VISUAL_ARCHITECTURE_AT_SCALE.md` (más datos → menos ruido visible; estructura Atmosphere → Recent → Nearby → Horizon → Strata; prohibido dashboards, infinite scroll, métricas en hero).
 
 **Physics leads. AI observes. UI reveals.**
 

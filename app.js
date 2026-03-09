@@ -55,7 +55,8 @@ const FIELD_SCOPE_KEY = "slipup_v2_field_scope";
 const RELATE_STORAGE_KEY = "slipup_v2_relate";
 
 // Tone selector for key narrative lines:
-// Modo de copy: clear | poetic | narrative (narrative usa LANG: en | es)
+// narrative = copy observacional (Forming., Leans to X., Holds.); coherente con docs/OBSERVATORY_VISUAL_ARCHITECTURE_AT_SCALE.md (reglas de lenguaje).
+// clear/poetic exponen "metrics", "score", "trend" en Horizon/condition; evitar si se respeta arquitectura a escala.
 const COPY_MODE = "narrative";
 if (typeof document !== "undefined" && !document.documentElement.hasAttribute("lang")) {
   document.documentElement.lang = navigator.language?.startsWith("es") ? "es" : "en";

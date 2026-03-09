@@ -25,7 +25,7 @@
           <p class="contribute-layer-eyebrow">Into the atmosphere</p>
         </div>
         <p class="contribute-layer-hint" aria-hidden="true">Where the reading begins.</p>
-        <p class="contribute-rise-from" aria-hidden="true">Moments rise across the atmosphere.</p>
+        <p id="contributeMomentCountLine" class="contribute-rise-from" data-fallback="Moments rising across the atmosphere.">Moments rising across the atmosphere.</p>
         <form id="contributeForm" class="contribute-rise-form" novalidate>
           <label class="field">
             <span>Type</span>
@@ -67,8 +67,8 @@
             <input id="sharedInput" name="shared" type="checkbox" checked />
             <span>Share to the atmosphere</span>
           </label>
-          <p class="contribute-shared-hint">Shared moments enter the atmosphere reading.</p>
-          <p class="contribute-trust-note">No account. No exact pin. Sharing off keeps this moment on your device.</p>
+          <p class="contribute-shared-hint">Shared moments shape the atmosphere.</p>
+          <p class="contribute-trust-note">No account. No exact pin.<br>Sharing off keeps this moment on your device.</p>
           <label class="field field-inline" for="consentInput">
             <input id="consentInput" name="consent" type="checkbox" required />
             <span>I accept Privacy and Terms.</span>
@@ -83,6 +83,7 @@
           </p>
 
           <button id="saveButton" class="cta" type="submit">Contribute</button>
+          <p class="contribute-cta-hint">Your moment will enter the shared atmosphere.</p>
           <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
         </form>
       </section>

@@ -1,4 +1,4 @@
-import { postMomentRemote } from "./remote.js";
+import { postMomentRemote, fetchClimateRemote, isRemoteReady } from "./remote.js";
 import { getNoteSignalBreakdown } from "./modelConstants.js";
 
 const STORAGE_KEY = "slipup_v2_moments";
@@ -40,6 +40,32 @@ function reportObservatoryEvent(eventName) {
       window.__observatoryReportEvent(eventName);
     }
   } catch (_) {}
+}
+
+/** When remote is ready, sets "X moments across the atmosphere." from climate total; else uses data-fallback. */
+async function setMomentCountLine() {
+  const el = document.getElementById("contributeMomentCountLine");
+  if (!el) return;
+  const fallback = el.getAttribute("data-fallback") || "Moments rising across the atmosphere.";
+  if (!isRemoteReady()) {
+    el.textContent = fallback;
+    el.setAttribute("aria-hidden", "true");
+    return;
+  }
+  try {
+    const climate = await fetchClimateRemote(48);
+    const total = climate?.total;
+    if (Number.isFinite(total) && total > 0) {
+      el.textContent = `${Number(total).toLocaleString()} moments across the atmosphere.`;
+      el.removeAttribute("aria-hidden");
+    } else {
+      el.textContent = fallback;
+      el.setAttribute("aria-hidden", "true");
+    }
+  } catch {
+    el.textContent = fallback;
+    el.setAttribute("aria-hidden", "true");
+  }
 }
 
 function setRisePlaceholder() {
@@ -193,3 +219,4 @@ syncSaveState();
 updateNoteAnalysisLine();
 setRisePlaceholder();
 reportObservatoryEvent("contribute_view");
+setMomentCountLine();

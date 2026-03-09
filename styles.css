@@ -134,7 +134,7 @@ body.sheet-open {
     height: 1.5rem;
     min-width: 1.5rem;
     min-height: 1.5rem;
-    top: 0.6rem;
+    top: 0.25rem;
     right: 0.6rem;
   }
 }
@@ -1007,7 +1007,7 @@ h2 {
 /* Botón info: pequeño, bien posicionado; no solapa con el texto */
 .instrument-info-btn {
   position: absolute;
-  top: 0.5rem;
+  top: 0.15rem;
   right: 0.5rem;
   width: 1.25rem;
   height: 1.25rem;
@@ -1047,7 +1047,7 @@ h2 {
     height: 1.15rem;
     min-width: 1.15rem;
     min-height: 1.15rem;
-    top: 0.45rem;
+    top: 0.1rem;
     right: 0.45rem;
     font-size: 0.55rem;
   }
@@ -1917,14 +1917,18 @@ h2 {
   padding: 0 0.15rem;
   transition: opacity 600ms ease;
   position: relative;
+  /* Violeta royal: mismo efecto (gradiente + borde) que el resto, tono Strata */
+  --strata-royal-light: color-mix(in oklab, #5B4B8A 14%, transparent);
+  --strata-royal-mid: color-mix(in oklab, #4a3a72 48%, transparent);
+  --strata-royal-deep: color-mix(in oklab, #2d1b4e 42%, transparent);
   background:
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--layer-ground) 12%, transparent) 0%,
-      color-mix(in srgb, var(--layer-ground) calc(48% + var(--atmo) * 0.14%), transparent) 40%,
-      color-mix(in srgb, var(--bg-ink) 38%, transparent) 100%
+      var(--strata-royal-light) 0%,
+      var(--strata-royal-mid) 40%,
+      var(--strata-royal-deep) 100%
     );
-  border-top: 1px solid color-mix(in oklab, var(--layer-border-soft) calc(30% + var(--atmo) * 0.1%), transparent);
+  border-top: 1px solid color-mix(in oklab, #5B4B8A 28%, transparent);
 }
 
 /* Tierra: tinte más cálido/oscuro al bajar; mucho aire, inscripciones (viaje vertical). */
@@ -1938,9 +1942,9 @@ h2 {
   background:
     linear-gradient(
       180deg,
-      color-mix(in srgb, var(--layer-ground) 14%, transparent) 0%,
-      color-mix(in oklab, var(--layer-ground) 52%, #0e0f0a 8%) 42%,
-      color-mix(in oklab, var(--bg-ink) 42%, #0e0f0a 12%) 100%
+      color-mix(in oklab, #5B4B8A 16%, transparent) 0%,
+      color-mix(in oklab, #4a3a72 52%, #1a0a2e 8%) 42%,
+      color-mix(in oklab, #2d1b4e 48%, #1a0a2e 14%) 100%
     );
 }
 
@@ -1955,10 +1959,33 @@ h2 {
   background: linear-gradient(
     180deg,
     transparent 0%,
-    color-mix(in oklab, var(--layer-ground-soft) 18%, transparent) 35%,
-    color-mix(in oklab, var(--layer-ground-soft) 48%, transparent) 100%
+    color-mix(in oklab, #5B4B8A 20%, transparent) 35%,
+    color-mix(in oklab, #4a3a72 50%, transparent) 100%
   );
   opacity: 0.88;
+}
+
+/* Strata: efecto raíces blancas — texto blanco sobre violeta royal */
+.ground-strata .strata-context {
+  color: rgba(255, 255, 255, 0.88);
+  opacity: 0.92;
+}
+.ground-strata .strata-line {
+  color: rgba(255, 255, 255, 0.92);
+  opacity: 0.95;
+  border-top-color: rgba(255, 255, 255, 0.18);
+}
+.ground-strata .strata-line:first-child {
+  border-top: 0;
+}
+.ground-strata .strata-share-btn {
+  color: rgba(255, 255, 255, 0.8);
+}
+.ground-strata .strata-share-btn:hover {
+  color: rgba(255, 255, 255, 1);
+}
+.ground-strata .strata-metrics-line {
+  color: rgba(255, 255, 255, 0.85);
 }
 
 @media (min-width: 900px) {
@@ -2183,13 +2210,13 @@ h2 {
 }
 
 .contribute-layer-hint {
-  margin: 0 0 1rem 0;
+  margin: 0 0 1.25rem 0;
   font-size: 0.72rem;
   line-height: 1.4;
   color: #607189;
   opacity: 0.85;
   letter-spacing: 0.01em;
-  padding-bottom: 0.85rem;
+  padding-bottom: 1rem;
   border-bottom: 1px solid rgba(127, 143, 178, 0.18);
   border-bottom: 1px solid color-mix(in oklab, var(--contribute-accent) 18%, transparent);
 }
@@ -2428,7 +2455,7 @@ h2 {
 }
 
 .contribute-page .contribute-rise-from {
-  margin: 0.15rem 0 0.6rem;
+  margin: 0.2rem 0 1rem;
   font-size: 0.78rem;
   line-height: 1.35;
   color: #5a6d82;
@@ -2442,6 +2469,14 @@ h2 {
   line-height: 1.38;
   color: #607189;
   opacity: 0.82;
+}
+
+.contribute-page .contribute-cta-hint {
+  margin: 0.5rem 0 0.35rem;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: #5a6d82;
+  opacity: 0.8;
 }
 
 .contribute-page .legal-bucket-note {
