@@ -2,6 +2,33 @@
 
 Cuando el sistema empieza a tener vida propia, el mayor riesgo ya no es la falta de usuarios, sino **cambiar el sistema para “mostrar más actividad”**. Estos patrones suelen matar proyectos tipo observatorio.
 
+## La decisión más peligrosa: "Across the atmosphere" como feed
+
+**Objetivo de diseño:** que esa sección **no parezca un feed**. Justo al revés: debe sentirse como señales del aire, no como timeline ni actividad.
+
+La tentación más dañina al crecer es convertir la sección tipo *"Across the atmosphere"* (momentos recientes) en **un feed de actividad**: más momentos, orden por popularidad/reciente, scroll infinito, "actividad del sistema".
+
+**Qué rompe:** SlipUp se basa en *momentos → atmósfera*. Si se muestran demasiados momentos, el usuario deja de percibir **el campo** y empieza a percibir **posts individuales**. El foco pasa de *el cielo* a *quién dijo qué*.
+
+### Reglas que protegen la sección
+
+| Regla | Motivo |
+|-------|--------|
+| **6–8 momentos** (ideal); **máximo 10** | El cerebro percibe 6–10 como un *campo*; más se convierte en *lista*. |
+| **Sin scroll infinito** en esa sección | Infinito = feed. La sección es una **ventana al aire**, no un timeline. |
+| **Sin orden explícito** (popularidad, "más recientes primero" como narrativa) | Evitar sensación de ranking o actividad. |
+| **Más datos del sistema → menos ruido visible** | A escala, la interfaz debe mostrar **menos**, no más. Más silencio, misma sensación de atmósfera. |
+
+### Función real de la sección
+
+"Across the atmosphere" **no es una lista**. Es simplemente **una ventana para ver de qué está hecho el aire**. Y el aire solo necesita unas pocas partículas visibles para sentirse real.
+
+### Regla de oro
+
+La sección **no debe parecer** un feed (ni timeline, ni activity, ni stream). Debe seguir siendo *señales del aire*, no *actividad de usuarios*. Si una mejora la acerca a feed, está rompiendo la arquitectura.
+
+---
+
 ## 1. Convertir el campo en feed
 
 **Qué pasa:** scroll infinito, orden por reciente/popular, “más actividad ahora”, conteos visibles.

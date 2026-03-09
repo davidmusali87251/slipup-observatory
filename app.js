@@ -48,7 +48,7 @@ import {
 } from "./modelConstants.js";
 
 const STORAGE_KEY = "slipup_v2_moments";
-const RENDER_LIMIT = 6; // Recent: lista acotada, muy ligera. Sin infinite scroll (docs/OBSERVATORY_GROWTH_PITFALLS.md).
+const RENDER_LIMIT = 6; // No es lista: ventana al aire. Pocas partículas visibles. 6–8 ideal, nunca >10. Ver docs/OBSERVATORY_GROWTH_PITFALLS.md.
 const COMPUTED_DEGREE_KEY = "slipup_v2_computed_degree";
 const DISPLAY_DEGREE_KEY = "slipup_v2_display_degree";
 const FIELD_SCOPE_KEY = "slipup_v2_field_scope";
