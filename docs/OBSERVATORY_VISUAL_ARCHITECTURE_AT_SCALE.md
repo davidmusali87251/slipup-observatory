@@ -78,8 +78,7 @@ Textura que muestra que la atmósfera está hecha de momentos reales.
 
 ### Qué muestra
 
-* sin título obligatorio
-* línea opcional muy sutil: **Across the atmosphere.**
+* sin título: solo los momentos (señales del aire), sin línea "Across the atmosphere" para que suene a instrumento, no a narrativa
 * 6–10 momentos compartidos visibles
 * **View more** → sheet limitado (no infinite scroll)
 

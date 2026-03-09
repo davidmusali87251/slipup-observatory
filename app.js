@@ -2924,10 +2924,7 @@ async function boot() {
   ]);
   const sharedMoments = sharedResult.items;
   if (recentContext) {
-    const ui = UI_COPY[LANG] || UI_COPY.en;
-    recentContext.textContent = sharedResult.source === "remote"
-      ? ui.recentFromRemote
-      : ui.recentFromLocal;
+    recentContext.textContent = "";
   }
   const canonicalState = deriveClimateState(climateTruth, sharedMoments, moments);
   const fieldScopes = buildFieldScopeOptions();

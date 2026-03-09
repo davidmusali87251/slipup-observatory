@@ -1657,6 +1657,10 @@ h2 {
   text-align: center;
 }
 
+.panel-recent .recent-context.recent-context-hidden {
+  display: none;
+}
+
 .panel-recent::before {
   content: "";
   position: absolute;
