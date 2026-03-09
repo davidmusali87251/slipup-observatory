@@ -2378,9 +2378,9 @@ h2 {
 }
 
 .contribute-rise-examples-live {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.35rem 1rem;
   font-size: 0.88rem;
   color: #4a5c6f;
   opacity: 0.92;
@@ -2389,7 +2389,6 @@ h2 {
 }
 
 .contribute-rise-example-line {
-  display: block;
   padding-left: 0.5rem;
   border-left: 1px solid color-mix(in oklab, var(--muted) 35%, transparent);
 }

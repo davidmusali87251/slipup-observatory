@@ -317,6 +317,7 @@ Al modificar el Observatory, respetar:
 5. **Atmosphere:** solo grado, una línea de lectura corta, CTA y confianza. Sin instrumento visible en hero.
 6. **Lenguaje:** preferir reading, field, atmosphere, mix, signal, settle, gather; evitar score, performance, trend, optimize, analytics en narrativa.
 7. **Números:** solo en el grado atmosférico; nunca en Horizon, Strata ni en líneas de lectura narrativas.
+8. **Cielo como lectura colectiva:** no atribución de autor en Atmosphere ni en la lectura principal de Nearby (quién dijo qué). Los momentos son señales anónimas; el observatorio lee **estado colectivo**. Ver `EMERGENT_PHENOMENOLOGY.md` (cuarta propiedad emergente).
 
 Ver también: `OBSERVATORY_FLOW_AND_LAYERS.md`, `OBSERVATORY_ALIVE_THRESHOLD.md`, `OBSERVATORY_GROWTH_PITFALLS.md`, `EMERGENT_PHENOMENOLOGY.md`, `SLIPUP_MASTER_CONTEXT.md`, `RESPONSIVE_BREAKPOINTS.md`, `LAYER_BACKGROUNDS_COHERENCE.md`.
 

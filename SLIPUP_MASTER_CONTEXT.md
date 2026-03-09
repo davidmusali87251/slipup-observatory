@@ -402,4 +402,12 @@ The system should feel less like an app and more like **standing under a shared 
 
 ---
 
-See also: `docs/OBSERVATORY_FLOW_AND_LAYERS.md`, `docs/OBSERVATORY_ALIVE_THRESHOLD.md`, `docs/OBSERVATORY_GROWTH_PITFALLS.md`, `docs/OBSERVATORY_VISUAL_ARCHITECTURE_AT_SCALE.md`, `docs/SLIPUP_METRICS_AND_SIGNALS.md`, `docs/ARCHITECTURE_AT_SCALE.md`, `.cursor/rules/slipup-observatory-context.mdc`.
+# Emergent properties at scale
+
+With enough mass, SlipUp can become: (1) a **barometer of human state of time**, (2) a **map of local micro-climates** (Nearby), (3) a **silent instrument of human orientation**, (4) an **observatory of collective life rhythm** — *a place where humanity can observe itself without seeing each other directly*.
+
+To preserve this, the sky must stay **aggregate-only**: no "who said this", no author attribution in Atmosphere or in the main Nearby reading. Moments remain **anonymous signals**; the product reads **collective state**, not individuals. See `docs/EMERGENT_PHENOMENOLOGY.md`.
+
+---
+
+See also: `docs/OBSERVATORY_FLOW_AND_LAYERS.md`, `docs/OBSERVATORY_ALIVE_THRESHOLD.md`, `docs/OBSERVATORY_GROWTH_PITFALLS.md`, `docs/OBSERVATORY_VISUAL_ARCHITECTURE_AT_SCALE.md`, `docs/EMERGENT_PHENOMENOLOGY.md`, `docs/SLIPUP_METRICS_AND_SIGNALS.md`, `docs/ARCHITECTURE_AT_SCALE.md`, `.cursor/rules/slipup-observatory-context.mdc`.
