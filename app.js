@@ -2986,7 +2986,6 @@ async function boot() {
         const scopeLabel = ui.instrumentScopeLabel || "Global";
         const rangeText = ui.scopeRangeLine ? ui.scopeRangeLine(total) : `${total} moments`;
         console.debug("[observatory]", { scope: `${ui.instrumentLayerLabel || "Atmosphere"} · ${scopeLabel} · ${rangeText}`, density: densityFormatted });
-      }
     } else {
       climateMetricsLine.textContent = "";
       climateMetricsLine.classList.add("hidden");
