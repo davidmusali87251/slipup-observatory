@@ -1,6 +1,12 @@
+# ─── Principio: no subir nada que comprometa el proyecto ───
+# Secretos, claves, API keys, datos sensibles. Este .gitignore protege el repo
+# ahora y cubre archivos que puedas añadir en el futuro. Revisar antes de commit.
+
 # ─── Seguridad y secretos (nunca commitear) ───
 # Config local con URLs y claves reales; generar remote.js con scripts/generate-remote.js
 remote.local.js
+*.local.js
+!*.local.js.example
 
 # Variables de entorno (claves, URLs, API keys)
 .env
@@ -8,11 +14,21 @@ remote.local.js
 .env.*.local
 .env.development
 .env.production
+.env.test
+.env.staging
 *.env
 
 # Supabase: secretos locales
 supabase/.env
 supabase/.env.local
+
+# Archivos de credenciales (nombres habituales)
+credentials.json
+secrets.json
+**/firebase-adminsdk*.json
+**/serviceAccount*.json
+**/service-account*.json
+config.local.*
 
 # Certificados y claves
 *.pem
@@ -20,6 +36,11 @@ supabase/.env.local
 *.crt
 *.p12
 *.pfx
+
+# Copias de respaldo (pueden contener datos pegados por error)
+*.backup
+*~
+.npmrc.local
 
 # ─── Información interna del proyecto (solo uso local) ───
 # Planes y contexto de agente

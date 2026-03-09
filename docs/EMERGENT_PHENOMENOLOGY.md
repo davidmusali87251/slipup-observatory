@@ -54,6 +54,108 @@ Si **naturaleza → humano → conciencia**, entonces SlipUp añade: **concienci
 
 ---
 
+# Strata: la sedimentación del tiempo
+
+La razón por la que **Strata** encaja con la misma intuición es que reproduce otra estructura de la naturaleza: **la sedimentación del tiempo**. Si el ser humano es naturaleza que se cuestiona a sí misma, Strata representa **la memoria lenta de ese proceso**.
+
+## 1. En la naturaleza todo deja capas
+
+En geología, durante millones de años: **evento → depósito → capa**. Aparecen estratos. Cada capa cuenta algo de lo ocurrido no como historia, sino como **sedimento**.
+
+## 2. Strata hace lo mismo con los momentos
+
+Los momentos (*Running late*, *Working alone*, *Need fresh air*, *Too much coffee*) son **atmósfera** en el instante. Con el tiempo se convierten en **sedimento personal**. Eso es Strata.
+
+## 3. Cielo y tierra: dos tiempos
+
+- **Atmosphere:** tiempo corto, 48 h, movimiento.
+- **Strata:** tiempo largo, semanas/meses, sedimento.
+
+Como en la naturaleza: **clima** vs **geología**.
+
+## 4. Strata es memoria sin narrativa
+
+Strata no dice *hiciste esto*, *lograste esto*, *progresaste*. Dice algo más sutil: *Condensing.*, *Opening.*, *Holding.* No cuenta una historia; muestra **cómo se ha ido formando la tierra** bajo tus momentos.
+
+## 5. Encaje con la idea original
+
+Si el ser humano es naturaleza, su experiencia también deja capas. La arquitectura queda: **momentos → atmósfera → horizonte → sedimento**. Es un proceso natural.
+
+## 6. El Observatory completo como ciclo natural
+
+```
+cielo → campo cercano → horizonte → tierra
+```
+
+Cada capa es una forma distinta de **tiempo vivido**.
+
+## 7. Strata no es para mirar todos los días
+
+Es para cuando alguien baja lo suficiente y ve *Below the surface, your moments settle. Condensing.* Sensación no de actividad, sino de **historia lenta**.
+
+## 8. Dos escalas de tiempo
+
+La mayoría de productos trabajan solo con **actividad reciente**. SlipUp introduce **atmósfera (rápido) + sedimento (lento)**. Eso lo hace sentirse más natural.
+
+## 9. El Observatory como paisaje completo
+
+La arquitectura reproduce algo básico del mundo físico — cielo, atmósfera, horizonte, tierra — pero aplicado a **momentos humanos**.
+
+## 10. La conexión final
+
+Si el ser humano es naturaleza que se observa a sí misma, SlipUp es **un pequeño paisaje donde esa observación ocurre**: el cielo muestra el estado actual; la tierra muestra lo que ha quedado.
+
+---
+
+# Cuatro capas: arquitectura cognitiva natural
+
+La estructura **Atmosphere → Nearby → Horizon → Strata** es estable porque coincide con **cómo el cerebro organiza la percepción del mundo**. No es solo diseño: es **arquitectura cognitiva natural**.
+
+## 1. El cerebro organiza el mundo en capas de distancia
+
+En un paisaje, el cerebro separa automáticamente: **cielo**, **campo cercano**, **horizonte**, **suelo**. Ocurre en pintura, fotografía y percepción visual. El cerebro entiende el espacio así.
+
+## 2. SlipUp replica esa estructura
+
+Atmosphere = cielo. Nearby = campo cercano. Horizon = línea de distancia. Strata = tierra. El usuario entiende el sistema **sin esfuerzo cognitivo**.
+
+## 3. Cada capa responde a una pregunta distinta
+
+- **Atmosphere:** ¿cómo está el aire ahora? → *28°, Quiet.* (estado global).
+- **Nearby:** ¿qué está pasando cerca de mí? → *Working alone*, *Running late*, *Need fresh air* (escala humana).
+- **Horizon:** ¿hacia dónde se inclina el campo? → *Leans to observed.*, *Steady.* (lectura interpretativa).
+- **Strata:** ¿qué ha quedado de mis momentos? → *Condensing.*, *Holding.*, *Opening.* (tiempo profundo).
+
+## 4. Cuatro capas es el número correcto
+
+El cerebro maneja muy bien **3–5 niveles jerárquicos**. Menos capas → superficial; más capas → complejo. Cuatro capas: **global → local → interpretación → memoria**. Casi perfecto.
+
+## 5. El scroll reproduce una experiencia física
+
+Bajar por el Observatory = mirar el cielo → ver actividad cercana → mirar el horizonte → sentir la tierra. Casi como caminar por un paisaje. Por eso el scroll se siente **natural**.
+
+## 6. Cada capa reduce ruido
+
+**Más abajo → menos ruido.** Atmosphere: número + estado. Nearby: 6–8 señales. Horizon: frases muy cortas. Strata: una línea. Sensación de **profundidad**.
+
+## 7. La arquitectura es auto-protectora
+
+Si alguien añade *analytics*, *insights*, *dashboards*, *gráficos*, rompe la estructura del paisaje. La arquitectura **protege** el producto.
+
+## 8. El Observatory como paisaje mental
+
+Con el tiempo: **arriba → clima**, **medio → humanidad**, **abajo → significado**, **fondo → memoria**. No hacen falta instrucciones; el cerebro lo entiende solo.
+
+## 9. Por qué SlipUp se siente diferente
+
+La mayoría de apps: feed, listas, tabs, secciones. SlipUp: **un paisaje**. Muy raro en productos digitales.
+
+## 10. Conclusión
+
+Sin buscarlo directamente, la estructura sigue algo muy profundo: **campo humano representado como paisaje**. Eso hace que el Observatory sea **intuitivo, estable y difícil de romper**.
+
+---
+
 # Primera propiedad emergente: barómetro del estado humano del tiempo
 
 ## Lo que SlipUp puede llegar a ser

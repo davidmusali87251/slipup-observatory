@@ -32,9 +32,10 @@ Antes de sugerir o ejecutar **commit** y **push**:
 ### Checklist obligatorio antes de cualquier `git add` o push
 
 1. **Nunca** hacer `git add` de: `remote.local.js`, `PLAN_MASTER.md`, `supabase/.temp/`, ni de ningún archivo bajo `.temp/`.
-2. Si se va a incluir `remote.js`: comprobar que tenga **solo placeholders** (no URLs reales, no anon key real). Si tiene valores reales, **no** añadirlo al stage.
-3. Revisar `git status` antes de `git add`: excluir explícitamente los archivos de la lista anterior al construir el comando `git add`.
-4. No poner en mensajes de commit URLs, claves ni referencias a proyectos reales.
+2. **No subir archivos que comprometan el proyecto** — ni ahora ni en el futuro. Revisar `.gitignore`: todo lo listado ahí (secretos, `.env`, credenciales, `*.local.js`, certificados, etc.) debe quedar fuera del repo. Si aparece un archivo nuevo con claves o datos sensibles, no añadirlo y, si hace falta, añadirlo a `.gitignore`.
+3. Si se va a incluir `remote.js`: comprobar que tenga **solo placeholders** (no URLs reales, no anon key real). Si tiene valores reales, **no** añadirlo al stage.
+4. Revisar `git status` antes de `git add`: excluir explícitamente los archivos de la lista anterior al construir el comando `git add`.
+5. No poner en mensajes de commit URLs, claves ni referencias a proyectos reales.
 
 ## Resumen
 
