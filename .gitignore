@@ -8,3 +8,6 @@ PLAN_MASTER.md
 
 # Valores reales solo en local (generar remote.js con: node scripts/generate-remote.js)
 remote.local.js
+
+# Screenshots y assets locales no necesarios en repo
+Silpupobservatory.png
