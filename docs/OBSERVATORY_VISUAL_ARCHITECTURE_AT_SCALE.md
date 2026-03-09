@@ -318,7 +318,7 @@ Al modificar el Observatory, respetar:
 6. **Lenguaje:** preferir reading, field, atmosphere, mix, signal, settle, gather; evitar score, performance, trend, optimize, analytics en narrativa.
 7. **Números:** solo en el grado atmosférico; nunca en Horizon, Strata ni en líneas de lectura narrativas.
 
-Ver también: `OBSERVATORY_FLOW_AND_LAYERS.md`, `OBSERVATORY_ALIVE_THRESHOLD.md`, `OBSERVATORY_GROWTH_PITFALLS.md`, `SLIPUP_MASTER_CONTEXT.md`.
+Ver también: `OBSERVATORY_FLOW_AND_LAYERS.md`, `OBSERVATORY_ALIVE_THRESHOLD.md`, `OBSERVATORY_GROWTH_PITFALLS.md`, `SLIPUP_MASTER_CONTEXT.md`, `RESPONSIVE_BREAKPOINTS.md`, `LAYER_BACKGROUNDS_COHERENCE.md`.
 
 ---
 

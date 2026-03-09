@@ -186,6 +186,12 @@ Where the reading begins.
 Type
 Mood
 
+Moments rise like
+Working alone
+Running late
+Need fresh air
+Too much coffee
+
 Rise
 Name the moment
 
@@ -196,7 +202,7 @@ No account.
 No exact pin.
 Sharing off keeps this moment on your device.
 
-Contribute
+Contribute a moment
 ```
 
 Key principles:
@@ -216,9 +222,7 @@ Need fresh air
 Going to the gym
 ```
 
-These examples should appear only as **placeholders**, not fixed UI elements.
-
-Nearby must always show **real moments**, never canned examples.
+On the Contribute panel, examples appear **above** the Rise field (“Moments rise like” + 4 random each load) and as reference below it, to teach format and reduce friction. Nearby must always show **real moments**, never canned examples.
 
 ---
 

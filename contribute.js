@@ -74,6 +74,15 @@ function setRisePlaceholder() {
   noteInput.placeholder = example;
 }
 
+/** Picks 4 random examples for "Moments rise like" block above Rise; changes each load so it feels alive. */
+function setRiseExamplesLive() {
+  const el = document.getElementById("contributeRiseExamplesLive");
+  if (!el || RISE_EXAMPLES.length < 3) return;
+  const shuffled = [...RISE_EXAMPLES].sort(() => Math.random() - 0.5);
+  const four = shuffled.slice(0, 4);
+  el.textContent = four.join("\n");
+}
+
 function updateNoteAnalysisLine() {
   if (!noteAnalysisLine) return;
   const raw = noteInput?.value?.trim() ?? "";
@@ -218,5 +227,6 @@ form.addEventListener("submit", async (event) => {
 syncSaveState();
 updateNoteAnalysisLine();
 setRisePlaceholder();
+setRiseExamplesLive();
 reportObservatoryEvent("contribute_view");
 setMomentCountLine();

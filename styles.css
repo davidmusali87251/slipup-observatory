@@ -103,6 +103,7 @@ body.sheet-open {
 }
 
 @media (min-width: 481px) and (max-width: 1024px) {
+  /* Tablet: docs/RESPONSIVE_BREAKPOINTS.md */
   .page {
     width: min(720px, 88vw);
     padding-left: max(0.75rem, env(safe-area-inset-left));
@@ -144,6 +145,22 @@ body.sheet-open {
     width: 94vw;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
+  }
+
+  .cta-observatory,
+  .atmosphere-grounding .cta-observatory {
+    min-height: 44px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+  .cta {
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+  }
+  .nearby-view-more-wrap .nearby-view-more-btn,
+  .text-button {
+    min-height: 44px;
+    padding: 0.4rem 0.6rem;
   }
 }
 
@@ -2344,6 +2361,30 @@ h2 {
   letter-spacing: 0.02em;
   font-weight: 400;
   font-size: 0.84rem;
+}
+
+.contribute-rise-examples-intro {
+  margin: 1rem 0 0.75rem;
+  padding: 0;
+}
+
+.contribute-rise-examples-intro-text {
+  display: block;
+  font-size: 0.75rem;
+  color: #6b7d8f;
+  opacity: 0.88;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.35rem;
+}
+
+.contribute-rise-examples-live {
+  display: block;
+  white-space: pre-line;
+  font-size: 0.88rem;
+  color: #4a5c6f;
+  opacity: 0.9;
+  line-height: 1.6;
+  font-style: italic;
 }
 
 .contribute-page .contribute-rise-label-hint {

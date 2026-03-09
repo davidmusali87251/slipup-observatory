@@ -57,8 +57,9 @@ Control de coherencia visual: cada capa usa la paleta del observatorio y la prog
 - **::after:** Banda de transición con `--layer-ground-soft`.
 
 ### 8. Ground strata (Strata)
-- **.ground-strata:** Gradiente: `--layer-ground` → `--bg-ink`. Borde superior con `--layer-border-soft`.
-- **::before:** Transición superior con `--layer-ground-soft`.
+- **.ground-strata:** Excepción deliberada: paleta **violeta royal** (#5B4B8A, #4a3a72, #2d1b4e) y texto blanco (“raíces blancas”) para sensación de tierra/inscripciones. No usa `--layer-ground` / `--bg-ink` en esta capa. Gradiente y `::before` con tonos violeta; borde superior suave.
+- **Texto en Strata:** `.strata-context`, `.strata-line`, `.strata-share-btn` en blanco (rgba) para contraste sobre el violeta.
+- **Referencia:** `docs/OBSERVATORY_VISUAL_ARCHITECTURE_AT_SCALE.md` (Strata como inscripciones).
 
 ### 9. Contribute / otras páginas
 - **.panel-contribute:** `background: transparent` para fundir con la página.
@@ -68,7 +69,7 @@ Control de coherencia visual: cada capa usa la paleta del observatorio y la prog
 
 ## Reglas de coherencia
 
-1. **No hex sueltos** para violetas/lavanda: usar `--bg`, `--bg-deep`, `--bg-ink`, `--layer-horizon`, `--layer-ground` o los derivados `-soft` / `-border-soft`.
+1. **No hex sueltos** para violetas/lavanda en el resto de capas: usar `--bg`, `--bg-deep`, `--bg-ink`, `--layer-horizon`, `--layer-ground` o los derivados `-soft` / `-border-soft`. **Excepción:** Strata usa violeta royal en hex por decisión de diseño (ver §8).
 2. **Orden conceptual:** Arriba más “aire” (claro/transparente), abajo más “tierra” (horizonte → ground → ink).
 3. **Transiciones:** Los pseudo-elements (::before, ::after) que unen capas usan `--layer-*-soft` o `color-mix` con la paleta.
 4. **Continuidad:** Hero y topbar usan tintes de la misma paleta para insinuar flujo hacia arriba/abajo.
