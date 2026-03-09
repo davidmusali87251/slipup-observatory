@@ -2378,13 +2378,20 @@ h2 {
 }
 
 .contribute-rise-examples-live {
-  display: block;
-  white-space: pre-line;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   font-size: 0.88rem;
   color: #4a5c6f;
-  opacity: 0.9;
-  line-height: 1.6;
+  opacity: 0.92;
+  line-height: 1.4;
   font-style: italic;
+}
+
+.contribute-rise-example-line {
+  display: block;
+  padding-left: 0.5rem;
+  border-left: 1px solid color-mix(in oklab, var(--muted) 35%, transparent);
 }
 
 .contribute-page .contribute-rise-label-hint {
@@ -2394,15 +2401,6 @@ h2 {
   font-size: 0.8rem;
   color: #5a6d82;
   opacity: 0.9;
-}
-
-.contribute-page .contribute-rise-examples {
-  margin-top: 0.35rem;
-  margin-bottom: 0;
-  font-size: 0.78rem;
-  color: #6b7d8f;
-  opacity: 0.85;
-  line-height: 1.4;
 }
 
 .field select,

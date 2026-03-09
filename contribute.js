@@ -74,13 +74,19 @@ function setRisePlaceholder() {
   noteInput.placeholder = example;
 }
 
-/** Picks 4 random examples for "Moments rise like" block above Rise; changes each load so it feels alive. */
+/** Picks 4 random examples for "Moments rise like" block above Rise; changes each load so it feels alive. Renders each as a separate line (observatory-style: señales en el aire). */
 function setRiseExamplesLive() {
   const el = document.getElementById("contributeRiseExamplesLive");
   if (!el || RISE_EXAMPLES.length < 3) return;
   const shuffled = [...RISE_EXAMPLES].sort(() => Math.random() - 0.5);
   const four = shuffled.slice(0, 4);
-  el.textContent = four.join("\n");
+  el.innerHTML = "";
+  four.forEach((phrase) => {
+    const line = document.createElement("span");
+    line.className = "contribute-rise-example-line";
+    line.textContent = phrase;
+    el.appendChild(line);
+  });
 }
 
 function updateNoteAnalysisLine() {

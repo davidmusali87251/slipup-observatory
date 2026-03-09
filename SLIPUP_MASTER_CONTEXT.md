@@ -222,7 +222,7 @@ Need fresh air
 Going to the gym
 ```
 
-On the Contribute panel, examples appear **above** the Rise field (“Moments rise like” + 4 random each load) and as reference below it, to teach format and reduce friction. Nearby must always show **real moments**, never canned examples.
+On the Contribute panel, examples appear **above** the Rise field (“Moments rise like” + 4 random each load) to teach format and reduce friction. Nearby must always show **real moments**, never canned examples.
 
 ---
 
