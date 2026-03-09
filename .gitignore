@@ -6,6 +6,14 @@ supabase/.temp/
 # No incluir en deployments (solo uso interno)
 PLAN_MASTER.md
 
+# Docs internos: procedimientos, calibración, análisis de texto (mantener solo en local/copia privada)
+docs/INCIDENT_PROCEDURES.md
+docs/TECHNICAL_OPERATIONS_RECOMMENDATIONS.md
+docs/MODEL_DESIGN_AND_CALIBRATION.md
+docs/TEXT_ANALYSIS.md
+docs/GUIA_CONTADOR_NOT_ALONE.md
+docs/OBSERVATORY_COMPLEXITY.md
+
 # Valores reales solo en local (generar remote.js con: node scripts/generate-remote.js)
 remote.local.js
 
