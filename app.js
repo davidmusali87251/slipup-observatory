@@ -2087,9 +2087,11 @@ function createMomentItemElement(m, options = {}) {
     const context = regionLabel ? `${typeLabel} · ${moodLabel} · ${regionLabel}` : `${typeLabel} · ${moodLabel}`;
     li.innerHTML = `<span class="moment-note">${escapeHtml(noteLabel)}</span><span class="moment-context">${escapeHtml(context)}</span>`;
   } else {
-    const left = `${typeLabel} · ${moodLabel} · ${noteLabel}`;
-    const meta = regionLabel ? `${timeStr} · ${regionLabel}` : timeStr;
-    li.innerHTML = `<span>${escapeHtml(left)}</span><span class="moment-meta">${escapeHtml(meta)}</span>`;
+    const meta = regionLabel || timeStr;
+    li.innerHTML =
+      `<span class="moment-note">${escapeHtml(noteLabel)}</span>` +
+      `<span class="moment-type-mood">${escapeHtml(typeLabel + " · " + moodLabel)}</span>` +
+      `<span class="moment-meta">${escapeHtml(meta)}</span>`;
   }
 
   const momentId = m.id || `${m.timestamp || ""}-${(m.note || "").slice(0, 10)}`;
