@@ -2150,10 +2150,37 @@ function createMomentItemElement(m, options = {}) {
   infoBtn.title = ui.momentRelateInfoTitle || (LANG === "es" ? "No estás solo" : "Not alone");
   infoBtn.textContent = "i";
 
+  const infoTooltipText = ui.momentRelateInfoTitle || (LANG === "es" ? "No estás solo" : "Not alone");
+  const infoTooltip = document.createElement("span");
+  infoTooltip.className = "moment-relate-info-tooltip";
+  infoTooltip.setAttribute("role", "status");
+  infoTooltip.textContent = infoTooltipText;
+
+  infoBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    document.querySelectorAll(".moment-relate-info-tooltip.is-visible").forEach((el) => el.classList.remove("is-visible"));
+    infoTooltip.classList.toggle("is-visible");
+    if (infoTooltip.classList.contains("is-visible")) {
+      const close = (e2) => {
+        if (e2.target !== infoBtn && !infoTooltip.contains(e2.target)) {
+          infoTooltip.classList.remove("is-visible");
+          document.removeEventListener("click", close);
+          document.removeEventListener("touchstart", close);
+        }
+      };
+      setTimeout(() => {
+        document.addEventListener("click", close);
+        document.addEventListener("touchstart", close);
+      }, 0);
+    }
+  });
+
   const wrap = document.createElement("div");
   wrap.className = "moment-relate-controls";
   wrap.appendChild(relateBtn);
   wrap.appendChild(infoBtn);
+  wrap.appendChild(infoTooltip);
   li.appendChild(wrap);
   return li;
 }

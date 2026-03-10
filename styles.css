@@ -832,6 +832,11 @@ h2 {
     min-height: 0;
   }
 
+  /* En móvil: espacio extra bajo el instrumento para que el botón "i" (position top negativo) no solape el grado */
+  .observatory-hero > .climate-instrument {
+    margin-bottom: 0.85rem;
+  }
+
   .atmosphere-air .climate-instrument .climate-metrics-row,
   .observatory-hero > .climate-instrument .climate-metrics-row {
     flex-wrap: nowrap;
@@ -1070,13 +1075,13 @@ h2 {
 
 @media (max-width: 480px) {
   .instrument-info-btn {
-    width: 0.95rem;
-    height: 0.95rem;
-    min-width: 44px;
-    min-height: 44px;
-    top: -0.45rem;
-    right: 0.35rem;
-    font-size: 0.5rem;
+    width: 0.8rem;
+    height: 0.8rem;
+    min-width: 0.8rem;
+    min-height: 0.8rem;
+    top: -0.9rem;
+    right: 0.25rem;
+    font-size: 0.45rem;
     padding: 0;
   }
 }
@@ -2801,6 +2806,10 @@ h2 {
     margin-top: 0.65rem;
   }
 
+  .observatory-hero > .climate-instrument {
+    margin-bottom: 0.75rem;
+  }
+
   .atmosphere-value-prop {
     font-size: 0.62rem;
     padding: 0 0.5rem;
@@ -2966,13 +2975,13 @@ h2 {
   }
 
   .instrument-info-btn {
-    width: 0.9rem;
-    height: 0.9rem;
-    min-width: 44px;
-    min-height: 44px;
-    top: -0.4rem;
-    right: 0.3rem;
-    font-size: 0.48rem;
+    width: 0.75rem;
+    height: 0.75rem;
+    min-width: 0.75rem;
+    min-height: 0.75rem;
+    top: -0.85rem;
+    right: 0.2rem;
+    font-size: 0.42rem;
   }
 
   .panel {
@@ -3219,6 +3228,7 @@ section.panel.panel-recent {
 
 /* Contenedor: botón de acción + botón "i". Observatorio: anotación a la derecha, misma columna en cada fila. */
 .moment-relate-controls {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.35rem;
@@ -3231,6 +3241,7 @@ section.panel.panel-recent {
 
 .moment-relate-info-btn {
   flex: 0 0 auto;
+  position: relative;
   width: 1.35rem;
   height: 1.35rem;
   padding: 0;
@@ -3257,12 +3268,43 @@ section.panel.panel-recent {
   outline-offset: 2px;
 }
 
+.moment-relate-info-tooltip {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  margin-top: 0.35rem;
+  padding: 0.35rem 0.5rem;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: color-mix(in oklab, var(--text) 85%, var(--muted));
+  background: color-mix(in oklab, var(--bg) 94%, var(--line));
+  border: 1px solid color-mix(in oklab, var(--relate-accent) 22%, transparent);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px color-mix(in oklab, var(--text) 12%, transparent);
+  z-index: 5;
+  pointer-events: none;
+}
+
+.moment-relate-info-tooltip.is-visible {
+  display: block;
+}
+
 @media (max-width: 480px) {
   .moment-relate-info-btn {
-    min-width: 44px;
-    min-height: 44px;
-    width: 1.35rem;
-    height: 1.35rem;
+    width: 0.9rem;
+    height: 0.9rem;
+    min-width: 0.9rem;
+    min-height: 0.9rem;
+    font-size: 0.58rem;
+  }
+
+  /* Área táctil mayor sin agrandar el círculo (tap más fiable en móvil) */
+  .moment-relate-info-btn::after {
+    content: "";
+    position: absolute;
+    inset: -0.5rem;
   }
 }
 
