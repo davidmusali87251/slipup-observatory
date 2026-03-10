@@ -581,6 +581,9 @@ const UI_COPY = {
     viewMore: "View more",
     close: "Close",
     sheetEmpty: "No shared moments yet.",
+    sheetTitle: "Shared moments",
+    sheetTitleNearby: "Moments nearby",
+    sheetCountNearby: "Showing nearby.",
     momentRelateLabel: "Not alone",
     momentRelateLabelYou: "Not alone · you",
     momentRelateAria: "Mark that this resonates with you too",
@@ -680,6 +683,9 @@ const UI_COPY = {
     viewMore: "Ver más",
     close: "Cerrar",
     sheetEmpty: "Aún no hay momentos compartidos.",
+    sheetTitle: "Momentos compartidos",
+    sheetTitleNearby: "Moments cercanos",
+    sheetCountNearby: "Se muestran cercanos.",
     localFieldMomentsLabel: "En el campo cercano",
     nearbyIntroLine: "Lectura del campo cercano.",
     nearbyMomentsLabel: "Momentos cercanos",
@@ -2301,40 +2307,63 @@ function onSharedSheetKeydown(event) {
   }
 }
 
-async function openSharedSheet(sharedMoments) {
+/**
+ * Abre el panel de momentos (shared-sheet). Reutilizado para "Shared moments" (recent) y "Moments nearby".
+ * @param {Array} sharedMoments - Lista de momentos a mostrar
+ * @param {Object} [options] - { title, countLabel, emptyMessage, useRemote }
+ *   - useRemote: true = fetch remoto y actualizar estado (recent); false = solo mostrar la lista (nearby)
+ */
+async function openSharedSheet(sharedMoments, options = {}) {
   if (isSharedSheetOpen) return;
   isSharedSheetOpen = true;
   lastFocusedEl = document.activeElement;
+
+  const ui = UI_COPY[LANG] || UI_COPY.en;
+  const sheetTitleEl = document.getElementById("shared-sheet-title");
+  if (sheetTitleEl) {
+    sheetTitleEl.textContent = options.title ?? ui.sheetTitle ?? "Shared moments";
+  }
+  if (sharedSheetEmpty) {
+    sharedSheetEmpty.textContent = options.emptyMessage ?? ui.sheetEmpty ?? "No shared moments yet.";
+  }
 
   sharedSheet.hidden = false;
   sheetBackdrop.hidden = false;
   document.body.classList.add("sheet-open");
   document.addEventListener("keydown", onSharedSheetKeydown);
 
-  renderSharedSheetList([], (UI_COPY[LANG] || UI_COPY.en).loading || "Loading…");
+  const useRemote = options.useRemote !== false;
+  if (useRemote) {
+    renderSharedSheetList([], ui.loading || "Loading…");
+  }
   requestAnimationFrame(() => {
     sharedSheet.classList.add("is-open");
     sheetBackdrop.classList.add("is-open");
     sharedSheetCloseButton.focus();
   });
 
-  let listToShow = sharedMoments;
-  try {
-    const fresh = await fetchSharedMomentsRemote(SHARED_SHEET_MAX_ITEMS, 48, { skipCache: true });
-    listToShow = fresh.filter((m) => m.shared && !m.hidden);
-  } catch {
-    listToShow = sharedMoments;
-  }
+  let listToShow = Array.isArray(sharedMoments) ? sharedMoments : [];
 
-  if (observatoryState) {
-    observatoryState.sharedMoments = listToShow;
-    refreshObservatoryLists(listToShow);
-  }
+  if (useRemote) {
+    try {
+      const fresh = await fetchSharedMomentsRemote(SHARED_SHEET_MAX_ITEMS, 48, { skipCache: true });
+      listToShow = fresh.filter((m) => m.shared && !m.hidden);
+    } catch {
+      listToShow = Array.isArray(sharedMoments) ? sharedMoments : [];
+    }
 
-  const n = listToShow.length;
-  const ui = UI_COPY[LANG] || UI_COPY.en;
-  const countLabel = n === 0 ? "" : (ui.sheetCount ? ui.sheetCount(n) : "Showing recent.");
-  renderSharedSheetList(listToShow, countLabel);
+    if (observatoryState) {
+      observatoryState.sharedMoments = listToShow;
+      refreshObservatoryLists(listToShow);
+    }
+
+    const n = listToShow.length;
+    const countLabel = n === 0 ? "" : (typeof ui.sheetCount === "function" ? ui.sheetCount(n) : "Showing recent.");
+    renderSharedSheetList(listToShow, countLabel);
+  } else {
+    const countLabel = listToShow.length === 0 ? "" : (options.countLabel ?? ui.sheetCountNearby ?? "Showing nearby.");
+    renderSharedSheetList(listToShow, countLabel);
+  }
 
   sharedSheetCloseButton.focus();
 }
@@ -2458,17 +2487,16 @@ function renderRegionalMomentsList(sharedMoments, fieldScope) {
         btn.textContent = viewMoreLabel;
         btn.setAttribute("aria-label", viewMoreLabel);
         btn.onclick = () => {
-          nearbyListExpanded = true;
-          if (observatoryState) {
-            renderLocalClimate(
-              observatoryState.localClimateTruth,
-              observatoryState.canonicalState,
-              observatoryState.activeFieldScope?.label || "Nearby",
-              observatoryState.observatoryPipeline,
-              observatoryState.activeFieldScope,
-              observatoryState.sharedMoments
-            );
-          }
+          const ui = UI_COPY[LANG] || UI_COPY.en;
+          const nearbyList = observatoryState
+            ? filterMomentsByScope(observatoryState.sharedMoments || [], observatoryState.activeFieldScope).slice(0, LOCAL_FIELD_MOMENTS_LIMIT)
+            : [];
+          openSharedSheet(nearbyList, {
+            title: ui.sheetTitleNearby ?? "Moments nearby",
+            countLabel: ui.sheetCountNearby ?? "Showing nearby.",
+            emptyMessage: ui.localFieldMomentsEmpty ?? "No shared moments in this scope yet.",
+            useRemote: false,
+          });
         };
       }
     } else {

@@ -726,7 +726,7 @@ h2 {
   }
 
   .observatory-hero {
-    padding: 0.9rem 0 var(--page-pad-top);
+    padding: calc(env(safe-area-inset-top, 0px) + 1rem) 0 var(--page-pad-top);
   }
 
   .atmosphere-air,
@@ -735,7 +735,7 @@ h2 {
   }
 
   .climate-instrument {
-    padding: 0.65rem 0.75rem 0.75rem;
+    padding: 0.65rem 3rem 0.75rem 0.75rem;
   }
 
   .climate-instrument-scope {
@@ -779,7 +779,7 @@ h2 {
   }
 
   .observatory-hero {
-    padding: 0.6rem 0 var(--page-pad-top);
+    padding: calc(env(safe-area-inset-top, 0px) + 0.85rem) 0 var(--page-pad-top);
   }
 
   .panel-observatory .telescope-scope {
@@ -844,13 +844,7 @@ h2 {
     line-height: 1.3;
   }
 
-  .atmosphere-air .climate-instrument .instrument-info-btn,
-  .atmosphere-air .climate-instrument .instrument-info-text,
-  .observatory-hero > .climate-instrument .instrument-info-btn,
-  .observatory-hero > .climate-instrument .instrument-info-text,
-  .observatory-hero > .climate-instrument .instrument-info-technical {
-    display: none !important;
-  }
+  /* Botón "i" del instrumento visible en móvil; el texto se muestra al pulsar (sin display:none aquí para que el toggle funcione) */
 
   .atmosphere-grounding {
     padding-top: 0.5rem;
@@ -1061,6 +1055,7 @@ h2 {
   transition: opacity 0.15s ease, border-color 0.15s ease;
   flex-shrink: 0;
   box-sizing: border-box;
+  touch-action: manipulation;
 }
 
 .instrument-info-btn:hover {
@@ -1077,11 +1072,12 @@ h2 {
   .instrument-info-btn {
     width: 1.15rem;
     height: 1.15rem;
-    min-width: 1.15rem;
-    min-height: 1.15rem;
+    min-width: 44px;
+    min-height: 44px;
     top: 0.1rem;
     right: 0.45rem;
     font-size: 0.55rem;
+    padding: 0;
   }
 }
 
@@ -3248,6 +3244,7 @@ section.panel.panel-recent {
   cursor: help;
   opacity: 0.78;
   transition: opacity 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  touch-action: manipulation;
 }
 .moment-relate-info-btn:hover {
   opacity: 1;
@@ -3257,6 +3254,15 @@ section.panel.panel-recent {
 .moment-relate-info-btn:focus-visible {
   outline: 2px solid color-mix(in oklab, var(--relate-accent) 50%, transparent);
   outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+  .moment-relate-info-btn {
+    min-width: 44px;
+    min-height: 44px;
+    width: 1.35rem;
+    height: 1.35rem;
+  }
 }
 
 /* Botón "+" agregación: marco que lo define sin romper el estilo observatorio. */
