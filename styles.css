@@ -726,7 +726,7 @@ h2 {
   }
 
   .observatory-hero {
-    padding: calc(env(safe-area-inset-top, 0px) + 1rem) 0 var(--page-pad-top);
+    padding: calc(env(safe-area-inset-top, 0px) + 1.75rem) 0 var(--page-pad-top);
   }
 
   .atmosphere-air,
@@ -779,7 +779,7 @@ h2 {
   }
 
   .observatory-hero {
-    padding: calc(env(safe-area-inset-top, 0px) + 0.85rem) 0 var(--page-pad-top);
+    padding: calc(env(safe-area-inset-top, 0px) + 1.5rem) 0 var(--page-pad-top);
   }
 
   .panel-observatory .telescope-scope {
@@ -2823,7 +2823,7 @@ h2 {
   }
 
   .observatory-hero {
-    padding: 0.75rem 0 var(--page-pad-top);
+    padding: calc(env(safe-area-inset-top, 0px) + 1.35rem) 0 var(--page-pad-top);
   }
 
   .topbar h1 {
@@ -2940,7 +2940,7 @@ h2 {
   }
 
   .observatory-hero {
-    padding: 0.6rem 0 var(--page-pad-top);
+    padding: calc(env(safe-area-inset-top, 0px) + 1.15rem) 0 var(--page-pad-top);
   }
 
   .atmosphere-value-prop {
