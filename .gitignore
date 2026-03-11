@@ -1,6 +1,15 @@
-# ─── Principio: no subir nada que comprometa el proyecto ───
-# Secretos, claves, API keys, datos sensibles. Este .gitignore protege el repo
-# ahora y cubre archivos que puedas añadir en el futuro. Revisar antes de commit.
+# ─── Repo público: solo lo necesario para que la página funcione ───
+# El resto queda en local. No commitear:
+#   docs/  .cursor/  supabase/  PLAN_MASTER.md  SLIPUP_MASTER_CONTEXT.md  schema_v2.sql
+# Ver también .cursor/rules/remote-config-security.mdc (checklist antes de commit/push).
+
+# ─── Contenido interno / solo local (no exponer en repo público) ───
+docs/
+.cursor/
+PLAN_MASTER.md
+SLIPUP_MASTER_CONTEXT.md
+schema_v2.sql
+supabase/
 
 # ─── Seguridad y secretos (nunca commitear) ───
 # Config local con URLs y claves reales; generar remote.js con scripts/generate-remote.js
@@ -18,7 +27,7 @@ remote.local.js
 .env.staging
 *.env
 
-# Supabase: secretos locales
+# Supabase: secretos locales (redundante con supabase/ arriba; por si se desea trackear supabase/ más adelante)
 supabase/.env
 supabase/.env.local
 
@@ -42,25 +51,9 @@ config.local.*
 *~
 .npmrc.local
 
-# ─── Información interna del proyecto (solo uso local) ───
-# Planes y contexto de agente
-PLAN_MASTER.md
-docs/AGENT_CONTEXT_*.md
-
-# Procedimientos, calibración, análisis interno (exponen cómo funciona el sistema)
-docs/INCIDENT_PROCEDURES.md
-docs/TECHNICAL_OPERATIONS_RECOMMENDATIONS.md
-docs/MODEL_DESIGN_AND_CALIBRATION.md
-docs/TEXT_ANALYSIS.md
-docs/GUIA_CONTADOR_NOT_ALONE.md
-docs/OBSERVATORY_COMPLEXITY.md
-
 # ─── No necesarios para que funcione la página ───
 # Dependencias (se instalan con npm install)
 node_modules/
-
-# Supabase CLI: generados en local
-supabase/.temp/
 
 # Build y caché
 dist/
@@ -86,4 +79,3 @@ desktop.ini
 *.jpeg
 *.gif
 !favicon.svg
-Silpupobservatory.png
