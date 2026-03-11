@@ -169,6 +169,111 @@ const READING_STRUCTURES = {
 };
 const MOOD_NOUN = { en: { calm: "calm", focus: "focus", stressed: "stress", curious: "curiosity", tired: "fatigue" }, es: { calm: "calma", focus: "foco", stressed: "estrés", curious: "curiosidad", tired: "cansancio" } };
 
+/** Motor atmosférico de lenguaje: sujeto + verbo + objeto. Generación combinatoria determinista por seed (mismo momento → misma frase). Fases: gathering < 50, forming < 300, breathing >= 300. */
+const ATMOSPHERE_LINE = {
+  subject: {
+    en: ["The atmosphere", "The field", "The reading", "The air", "The sky", "The layer", "The signal field", "The shared air"],
+    es: ["La atmósfera", "El campo", "La lectura", "El aire", "El cielo", "La capa", "El campo de señales", "El aire compartido"],
+  },
+  verb: {
+    gathering: { en: ["gathers", "receives", "notes", "records", "collects", "holds", "takes in", "acknowledges"], es: ["reúne", "recibe", "anota", "registra", "recolecta", "sostiene", "acoge", "reconoce"] },
+    forming: { en: ["shifts", "adjusts", "records", "notes", "carries", "registers", "moves", "responds"], es: ["se mueve", "se ajusta", "registra", "anota", "lleva", "inscribe", "responde", "reacciona"] },
+    breathing: { en: ["receives", "holds", "carries", "registers", "absorbs", "responds", "settles", "acknowledges"], es: ["recibe", "sostiene", "lleva", "registra", "absorbe", "responde", "se asienta", "reconoce"] },
+  },
+  object: {
+    en: ["a moment", "a signal", "a trace", "this moment", "the signal", "a new trace", "a human moment", "a small signal"],
+    es: ["un momento", "una señal", "una traza", "este momento", "la señal", "una nueva traza", "un momento humano", "una señal pequeña"],
+  },
+};
+
+const TRANSIENT_PHASE_THRESHOLDS = { forming: 50, breathing: 300 };
+
+function getAtmospherePhase(total) {
+  if (total < TRANSIENT_PHASE_THRESHOLDS.forming) return "gathering";
+  if (total < TRANSIENT_PHASE_THRESHOLDS.breathing) return "forming";
+  return "breathing";
+}
+
+/** Genera una frase atmosférica determinista: mismo seed → misma frase. */
+function getAtmosphereLine(seed, lang, total) {
+  const phase = getAtmospherePhase(total);
+  const L = ATMOSPHERE_LINE;
+  const subjects = L.subject[lang] || L.subject.en;
+  const verbs = L.verb[phase][lang] || L.verb[phase].en;
+  const objects = L.object[lang] || L.object.en;
+  const s = subjects[Math.abs(seed) % subjects.length];
+  const v = verbs[Math.abs((seed >>> 8) || seed) % verbs.length];
+  const o = objects[Math.abs((seed >>> 16) || seed + 1) % objects.length];
+  return `${s} ${v} ${o}.`;
+}
+
+/** Umbral para compatibilidad con showTransientReading (ya no se usa para elegir pool, sino getAtmospherePhase). */
+const TRANSIENT_BREATHING_THRESHOLD = TRANSIENT_PHASE_THRESHOLDS.forming;
+
+/** Frases post-contribute: aparecen 2–3 s debajo del grado cuando el usuario vuelve al Observatory. Tono: breve, atmosférico, presente. 24 frases en dos pools (gathering = campo formándose; breathing = campo con masa). */
+const TRANSIENT_PHRASES = {
+  gathering: {
+    en: [
+      "The atmosphere gathers signals.",
+      "A moment enters the air.",
+      "Still forming.",
+      "The field receives a signal.",
+      "Moment registered.",
+      "Signal recorded.",
+      "The field notes a signal.",
+      "The reading registers a moment.",
+      "The atmosphere receives the moment.",
+      "A trace enters the sky.",
+      "The air holds a new trace.",
+      "The field grows.",
+    ],
+    es: [
+      "La atmósfera reúne señales.",
+      "Un momento entra en el aire.",
+      "Aún formándose.",
+      "El campo recibe una señal.",
+      "Momento registrado.",
+      "Señal registrada.",
+      "El campo anota una señal.",
+      "La lectura registra un momento.",
+      "La atmósfera recibe el momento.",
+      "Una traza entra en el cielo.",
+      "El aire guarda una nueva traza.",
+      "El campo crece.",
+    ],
+  },
+  breathing: {
+    en: [
+      "The atmosphere shifts.",
+      "The reading adjusts.",
+      "A signal enters the air.",
+      "The field receives a moment.",
+      "A moment rises into the atmosphere.",
+      "The atmosphere carries the signal.",
+      "The air moves slightly.",
+      "A small shift in the field.",
+      "The atmosphere tilts.",
+      "The field responds.",
+      "Signal registered.",
+      "The sky notices.",
+    ],
+    es: [
+      "La atmósfera se mueve.",
+      "La lectura se ajusta.",
+      "Una señal entra en el aire.",
+      "El campo recibe un momento.",
+      "Un momento sube a la atmósfera.",
+      "La atmósfera lleva la señal.",
+      "El aire se mueve un poco.",
+      "Un pequeño movimiento en el campo.",
+      "La atmósfera se inclina.",
+      "El campo responde.",
+      "Señal registrada.",
+      "El cielo lo nota.",
+    ],
+  },
+};
+
 function getMixLinePhrase(lang, type, mood, seed) {
   const key = `${String(type).toLowerCase()}|${String(mood).toLowerCase()}`;
   const variants = MIX_LINE_OBSERVATORY[lang]?.[key];
@@ -2833,8 +2938,9 @@ function animateDegree(from, to, ms) {
   requestAnimationFrame(frame);
 }
 
-function showTransientReading() {
-  transientReadingLine.textContent = "The reading adjusts.";
+function showTransientReading(total = 0, seed = 0, lang = "en") {
+  const phrase = getAtmosphereLine(seed, lang, total);
+  transientReadingLine.textContent = phrase;
   transientReadingLine.classList.remove("hidden");
   transientReadingLine.classList.add("is-visible");
 
@@ -2844,7 +2950,7 @@ function showTransientReading() {
       transientReadingLine.classList.add("hidden");
       transientReadingLine.textContent = "";
     }, 550);
-  }, 2300);
+  }, 2500);
 }
 
 function renderPatternLayer(canonicalState) {
@@ -3131,7 +3237,8 @@ async function boot() {
       firstPhaseTarget = clamp(startDisplay + localDirection * 1.2, 0, SCALE);
     }
     settleDuration = clamp(3000 + Math.abs(delta) * 70 + patternVolatilityMs, 3000, 8000);
-    showTransientReading();
+    const transientSeed = query.get("s") !== null ? (parseInt(query.get("s"), 10) || 0) : (Date.now() + (canonicalState?.total ?? 0) * 7) | 0;
+    showTransientReading(canonicalState?.total ?? 0, transientSeed, LANG);
     if (prefersReducedMotion) {
       animateDegree(startDisplay, computedDegree, 0);
       document.body.style.setProperty("--atmo", String(computedDegree));

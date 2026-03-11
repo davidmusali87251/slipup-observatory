@@ -2876,7 +2876,7 @@ h2 {
   }
 
   .observatory-hero {
-    padding: calc(env(safe-area-inset-top, 0px) + 1.35rem) 0 var(--page-pad-top);
+    padding: calc(env(safe-area-inset-top, 0px) + 2.25rem) 0 var(--page-pad-top);
   }
 
   .topbar h1 {
@@ -2993,7 +2993,7 @@ h2 {
   }
 
   .observatory-hero {
-    padding: calc(env(safe-area-inset-top, 0px) + 1.15rem) 0 var(--page-pad-top);
+    padding: calc(env(safe-area-inset-top, 0px) + 2rem) 0 var(--page-pad-top);
   }
 
   .atmosphere-value-prop {

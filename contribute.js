@@ -128,6 +128,12 @@ function todayClientDay() {
   return `${y}-${m}-${d}`;
 }
 
+function simpleHash(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = ((h << 5) - h + str.charCodeAt(i)) | 0;
+  return h >>> 0;
+}
+
 function makeMoment() {
   const note = noteInput.value.replace(/\s+/g, " ").trim().slice(0, 19);
   const mood = ALLOWED_MOODS.has(moodInput.value) ? moodInput.value : "calm";
@@ -225,8 +231,9 @@ form.addEventListener("submit", async (event) => {
 
   reportObservatoryEvent("contribute_done");
 
+  const seedParam = sharedInput.checked ? "&s=" + simpleHash(localMoment.id) : "";
   setTimeout(() => {
-    window.location.href = sharedInput.checked ? "./index.html?contributed=1" : "./index.html";
+    window.location.href = sharedInput.checked ? "./index.html?contributed=1" + seedParam : "./index.html";
   }, 1400);
 });
 
