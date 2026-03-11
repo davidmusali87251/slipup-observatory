@@ -565,7 +565,7 @@ const UI_COPY = {
       sedimentStillForming: "Your deep record is still forming.",
       sedimentFirstLayers: "First layers only.",
       sedimentPatternBeginning: "A pattern is beginning to settle.",
-      sedimentTentativePatternForming: "A pattern may be forming.",
+      sedimentTentativePatternForming: "A line begins to appear.",
       sedimentTentativeObservedCalm: "Observed calm appears after stress.",
       sedimentTentativeTensionGathers: "Some tension gathers late.",
       sedimentRecurrenceObservedCalm: "Observed calm often follows stress.",
@@ -577,7 +577,7 @@ const UI_COPY = {
       sedimentMatureOpeningsAfterDense: "Openings appear after dense periods.",
     },
     strataContextLine: "Below the surface, your moments settle into deeper record.",
-    strataShareLine: "Share this line",
+    strataShareLine: "Share this trace",
     strataShareCopied: "Copied",
     viewMore: "View more",
     close: "Close",
@@ -668,7 +668,7 @@ const UI_COPY = {
       sedimentStillForming: "Tu registro profundo sigue formándose.",
       sedimentFirstLayers: "Solo las primeras capas.",
       sedimentPatternBeginning: "Un patrón empieza a asentarse.",
-      sedimentTentativePatternForming: "Puede que se esté formando un patrón.",
+      sedimentTentativePatternForming: "Una línea empieza a aparecer.",
       sedimentTentativeObservedCalm: "La calma observada aparece tras el estrés.",
       sedimentTentativeTensionGathers: "Algo de tensión se acumula tarde.",
       sedimentRecurrenceObservedCalm: "La calma observada sigue a menudo al estrés.",
@@ -680,7 +680,7 @@ const UI_COPY = {
       sedimentMatureOpeningsAfterDense: "Las aperturas aparecen tras periodos densos.",
     },
     strataContextLine: "Bajo la superficie, tus momentos se asientan en un registro más profundo.",
-    strataShareLine: "Compartir esta línea",
+    strataShareLine: "Compartir esta traza",
     strataShareCopied: "Copiado",
     viewMore: "Ver más",
     close: "Cerrar",
@@ -2614,7 +2614,7 @@ function buildStrataLines(longWindowMoments, canonicalState) {
 
   if (phase === "tentative") {
     if (total < 12) {
-      lines.push(s.sedimentTentativePatternForming || "A pattern may be forming.");
+      lines.push(s.sedimentTentativePatternForming || "A line begins to appear.");
     }
     if (counts.observed >= 3 && moods.stressed >= 2) {
       lines.push(s.sedimentTentativeObservedCalm || "Observed calm appears after stress.");
@@ -2704,13 +2704,13 @@ function renderStrata(moments, canonicalState) {
   if (strataShareWrap && strataShareBtn) {
     strataShareWrap.classList.remove("hidden");
     strataShareWrap.hidden = false;
-    strataShareBtn.textContent = ui.strataShareLine || "Share this line";
+    strataShareBtn.textContent = ui.strataShareLine || "Share this trace";
     const lineToShare = lines[0] || "";
     strataShareBtn.onclick = () => {
       if (!lineToShare) return;
       if (navigator.clipboard?.writeText) {
         navigator.clipboard.writeText(lineToShare).then(
-          () => { strataShareBtn.textContent = (UI_COPY[LANG]?.strataShareCopied) || "Copied"; setTimeout(() => { strataShareBtn.textContent = ui.strataShareLine || "Share this line"; }, 1200); },
+          () => { strataShareBtn.textContent = (UI_COPY[LANG]?.strataShareCopied) || "Copied"; setTimeout(() => { strataShareBtn.textContent = ui.strataShareLine || "Share this trace"; }, 1200); },
           () => {}
         );
       }
