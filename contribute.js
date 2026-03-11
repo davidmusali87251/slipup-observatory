@@ -213,7 +213,7 @@ form.addEventListener("submit", async (event) => {
   } else {
     const remoteResult = await postMomentRemote(makeRemoteMomentPayload());
     if (remoteResult.ok) {
-      formStatus.textContent = "The reading adjusts.";
+      formStatus.textContent = "Your moment is in the atmosphere.";
     } else if (remoteResult.status === 422) {
       formStatus.textContent = "Saved locally. Shared sync couldn't accept this moment.";
     } else if (remoteResult.status === 429) {

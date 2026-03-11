@@ -1166,6 +1166,12 @@ h2 {
   opacity: 0.82;
 }
 
+.observatory-hero .contribute-invite-line {
+  font-size: 0.72rem;
+  opacity: 0.85;
+  margin-top: 0.7rem;
+}
+
 .climate-summary-line::before {
   content: "\201C";
   margin-right: 0.08em;
@@ -1178,6 +1184,21 @@ h2 {
 
 .climate-summary-line.hidden {
   display: none;
+}
+
+.contribute-invite-line {
+  margin-top: 0.85rem;
+  margin-bottom: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--muted);
+  opacity: 0.88;
+  letter-spacing: 0.02em;
+  font-family: var(--font-serif);
+  max-width: 28ch;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
 }
 
 .reading-confidence-line {
@@ -1384,6 +1405,20 @@ h2 {
   margin: 1.5rem 0 0;
   text-align: center;
   font-family: var(--font-sans);
+}
+
+.observatory-tagline {
+  margin: 1.25rem 0 0;
+  text-align: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  opacity: 0.78;
+  font-family: var(--font-serif);
+  line-height: 1.4;
+  max-width: 22ch;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .contribute-footer-link {
@@ -2368,6 +2403,15 @@ h2 {
   padding-bottom: 1rem;
   border-bottom: 1px solid rgba(127, 143, 178, 0.18);
   border-bottom: 1px solid color-mix(in oklab, var(--contribute-accent) 18%, transparent);
+}
+
+.contribute-field-line {
+  margin: 0.4rem 0 0;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: var(--muted);
+  opacity: 0.82;
+  letter-spacing: 0.02em;
 }
 
 .contribute-page {

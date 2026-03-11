@@ -516,8 +516,9 @@ const UI_COPY = {
   en: {
     orientation: "",
     valueProp: "Collective reading from shared moments",
-    cta: "Let it rise into the atmosphere.",
-    trust: "No account. No exact pin. Just shared moments.",
+    cta: "Let the atmosphere read this moment.",
+    contributeInvite: "This reading is made of moments. Add yours.",
+    trust: "No account. Region only. Just shared moments.",
     scopeLabel: "48h",
     recentFromRemote: "Across the atmosphere.",
     recentFromLocal: "Moments from this device only.",
@@ -618,8 +619,9 @@ const UI_COPY = {
   es: {
     orientation: "",
     valueProp: "Lectura colectiva de momentos compartidos",
-    cta: "Que suba a la atmósfera.",
-    trust: "Sin cuenta. Sin pin exacto. Solo momentos compartidos.",
+    cta: "Deja que la atmósfera lea este momento.",
+    contributeInvite: "Esta lectura está hecha de momentos. Añadí el tuyo.",
+    trust: "Sin cuenta. Solo región. Solo momentos compartidos.",
     scopeLabel: "48 h",
     recentFromRemote: "En la atmósfera.",
     recentFromLocal: "Solo momentos de este dispositivo.",
@@ -1026,6 +1028,7 @@ function setDegreeDisplay(txt) {
 }
 const conditionLine = document.getElementById("conditionLine");
 const climateSummaryLine = document.getElementById("climateSummaryLine");
+const contributeInviteLine = document.getElementById("contributeInviteLine");
 const climateMetricsLine = document.getElementById("climateMetricsLine");
 const climateInstrument = document.getElementById("climateInstrument");
 const observatoryScopeRange = document.getElementById("observatoryScopeRange");
@@ -3153,6 +3156,10 @@ async function boot() {
       climateSummaryLine.textContent = "";
       climateSummaryLine.classList.add("hidden");
     }
+  }
+  if (contributeInviteLine) {
+    const ui = UI_COPY[LANG] || UI_COPY.en;
+    contributeInviteLine.textContent = ui.contributeInvite || "This reading is made of moments. Add yours.";
   }
 
   const totalForWarmup = canonicalState.total || 0;
