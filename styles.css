@@ -252,6 +252,40 @@ body.sheet-open {
   opacity: 0.1;
 }
 
+/* Micro-respiración: variación lentísima para que la lectura se sienta suspendida en el aire. Menos amplitud que duración agresiva. */
+@keyframes hero-breathe {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.975; }
+}
+
+.observatory-hero.hero-breathe .atmosphere-air,
+.observatory-hero.hero-breathe .atmosphere-grounding {
+  animation: hero-breathe 10s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .observatory-hero.hero-breathe .atmosphere-air,
+  .observatory-hero.hero-breathe .atmosphere-grounding {
+    animation: none;
+  }
+}
+
+/* Respuesta ritual al volver del contribute: glow sutil ~2 s (respuesta del campo, no premio). */
+@keyframes hero-ritual-glow {
+  0%, 100% { opacity: 0.62; }
+  45% { opacity: 0.72; }
+}
+
+.observatory-hero-ritual::before {
+  animation: hero-ritual-glow 2.2s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .observatory-hero-ritual::before {
+    animation: none;
+  }
+}
+
 /* Seed hook for future layers (disabled visually by default) */
 .upper-atmosphere {
   height: 0;
@@ -958,6 +992,15 @@ h2 {
   transform: translateY(-5px);
 }
 
+.hero-instrument-line {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  letter-spacing: 0.02em;
+  opacity: 0.9;
+}
+
 .degree-value::after {
   content: "";
   position: absolute;
@@ -1582,6 +1625,19 @@ h2 {
   gap: 0.75rem;
   font-size: 0.84rem;
   line-height: 1.48;
+}
+
+.moment-item-empty-line {
+  justify-content: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+  opacity: 0.88;
+}
+
+.moment-item-empty-subtle {
+  font-size: 0.72rem;
+  opacity: 0.62;
+  margin-top: 0.25rem;
 }
 
 .horizon-line {
@@ -2463,6 +2519,22 @@ h2 {
 
 .contribute-page {
   padding-top: var(--page-pad-top);
+}
+
+/* Respuesta ritual al enviar momento: microtransición 1–2 s (respuesta del campo, no efecto UI). */
+@keyframes contribute-ritual-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 transparent; }
+  35% { box-shadow: 0 0 2.5rem 0.35rem color-mix(in oklab, var(--layer-air) 18%, transparent); }
+}
+
+body.contribute-ritual .page {
+  animation: contribute-ritual-pulse 1.6s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body.contribute-ritual .page {
+    animation: none;
+  }
 }
 
 .contribute-page .topbar {

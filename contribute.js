@@ -214,12 +214,39 @@ form.addEventListener("submit", async (event) => {
   moments.push(localMoment);
   saveMoments(moments);
 
+  /** Ritual confirmation: jerarquía poética — "A trace has settled" y "The reading has shifted" más frecuentes; "Registered…" menos (más técnico). */
+  const ritualPhrases = {
+    en: [
+      { t: "A trace has settled.", w: 5 },
+      { t: "The reading has shifted.", w: 3 },
+      { t: "Registered in the atmosphere.", w: 1 },
+    ],
+    es: [
+      { t: "Una traza se ha asentado.", w: 5 },
+      { t: "La lectura se ha movido.", w: 3 },
+      { t: "Registrado en la atmósfera.", w: 1 },
+    ],
+  };
+  const lang = (document.documentElement.getAttribute("lang") || "en").startsWith("es") ? "es" : "en";
+  const pool = ritualPhrases[lang];
+  const totalW = pool.reduce((s, p) => s + p.w, 0);
+  const pickRitual = () => {
+    let r = Math.random() * totalW;
+    for (const p of pool) {
+      r -= p.w;
+      if (r <= 0) return p.t;
+    }
+    return pool[0].t;
+  };
+
   if (!sharedInput.checked) {
     formStatus.textContent = "The reading adjusts.";
   } else {
     const remoteResult = await postMomentRemote(makeRemoteMomentPayload());
     if (remoteResult.ok) {
-      formStatus.textContent = "Your moment is in the atmosphere.";
+      formStatus.textContent = pickRitual();
+      document.body.classList.add("contribute-ritual");
+      setTimeout(() => document.body.classList.remove("contribute-ritual"), 1600);
     } else if (remoteResult.status === 422) {
       formStatus.textContent = "Saved locally. Shared sync couldn't accept this moment.";
     } else if (remoteResult.status === 429) {
@@ -232,9 +259,10 @@ form.addEventListener("submit", async (event) => {
   reportObservatoryEvent("contribute_done");
 
   const seedParam = sharedInput.checked ? "&s=" + simpleHash(localMoment.id) : "";
+  const redirectDelay = sharedInput.checked ? 2200 : 1400;
   setTimeout(() => {
     window.location.href = sharedInput.checked ? "./index.html?contributed=1" + seedParam : "./index.html";
-  }, 1400);
+  }, redirectDelay);
 });
 
 syncSaveState();

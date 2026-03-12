@@ -220,6 +220,10 @@ const TRANSIENT_PHRASES = {
       "A trace enters the sky.",
       "The air holds a new trace.",
       "The field grows.",
+      "Every moment leaves a trace.",
+      "Registered in the atmosphere.",
+      "A trace has settled.",
+      "The reading has shifted.",
     ],
     es: [
       "La atmósfera reúne señales.",
@@ -234,6 +238,10 @@ const TRANSIENT_PHRASES = {
       "Una traza entra en el cielo.",
       "El aire guarda una nueva traza.",
       "El campo crece.",
+      "Cada momento deja una traza.",
+      "Registrado en la atmósfera.",
+      "Una traza se ha asentado.",
+      "La lectura se ha movido.",
     ],
   },
   breathing: {
@@ -250,6 +258,10 @@ const TRANSIENT_PHRASES = {
       "The field responds.",
       "Signal registered.",
       "The sky notices.",
+      "Every moment leaves a trace.",
+      "Registered in the atmosphere.",
+      "A trace has settled.",
+      "The reading has shifted.",
     ],
     es: [
       "La atmósfera se mueve.",
@@ -264,6 +276,10 @@ const TRANSIENT_PHRASES = {
       "El campo responde.",
       "Señal registrada.",
       "El cielo lo nota.",
+      "Cada momento deja una traza.",
+      "Registrado en la atmósfera.",
+      "Una traza se ha asentado.",
+      "La lectura se ha movido.",
     ],
   },
 };
@@ -667,6 +683,10 @@ const UI_COPY = {
     orientation: "",
     valueProp: "Collective reading from shared moments",
     cta: "Let the atmosphere read this moment.",
+    heroInstrumentLine: "Each moment alters the reading.",
+    emptyStateQuiet: "The atmosphere is quiet.",
+    emptyStateSignal: "What settles here becomes signal.",
+    momentLeavesTrace: "Every moment leaves a trace.",
     contributeInvite: "A shared atmosphere of human moments.\nLet one moment rise.",
     contributeFooterLine: "Let one moment rise.",
     trust: "No account. Region only. Just shared moments.",
@@ -779,6 +799,10 @@ const UI_COPY = {
     orientation: "",
     valueProp: "Lectura colectiva de momentos compartidos",
     cta: "Deja que la atmósfera lea este momento.",
+    heroInstrumentLine: "Cada momento altera la lectura.",
+    emptyStateQuiet: "La atmósfera está en calma.",
+    emptyStateSignal: "Lo que se asienta aquí se vuelve señal.",
+    momentLeavesTrace: "Cada momento deja una traza.",
     contributeInvite: "Una atmósfera compartida de momentos humanos.\nDejá subir un momento.",
     contributeFooterLine: "Dejá subir un momento.",
     trust: "Sin cuenta. Solo región. Solo momentos compartidos.",
@@ -927,6 +951,11 @@ function applyUICopy() {
   }
   const contributeFooterLink = document.getElementById("contributeFooterLink");
   if (contributeFooterLink && ui.contributeFooterLine) contributeFooterLink.textContent = ui.contributeFooterLine;
+  const heroInstrumentLine = document.getElementById("heroInstrumentLine");
+  if (heroInstrumentLine && ui.heroInstrumentLine) heroInstrumentLine.textContent = ui.heroInstrumentLine;
+  const ctaObservatory = document.getElementById("ctaObservatory");
+  if (ctaObservatory && ui.momentLeavesTrace) ctaObservatory.setAttribute("title", ui.momentLeavesTrace);
+  if (viewMoreButton && ui.momentLeavesTrace) viewMoreButton.setAttribute("title", ui.momentLeavesTrace);
 }
 // FUTURE: Keep scaffold switches explicit for non-active UI lines.
 const FUTURE_UI = {
@@ -2387,11 +2416,19 @@ function renderRecent(sharedMoments) {
   const list = sharedMoments.slice(0, RENDER_LIMIT);
 
   if (list.length === 0) {
-    const empty = document.createElement("li");
-    empty.className = "moment-item";
     const ui = UI_COPY[LANG] || UI_COPY.en;
-    empty.textContent = ui.sheetEmpty || "No shared moments yet.";
-    recentMoments.appendChild(empty);
+    const line1 = document.createElement("li");
+    line1.className = "moment-item moment-item-empty-line";
+    line1.textContent = ui.emptyStateQuiet || "The atmosphere is quiet.";
+    const line2 = document.createElement("li");
+    line2.className = "moment-item moment-item-empty-line";
+    line2.textContent = ui.emptyStateSignal || "What settles here becomes signal.";
+    const line3 = document.createElement("li");
+    line3.className = "moment-item moment-item-empty-line moment-item-empty-subtle";
+    line3.textContent = ui.sheetEmpty || "No shared moments yet.";
+    recentMoments.appendChild(line1);
+    recentMoments.appendChild(line2);
+    recentMoments.appendChild(line3);
     return;
   }
 
@@ -3342,6 +3379,10 @@ async function boot() {
     settleDuration = clamp(3000 + Math.abs(delta) * 70 + patternVolatilityMs, 3000, 8000);
     const transientSeed = query.get("s") !== null ? (parseInt(query.get("s"), 10) || 0) : (Date.now() + (canonicalState?.total ?? 0) * 7) | 0;
     showTransientReading(canonicalState?.total ?? 0, transientSeed, LANG);
+    if (heroEl) {
+      heroEl.classList.add("observatory-hero-ritual");
+      setTimeout(() => heroEl.classList.remove("observatory-hero-ritual"), 2200);
+    }
     if (prefersReducedMotion) {
       animateDegree(startDisplay, computedDegree, 0);
       document.body.style.setProperty("--atmo", String(computedDegree));
