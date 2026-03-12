@@ -1,4 +1,5 @@
 /**
+ * SlipUp Observatory — Copyright © 2026 Selim D. Musali
  * Observatory model constants — frontend mirror for calibration.
  * Canonical source: supabase/functions/_shared/modelConstants.ts
  * Keep in sync when changing backend constants (see docs/MODEL_DESIGN_AND_CALIBRATION.md).
@@ -49,6 +50,27 @@ export const DEGREE_SCALE_BANDS = {
   gathering: DEGREE_BAND_GATHERING,
   dense: 100,
 };
+
+/* ----- Climate v1 aggregation (Activity / Spread / Persistence). Ver docs/CLIMATE_ENGINE_DESIGN.md ----- */
+export const ACTIVITY_WEIGHT = 0.45;
+export const SPREAD_WEIGHT = 0.35;
+export const PERSISTENCE_WEIGHT = 0.2;
+export const INERTIA_ALPHA = 0.35;
+export const MAX_DEGREE_DELTA = 4;
+/** Referencia para normalizar activity: log(1+mass)/log(1+ACTIVITY_MAX_MASS_REF) → [0,1]. */
+export const ACTIVITY_MAX_MASS_REF = 40;
+/** Buckets con mass >= este valor cuentan como "activos" para persistence (evita ruido disperso). */
+export const PERSISTENCE_MIN_MASS = 2;
+
+/** Bandas de condition v1: cortas, observacionales, sin score. */
+export const CONDITION_BANDS_V1 = [
+  { max: 15, label: "Quiet." },
+  { max: 28, label: "Gathering." },
+  { max: 42, label: "Holding." },
+  { max: 58, label: "Shifting." },
+  { max: 74, label: "Dense." },
+  { max: 100, label: "Unsettled." },
+];
 
 export const PRESSURE_MODE_CONDENSING_DELTA = 4.5;
 export const PRESSURE_MODE_CLEARING_DELTA = -3.5;

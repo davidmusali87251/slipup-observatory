@@ -1,5 +1,7 @@
 # SlipUp Observatory V2
 
+**SlipUp Observatory** — Copyright © 2026 Selim D. Musali
+
 Clean rebuild aligned with the Observatory model.
 
 ## Included in this baseline
@@ -111,3 +113,7 @@ Frontend keeps local fallback enabled by default:
 - Treat climate as a shared reading of moments, not literal weather.
 - Keep language non-judgmental (`condense / clear / stabilize`).
 - Avoid ranking, gamification, alerts, and moral framing.
+
+## License
+
+See [LICENSE](LICENSE).

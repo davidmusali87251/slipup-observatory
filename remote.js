@@ -1,3 +1,4 @@
+// SlipUp Observatory — Copyright © 2026 Selim D. Musali
 // En repo: placeholders. Local con datos reales: node scripts/generate-remote.js (usa remote.local.js o env).
 const USE_REMOTE_SHARED = false;
 const REMOTE_MOMENTS_URL = "https://YOUR_PROJECT_REF.supabase.co/functions/v1/moments";

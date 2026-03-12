@@ -1,3 +1,4 @@
+/* SlipUp Observatory — Copyright © 2026 Selim D. Musali */
 :root {
   /* Tipografía: coherente en toda la página. --font-sans = UI, cuerpo, controles; --font-serif = lectura observatory (grado, condition, pattern, summary, CTA). */
   --font-sans: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -1860,6 +1861,38 @@ h2 {
 }
 .horizon-time-of-day-line.hidden {
   display: none;
+}
+
+/* Climate debug panel: solo visible con ?debug=1. Calibración en vivo (Activity, Spread, Persistence). */
+.climate-debug-panel {
+  position: fixed;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  z-index: 9999;
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: var(--muted);
+  background: color-mix(in oklab, var(--bg) 92%, var(--text));
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.5rem 0.65rem;
+  min-width: 10rem;
+  box-shadow: 0 2px 8px color-mix(in oklab, var(--text) 12%, transparent);
+  pointer-events: none;
+}
+.climate-debug-panel-title {
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  color: var(--text);
+}
+.climate-debug-panel-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.climate-debug-panel-row span:last-child {
+  font-variant-numeric: tabular-nums;
 }
 
 .panel-horizon::before {

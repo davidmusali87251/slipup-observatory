@@ -1,3 +1,6 @@
+/**
+ * SlipUp Observatory — Copyright © 2026 Selim D. Musali
+ */
 import { postMomentRemote, fetchClimateRemote, isRemoteReady } from "./remote.js";
 import { getNoteSignalBreakdown } from "./modelConstants.js";
 

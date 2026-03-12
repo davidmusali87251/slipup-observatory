@@ -1,3 +1,6 @@
+/**
+ * SlipUp Observatory — Copyright © 2026 Selim D. Musali
+ */
 import {
   fetchClimateRemote,
   fetchGeoIndexRemote,
@@ -46,6 +49,14 @@ import {
   chooseAlpha,
   REFLECTIVE_SEMANTIC_STABILIZE_FACTOR,
   noteSignal,
+  ACTIVITY_WEIGHT,
+  SPREAD_WEIGHT,
+  PERSISTENCE_WEIGHT,
+  INERTIA_ALPHA,
+  MAX_DEGREE_DELTA,
+  ACTIVITY_MAX_MASS_REF,
+  PERSISTENCE_MIN_MASS,
+  CONDITION_BANDS_V1,
 } from "./modelConstants.js";
 
 const STORAGE_KEY = "slipup_v2_moments";
@@ -1842,7 +1853,7 @@ function deriveClimateState(climateTruth, sharedMoments, localMoments) {
     ? climateTruth.toneReading
     : clamp(50 + (climateTruth.computedDegree - BASELINE) * 2.2, 0, 100);
 
-  return {
+  const out = {
     computedDegree: climateTruth.computedDegree,
     total: climateTruth.total,
     condition: climateTruth.condition,
@@ -1853,6 +1864,10 @@ function deriveClimateState(climateTruth, sharedMoments, localMoments) {
     stabilityIndex,
     groundIndex,
   };
+  if (climateTruth.activity != null) out.activity = climateTruth.activity;
+  if (climateTruth.spread != null) out.spread = climateTruth.spread;
+  if (climateTruth.persistence != null) out.persistence = climateTruth.persistence;
+  return out;
 }
 
 function loadMoments() {
@@ -1868,6 +1883,84 @@ function getRecentWindow(moments) {
   const twoDaysMs = 48 * 60 * 60 * 1000;
   return moments.filter((m) => now - new Date(m.timestamp).getTime() <= twoDaysMs);
 }
+
+const WINDOW_HOURS = 48;
+
+/** Agrega momentos de la ventana 48h en 48 buckets horarios. Cada bucket: { total, typeCounts, hourIndex }. */
+function aggregateMomentsIntoBuckets(moments) {
+  const now = Date.now();
+  const buckets = Array.from({ length: WINDOW_HOURS }, (_, i) => ({
+    total: 0,
+    typeCounts: { avoidable: 0, fertile: 0, observed: 0 },
+    hourIndex: i,
+  }));
+  for (const m of moments) {
+    const ageHours = (now - new Date(m.timestamp).getTime()) / 3600_000;
+    if (ageHours < 0 || ageHours >= WINDOW_HOURS) continue;
+    const slot = Math.min(WINDOW_HOURS - 1, Math.max(0, Math.floor(WINDOW_HOURS - 1 - ageHours)));
+    const b = buckets[slot];
+    b.total += 1;
+    const t = String(m.type || "observed").toLowerCase();
+    if (b.typeCounts[t] != null) b.typeCounts[t] += 1;
+    else b.typeCounts[t] = 1;
+  }
+  return buckets;
+}
+
+/** Activity normalizada [0,1]: log(1+mass)/log(1+ref). Evita que activity domine el raw degree. */
+function normalizeActivity(mass, ref = ACTIVITY_MAX_MASS_REF) {
+  return Math.min(1, Math.log(1 + mass) / Math.log(1 + ref));
+}
+
+/** Masa reciente = últimas 6 horas. Activity en [0,1]. */
+function computeActivityV1(buckets) {
+  const recent = buckets.slice(-6);
+  const mass = recent.reduce((s, b) => s + b.total, 0);
+  return normalizeActivity(mass);
+}
+
+/** Spread por type solamente: 1 - sum(p_c^2). Dispersión de la mezcla. */
+function computeSpreadV1(buckets) {
+  const total = buckets.reduce((s, b) => s + b.total, 0);
+  if (total === 0) return 0;
+  const combined = {};
+  for (const b of buckets) {
+    for (const [type, count] of Object.entries(b.typeCounts || {})) {
+      combined[type] = (combined[type] || 0) + count;
+    }
+  }
+  const p = Object.values(combined).map((c) => c / total);
+  const concentration = p.reduce((s, x) => s + x * x, 0);
+  return 1 - concentration;
+}
+
+/** Proporción de buckets con masa >= threshold (presencia sostenida, no ruido). */
+function computePersistenceV1(buckets) {
+  const active = buckets.filter((b) => b.total >= PERSISTENCE_MIN_MASS).length;
+  return buckets.length ? active / buckets.length : 0;
+}
+
+function computeRawDegreeV1(activity, spread, persistence) {
+  return (
+    (ACTIVITY_WEIGHT * activity + SPREAD_WEIGHT * spread + PERSISTENCE_WEIGHT * persistence) * SCALE
+  );
+}
+
+/** Inercia + cap de movimiento: el cielo se desplaza, no salta. */
+function applyInertiaV1(prev, raw, totalMass) {
+  const inertia = 1 / (1 + INERTIA_ALPHA * Math.log(1 + totalMass));
+  const delta = inertia * (raw - prev);
+  const capped = Math.max(-MAX_DEGREE_DELTA, Math.min(MAX_DEGREE_DELTA, delta));
+  return prev + capped;
+}
+
+function conditionFromBandsV1(degree) {
+  const band = CONDITION_BANDS_V1.find((b) => degree <= b.max);
+  return band ? band.label : CONDITION_BANDS_V1[CONDITION_BANDS_V1.length - 1].label;
+}
+
+/** true = usar motor v1 (buckets + Activity/Spread/Persistence + inercia + bandas). */
+const USE_V1_AGGREGATION = true;
 
 function recencyMass(ageHours) {
   return Math.pow(0.5, ageHours / RECENCY_HALFLIFE_HOURS);
@@ -1895,6 +1988,31 @@ function calculateClimate(moments) {
       latestTimestamp: null,
       repetition,
       toneReading: 50,
+    };
+  }
+
+  if (USE_V1_AGGREGATION) {
+    const buckets = aggregateMomentsIntoBuckets(windowed);
+    const totalMass = buckets.reduce((s, b) => s + b.total, 0);
+    const activity = computeActivityV1(buckets);
+    const spread = computeSpreadV1(buckets);
+    const persistence = computePersistenceV1(buckets);
+    const raw = computeRawDegreeV1(activity, spread, persistence);
+    const prev = getStoredComputedDegree();
+    const prevDegree = prev != null && Number.isFinite(prev) ? prev : BASELINE;
+    const computedDegree = clamp(applyInertiaV1(prevDegree, raw, totalMass), 0, SCALE);
+    const condition = conditionFromBandsV1(computedDegree);
+    const toneReading = clamp(50 + (computedDegree - BASELINE) * 2.2, 0, 100);
+    return {
+      computedDegree,
+      total: totalMass,
+      latestTimestamp: latestInWindow ? latestInWindow.timestamp : null,
+      repetition,
+      toneReading,
+      condition,
+      activity,
+      spread,
+      persistence,
     };
   }
 
@@ -3201,7 +3319,7 @@ async function loadClimateTruth(localMoments) {
       source: "local",
       computedDegree: localClimate.computedDegree,
       total: localClimate.total,
-      condition: conditionForDegree(localClimate.computedDegree, localClimate.total),
+      condition: localClimate.condition ?? conditionForDegree(localClimate.computedDegree, localClimate.total),
       repetition: localClimate.repetition,
       pressureMode: "",
       toneReading: localClimate.toneReading ?? 50,
@@ -3268,6 +3386,37 @@ async function loadFieldClimateTruth(globalClimate, fieldScope) {
   } catch {
     return { source: "global_fallback", ...globalClimate };
   }
+}
+
+let climateDebugPanelEl = null;
+
+function ensureClimateDebugPanel() {
+  if (climateDebugPanelEl && document.body.contains(climateDebugPanelEl)) return;
+  climateDebugPanelEl = document.createElement("div");
+  climateDebugPanelEl.id = "climate-debug-panel";
+  climateDebugPanelEl.setAttribute("aria-label", "Climate engine debug (v1 signals)");
+  climateDebugPanelEl.className = "climate-debug-panel";
+  document.body.appendChild(climateDebugPanelEl);
+}
+
+function updateClimateDebugPanel(canonicalState) {
+  if (!climateDebugPanelEl || !canonicalState) return;
+  const fmt = (n) => (n != null && Number.isFinite(n) ? String(Math.round(n * 100) / 100) : "—");
+  const activity = canonicalState.activity != null ? fmt(canonicalState.activity) : "—";
+  const spread = canonicalState.spread != null ? fmt(canonicalState.spread) : "—";
+  const persistence = canonicalState.persistence != null ? fmt(canonicalState.persistence) : "—";
+  const mass = canonicalState.total != null ? String(canonicalState.total) : "—";
+  const degree = canonicalState.computedDegree != null ? fmt(canonicalState.computedDegree) : "—";
+  const condition = canonicalState.condition || "—";
+  climateDebugPanelEl.innerHTML = `
+    <div class="climate-debug-panel-title">Climate (debug)</div>
+    <div class="climate-debug-panel-row"><span>Activity</span><span>${activity}</span></div>
+    <div class="climate-debug-panel-row"><span>Spread</span><span>${spread}</span></div>
+    <div class="climate-debug-panel-row"><span>Persistence</span><span>${persistence}</span></div>
+    <div class="climate-debug-panel-row"><span>Mass 48h</span><span>${mass}</span></div>
+    <div class="climate-debug-panel-row"><span>ComputedDegree</span><span>${degree}</span></div>
+    <div class="climate-debug-panel-row"><span>Condition</span><span>${condition}</span></div>
+  `;
 }
 
 async function boot() {
@@ -3513,6 +3662,11 @@ async function boot() {
     localClimateTruth,
     observatoryPipeline,
   };
+
+  if (typeof window !== "undefined" && /[?&]debug=1/.test(window.location.search)) {
+    ensureClimateDebugPanel();
+    updateClimateDebugPanel(observatoryState.canonicalState);
+  }
 
   renderHiddenFromView();
 
