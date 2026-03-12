@@ -3403,6 +3403,21 @@ section.panel.panel-recent {
     inset 0 1px 0 color-mix(in oklab, #fff 60%, transparent);
 }
 
+.moment-remove-btn {
+  font: inherit;
+  font-size: 0.7rem;
+  color: var(--text-muted, #666);
+  background: none;
+  border: none;
+  padding: 0 0.25rem;
+  cursor: pointer;
+  margin-left: 0.35rem;
+}
+.moment-remove-btn:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+
 .local-climate-moments .moment-item-nearby .moment-relate-controls {
   align-self: flex-end;
   margin-top: 0.28rem;

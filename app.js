@@ -53,10 +53,36 @@ const COMPUTED_DEGREE_KEY = "slipup_v2_computed_degree";
 const DISPLAY_DEGREE_KEY = "slipup_v2_display_degree";
 const FIELD_SCOPE_KEY = "slipup_v2_field_scope";
 const RELATE_STORAGE_KEY = "slipup_v2_relate";
+const HIDDEN_MOMENT_IDS_KEY = "slipup_v2_hidden_moment_ids";
+
+function getHiddenMomentIds() {
+  try {
+    const raw = localStorage.getItem(HIDDEN_MOMENT_IDS_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return new Set(Array.isArray(arr) ? arr : []);
+  } catch {
+    return new Set();
+  }
+}
+
+function addHiddenMomentId(id) {
+  if (!id) return;
+  const set = getHiddenMomentIds();
+  set.add(id);
+  try {
+    localStorage.setItem(HIDDEN_MOMENT_IDS_KEY, JSON.stringify([...set]));
+  } catch (_) {}
+}
+
+function filterHiddenMoments(items) {
+  const hidden = getHiddenMomentIds();
+  return items.filter((m) => !hidden.has(m.id));
+}
 
 // Tone selector for key narrative lines:
 // narrative = copy observacional (Forming., Leans to X., Holds.); coherente con docs/OBSERVATORY_VISUAL_ARCHITECTURE_AT_SCALE.md (reglas de lenguaje).
 // clear/poetic exponen "metrics", "score", "trend" en Horizon/condition; evitar si se respeta arquitectura a escala.
+// Diseño a escala: más datos → menos ruido visual. Instrumento, no app. Listas acotadas; sin dashboards en hero. Ver docs/OBSERVATORY_AT_SCALE_VISION.md.
 const COPY_MODE = "narrative";
 if (typeof document !== "undefined" && !document.documentElement.hasAttribute("lang")) {
   document.documentElement.lang = navigator.language?.startsWith("es") ? "es" : "en";
@@ -697,6 +723,7 @@ const UI_COPY = {
     valueProp: "Collective reading from shared moments",
     cta: "Let the atmosphere read this moment.",
     contributeInvite: "A shared atmosphere of human moments.\nLet one moment rise.",
+    contributeFooterLine: "Let one moment rise.",
     trust: "No account. Region only. Just shared moments.",
     scopeLabel: "48h",
     recentFromRemote: "Across the atmosphere.",
@@ -768,6 +795,8 @@ const UI_COPY = {
     momentRelateLabelYou: "Not alone · you",
     momentRelateAria: "Mark that this resonates with you too",
     momentRelateInfoTitle: "Not alone",
+    momentRemoveLabel: "Remove",
+    momentRemoveAria: "Remove this moment from your view",
     nearbyRelateLabel: (count) => (count === 1 ? "1 nearby" : `${count} nearby`),
     sheetCount: () => "Showing recent.",
     loading: "Loading…",
@@ -800,6 +829,7 @@ const UI_COPY = {
     valueProp: "Lectura colectiva de momentos compartidos",
     cta: "Deja que la atmósfera lea este momento.",
     contributeInvite: "Una atmósfera compartida de momentos humanos.\nDejá subir un momento.",
+    contributeFooterLine: "Dejá subir un momento.",
     trust: "Sin cuenta. Solo región. Solo momentos compartidos.",
     scopeLabel: "48 h",
     recentFromRemote: "En la atmósfera.",
@@ -881,6 +911,8 @@ const UI_COPY = {
     momentRelateLabelYou: "No estás solo · tú",
     momentRelateAria: "Señalar que esto también resuena contigo",
     momentRelateInfoTitle: "No estás solo",
+    momentRemoveLabel: "Quitar",
+    momentRemoveAria: "Quitar este momento de tu vista",
     nearbyRelateLabel: (count) => (count === 1 ? "1 en el campo" : `${count} en el campo`),
     sheetCount: () => "Se muestran recientes.",
     loading: "Cargando…",
@@ -936,6 +968,8 @@ function applyUICopy() {
   if (instrumentInfoBtn) {
     instrumentInfoBtn.setAttribute("aria-label", LANG === "es" ? "Información sobre estos valores" : "About these values");
   }
+  const contributeFooterLink = document.getElementById("contributeFooterLink");
+  if (contributeFooterLink && ui.contributeFooterLine) contributeFooterLink.textContent = ui.contributeFooterLine;
 }
 // FUTURE: Keep scaffold switches explicit for non-active UI lines.
 const FUTURE_UI = {
@@ -1207,7 +1241,6 @@ function setDegreeDisplay(txt) {
 }
 const conditionLine = document.getElementById("conditionLine");
 const climateSummaryLine = document.getElementById("climateSummaryLine");
-const contributeInviteLine = document.getElementById("contributeInviteLine");
 const climateMetricsLine = document.getElementById("climateMetricsLine");
 const climateInstrument = document.getElementById("climateInstrument");
 const observatoryScopeRange = document.getElementById("observatoryScopeRange");
@@ -2358,11 +2391,28 @@ function createMomentItemElement(m, options = {}) {
     }
   });
 
+  const removeBtn = document.createElement("button");
+  removeBtn.type = "button";
+  removeBtn.className = "moment-remove-btn text-button";
+  removeBtn.setAttribute("aria-label", ui.momentRemoveAria || "Remove this moment from your view");
+  removeBtn.textContent = ui.momentRemoveLabel || "Remove";
+  removeBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addHiddenMomentId(momentId);
+    const localMoments = loadMoments();
+    if (momentId && localMoments.some((mom) => mom.id === momentId)) {
+      saveMoments(localMoments.filter((mom) => mom.id !== momentId));
+    }
+    if (observatoryState?.sharedMoments) refreshObservatoryLists(observatoryState.sharedMoments);
+  });
+
   const wrap = document.createElement("div");
   wrap.className = "moment-relate-controls";
   wrap.appendChild(relateBtn);
   wrap.appendChild(infoBtn);
   wrap.appendChild(infoTooltip);
+  wrap.appendChild(removeBtn);
   li.appendChild(wrap);
   return li;
 }
@@ -3008,17 +3058,18 @@ async function loadSharedMoments(localMoments) {
 /** Estado actual del observatorio para re-renderizar listas (Across the atmosphere + Nearby) con datos frescos sin recargar. */
 let observatoryState = null;
 
-/** Actualiza solo las listas de momentos (recent + nearby) con el array indicado. */
+/** Actualiza solo las listas de momentos (recent + nearby) con el array indicado. Oculta los momentos marcados como "quitar de mi vista". */
 function refreshObservatoryLists(sharedMoments) {
   if (!observatoryState || !Array.isArray(sharedMoments)) return;
-  renderRecent(sharedMoments);
+  const filtered = filterHiddenMoments(sharedMoments);
+  renderRecent(filtered);
   renderLocalClimate(
     observatoryState.localClimateTruth,
     observatoryState.canonicalState,
     observatoryState.activeFieldScope?.label || "Nearby",
     observatoryState.observatoryPipeline,
     observatoryState.activeFieldScope,
-    sharedMoments
+    filtered
   );
 }
 
@@ -3338,10 +3389,6 @@ async function boot() {
       climateSummaryLine.classList.add("hidden");
     }
   }
-  if (contributeInviteLine) {
-    const ui = UI_COPY[LANG] || UI_COPY.en;
-    contributeInviteLine.textContent = ui.contributeInvite || "A shared atmosphere of human moments.\nLet one moment rise.";
-  }
 
   const totalForWarmup = canonicalState.total || 0;
   if (warmupHint) {
@@ -3350,7 +3397,8 @@ async function boot() {
   }
   renderFutureConfidenceLine(canonicalState, observatoryPipeline);
   renderPatternLayer(canonicalState);
-  renderRecent(sharedMoments);
+  const sharedFiltered = filterHiddenMoments(sharedMoments);
+  renderRecent(sharedFiltered);
   renderHorizon(canonicalState, sharedMoments, observatoryPipeline);
   renderLocalClimate(
     localClimateTruth,
@@ -3358,7 +3406,7 @@ async function boot() {
     activeFieldScope.label || "Nearby",
     observatoryPipeline,
     activeFieldScope,
-    sharedMoments
+    sharedFiltered
   );
   renderStrata(moments, canonicalState);
   initSilentDescentTransitions();
@@ -3373,7 +3421,7 @@ async function boot() {
     observatoryPipeline,
   };
 
-  viewMoreButton.onclick = () => openSharedSheet(observatoryState?.sharedMoments ?? []);
+  viewMoreButton.onclick = () => openSharedSheet(filterHiddenMoments(observatoryState?.sharedMoments ?? []));
 
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState !== "visible" || !observatoryState) return;
