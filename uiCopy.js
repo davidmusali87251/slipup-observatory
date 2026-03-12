@@ -1,5 +1,5 @@
 /**
- * SlipUp Observatory — Copyright © 2026 Selim D. Musali
+ * SlipUp™ Observatory
  * Copy para #climateSummaryLine (línea de lectura del hero).
  * Primer módulo extraído desde app.js para reducir tamaño y facilitar pruebas.
  */

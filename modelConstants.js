@@ -1,5 +1,5 @@
 /**
- * SlipUp Observatory — Copyright © 2026 Selim D. Musali
+ * SlipUp™ Observatory
  * Observatory model constants — frontend mirror for calibration.
  * Canonical source: supabase/functions/_shared/modelConstants.ts
  * Keep in sync when changing backend constants (see docs/MODEL_DESIGN_AND_CALIBRATION.md).

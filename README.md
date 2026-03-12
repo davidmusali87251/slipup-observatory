@@ -1,6 +1,6 @@
-# SlipUp Observatory V2
+# SlipUp™ Observatory V2
 
-**SlipUp Observatory** — Copyright © 2026 Selim D. Musali
+**SlipUp™ Observatory**
 
 Clean rebuild aligned with the Observatory model.
 
