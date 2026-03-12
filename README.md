@@ -50,6 +50,7 @@ El workflow **`.github/workflows/deploy-pages.yml`** despliega a GitHub Pages y 
 
 - This baseline intentionally avoids V1 carryover.
 - No ranking, gamification, alerts, or moral language.
+- **Backlog / mejoras:** ver [BACKLOG.md](BACKLOG.md) para mejoras identificadas (modularización, tests, reversión Remove, BUILD_ID, etc.).
 
 ## Edge Setup (Supabase)
 

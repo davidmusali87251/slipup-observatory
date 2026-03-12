@@ -5,6 +5,7 @@ import {
   isRemoteReady,
   postRelateMoment,
 } from "./remote.js";
+import { getReadingStatusLine } from "./uiCopy.js";
 import {
   BASELINE,
   SCALE,
@@ -49,6 +50,8 @@ import {
 
 const STORAGE_KEY = "slipup_v2_moments";
 const RENDER_LIMIT = 6; // No es lista: ventana al aire. Pocas partículas visibles. 6–8 ideal, nunca >10. Ver docs/OBSERVATORY_GROWTH_PITFALLS.md.
+/** Si true, Horizon puede mostrar una línea por franja del día (morning/afternoon/evening) cuando hay suficientes momentos. */
+const ENABLE_TIME_OF_DAY_HINT = true;
 const COMPUTED_DEGREE_KEY = "slipup_v2_computed_degree";
 const DISPLAY_DEGREE_KEY = "slipup_v2_display_degree";
 const FIELD_SCOPE_KEY = "slipup_v2_field_scope";
@@ -69,6 +72,15 @@ function addHiddenMomentId(id) {
   if (!id) return;
   const set = getHiddenMomentIds();
   set.add(id);
+  try {
+    localStorage.setItem(HIDDEN_MOMENT_IDS_KEY, JSON.stringify([...set]));
+  } catch (_) {}
+}
+
+function removeHiddenMomentId(id) {
+  if (!id) return;
+  const set = getHiddenMomentIds();
+  set.delete(id);
   try {
     localStorage.setItem(HIDDEN_MOMENT_IDS_KEY, JSON.stringify([...set]));
   } catch (_) {}
@@ -127,50 +139,6 @@ const MIX_LINE_OBSERVATORY = {
     "fertile|stressed": ["Tensión y apertura comparten la lectura.", "Los momentos mezclan tensión y apertura.", "Apertura bajo tensión.", "Tensión y apertura en la mezcla.", "La lectura sostiene tensión y apertura."],
     "fertile|curious": ["Curiosidad y apertura.", "El campo se inclina al descubrimiento.", "Curiosidad fértil.", "Descubrimiento en la mezcla.", "Apertura y curiosidad."],
     "fertile|tired": ["Cansado pero abierto.", "La lectura guarda espacio pese al cansancio.", "Cansancio y apertura.", "Abierto pese al cansancio.", "Cansancio y apertura comparten la lectura."],
-  },
-};
-
-/** Fallback para #climateSummaryLine cuando total >= 1000 y no hay dominantMix (pocas frases, tono observatorio). */
-const READING_SUMMARY_FALLBACK = {
-  en: ["The reading holds.", "The field steadies.", "A layer forms.", "Signals settle.", "The mix holds.", "Steady in the window.", "The reading steadies.", "Moments in the field."],
-  es: ["La lectura se mantiene.", "El campo se estabiliza.", "Se forma una capa.", "Las señales se asientan.", "La mezcla se mantiene.", "Estable en la ventana.", "La lectura se estabiliza.", "Momentos en el campo."],
-};
-
-/** 75 frases núcleo por type×mood para #climateSummaryLine (total >= 1000). Observacional, no moral; solo type + mood. */
-const READING_SUMMARY_BY_MIX = {
-  en: {
-    "observed|calm": ["Calm holds observed moments.", "Observed signals rest in calm.", "The reading stays quiet with observed moments.", "Calm carries simple observations.", "Observed moments settle in calm air."],
-    "observed|focus": ["Focus sharpens observed moments.", "Observed signals gather in focus.", "The field reads observation through focus.", "Focus holds quiet observation.", "Observed moments move with focus."],
-    "observed|stressed": ["Stress reveals observed moments.", "Observed signals surface under stress.", "The reading shows observation through stress.", "Stress sharpens observation.", "Observed moments appear under pressure."],
-    "observed|curious": ["Curiosity carries observed moments.", "Observed signals follow curiosity.", "The field opens through observation.", "Curiosity reveals quiet signals.", "Observed moments travel with curiosity."],
-    "observed|tired": ["Fatigue softens observed moments.", "Observed signals appear through fatigue.", "The reading slows into observation.", "Fatigue carries quiet noticing.", "Observed moments settle after effort."],
-    "fertile|calm": ["Calm allows fertile moments.", "Fertile signals open in calm air.", "The field grows through calm.", "Fertile moments rest in calm.", "Calm carries quiet openings."],
-    "fertile|focus": ["Focus brings fertile moments forward.", "Fertile signals gather through focus.", "The reading opens with focus.", "Focus sharpens fertile signals.", "Fertile moments follow attention."],
-    "fertile|stressed": ["Fertile moments follow fatigue.", "Openings appear under pressure.", "The field holds tension and growth.", "Stress carries fertile signals.", "Fertile moments rise after strain."],
-    "fertile|curious": ["Curiosity opens fertile moments.", "Fertile signals follow curiosity.", "The reading widens through curiosity.", "Curiosity reveals fertile traces.", "Fertile moments move with wonder."],
-    "fertile|tired": ["Fatigue precedes fertile moments.", "Tired hours carry openings.", "The field softens into growth.", "Fertile moments follow rest.", "Fatigue leaves room for change."],
-    "avoidable|calm": ["Calm reveals avoidable moments.", "Avoidable signals appear in calm air.", "The reading shows quiet mistakes.", "Calm exposes avoidable traces.", "Avoidable moments settle into view."],
-    "avoidable|focus": ["Focus reveals avoidable moments.", "Avoidable signals surface in attention.", "The field sharpens around mistakes.", "Focus exposes avoidable traces.", "Avoidable moments appear under focus."],
-    "avoidable|stressed": ["Stress gathers avoidable moments.", "Avoidable signals cluster under pressure.", "The reading tightens around mistakes.", "Stress reveals avoidable traces.", "Avoidable moments follow tension."],
-    "avoidable|curious": ["Curiosity notices avoidable moments.", "Avoidable signals surface through curiosity.", "The field questions avoidable traces.", "Curiosity reveals quiet mistakes.", "Avoidable moments appear through wonder."],
-    "avoidable|tired": ["Fatigue invites avoidable moments.", "Avoidable signals appear in tired hours.", "The reading loosens under fatigue.", "Fatigue carries avoidable traces.", "Avoidable moments follow long days."],
-  },
-  es: {
-    "observed|calm": ["La calma sostiene momentos observados.", "Las señales observadas descansan en calma.", "La lectura se queda tranquila con momentos observados.", "La calma lleva observaciones simples.", "Los momentos observados se asientan en aire calmado."],
-    "observed|focus": ["El foco afila momentos observados.", "Las señales observadas se reúnen en foco.", "El campo lee observación a través del foco.", "El foco sostiene observación tranquila.", "Los momentos observados se mueven con foco."],
-    "observed|stressed": ["El estrés revela momentos observados.", "Las señales observadas afloran bajo estrés.", "La lectura muestra observación bajo estrés.", "El estrés afila la observación.", "Los momentos observados aparecen bajo presión."],
-    "observed|curious": ["La curiosidad lleva momentos observados.", "Las señales observadas siguen la curiosidad.", "El campo se abre a través de la observación.", "La curiosidad revela señales tranquilas.", "Los momentos observados viajan con curiosidad."],
-    "observed|tired": ["El cansancio suaviza momentos observados.", "Las señales observadas aparecen con el cansancio.", "La lectura se ralentiza en observación.", "El cansancio lleva una atención tranquila.", "Los momentos observados se asientan tras el esfuerzo."],
-    "fertile|calm": ["La calma permite momentos fértiles.", "Las señales fértiles se abren en aire calmado.", "El campo crece a través de la calma.", "Los momentos fértiles descansan en calma.", "La calma lleva aperturas tranquilas."],
-    "fertile|focus": ["El foco trae momentos fértiles al frente.", "Las señales fértiles se reúnen con el foco.", "La lectura se abre con foco.", "El foco afila señales fértiles.", "Los momentos fértiles siguen la atención."],
-    "fertile|stressed": ["Los momentos fértiles siguen al cansancio.", "Las aperturas aparecen bajo presión.", "El campo sostiene tensión y crecimiento.", "El estrés lleva señales fértiles.", "Los momentos fértiles surgen tras la tensión."],
-    "fertile|curious": ["La curiosidad abre momentos fértiles.", "Las señales fértiles siguen la curiosidad.", "La lectura se amplía con la curiosidad.", "La curiosidad revela trazas fértiles.", "Los momentos fértiles se mueven con asombro."],
-    "fertile|tired": ["El cansancio precede momentos fértiles.", "Las horas cansadas llevan aperturas.", "El campo se suaviza hacia el crecimiento.", "Los momentos fértiles siguen al descanso.", "El cansancio deja espacio al cambio."],
-    "avoidable|calm": ["La calma revela momentos evitables.", "Las señales evitables aparecen en aire calmado.", "La lectura muestra errores tranquilos.", "La calma expone trazas evitables.", "Los momentos evitables entran en vista."],
-    "avoidable|focus": ["El foco revela momentos evitables.", "Las señales evitables afloran en la atención.", "El campo se afila en torno a los errores.", "El foco expone trazas evitables.", "Los momentos evitables aparecen bajo foco."],
-    "avoidable|stressed": ["El estrés reúne momentos evitables.", "Las señales evitables se agrupan bajo presión.", "La lectura se tensa en torno a los errores.", "El estrés revela trazas evitables.", "Los momentos evitables siguen a la tensión."],
-    "avoidable|curious": ["La curiosidad nota momentos evitables.", "Las señales evitables afloran con la curiosidad.", "El campo cuestiona trazas evitables.", "La curiosidad revela errores tranquilos.", "Los momentos evitables aparecen con el asombro."],
-    "avoidable|tired": ["El cansancio invita momentos evitables.", "Las señales evitables aparecen en horas cansadas.", "La lectura se afloja bajo el cansancio.", "El cansancio lleva trazas evitables.", "Los momentos evitables siguen a días largos."],
   },
 };
 
@@ -309,29 +277,6 @@ function getMixLinePhrase(lang, type, mood, seed) {
   }
   const index = Math.abs(seed) % variants.length;
   return variants[index];
-}
-
-/**
- * Línea de lectura neutral para el hero: fenómeno, no telemetría.
- * total < 3 → cielo quieto; total >= 3 → movimiento estable; total >= 1000 → muchas frases por mix type|mood.
- */
-function getReadingStatusLine(lang, total, seed = 0, dominantMix = "") {
-  const lines = lang === "es"
-    ? { quiet: "Las señales se reúnen.", steady: ["Estable.", "Se mantiene."] }
-    : { quiet: "Signals are gathering.", steady: ["Steady.", "Holds."] };
-  if (total < 3) return lines.quiet;
-  if (total >= 1000) {
-    const raw = String(dominantMix || "").trim();
-    const key = raw.toLowerCase().replace(/\s*[·•]\s*/g, "|");
-    const byMix = READING_SUMMARY_BY_MIX[lang]?.[key];
-    const pool = Array.isArray(byMix) && byMix.length > 0
-      ? byMix
-      : READING_SUMMARY_FALLBACK[lang] || READING_SUMMARY_FALLBACK.en;
-    const idx = Math.abs(seed) % pool.length;
-    return pool[idx];
-  }
-  const idx = Math.abs(seed) % lines.steady.length;
-  return lines.steady[idx];
 }
 
 /** Hook opcional para métricas/servicio externo (Sentry, Analytics). Si window.__observatoryReportEvent es una función, se llama con el nombre del evento; sin payload de usuario. Eventos: observatory_view (boot), contribute_view/contribute_done (contribute.js). Ver docs/SLIPUP_METRICS_AND_SIGNALS.md. */
@@ -736,6 +681,9 @@ const UI_COPY = {
     eyebrowContext: "Moments",
     horizonTitle: "Horizon",
     horizonMoreLabel: "Deeper",
+    timeOfDayMorningLabel: "Morning",
+    timeOfDayAfternoonLabel: "Afternoon",
+    timeOfDayEveningLabel: "Evening",
     nearbyTitle: "Nearby",
     instrumentAriaLabel: "Reading metrics",
     instrumentLayerLabel: "Atmosphere",
@@ -781,6 +729,7 @@ const UI_COPY = {
       sedimentMatureAvoidableLate: "Avoidable tension gathers late in the day.",
       sedimentMatureFertileAfterFatigue: "Fertile openings follow fatigue.",
       sedimentMatureOpeningsAfterDense: "Openings appear after dense periods.",
+      sedimentCollectiveEcho: "The field echoes.",
     },
     strataContextLine: "Below the surface, your moments settle into deeper record.",
     strataShareLine: "Share this trace",
@@ -797,6 +746,8 @@ const UI_COPY = {
     momentRelateInfoTitle: "Not alone",
     momentRemoveLabel: "Remove",
     momentRemoveAria: "Remove this moment from your view",
+    hiddenFromViewTitle: "Hidden from view",
+    showAgainLabel: "Show again",
     nearbyRelateLabel: (count) => (count === 1 ? "1 nearby" : `${count} nearby`),
     sheetCount: () => "Showing recent.",
     loading: "Loading…",
@@ -842,6 +793,9 @@ const UI_COPY = {
     eyebrowContext: "Momentos",
     horizonTitle: "Horizonte",
     horizonMoreLabel: "Más",
+    timeOfDayMorningLabel: "Mañana",
+    timeOfDayAfternoonLabel: "Tarde",
+    timeOfDayEveningLabel: "Noche",
     nearbyTitle: "Cercano",
     instrumentAriaLabel: "Métricas de lectura",
     instrumentLayerLabel: "Atmósfera",
@@ -887,6 +841,7 @@ const UI_COPY = {
       sedimentMatureAvoidableLate: "La tensión evitable se acumula al final del día.",
       sedimentMatureFertileAfterFatigue: "Las aperturas fértiles siguen al cansancio.",
       sedimentMatureOpeningsAfterDense: "Las aperturas aparecen tras periodos densos.",
+      sedimentCollectiveEcho: "El campo hace eco.",
     },
     strataContextLine: "Bajo la superficie, tus momentos se asientan en un registro más profundo.",
     strataShareLine: "Compartir esta traza",
@@ -913,6 +868,8 @@ const UI_COPY = {
     momentRelateInfoTitle: "No estás solo",
     momentRemoveLabel: "Quitar",
     momentRemoveAria: "Quitar este momento de tu vista",
+    hiddenFromViewTitle: "Ocultos de tu vista",
+    showAgainLabel: "Mostrar de nuevo",
     nearbyRelateLabel: (count) => (count === 1 ? "1 en el campo" : `${count} en el campo`),
     sheetCount: () => "Se muestran recientes.",
     loading: "Cargando…",
@@ -1254,6 +1211,7 @@ const viewMoreButton = document.getElementById("viewMoreButton");
 const horizonPrimary = document.getElementById("horizonPrimary");
 const horizonPulseLine = document.getElementById("horizonPulseLine");
 const horizonSecondary = document.getElementById("horizonSecondary");
+const horizonTimeOfDayLine = document.getElementById("horizonTimeOfDayLine");
 const horizonMoreButton = document.getElementById("horizonMoreButton");
 const heroEl = document.getElementById("observatory-hero");
 const atmospherePatternLine = document.getElementById("atmosphere-pattern-line");
@@ -1278,6 +1236,8 @@ const localClimateMoments = document.getElementById("localClimateMoments");
 const groundStrata = document.getElementById("ground-strata");
 const strataLines = document.getElementById("strataLines");
 const strataMetricsLine = document.getElementById("strataMetricsLine");
+const hiddenFromViewWrap = document.getElementById("hidden-from-view-wrap");
+const hiddenFromViewList = document.getElementById("hiddenFromViewList");
 
 const query = new URLSearchParams(window.location.search);
 const contributed = query.get("contributed") === "1";
@@ -2627,6 +2587,38 @@ async function openSharedSheet(sharedMoments, options = {}) {
   sharedSheetCloseButton.focus();
 }
 
+/** Franjas horarias (hora UTC 0-23): morning 6-11, afternoon 12-17, evening 18-23 y 0-5. */
+function getTimeOfDayBucket(isoTimestamp) {
+  const hour = new Date(isoTimestamp).getUTCHours();
+  if (hour >= 6 && hour <= 11) return "morning";
+  if (hour >= 12 && hour <= 17) return "afternoon";
+  return "evening";
+}
+
+/** Devuelve una línea tipo "Morning: focus. Evening: tired." si hay >= minPerBucket momentos en >= 2 franjas; si no "". */
+function getTimeOfDayHint(moments, minPerBucket = 3, lang = "en") {
+  if (!ENABLE_TIME_OF_DAY_HINT || !Array.isArray(moments) || moments.length < minPerBucket * 2) return "";
+  const buckets = { morning: [], afternoon: [], evening: [] };
+  moments.forEach((m) => {
+    const bucket = getTimeOfDayBucket(m.timestamp || m.created_at);
+    if (buckets[bucket]) buckets[bucket].push(m);
+  });
+  const counts = { morning: buckets.morning.length, afternoon: buckets.afternoon.length, evening: buckets.evening.length };
+  const withEnough = Object.entries(counts).filter(([, n]) => n >= minPerBucket);
+  if (withEnough.length < 2) return "";
+  const ui = UI_COPY[lang] || UI_COPY.en;
+  const labels = { morning: ui.timeOfDayMorningLabel || "Morning", afternoon: ui.timeOfDayAfternoonLabel || "Afternoon", evening: ui.timeOfDayEveningLabel || "Evening" };
+  const parts = [];
+  withEnough.forEach(([key]) => {
+    const arr = buckets[key];
+    const moodCounts = { calm: 0, focus: 0, stressed: 0, curious: 0, tired: 0 };
+    arr.forEach((m) => { if (moodCounts[m.mood] !== undefined) moodCounts[m.mood] += 1; });
+    const dominant = Object.entries(moodCounts).sort((a, b) => b[1] - a[1])[0][0];
+    parts.push(`${labels[key]}: ${dominant}.`);
+  });
+  return parts.join(" ");
+}
+
 function renderHorizon(canonicalState, sharedMoments, pipeline = null) {
   const total = sharedMoments.length;
   const seed = Math.round((canonicalState?.computedDegree || BASELINE) * 10) + total;
@@ -2638,11 +2630,13 @@ function renderHorizon(canonicalState, sharedMoments, pipeline = null) {
 
   if (total === 0) {
     horizonPrimary.textContent = pickCopy(COPY.horizon.empty, seed);
+    if (horizonTimeOfDayLine) { horizonTimeOfDayLine.textContent = ""; horizonTimeOfDayLine.classList.add("hidden"); }
     return;
   }
 
   if (total < 4) {
     horizonPrimary.textContent = pickCopy(COPY.horizon.early, seed);
+    if (horizonTimeOfDayLine) { horizonTimeOfDayLine.textContent = ""; horizonTimeOfDayLine.classList.add("hidden"); }
     return;
   }
 
@@ -2657,6 +2651,17 @@ function renderHorizon(canonicalState, sharedMoments, pipeline = null) {
   const dominant = Object.entries(countByType).sort((a, b) => b[1] - a[1])[0][0];
   const dominantTemplate = pickCopyFromState(COPY.horizon.dominant, seed);
   horizonPrimary.textContent = dominantTemplate(dominant);
+
+  const timeOfDayHint = getTimeOfDayHint(sharedMoments, 3, LANG);
+  if (horizonTimeOfDayLine) {
+    if (timeOfDayHint) {
+      horizonTimeOfDayLine.textContent = timeOfDayHint;
+      horizonTimeOfDayLine.classList.remove("hidden");
+    } else {
+      horizonTimeOfDayLine.textContent = "";
+      horizonTimeOfDayLine.classList.add("hidden");
+    }
+  }
 
   horizonMoreButton.classList.remove("hidden");
   horizonMoreButton.onclick = () => {
@@ -2879,6 +2884,9 @@ function buildStrataLines(longWindowMoments, canonicalState) {
     if (fertileRatio > 0.3 && lines.length < STRATA_MAX_LINES) {
       lines.push(s.sedimentFertileDominant || "Fertile moments show up in the mix.");
     }
+    if (lines.length < STRATA_MAX_LINES && lines.length >= 1 && counts.fertile >= 2 && counts.observed >= 2 && s.sedimentCollectiveEcho) {
+      lines.push(s.sedimentCollectiveEcho);
+    }
     if (lines.length < 2) {
       lines.push(s.sedimentStillForming || "Your deep record is still forming.");
     }
@@ -2894,6 +2902,9 @@ function buildStrataLines(longWindowMoments, canonicalState) {
     }
     if (lines.length < STRATA_MAX_LINES && counts.observed >= 4) {
       lines.push(s.sedimentMatureOpeningsAfterDense || "Openings appear after dense periods.");
+    }
+    if (lines.length < STRATA_MAX_LINES && lines.length >= 1 && counts.fertile >= 2 && counts.observed >= 2 && s.sedimentCollectiveEcho) {
+      lines.push(s.sedimentCollectiveEcho);
     }
     if (lines.length < 2) {
       lines.push(s.sedimentStillForming || "Your deep record is still forming.");
@@ -3020,8 +3031,12 @@ function renderPatternLayer(canonicalState) {
     pattern_b: "Repeated mood in the field.",
     pattern_c: "Clustering in the window.",
   };
+  const patternFallback = LANG === "es"
+    ? ["Patrón en la lectura.", "Ritmo en la ventana.", "Eco colectivo en la lectura."]
+    : ["Pattern in the reading.", "Rhythm in the window.", "Collective echo in the read."];
+  const seed = (total * 7 + (dominant.length || 0)) | 0;
   const line = repetition?.hasPattern
-    ? tagMap[repetition.tag] || "Pattern in the reading."
+    ? (tagMap[repetition.tag] || patternFallback[Math.abs(seed) % patternFallback.length])
     : dominant
       ? dominant.split("|").map((s) => capitalizeForDisplay(s.trim())).join(" · ")
       : "";
@@ -3058,6 +3073,42 @@ async function loadSharedMoments(localMoments) {
 /** Estado actual del observatorio para re-renderizar listas (Across the atmosphere + Nearby) con datos frescos sin recargar. */
 let observatoryState = null;
 
+/** Pinta la sección "Hidden from view" con botones "Show again" por cada id oculto. */
+function renderHiddenFromView() {
+  if (!hiddenFromViewWrap || !hiddenFromViewList) return;
+  const hidden = getHiddenMomentIds();
+  const ids = [...hidden];
+  const ui = UI_COPY[LANG] || UI_COPY.en;
+  if (ids.length === 0) {
+    hiddenFromViewWrap.classList.add("hidden");
+    hiddenFromViewWrap.hidden = true;
+    hiddenFromViewList.innerHTML = "";
+    return;
+  }
+  hiddenFromViewWrap.classList.remove("hidden");
+  hiddenFromViewWrap.hidden = false;
+  const titleEl = hiddenFromViewWrap.querySelector(".hidden-from-view-title");
+  if (titleEl) titleEl.textContent = ui.hiddenFromViewTitle || "Hidden from view";
+  hiddenFromViewList.innerHTML = "";
+  const showAgain = ui.showAgainLabel || "Show again";
+  ids.forEach((id) => {
+    const li = document.createElement("li");
+    li.className = "hidden-from-view-item";
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "text-button hidden-from-view-show-again";
+    btn.textContent = showAgain;
+    btn.setAttribute("aria-label", (LANG === "es" ? "Mostrar de nuevo este momento" : "Show this moment again"));
+    btn.addEventListener("click", () => {
+      removeHiddenMomentId(id);
+      if (observatoryState?.sharedMoments) refreshObservatoryLists(observatoryState.sharedMoments);
+      renderHiddenFromView();
+    });
+    li.appendChild(btn);
+    hiddenFromViewList.appendChild(li);
+  });
+}
+
 /** Actualiza solo las listas de momentos (recent + nearby) con el array indicado. Oculta los momentos marcados como "quitar de mi vista". */
 function refreshObservatoryLists(sharedMoments) {
   if (!observatoryState || !Array.isArray(sharedMoments)) return;
@@ -3071,6 +3122,7 @@ function refreshObservatoryLists(sharedMoments) {
     observatoryState.activeFieldScope,
     filtered
   );
+  renderHiddenFromView();
 }
 
 function normalizeRepetition(repetition) {
@@ -3420,6 +3472,8 @@ async function boot() {
     localClimateTruth,
     observatoryPipeline,
   };
+
+  renderHiddenFromView();
 
   viewMoreButton.onclick = () => openSharedSheet(filterHiddenMoments(observatoryState?.sharedMoments ?? []));
 

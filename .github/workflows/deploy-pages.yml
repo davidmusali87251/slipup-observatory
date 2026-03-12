@@ -44,7 +44,7 @@ jobs:
           set -e
           mkdir -p _site
           cp index.html contribute.html terms.html privacy.html ai.html _site/
-          cp app.js contribute.js remote.js modelConstants.js styles.css _site/
+          cp app.js contribute.js remote.js modelConstants.js uiCopy.js styles.css _site/
           cp favicon.svg CNAME _site/ 2>/dev/null || true
           BUILD_ID="${{ github.sha }}"
           for f in _site/*.html; do
