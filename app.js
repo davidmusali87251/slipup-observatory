@@ -291,8 +291,8 @@ function getMixLinePhrase(lang, type, mood, seed) {
  */
 function getReadingStatusLine(lang, total, seed = 0, dominantMix = "") {
   const lines = lang === "es"
-    ? { quiet: "Calma.", steady: ["Estable.", "Se mantiene."] }
-    : { quiet: "Quiet.", steady: ["Steady.", "Holds."] };
+    ? { quiet: "Las señales se reúnen.", steady: ["Estable.", "Se mantiene."] }
+    : { quiet: "Signals are gathering.", steady: ["Steady.", "Holds."] };
   if (total < 3) return lines.quiet;
   if (total >= 1000) {
     const raw = String(dominantMix || "").trim();
@@ -696,7 +696,7 @@ const UI_COPY = {
     orientation: "",
     valueProp: "Collective reading from shared moments",
     cta: "Let the atmosphere read this moment.",
-    contributeInvite: "This reading is made of moments. Add yours.",
+    contributeInvite: "A shared atmosphere of human moments.\nLet one moment rise.",
     trust: "No account. Region only. Just shared moments.",
     scopeLabel: "48h",
     recentFromRemote: "Across the atmosphere.",
@@ -799,7 +799,7 @@ const UI_COPY = {
     orientation: "",
     valueProp: "Lectura colectiva de momentos compartidos",
     cta: "Deja que la atmósfera lea este momento.",
-    contributeInvite: "Esta lectura está hecha de momentos. Añadí el tuyo.",
+    contributeInvite: "Una atmósfera compartida de momentos humanos.\nDejá subir un momento.",
     trust: "Sin cuenta. Solo región. Solo momentos compartidos.",
     scopeLabel: "48 h",
     recentFromRemote: "En la atmósfera.",
@@ -3340,7 +3340,7 @@ async function boot() {
   }
   if (contributeInviteLine) {
     const ui = UI_COPY[LANG] || UI_COPY.en;
-    contributeInviteLine.textContent = ui.contributeInvite || "This reading is made of moments. Add yours.";
+    contributeInviteLine.textContent = ui.contributeInvite || "A shared atmosphere of human moments.\nLet one moment rise.";
   }
 
   const totalForWarmup = canonicalState.total || 0;
