@@ -177,6 +177,37 @@ html.theme-atmosphere .contribute-footer-link {
 html.theme-atmosphere .contribute-footer-link:hover {
   color: var(--text);
 }
+
+/* Shared sheet (modal): fondo y contraste en tema oscuro */
+html.theme-atmosphere .shared-sheet {
+  background: rgba(11, 12, 26, 0.97);
+  border-top-color: rgba(139, 108, 255, 0.2);
+}
+html.theme-atmosphere .shared-sheet-head h2 {
+  color: var(--text);
+}
+html.theme-atmosphere #shared-sheet .shared-sheet-list .moment-item .moment-note {
+  color: #E6E6F0;
+  opacity: 1;
+}
+html.theme-atmosphere .shared-sheet-count,
+html.theme-atmosphere .shared-sheet-list .moment-item .moment-type-mood,
+html.theme-atmosphere .shared-sheet-list .moment-item > span.moment-meta {
+  color: color-mix(in oklab, var(--text) 78%, var(--soft));
+  opacity: 0.92;
+}
+html.theme-atmosphere .shared-sheet-list .moment-item {
+  border-bottom-color: rgba(139, 108, 255, 0.12);
+}
+html.theme-atmosphere .shared-sheet-empty {
+  color: var(--soft);
+}
+html.theme-atmosphere .nearby-view-more-wrap .nearby-view-more-btn {
+  color: color-mix(in oklab, var(--text) 88%, var(--soft));
+}
+html.theme-atmosphere .nearby-view-more-wrap .nearby-view-more-btn:hover {
+  color: var(--text);
+}
 html.theme-atmosphere .contribute-rise-tone {
   background: rgba(27, 21, 64, 0.5);
   border-color: rgba(139, 108, 255, 0.15);
