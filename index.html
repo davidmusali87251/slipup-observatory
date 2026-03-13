@@ -33,15 +33,14 @@
     <link rel="stylesheet" href="./styles.css?v={{BUILD_ID}}" />
   </head>
   <body>
-    <main class="page">
+    <main id="top" class="page">
       <section id="upper-atmosphere" class="upper-atmosphere" aria-hidden="true"></section>
       <section id="observatory-hero" class="observatory-hero hero-breathe" aria-label="Observatory hero">
-        <header class="topbar">
-          <h1>SlipUp™ Observatory</h1>
-          <p class="atmosphere-meta-line">Reading from the last 48 hours.</p>
-        </header>
+        <a href="#top" class="topbar topbar-top-link" title="Reading from the last 48 hours." aria-label="SlipUp™ Observatory — Back to top">
+          <span class="topbar-tooltip" aria-hidden="true">Reading from the last 48 hours.</span>
+        </a>
         <p class="atmosphere-value-prop visually-hidden" aria-hidden="true">Collective reading from shared moments</p>
-        <p class="upper-cue" aria-hidden="true">Upper view</p>
+        <p class="upper-cue" aria-hidden="true">SlipUp™ Observatory</p>
         <a class="space-cue space-cue-link" href="./ai.html">AI sector ↑</a>
 
         <div id="climateInstrument" class="climate-instrument" role="status" aria-live="polite" aria-label="Reading metrics">

@@ -200,7 +200,8 @@ body.sheet-open {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding: calc(2.75rem + 1cm) 0 calc(var(--page-pad-top) + 0.5rem);
+  /* padding-top reserva espacio para la topbar fija (~4.25rem de altura) */
+  padding: calc(4.25rem + env(safe-area-inset-top, 0px) + 0.5rem) 0 calc(var(--page-pad-top) + 0.5rem);
   position: relative;
   isolation: isolate;
   /* Capas de profundidad: aire arriba, horizonte abajo — sensación de espacio */
@@ -319,12 +320,60 @@ body.sheet-open {
   background-origin: border-box;
 }
 
-/* Hero topbar: título + línea de lectura en modo observatorio (columna) */
+/* Hero topbar: barra fija arriba; enlace al inicio con tooltip elegante */
 .observatory-hero .topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.2rem;
-  padding-bottom: 0.25rem;
+  padding-bottom: 0.5rem;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 0.5rem);
+  min-height: 2.75rem;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--layer-horizon) 32%, var(--bg) 25%) 0%,
+    color-mix(in oklab, var(--layer-horizon) 14%, var(--bg) 95%) 55%,
+    color-mix(in oklab, var(--bg) 98%, transparent) 100%
+  );
+  box-shadow: 0 1px 0 color-mix(in oklab, var(--line) 40%, transparent);
+}
+
+.observatory-hero .topbar.topbar-top-link {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+.observatory-hero .topbar.topbar-top-link:hover {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--layer-horizon) 38%, var(--bg) 28%) 0%,
+    color-mix(in oklab, var(--layer-horizon) 18%, var(--bg) 96%) 55%,
+    color-mix(in oklab, var(--bg) 99%, transparent) 100%
+  );
+  box-shadow: 0 1px 0 color-mix(in oklab, var(--line) 55%, transparent);
+}
+.observatory-hero .topbar .topbar-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: 0.2rem;
+  transform: translate(-50%, 100%);
+  font-family: var(--font-serif);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.observatory-hero .topbar:hover .topbar-tooltip {
+  opacity: 0.92;
 }
 
 /* Título principal al estilo de la identidad (imagen/logo): serif, lectura, reflejo sutil. Micro-afinación: tamaño −2%, más aire arriba, contraste −2%. */
@@ -761,7 +810,7 @@ h2 {
   }
 
   .observatory-hero {
-    padding: calc(env(safe-area-inset-top, 0px) + 1.75rem) 0 var(--page-pad-top);
+    padding: calc(env(safe-area-inset-top, 0px) + 4rem) 0 var(--page-pad-top);
   }
 
   .atmosphere-air,
@@ -814,7 +863,7 @@ h2 {
   }
 
   .observatory-hero {
-    padding: calc(env(safe-area-inset-top, 0px) + 1.5rem) 0 var(--page-pad-top);
+    padding: calc(env(safe-area-inset-top, 0px) + 4rem) 0 var(--page-pad-top);
   }
 
   .panel-observatory .telescope-scope {
@@ -3028,7 +3077,7 @@ body.contribute-ritual .page {
   }
 
   .observatory-hero {
-    padding: calc(env(safe-area-inset-top, 0px) + 2.25rem) 0 var(--page-pad-top);
+    padding: calc(env(safe-area-inset-top, 0px) + 4rem) 0 var(--page-pad-top);
   }
 
   .topbar h1 {
@@ -3145,7 +3194,7 @@ body.contribute-ritual .page {
   }
 
   .observatory-hero {
-    padding: calc(env(safe-area-inset-top, 0px) + 2rem) 0 var(--page-pad-top);
+    padding: calc(env(safe-area-inset-top, 0px) + 4rem) 0 var(--page-pad-top);
   }
 
   .atmosphere-value-prop {
