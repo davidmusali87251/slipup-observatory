@@ -320,13 +320,13 @@ body.sheet-open {
   background-origin: border-box;
 }
 
-/* Hero topbar: barra fija arriba; enlace al inicio con tooltip elegante */
+/* Hero topbar: barra fija arriba; siempre visible y clickeable (z-index alto). Fondo opaco para que no se desvanezca al scroll. */
 .observatory-hero .topbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
+  z-index: 1100;
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -336,11 +336,11 @@ body.sheet-open {
   min-height: 2.75rem;
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, var(--layer-horizon) 32%, var(--bg) 25%) 0%,
-    color-mix(in oklab, var(--layer-horizon) 14%, var(--bg) 95%) 55%,
-    color-mix(in oklab, var(--bg) 98%, transparent) 100%
+    color-mix(in oklab, var(--layer-horizon) 42%, var(--bg) 35%) 0%,
+    color-mix(in oklab, var(--layer-horizon) 22%, var(--bg) 98%) 50%,
+    var(--bg) 100%
   );
-  box-shadow: 0 1px 0 color-mix(in oklab, var(--line) 40%, transparent);
+  box-shadow: 0 1px 0 color-mix(in oklab, var(--line) 50%, transparent);
 }
 
 .observatory-hero .topbar.topbar-top-link {
@@ -352,11 +352,11 @@ body.sheet-open {
 .observatory-hero .topbar.topbar-top-link:hover {
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, var(--layer-horizon) 38%, var(--bg) 28%) 0%,
-    color-mix(in oklab, var(--layer-horizon) 18%, var(--bg) 96%) 55%,
-    color-mix(in oklab, var(--bg) 99%, transparent) 100%
+    color-mix(in oklab, var(--layer-horizon) 48%, var(--bg) 38%) 0%,
+    color-mix(in oklab, var(--layer-horizon) 26%, var(--bg) 99%) 50%,
+    var(--bg) 100%
   );
-  box-shadow: 0 1px 0 color-mix(in oklab, var(--line) 55%, transparent);
+  box-shadow: 0 1px 0 color-mix(in oklab, var(--line) 60%, transparent);
 }
 .observatory-hero .topbar .topbar-tooltip {
   position: absolute;
@@ -364,16 +364,16 @@ body.sheet-open {
   bottom: 0.2rem;
   transform: translate(-50%, 100%);
   font-family: var(--font-serif);
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   letter-spacing: 0.05em;
-  color: var(--muted);
+  color: color-mix(in oklab, var(--text) 88%, var(--muted));
   opacity: 0;
   transition: opacity 0.25s ease;
   pointer-events: none;
   white-space: nowrap;
 }
 .observatory-hero .topbar:hover .topbar-tooltip {
-  opacity: 0.92;
+  opacity: 1;
 }
 
 /* Título principal al estilo de la identidad (imagen/logo): serif, lectura, reflejo sutil. Micro-afinación: tamaño −2%, más aire arriba, contraste −2%. */
