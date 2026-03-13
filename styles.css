@@ -856,6 +856,114 @@ h2 {
 .atmosphere-grounding .climate-summary-line { margin-top: 0; }
 .atmosphere-grounding .cta-observatory { margin-top: 0; }
 
+/* Señal atmosférica: horizonte en doble capa (difuso + pulso reactivo) */
+.horizon-pulse-bar {
+  --horizon-base: rgba(92, 61, 255, 0.06);
+  --horizon-mid: rgba(92, 61, 255, 0.12);
+  --horizon-strong: rgba(92, 61, 255, 0.28);
+  --pulse-duration: 1000ms;
+  position: relative;
+  width: min(70%, 200px);
+  height: 6px;
+  margin: 0 auto 0.9rem;
+  background: linear-gradient(90deg, transparent, color-mix(in oklab, var(--line) 50%, transparent), transparent);
+  border-radius: 6px;
+  overflow: visible;
+  transition: box-shadow var(--pulse-duration) cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.horizon-pulse-bar::before {
+  content: "";
+  position: absolute;
+  left: -40%;
+  right: -40%;
+  top: -20px;
+  height: 56px;
+  background: radial-gradient(ellipse 80% 50% at 50% 20%, var(--horizon-base) 0%, transparent 60%);
+  filter: blur(14px);
+  opacity: 1;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+.horizon-pulse-bar::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -8px;
+  height: 22px;
+  background: linear-gradient(90deg, rgba(92, 61, 255, 0) 0%, var(--horizon-mid) 50%, rgba(92, 61, 255, 0) 100%);
+  filter: blur(5px);
+  opacity: 0.08;
+  transition: opacity var(--pulse-duration) cubic-bezier(0.2, 0.8, 0.2, 1), transform var(--pulse-duration) cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform: translateY(0);
+  pointer-events: none;
+}
+.horizon-pulse-bar.is-active::after {
+  opacity: 0.32;
+  transform: translateY(-3px) scaleX(1.02);
+  filter: blur(8px);
+}
+html.theme-atmosphere .horizon-pulse-bar {
+  background: linear-gradient(90deg, transparent, rgba(139, 108, 255, 0.18), transparent);
+}
+html.theme-atmosphere .horizon-pulse-bar::before {
+  background: radial-gradient(ellipse 80% 50% at 50% 20%, rgba(92, 61, 255, 0.06) 0%, transparent 60%);
+}
+@media (max-width: 480px) {
+  .horizon-pulse-bar::before {
+    filter: blur(10px);
+    height: 44px;
+    opacity: 0.6;
+  }
+  .horizon-pulse-bar::after {
+    filter: blur(4px);
+    opacity: 0.05;
+  }
+  .horizon-pulse-bar.is-active::after {
+    filter: blur(6px);
+    opacity: 0.2;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .horizon-pulse-bar { transition: none; }
+  .horizon-pulse-bar::after { transition: none; }
+}
+
+.atm-reading-line {
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  opacity: 0.88;
+  margin: 0 0 0.4rem;
+  min-height: 1.2em;
+}
+html.theme-atmosphere .atm-reading-line {
+  color: #E6E6F0;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.3);
+}
+
+.atm-signals {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: 22%;
+  pointer-events: none;
+  z-index: 0;
+}
+.atm-point {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--royal, #5C3DFF);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+@media (prefers-reduced-motion: reduce) {
+  .horizon-pulse-bar { transition: none; }
+  .atm-point { animation: none; }
+}
+
 .panel-observatory[data-scope-tone="quiet"] {
   --scope-intensity: 0.26;
   --scope-accent: #8a9ab5;

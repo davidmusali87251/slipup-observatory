@@ -1,0 +1,180 @@
+/**
+ * SlipUp™ Observatory — señal atmosférica visible.
+ * Convierte momentos recientes en lectura breve + horizonte pulsante + puntos de señal.
+ * Sin backend extra; usa solo timestamps y tipo de moment.
+ *
+ * Eventos (si existe window.__observatoryReportEvent):
+ *   atmosphere.reading_shown — se mostró la etiqueta de lectura.
+ *   atmosphere.pulse_fired   — el pulso pasó a activo (transición a .is-active).
+ *   atmosphere.bumped        — se llamó a bump() (p. ej. tras contribuir).
+ * Ejemplo analíticos: window.__observatoryReportEvent = function(name) { analytics.track(name); };
+ *
+ * Tuning (A/B sugerido):
+ *   DECAY_HALFLIFE_HOURS: 8 = más reactivo, 16 = más persistente (actual 12).
+ *   T1/T2: si muchos días "quiet" bajar T1 a 2; si muchos "dense" subir T2 a 10–12 (actual 3/8).
+ *   pulseDelay: 3–7 s más rápido, 7–12 s más lento (actual 5–10 s).
+ * Panel dev: ?atm_tune=1 carga atm-tune-panel.js para cambiar tuning en vivo.
+ */
+(function () {
+  "use strict";
+
+  const WEIGHTS = { avoidable: 0.8, fertile: 1.0, observed: 0.6 };
+  const WINDOW_MS = 24 * 3600 * 1000;
+  const UPDATE_THROTTLE_MS = 1500;
+  const LONGTAIL_POINT_CHANCE = 0.1;
+  const LONGTAIL_DURATION_MS = { min: 10000, max: 14000 };
+
+  var lastUpdateTs = 0;
+  var tuning = {
+    DECAY_HALFLIFE_HOURS: 12,
+    T1: 3,
+    T2: 8,
+  };
+
+  const LABELS = {
+    en: { quiet: "quiet field", rising: "signals rising", dense: "dense tonight" },
+    es: { quiet: "campo tranquilo", rising: "señales en ascenso", dense: "denso esta noche" },
+  };
+
+  function lang() {
+    const l = (document.documentElement.getAttribute("lang") || "en").slice(0, 2);
+    return l === "es" ? "es" : "en";
+  }
+
+  function computeScore(moments) {
+    if (!Array.isArray(moments)) return 0;
+    const now = Date.now();
+    const cutoff = now - WINDOW_MS;
+    return moments.reduce(function (s, m) {
+      const raw = m.timestamp || m.created_at;
+      const ts = raw ? new Date(raw).getTime() : 0;
+      if (ts < cutoff) return s;
+      const ageHours = (now - ts) / 3600000;
+      const base = WEIGHTS[String(m.type || "observed").toLowerCase()] || 0.7;
+      const temporal = Math.exp(-ageHours / tuning.DECAY_HALFLIFE_HOURS);
+      return s + base * temporal;
+    }, 0);
+  }
+
+  function getState(score) {
+    const l = LABELS[lang()];
+    var t1 = tuning.T1, t2 = tuning.T2;
+    if (score < t1) return { label: l.quiet, level: 0 };
+    if (score < t2) return { label: l.rising, level: Math.min(1, (score - t1) / (t2 - t1)) };
+    return { label: l.dense, level: 1 };
+  }
+
+  function setTuning(opts) {
+    if (opts && typeof opts === "object") {
+      if (Number.isFinite(opts.DECAY_HALFLIFE_HOURS)) tuning.DECAY_HALFLIFE_HOURS = opts.DECAY_HALFLIFE_HOURS;
+      if (Number.isFinite(opts.T1)) tuning.T1 = opts.T1;
+      if (Number.isFinite(opts.T2)) tuning.T2 = opts.T2;
+    }
+    return tuning;
+  }
+
+  function getTuning() {
+    return { DECAY_HALFLIFE_HOURS: tuning.DECAY_HALFLIFE_HOURS, T1: tuning.T1, T2: tuning.T2 };
+  }
+
+  function report(eventName, payload) {
+    try {
+      if (typeof window.__observatoryReportEvent === "function") {
+        window.__observatoryReportEvent(eventName, payload);
+      }
+    } catch (_) {}
+  }
+
+  function applyVisuals(state, pulseActive, spawnPoints, opts) {
+    opts = opts || {};
+    if (pulseActive === undefined) pulseActive = state.level > 0.35;
+    if (spawnPoints === undefined) spawnPoints = true;
+    const horizonBar = document.getElementById("horizonPulseBar");
+    const labelEl = document.getElementById("atmReadingLine");
+    const signalsEl = document.getElementById("atmSignals");
+
+    if (horizonBar) {
+      var wasActive = horizonBar.classList.contains("is-active");
+      horizonBar.classList.toggle("is-active", pulseActive);
+      if (pulseActive && !wasActive) {
+        report("atmosphere.pulse_fired", { level: state.level, pulseDelayMs: opts.pulseDelayMs || 0, trigger: "auto" });
+      }
+    }
+    if (labelEl) {
+      const prefix = lang() === "es" ? "Atmósfera: " : "Atmosphere: ";
+      labelEl.textContent = prefix + state.label;
+      labelEl.classList.toggle("hidden", !state.label);
+      if (state.label) report("atmosphere.reading_shown", { level: state.level, label: state.label, score: opts.score });
+    }
+    if (spawnPoints && signalsEl && state.level > 0 && !reduceMotion()) {
+      spawnSignals(signalsEl, Math.min(6, Math.round(1 + state.level * 5)), state.level);
+    }
+  }
+
+  function spawnSignals(container, count, intensity) {
+    container.innerHTML = "";
+    for (var i = 0; i < count; i++) {
+      var p = document.createElement("div");
+      p.className = "atm-point";
+      p.setAttribute("aria-hidden", "true");
+      var left = 10 + Math.random() * 80;
+      var delayMs = Math.random() * 2000;
+      var isLongtail = Math.random() < LONGTAIL_POINT_CHANCE;
+      var durationMs = isLongtail
+        ? LONGTAIL_DURATION_MS.min + Math.random() * (LONGTAIL_DURATION_MS.max - LONGTAIL_DURATION_MS.min)
+        : 4000 + Math.random() * 4000;
+      p.style.left = left + "%";
+      p.style.bottom = "0";
+      container.appendChild(p);
+      requestAnimationFrame(function (el, delay, dur, int) {
+        return function () {
+          el.style.transition = "opacity " + dur + "ms ease-out " + delay + "ms, transform " + dur + "ms " + delay + "ms";
+          el.style.opacity = 0.85 * int;
+          el.style.transform = "translateY(-" + (12 + Math.random() * 24) + "px) scale(" + (0.6 + Math.random() * 0.6) + ")";
+          setTimeout(function () {
+            el.style.opacity = 0;
+          }, delay + dur * 0.4);
+        };
+      }(p, delayMs, durationMs, intensity));
+    }
+  }
+
+  function reduceMotion() {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+
+  function update(moments, opts) {
+    opts = opts || {};
+    var now = Date.now();
+    var pulseDelay = opts.pulseDelay;
+    if (!pulseDelay && now - lastUpdateTs < UPDATE_THROTTLE_MS) return;
+    lastUpdateTs = now;
+
+    var score = computeScore(moments);
+    var state = getState(score);
+    if (pulseDelay > 0 && !reduceMotion()) {
+      applyVisuals(state, false, false, { pulseDelayMs: pulseDelay, score: score });
+      setTimeout(function () {
+        applyVisuals(state, state.level > 0.35, true, { pulseDelayMs: pulseDelay, score: score });
+      }, pulseDelay);
+    } else {
+      applyVisuals(state, undefined, true, { score: score });
+    }
+  }
+
+  function bump() {
+    if (reduceMotion()) return;
+    report("atmosphere.bumped", { source: "ui", momentType: "fertile" });
+    var fake = [{ type: "fertile", timestamp: new Date().toISOString() }];
+    var existing = typeof window.__slipupMomentsCache !== "undefined" && Array.isArray(window.__slipupMomentsCache) ? window.__slipupMomentsCache : [];
+    lastUpdateTs = 0;
+    update(fake.concat(existing));
+  }
+
+  window.atmosphereSignal = {
+    update: update,
+    bump: bump,
+    setTuning: setTuning,
+    getTuning: getTuning,
+  };
+})();

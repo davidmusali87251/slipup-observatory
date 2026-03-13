@@ -36,6 +36,7 @@
     <main id="top" class="page">
       <section id="upper-atmosphere" class="upper-atmosphere" aria-hidden="true"></section>
       <section id="observatory-hero" class="observatory-hero hero-breathe" aria-label="Observatory hero">
+        <div id="atmSignals" class="atm-signals" aria-hidden="true"></div>
         <header class="topbar topbar-fixed">
           <a href="#top" class="topbar-brand">
             SlipUp™ Observatory
@@ -76,6 +77,8 @@
             <p id="heroInstrumentLine" class="hero-instrument-line">Each moment alters the reading.</p>
           </div>
           <div class="atmosphere-grounding" aria-label="Toward the horizon">
+            <div id="horizonPulseBar" class="horizon-pulse-bar" aria-hidden="true"></div>
+            <p id="atmReadingLine" class="atm-reading-line" role="status" aria-live="polite"></p>
             <p id="climateSummaryLine" class="climate-summary-line" role="status" aria-live="polite"></p>
             <p id="warmupHint" class="warmup-hint hidden" aria-live="polite"></p>
             <p id="transientReadingLine" class="transient-reading-line hidden" aria-live="polite"></p>
@@ -177,6 +180,25 @@
     </section>
 
     <script src="./atmosphere.js?v={{BUILD_ID}}"></script>
+    <script src="./atmosphere-signal.js?v={{BUILD_ID}}"></script>
+    <script>
+      (function () {
+        var params = new URLSearchParams(location.search);
+        var enable = params.has("analytics") || location.hostname.indexOf("staging") !== -1;
+        if (!enable) return;
+        var s = document.createElement("script");
+        s.src = "./atmosphere-analytics-snippet.js?v={{BUILD_ID}}";
+        s.defer = true;
+        document.head.appendChild(s);
+      })();
+    </script>
+    <script>
+      if (/[?&]atm_tune=1/.test(location.search)) {
+        var s = document.createElement("script");
+        s.src = "./atm-tune-panel.js?v={{BUILD_ID}}";
+        document.body.appendChild(s);
+      }
+    </script>
     <script src="./app.js?v={{BUILD_ID}}" type="module"></script>
   </body>
 </html>

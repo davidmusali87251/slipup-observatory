@@ -3708,6 +3708,14 @@ async function boot() {
     }
   }
 
+  if (typeof window.atmosphereSignal !== "undefined" && window.atmosphereSignal.update) {
+    try {
+      window.__slipupMomentsCache = sharedMoments;
+      const opts = contributed ? { pulseDelay: 5000 + Math.random() * 5000 } : {};
+      window.atmosphereSignal.update(sharedMoments, opts);
+    } catch (_) {}
+  }
+
   const totalForWarmup = canonicalState.total || 0;
   if (warmupHint) {
     warmupHint.textContent = "";
