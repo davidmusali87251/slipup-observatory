@@ -2298,10 +2298,10 @@ h2 {
   opacity: 0.92;
 }
 
-/* Móvil: el respiro entre silencio y "Señales cercanas" como pausa, no como salto; altura mínima por señal. */
+/* Móvil: calibración atmosférica — respiro como pausa, señales ligeras, final con aire. */
 @media (max-width: 480px) {
   .local-climate-moments .moment-item-empty-header.nearby-signals-header {
-    margin-top: 1.25rem;
+    margin-top: 1.75rem;
     margin-bottom: 0.35rem;
     font-size: 0.76rem;
   }
@@ -2310,10 +2310,28 @@ h2 {
   }
   .local-climate-moments .signal-item .signal-text {
     font-size: 0.88rem;
+    line-height: 1.45;
   }
   .local-climate-moments .signal-item .signal-meta {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     margin-top: 0.15rem;
+  }
+  .local-climate {
+    padding-bottom: 2.5rem;
+  }
+}
+@media (max-width: 380px) {
+  .local-climate-moments .moment-item-empty-header.nearby-signals-header {
+    margin-top: 2rem;
+  }
+  .local-climate-moments .signal-item .signal-meta {
+    font-size: 0.65rem;
+  }
+}
+/* Pantallas intermedias (501–700px): respiro 24px para evitar exceso de aire. */
+@media (min-width: 501px) and (max-width: 700px) {
+  .local-climate-moments .moment-item-empty-header.nearby-signals-header {
+    margin-top: 1.5rem;
   }
 }
 
