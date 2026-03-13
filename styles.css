@@ -147,6 +147,9 @@ html.theme-atmosphere .local-climate {
   background: transparent;
   border: none;
 }
+html.theme-atmosphere .panel-observatory {
+  box-shadow: 0 1.2rem 2.5rem -0.5rem color-mix(in oklab, var(--layer-ground) 18%, transparent);
+}
 html.theme-atmosphere .degree-value,
 html.theme-atmosphere .climate-summary-line {
   color: color-mix(in oklab, var(--text) 98%, var(--glow));
