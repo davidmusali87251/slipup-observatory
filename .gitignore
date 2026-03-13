@@ -1,6 +1,7 @@
 # ─── Repo público: solo lo necesario para que la página funcione ───
 # El resto queda en local. No commitear:
 #   docs/  .cursor/  supabase/  PLAN_MASTER.md  SLIPUP_MASTER_CONTEXT.md  schema_v2.sql
+#   BACKLOG.md  SLIPUP_ORIGIN_2026.md  (documentación interna; no necesarios para que funcione la página)
 # Ver también .cursor/rules/remote-config-security.mdc (checklist antes de commit/push).
 
 # ─── Contenido interno / solo local (no exponer en repo público) ───
@@ -10,6 +11,8 @@ PLAN_MASTER.md
 SLIPUP_MASTER_CONTEXT.md
 schema_v2.sql
 supabase/
+BACKLOG.md
+SLIPUP_ORIGIN_2026.md
 
 # ─── Seguridad y secretos (nunca commitear) ───
 # Config local con URLs y claves reales; generar remote.js con scripts/generate-remote.js
