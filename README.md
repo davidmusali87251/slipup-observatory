@@ -17,6 +17,7 @@ Clean rebuild aligned with the Observatory model.
   - inertial settling (3-8 seconds)
 - Offline-first local persistence for moments (`localStorage`).
 - Supabase-backed shared flow (`moments` + `climate` edge functions).
+- **Tema atmosférico** (violeta royal, fondo oscuro): activar con `class="theme-atmosphere"` en `<html>`. Páginas donde aplica: `index.html`, `contribute.html`, `privacy.html`, `terms.html`, `ai.html`. El glow se intensifica al contribuir un momento (`atmosphere.bump()`). Variantes del logo en `assets/icons/` (512, 256, 96 px; trazo grueso; invertido).
 
 ## Local run
 

@@ -103,6 +103,9 @@ html.theme-atmosphere {
   --layer-horizon: rgba(27, 21, 64, 0.6);
   --layer-air: rgba(92, 61, 255, 0.08);
   --layer-ground: rgba(27, 21, 64, 0.4);
+  /* Intensidad del glow (CTA, sombras, fondo). JS puede setear vía atmosphere.bump() para subir temporalmente. */
+  --atm-glow-alpha: 0.2;
+  --atm-glow-hero: calc(0.18 * (var(--atm-glow-alpha) / 0.2));
 }
 html.theme-atmosphere body {
   background: #0B0C1A;
@@ -117,7 +120,7 @@ html.theme-atmosphere body::before {
   pointer-events: none;
   background: radial-gradient(
     circle at 50% 18%,
-    rgba(92, 61, 255, 0.18) 0%,
+    rgba(92, 61, 255, var(--atm-glow-hero)) 0%,
     rgba(27, 21, 64, 0.25) 35%,
     transparent 70%
   );
@@ -150,11 +153,26 @@ html.theme-atmosphere .climate-summary-line {
 }
 html.theme-atmosphere .text-link,
 html.theme-atmosphere .cta-observatory {
-  color: var(--soft);
+  color: var(--text);
+  border-color: rgba(139, 108, 255, 0.45);
+  background: rgba(139, 108, 255, 0.14);
+}
+html.theme-atmosphere .cta-observatory {
+  opacity: 1;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.08), 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 html.theme-atmosphere .cta-observatory:hover {
-  color: var(--glow);
-  box-shadow: 0 0 28px rgba(139, 108, 255, 0.2);
+  color: var(--text);
+  border-color: rgba(139, 108, 255, 0.6);
+  background: rgba(139, 108, 255, 0.22);
+  box-shadow: 0 0 28px rgba(139, 108, 255, var(--atm-glow-alpha)), 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+html.theme-atmosphere .contribute-footer-link {
+  color: color-mix(in oklab, var(--text) 92%, var(--soft));
+  opacity: 1;
+}
+html.theme-atmosphere .contribute-footer-link:hover {
+  color: var(--text);
 }
 html.theme-atmosphere .contribute-rise-tone {
   background: rgba(27, 21, 64, 0.5);
@@ -201,7 +219,7 @@ html.theme-atmosphere #recentMoments.moment-list .moment-item > span.moment-meta
   }
 }
 
-/* Tema atmósfera: móvil */
+/* Tema atmósfera: móvil (contraste extra en CTA y footer) */
 @media (max-width: 480px) {
   html.theme-atmosphere .observatory-hero .topbar.topbar-fixed {
     padding: calc(env(safe-area-inset-top, 0px) + 0.4rem) 0.75rem 0.4rem;
@@ -212,6 +230,13 @@ html.theme-atmosphere #recentMoments.moment-list .moment-item > span.moment-meta
   html.theme-atmosphere .panel {
     padding-left: 0.85rem;
     padding-right: 0.85rem;
+  }
+  html.theme-atmosphere .cta-observatory {
+    border-color: rgba(139, 108, 255, 0.55);
+    background: rgba(139, 108, 255, 0.2);
+  }
+  html.theme-atmosphere .text-link.contribute-footer-link {
+    color: var(--text);
   }
 }
 

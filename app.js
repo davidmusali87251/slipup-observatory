@@ -3605,6 +3605,7 @@ async function boot() {
     showTransientReading(canonicalState?.total ?? 0, transientSeed, LANG);
     if (heroEl) {
       heroEl.classList.add("observatory-hero-ritual");
+      try { window.atmosphere?.bump?.(); } catch (_) {}
       setTimeout(() => heroEl.classList.remove("observatory-hero-ritual"), 2200);
     }
     if (prefersReducedMotion) {
