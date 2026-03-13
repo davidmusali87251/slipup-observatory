@@ -1206,6 +1206,29 @@ h2 {
   margin: 0;
 }
 
+/* Tooltip/popover del botón "i": aparece debajo, junto al copy de confianza */
+.instrument-info-popover {
+  display: none;
+  width: 100%;
+  flex-basis: 100%;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.6rem;
+  background: color-mix(in oklab, var(--bg) 94%, var(--layer-horizon));
+  border: 1px solid color-mix(in oklab, var(--line) 50%, transparent);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px color-mix(in oklab, var(--text) 6%, transparent);
+}
+.instrument-info-popover.is-open {
+  display: block;
+}
+.instrument-info-popover .instrument-info-text,
+.instrument-info-popover .instrument-info-technical {
+  margin: 0;
+}
+.instrument-info-popover .instrument-info-technical {
+  margin-top: 0.2rem;
+}
+
 @media (max-width: 480px) {
   .instrument-info-btn {
     width: 0.9rem;
@@ -1218,7 +1241,6 @@ h2 {
 }
 
 .instrument-info-text {
-  margin: 0.4rem 0 0;
   font-size: 0.65rem;
   line-height: 1.45;
   color: var(--muted);
@@ -1226,7 +1248,6 @@ h2 {
 }
 
 .instrument-info-technical {
-  margin: 0.25rem 0 0;
   font-size: 0.6rem;
   line-height: 1.35;
   color: var(--muted);

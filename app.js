@@ -3765,11 +3765,17 @@ async function boot() {
   const instrumentInfoBtn = document.getElementById("instrumentInfoBtn");
   const instrumentInfoTextEl = document.getElementById("instrumentInfoText");
   const instrumentInfoTechnicalEl = document.getElementById("instrumentInfoTechnical");
+  const instrumentInfoPopoverEl = document.getElementById("instrumentInfoPopover");
   if (instrumentInfoBtn && instrumentInfoTextEl) {
     instrumentInfoBtn.addEventListener("click", () => {
       instrumentInfoTextEl.classList.toggle("hidden");
       if (instrumentInfoTechnicalEl) instrumentInfoTechnicalEl.classList.toggle("hidden");
-      instrumentInfoBtn.setAttribute("aria-expanded", String(!instrumentInfoTextEl.classList.contains("hidden")));
+      const isOpen = !instrumentInfoTextEl.classList.contains("hidden");
+      instrumentInfoBtn.setAttribute("aria-expanded", String(isOpen));
+      if (instrumentInfoPopoverEl) {
+        instrumentInfoPopoverEl.classList.toggle("is-open", isOpen);
+        instrumentInfoPopoverEl.setAttribute("aria-hidden", String(!isOpen));
+      }
     });
   }
 
