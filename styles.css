@@ -105,14 +105,22 @@ html.theme-atmosphere {
   --layer-ground: rgba(27, 21, 64, 0.4);
 }
 html.theme-atmosphere body {
-  background:
-    radial-gradient(
-      circle at 50% 18%,
-      rgba(92, 61, 255, 0.18) 0%,
-      rgba(27, 21, 64, 0.25) 35%,
-      #0B0C1A 70%
-    );
+  background: #0B0C1A;
   color: var(--text);
+}
+/* Capa fija del efecto atmosférico: mismo aspecto en desktop, móvil y ventana privada (no depende de background-attachment: fixed) */
+html.theme-atmosphere body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 18%,
+    rgba(92, 61, 255, 0.18) 0%,
+    rgba(27, 21, 64, 0.25) 35%,
+    transparent 70%
+  );
 }
 /* Royal solo en horizonte, señales y hover (intencional, no saturado) */
 html.theme-atmosphere .cta-observatory:hover,
@@ -134,7 +142,7 @@ html.theme-atmosphere .observatory-hero .topbar.topbar-fixed {
 html.theme-atmosphere .panel,
 html.theme-atmosphere .local-climate {
   background: transparent;
-  border-color: rgba(139, 108, 255, 0.12);
+  border: none;
 }
 html.theme-atmosphere .degree-value,
 html.theme-atmosphere .climate-summary-line {
@@ -170,6 +178,27 @@ html.theme-atmosphere .field input[type="text"]:hover {
 }
 html.theme-atmosphere .contribute-page .panel::before {
   opacity: 0.6;
+}
+
+/* Panel Recent: contraste legible en tema oscuro */
+html.theme-atmosphere #recentMoments.moment-list .moment-item {
+  opacity: 1;
+}
+html.theme-atmosphere #recentMoments.moment-list .moment-item .moment-note {
+  color: var(--text);
+}
+html.theme-atmosphere #recentMoments.moment-list .moment-item .moment-type-mood {
+  color: color-mix(in oklab, var(--text) 78%, var(--soft));
+  opacity: 0.92;
+}
+html.theme-atmosphere #recentMoments.moment-list .moment-item > span.moment-meta {
+  color: color-mix(in oklab, var(--text) 70%, var(--soft));
+  opacity: 0.9;
+}
+@media (hover: hover) and (pointer: fine) {
+  html.theme-atmosphere #recentMoments.moment-list .moment-item:hover {
+    background: rgba(139, 108, 255, 0.06);
+  }
 }
 
 /* Tema atmósfera: móvil */
@@ -606,7 +635,7 @@ h2 {
 
 .panel {
   background: var(--card);
-  border: 1px solid #ffffff8f;
+  border: none;
   border-radius: 20px;
   backdrop-filter: blur(8px);
   padding: 1.5rem 1.35rem;
