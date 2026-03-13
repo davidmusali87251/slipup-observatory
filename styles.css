@@ -85,6 +85,107 @@ body {
   overscroll-behavior-y: none;
 }
 
+/* ─── Tema atmosférico (violeta royal + fondo profundo). Activar con class="theme-atmosphere" en <html>. ─── */
+html.theme-atmosphere {
+  color-scheme: dark;
+  --bg: #0B0C1A;
+  --bg-deep: #0f1024;
+  --bg-ink: #1B1540;
+  --text: #E6E6F0;
+  --muted: #9B8FBF;
+  --line: #2a2555;
+  --card: rgba(27, 21, 64, 0.5);
+  --royal: #5C3DFF;
+  --glow: #8B6CFF;
+  --soft: #C8B6FF;
+  --relate-accent: #5C3DFF;
+  --relate-accent-soft: #8B6CFF;
+  --layer-horizon: rgba(27, 21, 64, 0.6);
+  --layer-air: rgba(92, 61, 255, 0.08);
+  --layer-ground: rgba(27, 21, 64, 0.4);
+}
+html.theme-atmosphere body {
+  background:
+    radial-gradient(
+      circle at 50% 18%,
+      rgba(92, 61, 255, 0.18) 0%,
+      rgba(27, 21, 64, 0.25) 35%,
+      #0B0C1A 70%
+    );
+  color: var(--text);
+}
+/* Royal solo en horizonte, señales y hover (intencional, no saturado) */
+html.theme-atmosphere .cta-observatory:hover,
+html.theme-atmosphere .topbar-brand:hover,
+html.theme-atmosphere .topbar-ai:hover {
+  color: var(--glow);
+}
+html.theme-atmosphere .signal-item .signal-text,
+html.theme-atmosphere .moment-note {
+  color: color-mix(in oklab, var(--text) 92%, var(--soft));
+}
+html.theme-atmosphere .observatory-hero .topbar.topbar-fixed {
+  background: linear-gradient(
+    180deg,
+    rgba(27, 21, 64, 0.85) 0%,
+    rgba(11, 12, 26, 0.95) 100%
+  );
+}
+html.theme-atmosphere .panel,
+html.theme-atmosphere .local-climate {
+  background: transparent;
+  border-color: rgba(139, 108, 255, 0.12);
+}
+html.theme-atmosphere .degree-value,
+html.theme-atmosphere .climate-summary-line {
+  color: color-mix(in oklab, var(--text) 98%, var(--glow));
+}
+html.theme-atmosphere .text-link,
+html.theme-atmosphere .cta-observatory {
+  color: var(--soft);
+}
+html.theme-atmosphere .cta-observatory:hover {
+  color: var(--glow);
+  box-shadow: 0 0 28px rgba(139, 108, 255, 0.2);
+}
+html.theme-atmosphere .contribute-rise-tone {
+  background: rgba(27, 21, 64, 0.5);
+  border-color: rgba(139, 108, 255, 0.15);
+  box-shadow: 0 1px 0 rgba(139, 108, 255, 0.06) inset;
+}
+html.theme-atmosphere .contribute-rise-tone-intro,
+html.theme-atmosphere .contribute-rise-tone .field-tone-label {
+  color: var(--soft);
+  opacity: 0.9;
+}
+html.theme-atmosphere .field select,
+html.theme-atmosphere .field input[type="text"] {
+  background: rgba(11, 12, 26, 0.6);
+  border-color: rgba(139, 108, 255, 0.2);
+  color: var(--text);
+}
+html.theme-atmosphere .field select:hover,
+html.theme-atmosphere .field input[type="text"]:hover {
+  border-color: rgba(139, 108, 255, 0.35);
+}
+html.theme-atmosphere .contribute-page .panel::before {
+  opacity: 0.6;
+}
+
+/* Tema atmósfera: móvil */
+@media (max-width: 480px) {
+  html.theme-atmosphere .observatory-hero .topbar.topbar-fixed {
+    padding: calc(env(safe-area-inset-top, 0px) + 0.4rem) 0.75rem 0.4rem;
+  }
+  html.theme-atmosphere .degree-value {
+    font-size: clamp(1.6rem, 5vw, 2rem);
+  }
+  html.theme-atmosphere .panel {
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+}
+
 /* Sin salto visual: solo cambio de scroll para sensación de rueda continua */
 body.loop-warp .page {
   transition: none;
@@ -2839,6 +2940,47 @@ body.contribute-ritual .page {
 #contributeForm {
   display: grid;
   gap: 0.9rem;
+}
+
+/* Bloque único "Kind and tone": menos sistema, más atmósfera */
+.contribute-rise-tone {
+  padding: 0.85rem 0.95rem 0.95rem;
+  border-radius: 12px;
+  background: color-mix(in oklab, var(--bg) 94%, var(--line));
+  border: 1px solid color-mix(in oklab, var(--line) 60%, transparent);
+  box-shadow: 0 1px 0 color-mix(in oklab, #fff 40%, transparent) inset;
+}
+.contribute-rise-tone-intro {
+  margin: 0 0 0.65rem 0;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  font-family: var(--font-serif);
+}
+.contribute-rise-tone-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1rem;
+}
+.contribute-rise-tone .field-tone {
+  margin: 0;
+  gap: 0.28rem;
+}
+.contribute-rise-tone .field-tone-label {
+  font-size: 0.76rem;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  font-weight: 400;
+}
+@media (max-width: 420px) {
+  .contribute-rise-tone-fields {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+  .contribute-rise-tone {
+    padding: 0.7rem 0.8rem 0.8rem;
+  }
 }
 
 .field {

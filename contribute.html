@@ -37,25 +37,29 @@
         <p class="contribute-field-line">Contribute to the field.</p>
         <p id="contributeMomentCountLine" class="contribute-rise-from" data-fallback="Moments rising across the atmosphere.">Moments rising across the atmosphere.</p>
         <form id="contributeForm" class="contribute-rise-form" novalidate>
-          <label class="field">
-            <span>Type</span>
-            <select id="typeInput" name="type" required>
-              <option value="fertile">Fertile moment</option>
-              <option value="avoidable">Avoidable moment</option>
-              <option value="observed">Observed moment</option>
-            </select>
-          </label>
-
-          <label class="field">
-            <span>Mood</span>
-            <select id="moodInput" name="mood" required>
-              <option value="calm">Calm</option>
-              <option value="focus">Focus</option>
-              <option value="stressed">Stressed</option>
-              <option value="curious">Curious</option>
-              <option value="tired">Tired</option>
-            </select>
-          </label>
+          <div class="contribute-rise-tone" aria-describedby="contributeToneHint">
+            <p id="contributeToneHint" class="contribute-rise-tone-intro">Kind and tone</p>
+            <div class="contribute-rise-tone-fields">
+              <label class="field field-tone">
+                <span class="field-tone-label">Kind</span>
+                <select id="typeInput" name="type" required aria-describedby="contributeToneHint">
+                  <option value="fertile">Fertile moment</option>
+                  <option value="avoidable">Avoidable moment</option>
+                  <option value="observed">Observed moment</option>
+                </select>
+              </label>
+              <label class="field field-tone">
+                <span class="field-tone-label">Tone</span>
+                <select id="moodInput" name="mood" required aria-describedby="contributeToneHint">
+                  <option value="calm">Calm</option>
+                  <option value="focus">Focus</option>
+                  <option value="stressed">Stressed</option>
+                  <option value="curious">Curious</option>
+                  <option value="tired">Tired</option>
+                </select>
+              </label>
+            </div>
+          </div>
 
           <p class="contribute-rise-examples-intro" aria-hidden="true">
             <span class="contribute-rise-examples-intro-text">Moments rise like</span>
