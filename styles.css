@@ -1193,6 +1193,7 @@ h2 {
 
 /* Sector trust-microcopy + botón "i": mismo bloque, botón al lado del texto */
 .trust-microcopy-wrap {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -1206,17 +1207,21 @@ h2 {
   margin: 0;
 }
 
-/* Tooltip/popover del botón "i": aparece debajo, junto al copy de confianza */
+/* Tooltip/popover del botón "i": flotante, no desplaza el layout */
 .instrument-info-popover {
   display: none;
-  width: 100%;
-  flex-basis: 100%;
-  margin-top: 0.5rem;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.4rem;
+  min-width: 16rem;
+  max-width: 22rem;
   padding: 0.5rem 0.6rem;
   background: color-mix(in oklab, var(--bg) 94%, var(--layer-horizon));
   border: 1px solid color-mix(in oklab, var(--line) 50%, transparent);
   border-radius: 6px;
   box-shadow: 0 2px 8px color-mix(in oklab, var(--text) 6%, transparent);
+  z-index: 10;
 }
 .instrument-info-popover.is-open {
   display: block;
