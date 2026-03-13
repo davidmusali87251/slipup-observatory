@@ -36,15 +36,14 @@
     <main id="top" class="page">
       <section id="upper-atmosphere" class="upper-atmosphere" aria-hidden="true"></section>
       <section id="observatory-hero" class="observatory-hero hero-breathe" aria-label="Observatory hero">
-        <a href="#top" class="topbar topbar-top-link" title="Reading from the last 48 hours." aria-label="SlipUp™ Observatory — Back to top">
-          <span class="topbar-tooltip" aria-hidden="true">Reading from the last 48 hours.</span>
-        </a>
+        <header class="topbar topbar-fixed">
+          <a href="#top" class="topbar-brand" title="Reading from the last 48 hours.">SlipUp™ Observatory</a>
+          <span class="topbar-reading" aria-hidden="true">Reading from the last 48 hours.</span>
+          <a href="./ai.html" class="topbar-ai">AI sector ↑</a>
+        </header>
         <p class="atmosphere-value-prop visually-hidden" aria-hidden="true">Collective reading from shared moments</p>
-        <p class="upper-cue" aria-hidden="true">SlipUp™ Observatory</p>
-        <a class="space-cue space-cue-link" href="./ai.html">AI sector ↑</a>
 
         <div id="climateInstrument" class="climate-instrument" role="status" aria-live="polite" aria-label="Reading metrics">
-          <button type="button" id="instrumentInfoBtn" class="instrument-info-btn" aria-label="About these values" aria-expanded="false" aria-controls="instrumentInfoText">i</button>
           <p id="observatoryScopeRange" class="observatory-scope-range hidden" aria-live="polite"></p>
           <div class="climate-metrics-row">
             <p id="climateMetricsLine" class="climate-metrics-line"></p>
@@ -82,7 +81,10 @@
             <p id="transientReadingLine" class="transient-reading-line hidden" aria-live="polite"></p>
             <a id="ctaObservatory" class="cta cta-observatory" href="./contribute.html" title="Every moment leaves a trace.">Contribute a moment</a>
             <p class="cta-microcopy">Let the atmosphere read this moment.</p>
-            <p class="trust-microcopy">No account. Region only. Just shared moments.</p>
+            <div class="trust-microcopy-wrap">
+              <p class="trust-microcopy">No account. Region only. Just shared moments.</p>
+              <button type="button" id="instrumentInfoBtn" class="instrument-info-btn" aria-label="About these values" aria-expanded="false" aria-controls="instrumentInfoText">i</button>
+            </div>
           </div>
         </section>
       </section>

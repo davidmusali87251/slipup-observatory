@@ -65,7 +65,24 @@ La agregación se hace sobre **últimos 48 buckets horarios**; no full-table sca
 
 ---
 
-## 5. Autor
+## 5. Scroll, ritmo y estado vacío de Nearby (memoria del diseño)
+
+SlipUp no tiene “scroll de contenido”: tiene **scroll de aire**. El desplazamiento es un movimiento suave entre capas, no una lista ni un feed. Cualquier elemento nuevo debe entrar en ese ritmo, no interrumpirlo.
+
+### Estado vacío y “Señales cercanas”
+
+- El **estado vacío** no es un error: es un estado atmosférico. Si no hay momentos en el ámbito actual, se muestra el mensaje principal (“No shared moments in this scope yet.” / “El campo está quieto.”) y, si existe otra región con actividad en el orden conceptual del observatorio, la sección **“Señales cercanas”** con 1–3 momentos reales.
+- **“Señales cercanas”** es un eco, no un feed: sin tarjetas, sin bordes, sin sombras, sin “ver más”. Solo texto (nota + hora · región). La suficiente presencia para ser percibida, no para reclamar atención.
+- **Región “más cercana”:** se elige por **orden conceptual** (siguiente región en la lista del observatorio con ≥1 momento), no por distancia geográfica ni por volumen. Sin métricas, sin proximidad cuantitativa.
+- **Selección de momentos:** aleatoria entre los **últimos 10** de esa región; se muestran **1–3**. Sin “más recientes”, sin ranking, sin urgencia.
+- **Silencio:** si no hay ninguna región con actividad, no se inventan ejemplos ni se simula movimiento. SlipUp acepta el silencio como parte del clima.
+- **Espaciado:** el margen entre “El campo está quieto.” y “Señales cercanas” forma parte del ritmo (silencio → eco). En desktop ~1.75rem; en móvil algo menor para que sea pausa, no salto. La altura por señal se mantiene mínima para no cargar el scroll.
+
+Ritmo del scroll: **silencio → eco → vacío**. Sin loops, sin carga infinita, sin presión.
+
+---
+
+## 6. Autor
 
 **Autor del proyecto y del sistema:**  
 **Selim D. Musali**

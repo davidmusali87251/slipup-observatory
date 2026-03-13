@@ -200,8 +200,8 @@ body.sheet-open {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  /* padding-top reserva espacio para la topbar fija (~4.25rem de altura) */
-  padding: calc(4.25rem + env(safe-area-inset-top, 0px) + 0.5rem) 0 calc(var(--page-pad-top) + 0.5rem);
+  /* padding-top reserva espacio para la topbar fija; poco margen para que no se vea separada */
+  padding: calc(4rem + env(safe-area-inset-top, 0px) + 0.25rem) 0 calc(var(--page-pad-top) + 0.5rem);
   position: relative;
   isolation: isolate;
   /* Capas de profundidad: aire arriba, horizonte abajo — sensación de espacio */
@@ -320,60 +320,74 @@ body.sheet-open {
   background-origin: border-box;
 }
 
-/* Hero topbar: barra fija arriba; siempre visible y clickeable (z-index alto). Fondo opaco para que no se desvanezca al scroll. */
-.observatory-hero .topbar {
+/* Hero topbar: barra fija con SlipUp™ Observatory (izq) y AI sector (der); unida al hero sin línea dura. */
+.observatory-hero .topbar.topbar-fixed {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1100;
-  flex-direction: column;
+  margin-bottom: 0;
+  display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: 0.2rem;
-  padding-bottom: 0.5rem;
-  padding-top: calc(env(safe-area-inset-top, 0px) + 0.5rem);
+  justify-content: space-between;
+  gap: 1rem;
+  padding: calc(env(safe-area-inset-top, 0px) + 0.5rem) 1rem 0.5rem;
   min-height: 2.75rem;
+  /* Gradiente que termina como el inicio del hero para continuidad visual (sin costura) */
   background: linear-gradient(
     180deg,
     color-mix(in oklab, var(--layer-horizon) 42%, var(--bg) 35%) 0%,
     color-mix(in oklab, var(--layer-horizon) 22%, var(--bg) 98%) 50%,
-    var(--bg) 100%
+    color-mix(in oklab, var(--bg) 88%, var(--layer-air)) 100%
   );
-  box-shadow: 0 1px 0 color-mix(in oklab, var(--line) 50%, transparent);
+  box-shadow: none;
 }
 
-.observatory-hero .topbar.topbar-top-link {
-  text-decoration: none;
-  color: inherit;
-  display: flex;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
-}
-.observatory-hero .topbar.topbar-top-link:hover {
-  background: linear-gradient(
-    180deg,
-    color-mix(in oklab, var(--layer-horizon) 48%, var(--bg) 38%) 0%,
-    color-mix(in oklab, var(--layer-horizon) 26%, var(--bg) 99%) 50%,
-    var(--bg) 100%
-  );
-  box-shadow: 0 1px 0 color-mix(in oklab, var(--line) 60%, transparent);
-}
-.observatory-hero .topbar .topbar-tooltip {
-  position: absolute;
-  left: 50%;
-  bottom: 0.2rem;
-  transform: translate(-50%, 100%);
+.observatory-hero .topbar-brand {
   font-family: var(--font-serif);
-  font-size: 0.74rem;
-  letter-spacing: 0.05em;
-  color: color-mix(in oklab, var(--text) 88%, var(--muted));
-  opacity: 0;
-  transition: opacity 0.25s ease;
-  pointer-events: none;
-  white-space: nowrap;
+  font-size: clamp(1.05rem, 1.9vw, 1.35rem);
+  font-weight: 560;
+  letter-spacing: 0.02em;
+  color: color-mix(in oklab, var(--text) 90%, var(--muted));
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
-.observatory-hero .topbar:hover .topbar-tooltip {
-  opacity: 1;
+.observatory-hero .topbar-brand:hover {
+  color: var(--text);
+}
+
+.observatory-hero .topbar-reading {
+  font-family: var(--font-serif);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: color-mix(in oklab, var(--text) 72%, var(--muted));
+  flex: 0 0 auto;
+}
+
+.observatory-hero .topbar-ai {
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: color-mix(in oklab, var(--text) 78%, var(--muted));
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+.observatory-hero .topbar-ai:hover {
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.observatory-hero .topbar-ai:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--text) 30%, #fff);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+@media (max-width: 480px) {
+  .observatory-hero .topbar-reading {
+    display: none;
+  }
 }
 
 /* Título principal al estilo de la identidad (imagen/logo): serif, lectura, reflejo sutil. Micro-afinación: tamaño −2%, más aire arriba, contraste −2%. */
@@ -1128,11 +1142,8 @@ h2 {
   max-width: 100%;
 }
 
-/* Botón info: pequeño, bien posicionado; no solapa con el texto */
+/* Botón info: solo en atmosphere-grounding, junto a trust-microcopy (no sobre el instrumento) */
 .instrument-info-btn {
-  position: absolute;
-  top: 0.15rem;
-  right: 0.5rem;
   width: 1.25rem;
   height: 1.25rem;
   min-width: 1.25rem;
@@ -1166,15 +1177,28 @@ h2 {
   outline-offset: 2px;
 }
 
+/* Sector trust-microcopy + botón "i": mismo bloque, botón al lado del texto */
+.trust-microcopy-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+.trust-microcopy-wrap .trust-microcopy {
+  margin: 0;
+}
+.atmosphere-grounding .instrument-info-btn {
+  margin: 0;
+}
+
 @media (max-width: 480px) {
   .instrument-info-btn {
-    width: 0.8rem;
-    height: 0.8rem;
-    min-width: 0.8rem;
-    min-height: 0.8rem;
-    top: -0.9rem;
-    right: 0.25rem;
-    font-size: 0.45rem;
+    width: 0.9rem;
+    height: 0.9rem;
+    min-width: 0.9rem;
+    min-height: 0.9rem;
+    font-size: 0.5rem;
     padding: 0;
   }
 }
@@ -2184,11 +2208,73 @@ h2 {
 .local-climate-moments .moment-item-empty .empty-message {
   color: var(--muted);
   font-size: 0.84rem;
+  display: block;
+}
+.local-climate-moments .moment-item-empty .empty-quiet {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  opacity: 0.88;
+  font-style: italic;
 }
 .local-climate-moments .moment-item-empty .empty-examples {
   font-size: 0.78rem;
   color: var(--muted);
   opacity: 0.88;
+}
+
+/* Ritmo del scroll: espacio para que el ojo respire antes de "Señales cercanas" (silencio → eco). */
+.local-climate-moments .moment-item-empty-header.nearby-signals-header {
+  margin-top: 1.75rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  list-style: none;
+}
+/* Señales cercanas: solo texto y aire, sin tarjetas ni bordes (eco, murmullo). */
+.local-climate-moments .signal-item {
+  list-style: none;
+  padding: 0.4rem 0 0.5rem 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+}
+.local-climate-moments .signal-item .signal-text {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+}
+.local-climate-moments .signal-item .signal-meta {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  color: var(--muted);
+  opacity: 0.9;
+}
+.local-climate-moments .moment-item-from-other-region {
+  opacity: 0.92;
+}
+
+/* Móvil: el respiro entre silencio y "Señales cercanas" como pausa, no como salto; altura mínima por señal. */
+@media (max-width: 480px) {
+  .local-climate-moments .moment-item-empty-header.nearby-signals-header {
+    margin-top: 1.25rem;
+    margin-bottom: 0.35rem;
+    font-size: 0.76rem;
+  }
+  .local-climate-moments .signal-item {
+    padding: 0.35rem 0 0.4rem 0;
+  }
+  .local-climate-moments .signal-item .signal-text {
+    font-size: 0.88rem;
+  }
+  .local-climate-moments .signal-item .signal-meta {
+    font-size: 0.7rem;
+    margin-top: 0.15rem;
+  }
 }
 
 .local-climate-moments.hidden {
@@ -3224,8 +3310,6 @@ body.contribute-ritual .page {
     height: 0.75rem;
     min-width: 0.75rem;
     min-height: 0.75rem;
-    top: -0.85rem;
-    right: 0.2rem;
     font-size: 0.42rem;
   }
 

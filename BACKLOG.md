@@ -4,6 +4,14 @@ Lista de mejoras identificadas para el proyecto. Ver también las reglas de comm
 
 ---
 
+## Guardrails de producto (recordatorio)
+
+- **Más usuarios → menos interfaz.** Con crecimiento, el observatorio debe sentirse más simple (ej. grado + “Holds.”), no más pantallas ni más métricas.
+- **No convertir el observatorio en app social:** sin likes, trending, ranking, comentarios, notificaciones ni perfiles. Mantener neutralidad del campo; los momentos entran sin incentivo social para que emerjan patrones reales.
+- **No sobre-explicar:** el sistema funciona mejor como instrumento misterioso (telescopio, barómetro). Evitar tutoriales o guías que rompan esa sensación.
+
+---
+
 ## 1. Tamaño de app.js
 
 | Prioridad | Media |

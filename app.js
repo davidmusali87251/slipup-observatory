@@ -790,7 +790,8 @@ const UI_COPY = {
     nearbyReadingCondensing: ["Forming.", "Tightening.", "Rising."],
     nearbyReadingFallback: ["Quiet.", "Light signal."],
     localFieldMomentsEmpty: "No shared moments in this scope yet.",
-    localFieldMomentsEmptyExamples: "Examples of moments that rise: Working alone · Running late · Too much coffee · Missed the call · Need fresh air.",
+    localFieldEmptyQuiet: "The field is quiet.",
+    nearbySignalsTitle: "Nearby signals",
     nearbyViewMoreLabel: "View more",
     metrics: {
       pressureCondensing: "condensing",
@@ -895,7 +896,8 @@ const UI_COPY = {
     nearbyReadingCondensing: ["Formando.", "Apretando.", "Subiendo."],
     nearbyReadingFallback: ["Tranquilo.", "Señal ligera."],
     localFieldMomentsEmpty: "Aún no hay momentos compartidos en este ámbito.",
-    localFieldMomentsEmptyExamples: "Ejemplos de momentos que suben: Solo · Corriendo tarde · Café de más · Llamada perdida · Aire fresco.",
+    localFieldEmptyQuiet: "El campo está quieto.",
+    nearbySignalsTitle: "Señales cercanas",
     nearbyViewMoreLabel: "Ver más",
     momentRelateLabel: "No estás solo",
     momentRelateLabelYou: "No estás solo · tú",
@@ -2853,7 +2855,63 @@ function filterMomentsByScope(sharedMoments, fieldScope) {
   });
 }
 
-function renderRegionalMomentsList(sharedMoments, fieldScope) {
+/**
+ * Busca la primera región con actividad en el orden conceptual del observatorio (no por distancia ni por volumen).
+ * Orden: lista de regiones (nearby → regional → wider → continentes → países → global). La "más cercana" es la
+ * siguiente en esa lista que tenga ≥1 momento. Sin métricas, sin proximidad geográfica.
+ */
+function findNearestScopeWithMoments(sharedMoments, currentScope, allScopes) {
+  if (!Array.isArray(allScopes) || !currentScope?.geo) return null;
+  const currentGeo = String(currentScope.geo).toLowerCase().trim();
+  const list = allScopes;
+  let currentIndex = -1;
+  for (let i = 0; i < list.length; i++) {
+    const g = String(list[i]?.geo || "").toLowerCase().trim();
+    if (g === currentGeo) {
+      currentIndex = i;
+      break;
+    }
+  }
+  if (currentIndex < 0) return null;
+  for (let i = currentIndex + 1; i < list.length; i++) {
+    const scope = list[i];
+    if (!scope?.geo) continue;
+    const moments = filterMomentsByScope(sharedMoments || [], scope);
+    if (moments.length > 0) return { scope, list: moments };
+  }
+  return null;
+}
+
+/** Elige aleatoriamente 1–3 momentos entre los últimos 10 de la región (sin ranking, sin "más recientes"). */
+function pickNearbySignals(list) {
+  if (!Array.isArray(list) || list.length === 0) return [];
+  const pool = list.slice(-10);
+  if (pool.length === 0) return [];
+  const count = Math.min(1 + Math.floor(Math.random() * 3), pool.length);
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
+
+/** Crea un ítem mínimo de "señal cercana": solo texto del momento + hora · región. Sin botones, sin type/mood. */
+function createNearbySignalElement(m, regionLabel) {
+  const li = document.createElement("li");
+  li.className = "signal-item";
+  const note = m.note ? String(m.note).trim() : "";
+  const noteLabel = note ? capitalizeNoteForDisplay(note) : "";
+  const timeStr = new Date(m.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const meta = regionLabel ? `${timeStr} · ${regionLabel}` : timeStr;
+  const textSpan = document.createElement("span");
+  textSpan.className = "signal-text";
+  textSpan.textContent = noteLabel || "—";
+  const metaSpan = document.createElement("span");
+  metaSpan.className = "signal-meta";
+  metaSpan.textContent = meta;
+  li.appendChild(textSpan);
+  li.appendChild(metaSpan);
+  return li;
+}
+
+function renderRegionalMomentsList(sharedMoments, fieldScope, allScopes = null) {
   if (!localClimateMoments) return;
   const ui = UI_COPY[LANG] || UI_COPY.en;
   const hasScope = fieldScope?.geo && fieldScope.scope !== "global";
@@ -2874,21 +2932,35 @@ function renderRegionalMomentsList(sharedMoments, fieldScope) {
   localClimateMoments.innerHTML = "";
   localClimateMoments.classList.remove("hidden");
   if (fullList.length === 0) {
-    const li = document.createElement("li");
-    li.className = "moment-item moment-item-empty";
     const emptyMsg = ui.localFieldMomentsEmpty || "No shared moments in this scope yet.";
-    const examplesLine = ui.localFieldMomentsEmptyExamples || "";
+    const quietLine = ui.localFieldEmptyQuiet || "The field is quiet.";
+    const nearest = findNearestScopeWithMoments(sharedMoments, fieldScope, allScopes);
+
+    const msgLi = document.createElement("li");
+    msgLi.className = "moment-item moment-item-empty";
     const msgSpan = document.createElement("span");
     msgSpan.className = "empty-message";
     msgSpan.textContent = emptyMsg;
-    li.appendChild(msgSpan);
-    if (examplesLine) {
-      const exSpan = document.createElement("span");
-      exSpan.className = "empty-examples";
-      exSpan.textContent = examplesLine;
-      li.appendChild(exSpan);
+    msgLi.appendChild(msgSpan);
+    const quietSpan = document.createElement("span");
+    quietSpan.className = "empty-quiet";
+    quietSpan.textContent = quietLine;
+    msgLi.appendChild(quietSpan);
+    localClimateMoments.appendChild(msgLi);
+
+    if (nearest && nearest.list.length > 0) {
+      const signalsTitle = ui.nearbySignalsTitle || "Nearby signals";
+      const titleLi = document.createElement("li");
+      titleLi.className = "moment-item moment-item-empty moment-item-empty-header nearby-signals-header";
+      titleLi.textContent = signalsTitle;
+      localClimateMoments.appendChild(titleLi);
+      const regionLabel = formatGeoForDisplay(nearest.scope?.geo) || (nearest.scope?.label ?? "");
+      const toShow = pickNearbySignals(nearest.list);
+      for (const m of toShow) {
+        localClimateMoments.appendChild(createNearbySignalElement(m, regionLabel));
+      }
     }
-    localClimateMoments.appendChild(li);
+
     const viewMoreWrapEmpty = document.getElementById("nearbyViewMoreWrap");
     if (viewMoreWrapEmpty) viewMoreWrapEmpty.classList.add("hidden");
     return;
@@ -2924,8 +2996,9 @@ function renderRegionalMomentsList(sharedMoments, fieldScope) {
   }
 }
 
-function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby", pipeline = null, fieldScope = null, sharedMoments = null) {
-  renderRegionalMomentsList(sharedMoments || [], fieldScope);
+function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby", pipeline = null, fieldScope = null, sharedMoments = null, fieldLensModel = null) {
+  const allScopes = fieldLensModel?.byValue ? Array.from(fieldLensModel.byValue.values()) : null;
+  renderRegionalMomentsList(sharedMoments || [], fieldScope, allScopes);
   const ui = UI_COPY[LANG] || UI_COPY.en;
   if (localClimateIntro) localClimateIntro.textContent = ui.nearbyIntroLine || "Local field reading.";
 
@@ -3275,7 +3348,8 @@ function refreshObservatoryLists(sharedMoments) {
     observatoryState.activeFieldScope?.label || "Nearby",
     observatoryState.observatoryPipeline,
     observatoryState.activeFieldScope,
-    filtered
+    filtered,
+    observatoryState.fieldLensModel
   );
   renderHiddenFromView();
 }
@@ -3484,7 +3558,8 @@ async function boot() {
         activeFieldScope.label || "Nearby",
         pipeline,
         activeFieldScope,
-        sharedMoments
+        sharedMoments,
+        fieldLensModel
       );
       if (observatoryState) {
         observatoryState.localClimateTruth = localClimateTruth;
@@ -3648,7 +3723,8 @@ async function boot() {
     activeFieldScope.label || "Nearby",
     observatoryPipeline,
     activeFieldScope,
-    sharedFiltered
+    sharedFiltered,
+    fieldLensModel
   );
   renderStrata(moments, canonicalState);
   initSilentDescentTransitions();
@@ -3661,6 +3737,7 @@ async function boot() {
     activeFieldScope,
     localClimateTruth,
     observatoryPipeline,
+    fieldLensModel,
   };
 
   if (typeof window !== "undefined" && /[?&]debug=1/.test(window.location.search)) {
@@ -3726,7 +3803,8 @@ async function boot() {
           activeFieldScope.label || "Nearby",
           observatoryPipeline,
           activeFieldScope,
-          sharedMoments
+          sharedMoments,
+          fieldLensModel
         );
         if (observatoryState) {
           observatoryState.activeFieldScope = activeFieldScope;
