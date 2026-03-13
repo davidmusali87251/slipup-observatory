@@ -55,6 +55,8 @@ config.local.*
 .npmrc.local
 
 # ─── No necesarios para que funcione la página ───
+# Cuerpo de PR generado localmente (gh pr create --body-file)
+.pr-body.md
 # Dependencias (se instalan con npm install)
 node_modules/
 
