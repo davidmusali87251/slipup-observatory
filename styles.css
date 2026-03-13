@@ -407,6 +407,8 @@ body.sheet-open {
   padding: calc(4rem + env(safe-area-inset-top, 0px) + 0.25rem) 0 calc(var(--page-pad-top) + 0.5rem);
   position: relative;
   isolation: isolate;
+  /* Topbar fija debe quedar por encima del contenido que hace scroll (panel-recent, etc.) en móvil */
+  z-index: 100;
   /* Capas de profundidad: aire arriba, horizonte abajo — sensación de espacio */
   box-shadow:
     inset 0 8rem 5rem -3rem color-mix(in oklab, var(--layer-air) 10%, var(--layer-horizon) 18%),
