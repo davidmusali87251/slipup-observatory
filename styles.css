@@ -346,6 +346,7 @@ body.sheet-open {
 }
 
 .observatory-hero .topbar-brand {
+  position: relative;
   font-family: var(--font-serif);
   font-size: clamp(1.05rem, 1.9vw, 1.35rem);
   font-weight: 560;
@@ -358,12 +359,31 @@ body.sheet-open {
   color: var(--text);
 }
 
-.observatory-hero .topbar-reading {
+/* Tooltip elegante al pasar sobre el título: misma frase, sin ocupar espacio en la barra */
+.observatory-hero .topbar-tooltip {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 0.4rem;
+  padding: 0.4rem 0.75rem;
   font-family: var(--font-serif);
   font-size: 0.7rem;
-  letter-spacing: 0.04em;
-  color: color-mix(in oklab, var(--text) 72%, var(--muted));
-  flex: 0 0 auto;
+  letter-spacing: 0.03em;
+  color: color-mix(in oklab, var(--text) 85%, var(--muted));
+  background: color-mix(in oklab, var(--bg) 96%, var(--layer-horizon));
+  border: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  box-shadow: 0 4px 12px color-mix(in oklab, var(--text) 8%, transparent);
+}
+.observatory-hero .topbar-brand:hover .topbar-tooltip {
+  opacity: 1;
+  visibility: visible;
 }
 
 .observatory-hero .topbar-ai {
@@ -382,12 +402,6 @@ body.sheet-open {
   outline: 2px solid color-mix(in oklab, var(--text) 30%, #fff);
   outline-offset: 2px;
   border-radius: 4px;
-}
-
-@media (max-width: 480px) {
-  .observatory-hero .topbar-reading {
-    display: none;
-  }
 }
 
 /* Título principal al estilo de la identidad (imagen/logo): serif, lectura, reflejo sutil. Micro-afinación: tamaño −2%, más aire arriba, contraste −2%. */
