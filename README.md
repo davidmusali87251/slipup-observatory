@@ -81,6 +81,8 @@ Set these in Supabase Functions secrets:
 - `CLIMATE_GET_MAX` (default `180`)
 - `LOCAL_MIN_MASS` (default `30`)
 
+**Supabase Pro:** Con el plan Pro tienes backups diarios, sin pausa del proyecto y pooler dedicado. Para conexiones directas a Postgres (fuera de las Edge Functions), usa el **Dedicated Pooler** desde el Dashboard (Connect → Connection strings → Pooler). Las Edge Functions usan `SUPABASE_URL` + service role (API); con Pro puedes subir opcionalmente los límites (p. ej. `MOMENTS_GET_MAX`, `CLIMATE_GET_MAX`) vía secrets si necesitas más capacidad.
+
 ### Frontend activation (config remota)
 
 El repo incluye `remote.js` con **placeholders** (no incluir valores reales en el commit). Para usar el backend:
