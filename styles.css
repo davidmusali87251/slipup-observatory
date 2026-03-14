@@ -4202,13 +4202,6 @@ section.panel.panel-recent {
   outline-offset: 2px;
 }
 
-html.theme-atmosphere .moment-report-btn {
-  color: rgba(255, 255, 255, 0.72);
-}
-html.theme-atmosphere .moment-report-btn:hover {
-  color: rgba(255, 255, 255, 1);
-}
-
 .local-climate-moments .moment-item-nearby .moment-relate-controls {
   align-self: flex-end;
   margin-top: 0.28rem;
