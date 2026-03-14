@@ -12,7 +12,7 @@
  * Tuning (A/B sugerido):
  *   DECAY_HALFLIFE_HOURS: 8 = más reactivo, 16 = más persistente (actual 12).
  *   T1/T2: si muchos días "quiet" bajar T1 a 2; si muchos "dense" subir T2 a 10–12 (actual 3/8).
- *   pulseDelay: 3–7 s más rápido, 7–12 s más lento (actual 5–10 s).
+ *   pulseDelay: tras contribuir 2–4 s (condensación → señal); tuning 3–12 s.
  * Panel dev: ?atm_tune=1 carga atm-tune-panel.js para cambiar tuning en vivo.
  */
 (function () {

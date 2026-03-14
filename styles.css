@@ -435,7 +435,8 @@ body.sheet-open {
   z-index: 0;
 }
 
-/* Transición aire → horizonte (más denso abajo), suave */
+/* Transición aire → horizonte (más denso abajo), suave.
+   + Glow radial en el horizonte = centro gravitacional: el violeta se condensa ahí y el ojo tiene un ancla. */
 .observatory-hero::after {
   content: "";
   position: absolute;
@@ -444,13 +445,21 @@ body.sheet-open {
   top: 0;
   height: 100%;
   pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    color-mix(in oklab, var(--bg) 18%, transparent) 0%,
-    transparent 40%,
-    color-mix(in oklab, var(--layer-horizon) 35%, transparent) 82%,
-    color-mix(in oklab, var(--layer-ground) 26%, transparent) 100%
-  );
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--bg) 18%, transparent) 0%,
+      transparent 40%,
+      color-mix(in oklab, var(--layer-horizon) 35%, transparent) 82%,
+      color-mix(in oklab, var(--layer-ground) 26%, transparent) 100%
+    ),
+    radial-gradient(
+      ellipse 120% 50% at 50% 55%,
+      rgba(92, 61, 255, 0.18) 0%,
+      rgba(92, 61, 255, 0.08) 35%,
+      rgba(92, 61, 255, 0.02) 60%,
+      transparent 80%
+    );
   opacity: 0.7;
   z-index: 0;
 }

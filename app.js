@@ -3711,7 +3711,8 @@ async function boot() {
   if (typeof window.atmosphereSignal !== "undefined" && window.atmosphereSignal.update) {
     try {
       window.__slipupMomentsCache = sharedMoments;
-      const opts = contributed ? { pulseDelay: 5000 + Math.random() * 5000 } : {};
+      /* Tras contribuir: horizonte reacciona en 2–4 s (condensación → señal). */
+      const opts = contributed ? { pulseDelay: 2000 + Math.random() * 2000 } : {};
       window.atmosphereSignal.update(sharedMoments, opts);
     } catch (_) {}
   }
