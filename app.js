@@ -777,6 +777,8 @@ const UI_COPY = {
     momentRelateInfoTitle: "Not alone",
     momentRemoveLabel: "Remove",
     momentRemoveAria: "Remove this moment from your view",
+    momentReportLabel: "Report",
+    momentReportAria: "Report this moment to moderators",
     hiddenFromViewTitle: "Hidden from view",
     showAgainLabel: "Show again",
     nearbyRelateLabel: (count) => (count === 1 ? "1 nearby" : `${count} nearby`),
@@ -905,6 +907,8 @@ const UI_COPY = {
     momentRelateInfoTitle: "No estás solo",
     momentRemoveLabel: "Quitar",
     momentRemoveAria: "Quitar este momento de tu vista",
+    momentReportLabel: "Denunciar",
+    momentReportAria: "Denunciar este momento ante moderación",
     hiddenFromViewTitle: "Ocultos de tu vista",
     showAgainLabel: "Mostrar de nuevo",
     nearbyRelateLabel: (count) => (count === 1 ? "1 en el campo" : `${count} en el campo`),
@@ -2516,12 +2520,47 @@ function createMomentItemElement(m, options = {}) {
     if (observatoryState?.sharedMoments) refreshObservatoryLists(observatoryState.sharedMoments);
   });
 
+  const reportHref = (() => {
+    const subject = LANG === "es"
+      ? "[SlipUp Observatory] Denuncia de momento"
+      : "[SlipUp Observatory] Report moment";
+    const bodyLines = [
+      LANG === "es" ? "Identificador del momento:" : "Moment identifier:",
+      momentId,
+      "",
+      LANG === "es" ? "Motivo (opcional):" : "Reason (optional):",
+      "",
+    ];
+    const body = bodyLines.join("\n");
+    return (
+      "mailto:slip@slipup.io?subject=" +
+      encodeURIComponent(subject) +
+      "&body=" +
+      encodeURIComponent(body)
+    );
+  })();
+  const reportLink = document.createElement("a");
+  reportLink.href = reportHref;
+  reportLink.className = "moment-report-btn text-button";
+  reportLink.setAttribute("aria-label", ui.momentReportAria || "Report this moment to moderators");
+  reportLink.rel = "noopener noreferrer";
+  reportLink.textContent = ui.momentReportLabel || "Report";
+  reportLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    addHiddenMomentId(momentId);
+    if (observatoryState?.sharedMoments) {
+      refreshObservatoryLists(observatoryState.sharedMoments);
+    }
+    window.location.href = reportHref;
+  });
+
   const wrap = document.createElement("div");
   wrap.className = "moment-relate-controls";
   wrap.appendChild(relateBtn);
   wrap.appendChild(infoBtn);
   wrap.appendChild(infoTooltip);
   wrap.appendChild(removeBtn);
+  wrap.appendChild(reportLink);
   li.appendChild(wrap);
   return li;
 }

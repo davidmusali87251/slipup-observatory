@@ -1551,6 +1551,13 @@ html.theme-atmosphere .atm-reading-line {
   margin: 0;
   text-align: center;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.atmosphere-grounding .trust-microcopy-wrap .instrument-info-btn {
+  margin: 0;
+  flex-shrink: 0;
+  align-self: center;
 }
 .atmosphere-grounding .instrument-info-btn {
   margin: 0;
@@ -4154,6 +4161,26 @@ section.panel.panel-recent {
 .moment-remove-btn:hover {
   color: var(--text);
   text-decoration: underline;
+}
+
+.moment-report-btn {
+  font: inherit;
+  font-size: 0.7rem;
+  color: var(--text-muted, #666);
+  background: none;
+  border: none;
+  padding: 0 0.25rem;
+  cursor: pointer;
+  margin-left: 0.35rem;
+  text-decoration: none;
+}
+.moment-report-btn:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
+.moment-report-btn:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--text) 35%, transparent);
+  outline-offset: 2px;
 }
 
 .local-climate-moments .moment-item-nearby .moment-relate-controls {
