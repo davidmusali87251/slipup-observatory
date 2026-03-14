@@ -174,7 +174,7 @@ html.theme-atmosphere body {
 }
 
 /* Capa fija: niebla violeta radial (atmósfera, no fondo plano). Royal como emanación. Escala con --mist-opacity. */
-/* Deriva: transición larga para que el cambio de estado se sienta como cielo, no como swap de tema. */
+/* Deriva entre estados: coreografía niebla(0) → nodo(200ms) → horizonte(600ms) → lectura(JS fade). No tocar delays sin revisar el flujo. */
 html.theme-atmosphere body::before {
   content: "";
   position: fixed;
@@ -1159,6 +1159,11 @@ html.theme-atmosphere .horizon-pulse-bar::before {
     filter: blur(6px);
     opacity: 0.2;
   }
+  /* Nodo de señal: escala en móvil para no desbordar y mantener centro gravitacional */
+  html.theme-atmosphere .atmosphere-grounding::after {
+    width: min(420px, 92vw);
+    height: clamp(100px, 18vw, 120px);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .horizon-pulse-bar { transition: none; }
@@ -1484,7 +1489,7 @@ html.theme-atmosphere .atm-reading-line {
   }
 
   .degree-value {
-    font-size: clamp(3.25rem, 20vw, 4.75rem);
+    font-size: clamp(3.75rem, 24vw, 5.25rem);
   }
 
   .atmosphere-air .condition-line {
@@ -1528,6 +1533,7 @@ html.theme-atmosphere .atm-reading-line {
   }
   html.theme-atmosphere .atmosphere-grounding::after {
     top: calc(0.5rem + 3px);
+    animation-duration: 12s;
   }
 
   .atmosphere-grounding .cta-observatory {
@@ -1539,6 +1545,19 @@ html.theme-atmosphere .atm-reading-line {
   .atmosphere-grounding .cta-microcopy,
   .atmosphere-grounding .trust-microcopy {
     font-size: 0.62rem;
+  }
+
+  /* Strata: bloque de lectura sin desborde en narrow; misma identidad */
+  .ground-strata .strata-lines {
+    max-width: 100%;
+    padding-left: 1rem;
+  }
+  .ground-strata .strata-line {
+    font-size: var(--text-small);
+  }
+  .ground-strata .strata-line + .strata-line {
+    margin-top: 0.2rem;
+    padding-top: 0.5rem;
   }
 
   .panel-recent,
@@ -3912,7 +3931,7 @@ body.contribute-ritual .page {
   }
 
   .degree-value {
-    font-size: clamp(3.5rem, 17vw, 5rem);
+    font-size: clamp(4rem, 20vw, 5.5rem);
   }
 
   .degree-scale-label {
@@ -4025,7 +4044,13 @@ body.contribute-ritual .page {
   }
 
   .degree-value {
-    font-size: clamp(3.25rem, 20vw, 4.5rem);
+    font-size: clamp(3.75rem, 24vw, 5.25rem);
+  }
+
+  /* Nodo de señal más compacto en pantallas muy estrechas */
+  html.theme-atmosphere .atmosphere-grounding::after {
+    width: min(320px, 90vw);
+    height: 100px;
   }
 
   .climate-instrument {
@@ -4047,6 +4072,15 @@ body.contribute-ritual .page {
     min-width: 0.75rem;
     min-height: 0.75rem;
     font-size: 0.42rem;
+  }
+
+  /* Lectura atmosférica y horizonte: legibilidad en pantallas muy estrechas */
+  .atmosphere-grounding .atm-reading-line {
+    font-size: max(0.65rem, var(--text-label));
+    min-height: 1.25em;
+  }
+  .horizon-pulse-bar {
+    width: min(70%, 180px);
   }
 
   .panel {
