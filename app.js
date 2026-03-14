@@ -724,7 +724,7 @@ const UI_COPY = {
     instrumentMetricsAriaStrata: "Deep record metrics",
     instrumentInfoCopy: "Type, mood, note, recency — what shapes each moment.",
     degreeScaleLabel: "0–100 scale",
-    readingPrefix: "Reading:",
+    readingPrefix: "",
     strata: {
       mixLow: "low",
       mixModerate: "moderate",
@@ -843,7 +843,7 @@ const UI_COPY = {
     instrumentMetricsAriaStrata: "Métricas del registro profundo",
     instrumentInfoCopy: "Tipo, humor, nota, recencia: lo que da forma a cada momento.",
     degreeScaleLabel: "0–100 escala",
-    readingPrefix: "Lectura:",
+    readingPrefix: "",
     strata: {
       mixLow: "bajo",
       mixModerate: "moderado",
@@ -3759,9 +3759,7 @@ async function boot() {
     const degree = Number(canonicalState?.computedDegree) || BASELINE;
     const seed = (total * 7 + Math.round(degree)) | 0;
     if (total > 0) {
-      const ui = UI_COPY[LANG] || UI_COPY.en;
-      const prefix = ui.readingPrefix || "Reading:";
-      climateSummaryLine.textContent = `${prefix} ${getReadingStatusLine(LANG, total, seed, canonicalState?.dominantMix)}`;
+      climateSummaryLine.textContent = getReadingStatusLine(LANG, total, seed, canonicalState?.dominantMix);
       climateSummaryLine.classList.remove("hidden");
     } else {
       climateSummaryLine.textContent = "";

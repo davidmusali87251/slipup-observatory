@@ -35,9 +35,21 @@
   };
 
   const LABELS = {
-    en: { quiet: "quiet field", rising: "signals rising", dense: "dense tonight" },
-    es: { quiet: "campo tranquilo", rising: "señales en ascenso", dense: "denso esta noche" },
+    en: {
+      quiet: ["quiet field", "field at rest", "still reading", "low signal", "calm horizon"],
+      rising: ["signals rising", "field stirring", "readings building", "momentum gathering", "lift in the air"],
+      dense: ["dense tonight", "thick reading", "field full", "heavy signal", "atmosphere charged"],
+    },
+    es: {
+      quiet: ["campo tranquilo", "campo en reposo", "lectura en calma", "señal baja", "horizonte quieto"],
+      rising: ["señales en ascenso", "campo en movimiento", "lectura en aumento", "impulso en el aire", "señales que suben"],
+      dense: ["denso esta noche", "lectura densa", "campo lleno", "señal cargada", "atmósfera cargada"],
+    },
   };
+
+  function pickLabel(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
 
   function lang() {
     const l = (document.documentElement.getAttribute("lang") || "en").slice(0, 2);
@@ -62,9 +74,9 @@
   function getState(score) {
     const l = LABELS[lang()];
     var t1 = tuning.T1, t2 = tuning.T2;
-    if (score < t1) return { label: l.quiet, level: 0 };
-    if (score < t2) return { label: l.rising, level: Math.min(1, (score - t1) / (t2 - t1)) };
-    return { label: l.dense, level: 1 };
+    if (score < t1) return { label: pickLabel(l.quiet), level: 0 };
+    if (score < t2) return { label: pickLabel(l.rising), level: Math.min(1, (score - t1) / (t2 - t1)) };
+    return { label: pickLabel(l.dense), level: 1 };
   }
 
   /** Tipo dominante en ventana (mismo peso temporal que score). Modula campo violeta (data-atmosphere-state). */
@@ -130,8 +142,7 @@
       }
     }
     if (labelEl) {
-      const prefix = lang() === "es" ? "Atmósfera: " : "Atmosphere: ";
-      const newText = state.label ? prefix + state.label : "";
+      const newText = state.label ? state.label : "";
       if (newText !== labelEl.textContent) {
         if (!reduceMotion() && state.label) {
           labelEl.classList.add("atm-reading-updating");
