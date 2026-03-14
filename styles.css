@@ -129,7 +129,7 @@ html.theme-atmosphere body {
   color: var(--text);
 }
 
-/* Capa fija: niebla violeta radial (atmósfera, no fondo plano). Royal como emanación. */
+/* Capa fija: niebla violeta radial (atmósfera, no fondo plano). Royal como emanación. Escala con --mist-opacity. */
 html.theme-atmosphere body::before {
   content: "";
   position: fixed;
@@ -143,21 +143,29 @@ html.theme-atmosphere body::before {
     rgba(15, 18, 38, 0.06) 52%,
     transparent 72%
   );
-  opacity: 0.95;
+  opacity: min(1, calc(0.95 * (var(--mist-opacity) / 0.14)));
 }
 
-/* Estados atmosféricos: mismo violeta, modulación sutil (opcional; app puede setear data-atmosphere-state en <html>). */
+/* Estados atmosféricos: mismo royal violet, modulación por opacidad/densidad/temperatura leve (no por matiz fuerte). */
+/* avoidable: más frío, comprimido, tenso — menos glow, menos niebla */
 html.theme-atmosphere[data-atmosphere-state="avoidable"] {
-  --signal-glow: rgba(79, 70, 216, 0.16);
-  --mist-opacity: 0.1;
+  --signal-glow: rgba(92, 61, 255, 0.12);
+  --mist-opacity: 0.08;
+  --atm-glow-alpha: 0.14;
 }
+/* fertile: más abierto, luminoso, expansivo — más intensidad, misma identidad */
 html.theme-atmosphere[data-atmosphere-state="fertile"] {
-  --signal-glow: rgba(106, 77, 255, 0.22);
+  --signal-glow: rgba(92, 61, 255, 0.22);
+  --mist-opacity: 0.16;
+  --atm-glow-alpha: 0.22;
   --violet-light: #7B61FF;
 }
+/* observed: más suspendido, distante, brumoso — glow suave, más niebla suave */
 html.theme-atmosphere[data-atmosphere-state="observed"] {
-  --signal-glow: rgba(90, 86, 200, 0.14);
-  --violet-mist: rgba(140, 130, 232, 0.12);
+  --signal-glow: rgba(92, 61, 255, 0.11);
+  --mist-opacity: 0.18;
+  --atm-glow-alpha: 0.16;
+  --violet-mist: rgba(168, 156, 255, 0.18);
 }
 
 /* Royal solo en horizonte, señales y hover (intencional, no saturado) */
