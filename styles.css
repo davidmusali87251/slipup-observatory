@@ -765,17 +765,27 @@ h2 {
   z-index: 0;
 }
 
-/* Estrato: lectura en el aire (arriba del horizonte). Orden ascendente → grado → descendente. */
+/* Estrato: lectura en el aire (arriba del horizonte). Una sola columna centrada. */
 .atmosphere-air {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
   gap: 0.85rem;
-  max-width: 36ch;
+  width: 100%;
+  max-width: 34ch;
   padding: 0.25rem 0;
+  margin-left: auto;
+  margin-right: auto;
 }
 
+/* Columna única: todos los elementos centrados en el mismo eje */
+.atmosphere-air .observatory-entry,
+.atmosphere-air .degree-wrap,
+.atmosphere-air .hero-instrument-line {
+  width: 100%;
+}
 .atmosphere-air .observatory-entry { margin-top: 0; }
 .atmosphere-air .atmosphere-orientation { margin-top: 0; margin-bottom: 0; }
 .atmosphere-air .degree-wrap {
@@ -832,14 +842,18 @@ h2 {
 }
 .atmosphere-air .climate-instrument-scope { margin-bottom: 0.35rem; }
 
-/* Estrato: hacia el horizonte (resumen, CTA, confianza). Más espacio arriba = sensación de descenso. */
+/* Estrato: hacia el horizonte (resumen, CTA, confianza). Misma columna centrada que atmosphere-air. */
 .atmosphere-grounding {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
   gap: 1.5rem;
+  width: 100%;
   max-width: 34ch;
+  margin-left: auto;
+  margin-right: auto;
   position: relative;
   padding-top: 1.35rem;
 }
@@ -862,6 +876,15 @@ h2 {
   opacity: 0.5;
 }
 
+/* Misma columna centrada en grounding (textos a ancho completo para alinear eje) */
+.atmosphere-grounding .atm-reading-line,
+.atmosphere-grounding .climate-summary-line,
+.atmosphere-grounding .cta-microcopy,
+.atmosphere-grounding .trust-microcopy-wrap {
+  width: 100%;
+  max-width: 34ch;
+  box-sizing: border-box;
+}
 .atmosphere-grounding .climate-summary-line { margin-top: 0; }
 .atmosphere-grounding .cta-observatory { margin-top: 0; }
 
@@ -1513,14 +1536,17 @@ html.theme-atmosphere .atm-reading-line {
   outline-offset: 2px;
 }
 
-/* Sector trust-microcopy + botón "i": mismo bloque, botón al lado del texto */
+/* Sector trust-microcopy + botón "i": mismo bloque, centrado en la columna del hero */
 .trust-microcopy-wrap {
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   flex-wrap: wrap;
   margin-top: 0.5rem;
+  width: 100%;
+  max-width: 34ch;
 }
 .trust-microcopy-wrap .trust-microcopy {
   margin: 0;
