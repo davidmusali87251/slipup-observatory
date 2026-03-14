@@ -742,12 +742,14 @@ const UI_COPY = {
     mixLine: (type, mood) => `Mostly ${type}, ${mood}.`,
     eyebrowLayer: "Atmosphere",
     eyebrowContext: "Moments",
+    sharedFieldLine: "Shared field — last 48h",
     horizonTitle: "Horizon",
     horizonMoreLabel: "Deeper",
     timeOfDayMorningLabel: "Morning",
     timeOfDayAfternoonLabel: "Afternoon",
     timeOfDayEveningLabel: "Evening",
     nearbyTitle: "Nearby",
+    nearbySignalsLine: "Signals nearby",
     instrumentAriaLabel: "Reading metrics",
     instrumentLayerLabel: "Atmosphere",
     instrumentScopeLabel: "Global",
@@ -863,6 +865,7 @@ const UI_COPY = {
     mixLine: (type, mood) => `Sobre todo ${type}, ${mood}.`,
     eyebrowLayer: "Atmósfera",
     eyebrowContext: "Momentos",
+    sharedFieldLine: "Campo compartido — últimas 48 h",
     horizonTitle: "Horizonte",
     horizonMoreLabel: "Más",
     timeOfDayMorningLabel: "Mañana",
@@ -934,6 +937,7 @@ const UI_COPY = {
     localFieldMomentsEmpty: "Aún no hay momentos compartidos en este ámbito.",
     localFieldEmptyQuiet: "El campo está quieto.",
     nearbySignalsTitle: "Señales cercanas",
+    nearbySignalsLine: "Señales cercanas",
     nearbyViewMoreLabel: "Ver más",
     momentRelateLabel: "No estás solo",
     momentRelateLabelYou: "No estás solo · tú",
@@ -983,12 +987,16 @@ function applyUICopy() {
   if (eyebrowLayerEl) eyebrowLayerEl.textContent = ui.eyebrowLayer;
   const eyebrowContextEl = document.querySelector(".eyebrow-context");
   if (eyebrowContextEl) eyebrowContextEl.textContent = ui.eyebrowContext;
+  const sharedFieldLineEl = document.getElementById("sharedFieldLine");
+  if (sharedFieldLineEl && ui.sharedFieldLine) sharedFieldLineEl.textContent = ui.sharedFieldLine;
   const horizonTitleEl = document.querySelector(".horizon-line");
   if (horizonTitleEl) horizonTitleEl.textContent = ui.horizonTitle;
   const horizonMoreBtn = document.getElementById("horizonMoreButton");
   if (horizonMoreBtn && ui.horizonMoreLabel) horizonMoreBtn.textContent = ui.horizonMoreLabel;
   const nearbyTitleEl = document.querySelector(".local-climate-line");
   if (nearbyTitleEl) nearbyTitleEl.textContent = ui.nearbyTitle;
+  const nearbySignalsLineEl = document.getElementById("nearbySignalsLine");
+  if (nearbySignalsLineEl && ui.nearbySignalsLine) nearbySignalsLineEl.textContent = ui.nearbySignalsLine;
   if (conditionLine) conditionLine.textContent = ui.conditionPending;
   if (viewMoreButton) viewMoreButton.textContent = ui.viewMore;
   const closeBtn = document.getElementById("shared-sheet-close");
@@ -3401,6 +3409,43 @@ async function loadSharedMoments(localMoments) {
 /** Estado actual del observatorio para re-renderizar listas (Across the atmosphere + Nearby) con datos frescos sin recargar. */
 let observatoryState = null;
 
+/** Timeout del eco de Nearby; se cancela si se programa otro antes de que dispare. */
+let nearbyEchoTimeoutId = null;
+/** Evita superposición si un repaint dispara otro eco antes de que termine el actual. */
+let nearbyEchoActive = false;
+
+/** Eco local: pulso sutil en "Signals nearby" y fade breve en la lectura local. Solo presencia, sin efectos fuertes. Respeta prefers-reduced-motion. */
+function triggerNearbyEcho() {
+  if (typeof window === "undefined" || prefersReducedMotion) return;
+  if (nearbyEchoActive) return;
+  nearbyEchoActive = true;
+  const pulseMs = 560 + Math.random() * 80;
+  const signalsLine = document.getElementById("nearbySignalsLine");
+  const introLine = document.getElementById("localClimateIntro");
+  if (signalsLine) {
+    signalsLine.style.setProperty("--echo-pulse-duration", `${pulseMs}ms`);
+    signalsLine.classList.add("echo-pulse");
+    setTimeout(() => {
+      signalsLine.classList.remove("echo-pulse");
+      signalsLine.style.removeProperty("--echo-pulse-duration");
+    }, pulseMs);
+  }
+  if (introLine) {
+    introLine.classList.add("echo-fade");
+    setTimeout(() => introLine.classList.remove("echo-fade"), 200);
+  }
+  setTimeout(() => { nearbyEchoActive = false; }, Math.max(pulseMs, 200));
+}
+
+/** Programa el eco de Nearby ~900–1200 ms después (propagación del campo). Se llama tras actualizar hero + renderLocalClimate. */
+function scheduleNearbyEcho() {
+  if (nearbyEchoTimeoutId != null) clearTimeout(nearbyEchoTimeoutId);
+  nearbyEchoTimeoutId = setTimeout(() => {
+    nearbyEchoTimeoutId = null;
+    triggerNearbyEcho();
+  }, 900 + Math.random() * 300);
+}
+
 /** Pinta la sección "Hidden from view" con botones "Show again" por cada id oculto. Muestra la frase/nota del momento cuando existe. */
 function renderHiddenFromView() {
   if (!hiddenFromViewWrap || !hiddenFromViewList) return;
@@ -3845,6 +3890,7 @@ async function boot() {
     sharedFiltered,
     fieldLensModel
   );
+  scheduleNearbyEcho();
   renderStrata(moments, canonicalState);
   initSilentDescentTransitions();
   applyDeepLinkIfPresent();

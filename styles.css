@@ -1365,6 +1365,21 @@ html.theme-atmosphere .atm-reading-line {
   font-size: 0.84rem;
 }
 
+/* Microseñal de campo compartido: da verdad a la atmósfera sin convertir en dashboard */
+.shared-field-line {
+  margin: 0.2rem 0 0;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  opacity: 0.72;
+  line-height: 1.35;
+  text-align: center;
+  max-width: 28ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .atmosphere-orientation {
   margin-top: -0.42rem;
   font-size: 0.72rem;
@@ -2730,6 +2745,48 @@ html.theme-atmosphere .atm-reading-line {
   opacity: 0.3;
   margin-right: 0.4rem;
   vertical-align: 0.15em;
+}
+
+/* Eco local del campo: subline que recontextualiza Nearby como capa del observatorio */
+.nearby-signals-line {
+  margin: -0.5rem 0 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  opacity: 0.72;
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* Eco de Nearby: pulso de presencia cuando el campo global se actualiza (600ms) */
+@keyframes nearby-echo-pulse {
+  0% { opacity: 0.72; }
+  50% { opacity: 0.85; }
+  100% { opacity: 0.72; }
+}
+
+.nearby-signals-line.echo-pulse {
+  animation: nearby-echo-pulse var(--echo-pulse-duration, 600ms) ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nearby-signals-line.echo-pulse { animation: none; }
+}
+
+/* Eco en la lectura local: fade breve (200ms) */
+@keyframes nearby-intro-echo {
+  0% { opacity: 0.78; }
+  50% { opacity: 0.4; }
+  100% { opacity: 0.78; }
+}
+
+.local-climate-intro.echo-fade {
+  animation: nearby-intro-echo 200ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .local-climate-intro.echo-fade { animation: none; }
 }
 
 .local-climate-context {
