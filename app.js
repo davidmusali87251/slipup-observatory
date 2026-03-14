@@ -779,6 +779,8 @@ const UI_COPY = {
     momentRemoveAria: "Remove this moment from your view",
     momentReportLabel: "Report",
     momentReportAria: "Report this moment to moderators",
+    heroReportLabel: "Report content",
+    heroReportAria: "Report content to moderators",
     hiddenFromViewTitle: "Hidden from view",
     showAgainLabel: "Show again",
     nearbyRelateLabel: (count) => (count === 1 ? "1 nearby" : `${count} nearby`),
@@ -909,6 +911,8 @@ const UI_COPY = {
     momentRemoveAria: "Quitar este momento de tu vista",
     momentReportLabel: "Denunciar",
     momentReportAria: "Denunciar este momento ante moderación",
+    heroReportLabel: "Denunciar contenido",
+    heroReportAria: "Denunciar contenido ante moderación",
     hiddenFromViewTitle: "Ocultos de tu vista",
     showAgainLabel: "Mostrar de nuevo",
     nearbyRelateLabel: (count) => (count === 1 ? "1 en el campo" : `${count} en el campo`),
@@ -970,6 +974,14 @@ function applyUICopy() {
   if (contributeFooterLink && ui.contributeFooterLine) contributeFooterLink.textContent = ui.contributeFooterLine;
   const heroInstrumentLine = document.getElementById("heroInstrumentLine");
   if (heroInstrumentLine && ui.heroInstrumentLine) heroInstrumentLine.textContent = ui.heroInstrumentLine;
+  const heroReportLink = document.getElementById("heroReportLink");
+  if (heroReportLink) {
+    heroReportLink.textContent = ui.heroReportLabel || "Report content";
+    heroReportLink.setAttribute("aria-label", ui.heroReportAria || "Report content to moderators");
+    if (LANG === "es") {
+      heroReportLink.href = "mailto:slip@slipup.io?subject=%5BSlipUp%20Observatory%5D%20Denuncia%20de%20contenido&body=Describe%20el%20contenido%20que%20quieres%20denunciar%20(o%20pega%20el%20identificador%20del%20momento%20si%20lo%20tienes)%3A%0A%0A";
+    }
+  }
   const ctaObservatory = document.getElementById("ctaObservatory");
   if (ctaObservatory && ui.momentLeavesTrace) ctaObservatory.setAttribute("title", ui.momentLeavesTrace);
   if (viewMoreButton && ui.momentLeavesTrace) viewMoreButton.setAttribute("title", ui.momentLeavesTrace);
