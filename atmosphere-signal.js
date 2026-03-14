@@ -13,6 +13,7 @@
  *   DECAY_HALFLIFE_HOURS: 8 = más reactivo, 16 = más persistente (actual 12).
  *   T1/T2: si muchos días "quiet" bajar T1 a 2; si muchos "dense" subir T2 a 10–12 (actual 3/8).
  *   pulseDelay: tras contribuir 2–4 s (condensación → señal); tuning 3–12 s.
+ *   REACTION_DELAY_MS: cuando el nivel atmosférico cambia, el horizonte reacciona con 1–2 s de retraso (condensation → signal).
  * Panel dev: ?atm_tune=1 carga atm-tune-panel.js para cambiar tuning en vivo.
  */
 (function () {
@@ -21,10 +22,12 @@
   const WEIGHTS = { avoidable: 0.8, fertile: 1.0, observed: 0.6 };
   const WINDOW_MS = 24 * 3600 * 1000;
   const UPDATE_THROTTLE_MS = 1500;
+  const REACTION_DELAY_MS = 1200;
   const LONGTAIL_POINT_CHANCE = 0.1;
   const LONGTAIL_DURATION_MS = { min: 10000, max: 14000 };
 
   var lastUpdateTs = 0;
+  var lastLevel = undefined;
   var tuning = {
     DECAY_HALFLIFE_HOURS: 12,
     T1: 3,
@@ -180,13 +183,23 @@
     var state = getState(score);
     var dominantType = getDominantType(moments);
     var baseOpts = { score: score, dominantType: dominantType };
+    var levelChanged = lastLevel !== undefined && Math.abs(state.level - lastLevel) > 0.05;
+
     if (pulseDelay > 0 && !reduceMotion()) {
       applyVisuals(state, false, false, Object.assign({ pulseDelayMs: pulseDelay }, baseOpts));
       setTimeout(function () {
         applyVisuals(state, state.level > 0.35, true, Object.assign({ pulseDelayMs: pulseDelay }, baseOpts));
+        lastLevel = state.level;
       }, pulseDelay);
+    } else if (levelChanged && !reduceMotion()) {
+      lastLevel = state.level;
+      applyVisuals(state, false, false, baseOpts);
+      setTimeout(function () {
+        applyVisuals(state, state.level > 0.35, true, baseOpts);
+      }, REACTION_DELAY_MS);
     } else {
       applyVisuals(state, undefined, true, baseOpts);
+      lastLevel = state.level;
     }
   }
 

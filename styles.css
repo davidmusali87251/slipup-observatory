@@ -1,8 +1,39 @@
 /* SlipUp™ Observatory */
 :root {
-  /* Tipografía: coherente en toda la página. --font-sans = UI, cuerpo, controles; --font-serif = lectura observatory (grado, condition, pattern, summary, CTA). */
+  /* ─── Control tipográfico general (coherencia en toda la página) ───
+   * Familia: --font-ui = controles, labels, listas, inputs. --font-reading = grado, condition, summary, CTA, strata.
+   * Cursiva: solo lectura interpretativa (strata-line, condition-line, pattern, contribute intro, ejemplos).
+   * Escala: usar estas variables para mantener proporción; ajustar aquí para cambiar globalmente.
+   */
   --font-sans: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-serif: Georgia, "Times New Roman", "Liberation Serif", serif;
+  --font-ui: var(--font-sans);
+  --font-reading: var(--font-serif);
+
+  /* Escala de tamaños (rem). Display = grado/hero; headline = títulos sección; lead = resumen; body/small/caption/label = UI. */
+  --text-display: clamp(3.25rem, 20vw, 4.75rem);
+  --text-display-sm: clamp(3.5rem, 17vw, 5rem);
+  --text-headline: clamp(1.05rem, 1.9vw, 1.35rem);
+  --text-lead: clamp(1.08rem, 1.55vw, 1.32rem);
+  --text-body: 0.92rem;
+  --text-body-lg: 0.96rem;
+  --text-small: 0.8rem;
+  --text-caption: 0.72rem;
+  --text-label: 0.68rem;
+  --text-micro: 0.6rem;
+
+  /* Line-height: tight (grado), snug (headlines), normal (UI), relaxed (párrafos), reading (strata, citas). */
+  --leading-tight: 0.88;
+  --leading-snug: 1.15;
+  --leading-normal: 1.35;
+  --leading-relaxed: 1.55;
+  --leading-reading: 1.6;
+
+  /* Letter-spacing: normal, wide (labels/uppercase), wider (microcopy). */
+  --tracking-normal: 0.01em;
+  --tracking-wide: 0.04em;
+  --tracking-wider: 0.08em;
+  --tracking-label: 0.06em;
 
   /* Paleta observatorio. Coherencia de fondos por capa: docs/LAYER_BACKGROUNDS_COHERENCE.md */
   --bg: #f3f0fb;
@@ -42,6 +73,16 @@
   --atmo-ground: 0.6rem;
 }
 
+/* ─── Uso de tipografía (respetar al tocar estilos) ───
+ * Serif (--font-reading): grado, condition-line, climate-summary-line, horizon primary/secondary,
+ *   CTA observatory, strata-context, strata-line, contribute-rise-tone-intro, contribute-rise-examples,
+ *   pattern/interpretación, Relate headline, moment-note en algunos contextos.
+ * Cursiva (font-style: italic): strata-line, condition-line, pattern-line, contribute examples,
+ *   quote-like blocks, moment-note italic. No usar cursiva en UI (labels, botones, inputs).
+ * Sans (--font-ui): body por defecto, topbar, panels, listas, inputs, labels, botones, legal.
+ * Al añadir texto nuevo: lectura atmosférica → serif (y cursiva si es interpretativa); UI → sans.
+ */
+
 * {
   box-sizing: border-box;
 }
@@ -59,8 +100,11 @@
 
 body {
   margin: 0;
-  font-family: var(--font-sans);
+  font-family: var(--font-ui);
   color: var(--text);
+  font-size: 1rem;
+  line-height: var(--leading-normal);
+  letter-spacing: var(--tracking-normal);
   -webkit-tap-highlight-color: color-mix(in oklab, var(--text) 12%, transparent);
   background:
     radial-gradient(ellipse 140% 90% at 50% -10%, color-mix(in oklab, #fff 40%, var(--bg)) 0%, transparent 55%),
@@ -529,6 +573,46 @@ body.sheet-open {
     );
   opacity: 0.7;
   z-index: 0;
+}
+
+/* Tema observatorio: una capa más de profundidad — niebla violeta muy suave centrada en el horizonte (deep sky → violet mist → horizon glow → panel). */
+html.theme-atmosphere .observatory-hero::after {
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--bg) 18%, transparent) 0%,
+      transparent 40%,
+      color-mix(in oklab, var(--layer-horizon) 35%, transparent) 82%,
+      color-mix(in oklab, var(--layer-ground) 26%, transparent) 100%
+    ),
+    radial-gradient(
+      ellipse 120% 50% at 50% 55%,
+      rgba(92, 61, 255, 0.18) 0%,
+      rgba(92, 61, 255, 0.08) 35%,
+      rgba(92, 61, 255, 0.02) 60%,
+      transparent 80%
+    ),
+    radial-gradient(
+      ellipse 160% 70% at 50% 55%,
+      rgba(92, 61, 255, 0.06) 0%,
+      rgba(92, 61, 255, 0.02) 40%,
+      transparent 60%
+    );
+}
+
+/* Segunda capa de niebla: más baja, más ancha, muy difusa — aire violeta acumulado alrededor del horizonte (presencia atmosférica, no color). */
+html.theme-atmosphere .observatory-hero::before {
+  background:
+    radial-gradient(ellipse 160% 100% at 50% 5%, color-mix(in oklab, var(--bg) 88%, var(--layer-air)) 0%, transparent 48%),
+    radial-gradient(ellipse 130% 85% at 50% 50%, var(--layer-horizon) 0%, transparent 58%),
+    radial-gradient(
+      ellipse 220% 110% at 50% 58%,
+      rgba(92, 61, 255, 0.07) 0%,
+      rgba(92, 61, 255, 0.04) 18%,
+      rgba(92, 61, 255, 0.02) 38%,
+      transparent 62%
+    );
+  opacity: 0.9;
 }
 
 .observatory-hero.observatory--pattern::before {
@@ -1029,8 +1113,9 @@ html.theme-atmosphere .horizon-pulse-bar::before {
 }
 
 .atm-reading-line {
-  font-size: 0.7rem;
-  letter-spacing: 0.06em;
+  font-size: var(--text-label);
+  font-family: var(--font-reading);
+  letter-spacing: var(--tracking-label);
   color: var(--muted);
   opacity: 0.88;
   margin: 0 0 0.4rem;
@@ -1448,8 +1533,8 @@ html.theme-atmosphere .atm-reading-line {
 .degree-value {
   font-size: clamp(4.25rem, 11.7vw, 6.45rem);
   font-weight: 300;
-  font-family: var(--font-serif);
-  line-height: 0.88;
+  font-family: var(--font-reading);
+  line-height: var(--leading-tight);
   letter-spacing: 0;
   position: relative;
   display: inline-block;
@@ -1732,8 +1817,8 @@ html.theme-atmosphere .atm-reading-line {
 .climate-summary-line {
   margin-top: 0;
   margin-bottom: 0.85rem;
-  font-size: 0.88rem;
-  font-family: var(--font-serif);
+  font-size: var(--text-body);
+  font-family: var(--font-reading);
   line-height: 1.85;
   letter-spacing: 0.03em;
   color: var(--muted);
@@ -2921,15 +3006,16 @@ html.theme-atmosphere .atm-reading-line {
 }
 
 .strata-context {
-  font-size: 0.76rem;
+  font-size: var(--text-caption);
+  font-family: var(--font-reading);
   color: var(--muted);
   opacity: 0.72;
-  letter-spacing: 0.02em;
+  letter-spacing: var(--tracking-normal);
   margin-top: 0.5rem;
   margin-bottom: 1rem;
   margin-left: auto;
   margin-right: auto;
-  line-height: 1.35;
+  line-height: var(--leading-normal);
   text-align: center;
   max-width: 52ch;
 }
@@ -2974,9 +3060,9 @@ html.theme-atmosphere .atm-reading-line {
 }
 
 .strata-line {
-  font-size: 0.9rem;
-  line-height: 1.6;
-  font-family: var(--font-serif);
+  font-size: var(--text-body);
+  line-height: var(--leading-reading);
+  font-family: var(--font-reading);
   font-style: italic;
   color: color-mix(in oklab, var(--text) 82%, var(--muted));
   opacity: 0.92;
@@ -2984,7 +3070,7 @@ html.theme-atmosphere .atm-reading-line {
   border: none;
   background: none;
   border-radius: 0;
-  letter-spacing: 0.01em;
+  letter-spacing: var(--tracking-normal);
 }
 .strata-line + .strata-line {
   margin-top: 0.15rem;
@@ -3330,11 +3416,11 @@ body.contribute-ritual .page {
 }
 .contribute-rise-tone-intro {
   margin: 0 0 0.65rem 0;
-  font-size: 0.78rem;
+  font-size: var(--text-small);
   font-weight: 500;
-  letter-spacing: 0.04em;
+  letter-spacing: var(--tracking-wide);
   color: var(--muted);
-  font-family: var(--font-serif);
+  font-family: var(--font-reading);
 }
 .contribute-rise-tone-fields {
   display: grid;
