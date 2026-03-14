@@ -3273,7 +3273,7 @@ html.theme-atmosphere .atm-reading-line {
   backdrop-filter: blur(3px);
   opacity: 0;
   transition: opacity 260ms ease;
-  z-index: 40;
+  z-index: 110;
 }
 
 .shared-sheet {
@@ -3293,7 +3293,7 @@ html.theme-atmosphere .atm-reading-line {
   transition:
     transform 280ms ease,
     opacity 220ms ease;
-  z-index: 50;
+  z-index: 120;
 }
 
 .shared-sheet-head {

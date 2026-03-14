@@ -72,28 +72,59 @@ const HIDDEN_MOMENT_IDS_KEY = "slipup_v2_hidden_moment_ids";
 function getHiddenMomentIds() {
   try {
     const raw = localStorage.getItem(HIDDEN_MOMENT_IDS_KEY);
-    const arr = raw ? JSON.parse(raw) : [];
-    return new Set(Array.isArray(arr) ? arr : []);
+    if (!raw) return new Set();
+    const data = JSON.parse(raw);
+    if (Array.isArray(data)) return new Set(data);
+    if (data && Array.isArray(data.ids)) return new Set(data.ids);
+    return new Set();
   } catch {
     return new Set();
   }
 }
 
-function addHiddenMomentId(id) {
-  if (!id) return;
-  const set = getHiddenMomentIds();
-  set.add(id);
+/** Devuelve la lista de momentos ocultos con etiqueta (nota o fallback) para mostrar en "Hidden from view". */
+function getHiddenMoments() {
   try {
-    localStorage.setItem(HIDDEN_MOMENT_IDS_KEY, JSON.stringify([...set]));
+    const raw = localStorage.getItem(HIDDEN_MOMENT_IDS_KEY);
+    if (!raw) return [];
+    const data = JSON.parse(raw);
+    if (Array.isArray(data)) return data.map((id) => ({ id: String(id), label: "" }));
+    if (data && Array.isArray(data.ids)) {
+      const labels = data.labels || {};
+      return data.ids.map((id) => ({ id: String(id), label: labels[id] || "" }));
+    }
+    return [];
+  } catch {
+    return [];
+  }
+}
+
+function addHiddenMomentId(id, label) {
+  if (!id) return;
+  const entries = getHiddenMoments();
+  const ids = entries.map((e) => e.id);
+  const labelsMap = {};
+  entries.forEach((e) => { labelsMap[e.id] = e.label; });
+  if (!ids.includes(id)) ids.push(id);
+  labelsMap[id] = typeof label === "string" ? label.trim().slice(0, 80) : "";
+  try {
+    localStorage.setItem(HIDDEN_MOMENT_IDS_KEY, JSON.stringify({ ids, labels: labelsMap }));
   } catch (_) {}
 }
 
 function removeHiddenMomentId(id) {
   if (!id) return;
-  const set = getHiddenMomentIds();
-  set.delete(id);
+  const entries = getHiddenMoments();
+  const next = entries.filter((e) => e.id !== id);
   try {
-    localStorage.setItem(HIDDEN_MOMENT_IDS_KEY, JSON.stringify([...set]));
+    if (next.length === 0) {
+      localStorage.removeItem(HIDDEN_MOMENT_IDS_KEY);
+      return;
+    }
+    localStorage.setItem(HIDDEN_MOMENT_IDS_KEY, JSON.stringify({
+      ids: next.map((e) => e.id),
+      labels: Object.fromEntries(next.map((e) => [e.id, e.label])),
+    }));
   } catch (_) {}
 }
 
@@ -2530,7 +2561,8 @@ function createMomentItemElement(m, options = {}) {
   removeBtn.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
-    addHiddenMomentId(momentId);
+    const hiddenLabel = (m.note || "").trim().slice(0, 80);
+    addHiddenMomentId(momentId, hiddenLabel);
     const localMoments = loadMoments();
     if (momentId && localMoments.some((mom) => mom.id === momentId)) {
       saveMoments(localMoments.filter((mom) => mom.id !== momentId));
@@ -2575,7 +2607,8 @@ function createMomentItemElement(m, options = {}) {
   reportWrap.appendChild(reportTooltip);
   reportLink.addEventListener("click", (e) => {
     e.preventDefault();
-    addHiddenMomentId(momentId);
+    const hiddenLabel = (m.note || "").trim().slice(0, 80);
+    addHiddenMomentId(momentId, hiddenLabel);
     if (observatoryState?.sharedMoments) {
       refreshObservatoryLists(observatoryState.sharedMoments);
     }
@@ -3368,13 +3401,12 @@ async function loadSharedMoments(localMoments) {
 /** Estado actual del observatorio para re-renderizar listas (Across the atmosphere + Nearby) con datos frescos sin recargar. */
 let observatoryState = null;
 
-/** Pinta la sección "Hidden from view" con botones "Show again" por cada id oculto. */
+/** Pinta la sección "Hidden from view" con botones "Show again" por cada id oculto. Muestra la frase/nota del momento cuando existe. */
 function renderHiddenFromView() {
   if (!hiddenFromViewWrap || !hiddenFromViewList) return;
-  const hidden = getHiddenMomentIds();
-  const ids = [...hidden];
+  const entries = getHiddenMoments();
   const ui = UI_COPY[LANG] || UI_COPY.en;
-  if (ids.length === 0) {
+  if (entries.length === 0) {
     hiddenFromViewWrap.classList.add("hidden");
     hiddenFromViewWrap.hidden = true;
     hiddenFromViewList.innerHTML = "";
@@ -3394,19 +3426,19 @@ function renderHiddenFromView() {
   hiddenFromViewList.innerHTML = "";
   const showAgain = ui.showAgainLabel || "Show again";
   const momentLabel = LANG === "es" ? "Momento" : "Moment";
-  ids.forEach((id, index) => {
+  entries.forEach((entry, index) => {
     const li = document.createElement("li");
     li.className = "hidden-from-view-item";
     const label = document.createElement("span");
     label.className = "hidden-from-view-item-label";
-    label.textContent = `${momentLabel} ${index + 1}`;
+    label.textContent = entry.label || `${momentLabel} ${index + 1}`;
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "text-button hidden-from-view-show-again";
     btn.textContent = showAgain;
     btn.setAttribute("aria-label", (LANG === "es" ? "Mostrar de nuevo este momento" : "Show this moment again"));
     btn.addEventListener("click", () => {
-      removeHiddenMomentId(id);
+      removeHiddenMomentId(entry.id);
       if (observatoryState?.sharedMoments) refreshObservatoryLists(observatoryState.sharedMoments);
       renderHiddenFromView();
     });
