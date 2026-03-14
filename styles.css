@@ -1536,23 +1536,25 @@ html.theme-atmosphere .atm-reading-line {
   outline-offset: 2px;
 }
 
-/* Sector trust-microcopy + botón "i": mismo bloque, centrado en la columna del hero */
+/* Sector trust-microcopy + botón "i": columna única para alinear con cta-microcopy */
 .trust-microcopy-wrap {
   position: relative;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 0.5rem;
-  flex-wrap: wrap;
   margin-top: 0.5rem;
   width: 100%;
   max-width: 34ch;
 }
 .trust-microcopy-wrap .trust-microcopy {
   margin: 0;
+  text-align: center;
+  width: 100%;
 }
 .atmosphere-grounding .instrument-info-btn {
   margin: 0;
+  flex-shrink: 0;
 }
 
 /* Tooltip/popover del botón "i": flotante, no desplaza el layout */
