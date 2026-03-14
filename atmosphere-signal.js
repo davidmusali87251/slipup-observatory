@@ -131,9 +131,24 @@
     }
     if (labelEl) {
       const prefix = lang() === "es" ? "Atmósfera: " : "Atmosphere: ";
-      labelEl.textContent = prefix + state.label;
-      labelEl.classList.toggle("hidden", !state.label);
-      if (state.label) report("atmosphere.reading_shown", { level: state.level, label: state.label, score: opts.score });
+      const newText = state.label ? prefix + state.label : "";
+      if (newText !== labelEl.textContent) {
+        if (!reduceMotion() && state.label) {
+          labelEl.classList.add("atm-reading-updating");
+          setTimeout(function () {
+            labelEl.textContent = newText;
+            labelEl.classList.toggle("hidden", !state.label);
+            labelEl.classList.remove("atm-reading-updating");
+            if (state.label) report("atmosphere.reading_shown", { level: state.level, label: state.label, score: opts.score });
+          }, 250);
+        } else {
+          labelEl.textContent = newText;
+          labelEl.classList.toggle("hidden", !state.label);
+          if (state.label) report("atmosphere.reading_shown", { level: state.level, label: state.label, score: opts.score });
+        }
+      } else {
+        labelEl.classList.toggle("hidden", !state.label);
+      }
     }
     if (spawnPoints && signalsEl && state.level > 0 && !reduceMotion()) {
       spawnSignals(signalsEl, Math.min(6, Math.round(1 + state.level * 5)), state.level);
