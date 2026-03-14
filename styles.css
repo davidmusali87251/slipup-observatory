@@ -1564,24 +1564,6 @@ html.theme-atmosphere .atm-reading-line {
   flex-shrink: 0;
 }
 
-.hero-report-link {
-  display: inline-block;
-  margin-top: 0.6rem;
-  font-size: 0.7rem;
-  color: var(--muted);
-  opacity: 0.82;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-.hero-report-link:hover {
-  color: var(--text);
-  opacity: 1;
-}
-.hero-report-link:focus-visible {
-  outline: 2px solid color-mix(in oklab, var(--text) 35%, transparent);
-  outline-offset: 2px;
-}
-
 /* Tooltip/popover del botón "i": flotante, no desplaza el layout */
 .instrument-info-popover {
   display: none;
@@ -4218,6 +4200,13 @@ section.panel.panel-recent {
 .moment-report-btn:focus-visible {
   outline: 2px solid color-mix(in oklab, var(--text) 35%, transparent);
   outline-offset: 2px;
+}
+
+html.theme-atmosphere .moment-report-btn {
+  color: rgba(255, 255, 255, 0.72);
+}
+html.theme-atmosphere .moment-report-btn:hover {
+  color: rgba(255, 255, 255, 1);
 }
 
 .local-climate-moments .moment-item-nearby .moment-relate-controls {
