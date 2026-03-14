@@ -188,8 +188,31 @@ html.theme-atmosphere body::before {
     rgba(15, 18, 38, 0.06) 52%,
     transparent 72%
   );
-  opacity: min(1, calc(0.95 * (var(--mist-opacity) / 0.14)));
+  opacity: min(1, calc(0.95 * (var(--mist-opacity) / 0.14) * (1 + var(--quiet-drift, 0))));
   transition: opacity 1500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Ritmo basal cuando el campo está muy quieto: deriva mínima de la niebla (no compite con actividad real) */
+@property --quiet-drift {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@keyframes quiet-field-drift {
+  0%, 100% { --quiet-drift: 0; }
+  50% { --quiet-drift: 0.03; }
+}
+
+html.theme-atmosphere[data-field-quiet="true"] body::before {
+  animation: quiet-field-drift 16s ease-in-out infinite;
+  animation-delay: -8s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.theme-atmosphere[data-field-quiet="true"] body::before {
+    animation: none;
+  }
 }
 
 /* Estados atmosféricos: mismo royal violet, modulación por opacidad/densidad/temperatura leve (no por matiz fuerte). */

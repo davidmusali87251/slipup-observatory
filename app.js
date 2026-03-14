@@ -820,7 +820,7 @@ const UI_COPY = {
     sheetCount: () => "Showing recent.",
     loading: "Loading…",
     localFieldMomentsLabel: "In the nearby field",
-    nearbyIntroLine: "Local field reading.",
+    nearbyIntroLine: "Reading nearby.",
     nearbyMomentsLabel: "Moments nearby",
     nearbyReadingStable: ["Quiet.", "Steady.", "Holds."],
     nearbyReadingClearing: ["Light movement.", "Easing.", "Opening."],
@@ -928,7 +928,7 @@ const UI_COPY = {
     sheetTitleNearby: "Moments cercanos",
     sheetCountNearby: "Se muestran cercanos.",
     localFieldMomentsLabel: "En el campo cercano",
-    nearbyIntroLine: "Lectura del campo cercano.",
+    nearbyIntroLine: "Lectura cercana.",
     nearbyMomentsLabel: "Momentos cercanos",
     nearbyReadingStable: ["Tranquilo.", "Estable.", "Se mantiene."],
     nearbyReadingClearing: ["Movimiento suave.", "Aflojando.", "Abriendo."],
@@ -3108,7 +3108,7 @@ function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby", p
   const allScopes = fieldLensModel?.byValue ? Array.from(fieldLensModel.byValue.values()) : null;
   renderRegionalMomentsList(sharedMoments || [], fieldScope, allScopes);
   const ui = UI_COPY[LANG] || UI_COPY.en;
-  if (localClimateIntro) localClimateIntro.textContent = ui.nearbyIntroLine || "Local field reading.";
+  if (localClimateIntro) localClimateIntro.textContent = ui.nearbyIntroLine || "Reading nearby.";
 
   const pressureMode = localState?.pressureMode || "stabilizing";
   const seed = Math.round((localState?.computedDegree || BASELINE) * 10) + (localState?.total || 0);
@@ -3904,6 +3904,16 @@ async function boot() {
     observatoryPipeline,
     fieldLensModel,
   };
+
+  const level = (canonicalState?.computedDegree ?? 0) / 100;
+  const isFieldQuiet = level < 0.18;
+  if (prefersReducedMotion) {
+    document.documentElement.removeAttribute("data-field-quiet");
+  } else if (isFieldQuiet) {
+    document.documentElement.setAttribute("data-field-quiet", "true");
+  } else {
+    document.documentElement.removeAttribute("data-field-quiet");
+  }
 
   if (typeof window !== "undefined" && /[?&]debug=1/.test(window.location.search)) {
     ensureClimateDebugPanel();
