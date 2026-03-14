@@ -64,6 +64,28 @@
     return { label: l.dense, level: 1 };
   }
 
+  /** Tipo dominante en ventana (mismo peso temporal que score). Modula campo violeta (data-atmosphere-state). */
+  function getDominantType(moments) {
+    if (!Array.isArray(moments) || moments.length === 0) return "observed";
+    const now = Date.now();
+    const cutoff = now - WINDOW_MS;
+    var sums = { avoidable: 0, fertile: 0, observed: 0 };
+    moments.forEach(function (m) {
+      const raw = m.timestamp || m.created_at;
+      const ts = raw ? new Date(raw).getTime() : 0;
+      if (ts < cutoff) return;
+      const ageHours = (now - ts) / 3600000;
+      const w = (WEIGHTS[String(m.type || "observed").toLowerCase()] || 0.7) * Math.exp(-ageHours / tuning.DECAY_HALFLIFE_HOURS);
+      const t = String(m.type || "observed").toLowerCase();
+      if (t === "avoidable") sums.avoidable += w;
+      else if (t === "fertile") sums.fertile += w;
+      else sums.observed += w;
+    });
+    if (sums.avoidable >= sums.fertile && sums.avoidable >= sums.observed) return "avoidable";
+    if (sums.fertile >= sums.observed) return "fertile";
+    return "observed";
+  }
+
   function setTuning(opts) {
     if (opts && typeof opts === "object") {
       if (Number.isFinite(opts.DECAY_HALFLIFE_HOURS)) tuning.DECAY_HALFLIFE_HOURS = opts.DECAY_HALFLIFE_HOURS;
@@ -89,6 +111,10 @@
     opts = opts || {};
     if (pulseActive === undefined) pulseActive = state.level > 0.35;
     if (spawnPoints === undefined) spawnPoints = true;
+    const dominantType = opts.dominantType || "observed";
+    try {
+      document.documentElement.setAttribute("data-atmosphere-state", dominantType);
+    } catch (_) {}
     const horizonBar = document.getElementById("horizonPulseBar");
     const labelEl = document.getElementById("atmReadingLine");
     const signalsEl = document.getElementById("atmSignals");
@@ -152,13 +178,15 @@
 
     var score = computeScore(moments);
     var state = getState(score);
+    var dominantType = getDominantType(moments);
+    var baseOpts = { score: score, dominantType: dominantType };
     if (pulseDelay > 0 && !reduceMotion()) {
-      applyVisuals(state, false, false, { pulseDelayMs: pulseDelay, score: score });
+      applyVisuals(state, false, false, Object.assign({ pulseDelayMs: pulseDelay }, baseOpts));
       setTimeout(function () {
-        applyVisuals(state, state.level > 0.35, true, { pulseDelayMs: pulseDelay, score: score });
+        applyVisuals(state, state.level > 0.35, true, Object.assign({ pulseDelayMs: pulseDelay }, baseOpts));
       }, pulseDelay);
     } else {
-      applyVisuals(state, undefined, true, { score: score });
+      applyVisuals(state, undefined, true, baseOpts);
     }
   }
 

@@ -2504,11 +2504,22 @@ function createMomentItemElement(m, options = {}) {
     }
   });
 
+  const removeLabel = ui.momentRemoveLabel || "Remove";
+  const removeAria = ui.momentRemoveAria || "Remove this moment from your view";
   const removeBtn = document.createElement("button");
   removeBtn.type = "button";
-  removeBtn.className = "moment-remove-btn text-button";
-  removeBtn.setAttribute("aria-label", ui.momentRemoveAria || "Remove this moment from your view");
-  removeBtn.textContent = ui.momentRemoveLabel || "Remove";
+  removeBtn.className = "moment-remove-btn text-button moment-control-symbol";
+  removeBtn.setAttribute("aria-label", removeAria);
+  removeBtn.title = removeLabel;
+  removeBtn.textContent = "\u00D7";
+  const removeTooltip = document.createElement("span");
+  removeTooltip.className = "moment-control-tooltip";
+  removeTooltip.setAttribute("role", "tooltip");
+  removeTooltip.textContent = removeLabel;
+  const removeWrap = document.createElement("span");
+  removeWrap.className = "moment-control-wrap";
+  removeWrap.appendChild(removeBtn);
+  removeWrap.appendChild(removeTooltip);
   removeBtn.addEventListener("click", (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -2539,12 +2550,23 @@ function createMomentItemElement(m, options = {}) {
       encodeURIComponent(body)
     );
   })();
+  const reportLabel = ui.momentReportLabel || "Report";
+  const reportAria = ui.momentReportAria || "Report this moment to moderators";
   const reportLink = document.createElement("a");
   reportLink.href = reportHref;
-  reportLink.className = "moment-report-btn text-button";
-  reportLink.setAttribute("aria-label", ui.momentReportAria || "Report this moment to moderators");
+  reportLink.className = "moment-report-btn text-button moment-control-symbol";
+  reportLink.setAttribute("aria-label", reportAria);
+  reportLink.title = reportLabel;
   reportLink.rel = "noopener noreferrer";
-  reportLink.textContent = ui.momentReportLabel || "Report";
+  reportLink.textContent = "\u0021";
+  const reportTooltip = document.createElement("span");
+  reportTooltip.className = "moment-control-tooltip";
+  reportTooltip.setAttribute("role", "tooltip");
+  reportTooltip.textContent = reportLabel;
+  const reportWrap = document.createElement("span");
+  reportWrap.className = "moment-control-wrap";
+  reportWrap.appendChild(reportLink);
+  reportWrap.appendChild(reportTooltip);
   reportLink.addEventListener("click", (e) => {
     e.preventDefault();
     addHiddenMomentId(momentId);
@@ -2559,8 +2581,8 @@ function createMomentItemElement(m, options = {}) {
   wrap.appendChild(relateBtn);
   wrap.appendChild(infoBtn);
   wrap.appendChild(infoTooltip);
-  wrap.appendChild(removeBtn);
-  wrap.appendChild(reportLink);
+  wrap.appendChild(removeWrap);
+  wrap.appendChild(reportWrap);
   li.appendChild(wrap);
   return li;
 }

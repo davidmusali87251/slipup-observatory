@@ -85,33 +85,51 @@ body {
   overscroll-behavior-y: none;
 }
 
-/* ─── Tema atmosférico (violeta royal + fondo profundo). Activar con class="theme-atmosphere" en <html>. ─── */
+/* ─── Tema atmosférico: noche violeta + niebla + royal como energía. Sistema cromático derivado de #5C3DFF. ─── */
 html.theme-atmosphere {
   color-scheme: dark;
-  --bg: #0B0C1A;
-  --bg-deep: #0f1024;
-  --bg-ink: #1B1540;
+  /* Base: cielo nocturno profundo (no lila; gravedad del observatorio) */
+  --sky-base: #0B0D1F;
+  --sky-mid: #11142a;
+  --sky-deep: #080912;
+  --bg: var(--sky-base);
+  --bg-deep: #0f1028;
+  --bg-ink: #1C1748;
   --text: #E6E6F0;
   --muted: #9B8FBF;
   --line: #2a2555;
-  --card: rgba(27, 21, 64, 0.5);
+  --card: rgba(28, 23, 72, 0.5);
+  /* Royal Violet = energía principal (horizonte, señales, acentos) */
   --royal: #5C3DFF;
+  --royal-core: #5C3DFF;
   --glow: #8B6CFF;
-  --soft: #C8B6FF;
+  --violet-light: #7A63FF;
+  --violet-mist: rgba(168, 156, 255, 0.15);
+  --soft: #C9C4FF;
   --relate-accent: #5C3DFF;
   --relate-accent-soft: #8B6CFF;
-  --layer-horizon: rgba(27, 21, 64, 0.6);
+  --layer-horizon: rgba(33, 28, 84, 0.6);
   --layer-air: rgba(92, 61, 255, 0.08);
-  --layer-ground: rgba(27, 21, 64, 0.4);
-  /* Intensidad del glow (CTA, sombras, fondo). JS puede setear vía atmosphere.bump() para subir temporalmente. */
+  --layer-ground: rgba(28, 23, 72, 0.4);
+  /* Sistema Royal Violet: 1 base #0B0D1F, 2 atm #1C1748, 3 royal #5C3DFF, 4 light #7A63FF, 5 mist #A89CFF, 6 texto #C9C4FF. Moduladores para estados (data-atmosphere-state en <html>). */
+  --signal-glow: rgba(92, 61, 255, 0.18);
+  --mist-opacity: 0.14;
   --atm-glow-alpha: 0.2;
   --atm-glow-hero: calc(0.18 * (var(--atm-glow-alpha) / 0.2));
 }
+
+/* Cuerpo: noche profunda + gradiente vertical (más profundidad abajo) */
 html.theme-atmosphere body {
-  background: #0B0C1A;
+  background: linear-gradient(
+    180deg,
+    var(--sky-mid) 0%,
+    var(--sky-base) 42%,
+    var(--sky-deep) 100%
+  );
   color: var(--text);
 }
-/* Capa fija del efecto atmosférico: mismo aspecto en desktop, móvil y ventana privada (no depende de background-attachment: fixed) */
+
+/* Capa fija: niebla violeta radial (atmósfera, no fondo plano). Royal como emanación. */
 html.theme-atmosphere body::before {
   content: "";
   position: fixed;
@@ -119,12 +137,29 @@ html.theme-atmosphere body::before {
   z-index: -1;
   pointer-events: none;
   background: radial-gradient(
-    circle at 50% 18%,
-    rgba(92, 61, 255, var(--atm-glow-hero)) 0%,
-    rgba(27, 21, 64, 0.25) 35%,
-    transparent 70%
+    ellipse 120% 80% at 50% 18%,
+    rgba(92, 61, 255, calc(var(--atm-glow-hero) * 1.2)) 0%,
+    rgba(50, 35, 120, 0.2) 28%,
+    rgba(15, 18, 38, 0.06) 52%,
+    transparent 72%
   );
+  opacity: 0.95;
 }
+
+/* Estados atmosféricos: mismo violeta, modulación sutil (opcional; app puede setear data-atmosphere-state en <html>). */
+html.theme-atmosphere[data-atmosphere-state="avoidable"] {
+  --signal-glow: rgba(79, 70, 216, 0.16);
+  --mist-opacity: 0.1;
+}
+html.theme-atmosphere[data-atmosphere-state="fertile"] {
+  --signal-glow: rgba(106, 77, 255, 0.22);
+  --violet-light: #7B61FF;
+}
+html.theme-atmosphere[data-atmosphere-state="observed"] {
+  --signal-glow: rgba(90, 86, 200, 0.14);
+  --violet-mist: rgba(140, 130, 232, 0.12);
+}
+
 /* Royal solo en horizonte, señales y hover (intencional, no saturado) */
 html.theme-atmosphere .cta-observatory:hover,
 html.theme-atmosphere .topbar-brand:hover,
@@ -936,7 +971,7 @@ h2 {
   filter: blur(8px);
 }
 html.theme-atmosphere .horizon-pulse-bar {
-  background: linear-gradient(90deg, transparent, rgba(139, 108, 255, 0.18), transparent);
+  background: linear-gradient(90deg, transparent, var(--signal-glow), transparent);
 }
 html.theme-atmosphere .horizon-pulse-bar::before {
   background: radial-gradient(ellipse 80% 50% at 50% 20%, rgba(92, 61, 255, 0.06) 0%, transparent 60%);
@@ -4034,10 +4069,10 @@ section.panel.panel-recent {
   }
 }
 
-/* Contenedor: botón de acción + botón "i". Observatorio: anotación a la derecha, misma columna en cada fila. */
+/* Contenedor: botón de acción + botón "i" + Remove + Report. Una sola barra continua, estilo observatory. */
 .moment-relate-controls {
   position: relative;
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.35rem;
@@ -4046,6 +4081,49 @@ section.panel.panel-recent {
 
 #recentMoments.moment-list .moment-item .moment-relate-controls {
   align-self: flex-end;
+}
+
+/* Móvil: barra única con fondo sutil para que no se vean líneas discontinuas; estilo observatory. */
+@media (max-width: 600px) {
+  .moment-relate-controls {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.25rem 0.4rem;
+    padding: 0.35rem 0.5rem;
+    margin-top: 0.35rem;
+    background: color-mix(in oklab, var(--bg) 94%, var(--line));
+    border: 1px solid color-mix(in oklab, var(--line) 35%, transparent);
+    border-radius: 12px;
+    box-shadow: 0 1px 0 color-mix(in oklab, #fff 25%, transparent) inset;
+  }
+  .moment-relate-controls .moment-relate-btn {
+    padding: 0.28rem 0.5rem;
+    font-size: 0.68rem;
+  }
+  .moment-relate-controls .moment-control-wrap {
+    margin-left: 0;
+  }
+  .moment-relate-controls .moment-control-symbol.moment-remove-btn,
+  .moment-relate-controls .moment-control-symbol.moment-report-btn {
+    margin-left: 0;
+  }
+  .moment-relate-controls .moment-relate-info-btn {
+    width: 1.2rem;
+    height: 1.2rem;
+    min-width: 1.2rem;
+    min-height: 1.2rem;
+    font-size: 0.6rem;
+  }
+}
+
+/* Tema atmosphere: en móvil la barra de controles con tinte violeta suave. */
+@media (max-width: 600px) {
+  html.theme-atmosphere .moment-relate-controls {
+    background: color-mix(in oklab, rgba(92, 61, 255, 0.08) 40%, var(--bg));
+    border-color: color-mix(in oklab, rgba(92, 61, 255, 0.2) 50%, transparent);
+  }
 }
 
 .moment-relate-info-btn {
@@ -4167,21 +4245,42 @@ section.panel.panel-recent {
     inset 0 1px 0 color-mix(in oklab, #fff 60%, transparent);
 }
 
-.moment-remove-btn {
-  font: inherit;
-  font-size: 0.7rem;
-  color: var(--text-muted, #666);
-  background: none;
-  border: none;
-  padding: 0 0.25rem;
-  cursor: pointer;
-  margin-left: 0.35rem;
-}
-.moment-remove-btn:hover {
-  color: var(--text);
-  text-decoration: underline;
+.moment-control-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
 }
 
+.moment-control-tooltip {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 100%;
+  margin-bottom: 0.35rem;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  color: color-mix(in oklab, var(--text) 88%, var(--muted));
+  background: color-mix(in oklab, var(--bg) 96%, var(--line));
+  border: 1px solid color-mix(in oklab, var(--line) 40%, transparent);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px color-mix(in oklab, var(--text) 10%, transparent);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 6;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, visibility 0.18s ease;
+}
+
+.moment-control-wrap:hover .moment-control-tooltip,
+.moment-control-wrap:focus-within .moment-control-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.moment-remove-btn,
 .moment-report-btn {
   font: inherit;
   font-size: 0.7rem;
@@ -4193,11 +4292,37 @@ section.panel.panel-recent {
   margin-left: 0.35rem;
   text-decoration: none;
 }
-.moment-report-btn:hover {
-  color: var(--text);
-  text-decoration: underline;
+
+.moment-control-symbol.moment-remove-btn,
+.moment-control-symbol.moment-report-btn {
+  width: 1.5rem;
+  height: 1.5rem;
+  min-width: 1.5rem;
+  min-height: 1.5rem;
+  padding: 0;
+  margin-left: 0.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  line-height: 1;
+  font-weight: 400;
+  border-radius: 50%;
+  opacity: 0.78;
+  transition: opacity 0.2s ease, color 0.2s ease, background 0.2s ease;
 }
-.moment-report-btn:focus-visible {
+
+.moment-control-symbol.moment-remove-btn:hover,
+.moment-control-symbol.moment-report-btn:hover {
+  opacity: 1;
+  color: var(--text);
+  background: color-mix(in oklab, var(--line) 25%, transparent);
+  text-decoration: none;
+}
+
+
+.moment-report-btn:focus-visible,
+.moment-remove-btn:focus-visible {
   outline: 2px solid color-mix(in oklab, var(--text) 35%, transparent);
   outline-offset: 2px;
 }
