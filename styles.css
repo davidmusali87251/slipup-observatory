@@ -1999,6 +1999,37 @@ html.theme-atmosphere .atm-reading-line {
   font-family: var(--font-serif);
 }
 
+.cta-observatory-wrap {
+  position: relative;
+  display: inline-block;
+}
+.cta-observatory-tooltip {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 100%;
+  margin-bottom: 0.35rem;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  color: color-mix(in oklab, var(--text) 88%, var(--muted));
+  background: color-mix(in oklab, var(--bg) 96%, var(--line));
+  border: 1px solid color-mix(in oklab, var(--line) 40%, transparent);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px color-mix(in oklab, var(--text) 10%, transparent);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 6;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, visibility 0.18s ease;
+}
+.cta-observatory-wrap:hover .cta-observatory-tooltip,
+.cta-observatory-wrap:focus-within .cta-observatory-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
 .cta-observatory {
   margin-top: 0.75rem;
   display: inline-flex;
@@ -2112,6 +2143,39 @@ html.theme-atmosphere .atm-reading-line {
   text-underline-offset: 2px;
 }
 
+/* Support the Observatory: wrap + tooltip de diseño */
+.support-observatory-wrap {
+  position: relative;
+  display: inline;
+}
+.support-observatory-tooltip {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 100%;
+  margin-bottom: 0.35rem;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  color: color-mix(in oklab, var(--text) 88%, var(--muted));
+  background: color-mix(in oklab, var(--bg) 96%, var(--line));
+  border: 1px solid color-mix(in oklab, var(--line) 40%, transparent);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px color-mix(in oklab, var(--text) 10%, transparent);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 6;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, visibility 0.18s ease;
+}
+.support-observatory-wrap:hover .support-observatory-tooltip,
+.support-observatory-wrap:focus-within .support-observatory-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
 /* Support the Observatory: brillo/reflejo para que destaque a primera vista */
 .support-observatory-link {
   color: var(--text);
@@ -2199,6 +2263,11 @@ html.theme-atmosphere .atm-reading-line {
   margin: 0 0 0.35rem;
   font-weight: 500;
 }
+.hidden-from-view-description {
+  margin: 0 0 0.5rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
 .hidden-from-view-list {
   list-style: none;
   margin: 0;
@@ -2211,6 +2280,13 @@ html.theme-atmosphere .atm-reading-line {
 .hidden-from-view-item {
   margin: 0;
   padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.hidden-from-view-item-label {
+  font-size: 0.75rem;
+  color: var(--muted);
 }
 .hidden-from-view-show-again {
   font-size: 0.7rem;
@@ -4596,6 +4672,37 @@ section.panel.panel-recent {
   opacity: 0.95;
 }
 
+.view-more-wrap {
+  position: relative;
+  display: inline-block;
+}
+.view-more-tooltip {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 100%;
+  margin-bottom: 0.35rem;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  color: color-mix(in oklab, var(--text) 88%, var(--muted));
+  background: color-mix(in oklab, var(--bg) 96%, var(--line));
+  border: 1px solid color-mix(in oklab, var(--line) 40%, transparent);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px color-mix(in oklab, var(--text) 10%, transparent);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 6;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.18s ease, visibility 0.18s ease;
+}
+.view-more-wrap:hover .view-more-tooltip,
+.view-more-wrap:focus-within .view-more-tooltip {
+  opacity: 1;
+  visibility: visible;
+}
 #viewMoreButton.text-button {
   display: inline-block;
   margin-top: 0;

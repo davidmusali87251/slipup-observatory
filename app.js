@@ -698,6 +698,7 @@ const UI_COPY = {
     emptyStateQuiet: "The atmosphere is quiet.",
     emptyStateSignal: "What settles here becomes signal.",
     momentLeavesTrace: "Every moment leaves a trace.",
+    supportObservatoryTooltip: "Donate via PayPal.",
     contributeInvite: "A shared atmosphere of human moments.\nLet one moment rise.",
     contributeFooterLine: "Let one moment rise.",
     trust: "No account. Region only. Just shared moments.",
@@ -780,6 +781,7 @@ const UI_COPY = {
     momentReportLabel: "Report",
     momentReportAria: "Report this moment to moderators",
     hiddenFromViewTitle: "Hidden from view",
+    hiddenFromViewDescription: "Moments you hid from this view. You can show them again below.",
     showAgainLabel: "Show again",
     nearbyRelateLabel: (count) => (count === 1 ? "1 nearby" : `${count} nearby`),
     sheetCount: () => "Showing recent.",
@@ -817,6 +819,7 @@ const UI_COPY = {
     emptyStateQuiet: "La atmósfera está en calma.",
     emptyStateSignal: "Lo que se asienta aquí se vuelve señal.",
     momentLeavesTrace: "Cada momento deja una traza.",
+    supportObservatoryTooltip: "Donar por PayPal.",
     contributeInvite: "Una atmósfera compartida de momentos humanos.\nDejá subir un momento.",
     contributeFooterLine: "Dejá subir un momento.",
     trust: "Sin cuenta. Solo región. Solo momentos compartidos.",
@@ -910,6 +913,7 @@ const UI_COPY = {
     momentReportLabel: "Denunciar",
     momentReportAria: "Denunciar este momento ante moderación",
     hiddenFromViewTitle: "Ocultos de tu vista",
+    hiddenFromViewDescription: "Momentos que ocultaste de tu vista. Puedes volver a mostrarlos abajo.",
     showAgainLabel: "Mostrar de nuevo",
     nearbyRelateLabel: (count) => (count === 1 ? "1 en el campo" : `${count} en el campo`),
     sheetCount: () => "Se muestran recientes.",
@@ -970,9 +974,12 @@ function applyUICopy() {
   if (contributeFooterLink && ui.contributeFooterLine) contributeFooterLink.textContent = ui.contributeFooterLine;
   const heroInstrumentLine = document.getElementById("heroInstrumentLine");
   if (heroInstrumentLine && ui.heroInstrumentLine) heroInstrumentLine.textContent = ui.heroInstrumentLine;
-  const ctaObservatory = document.getElementById("ctaObservatory");
-  if (ctaObservatory && ui.momentLeavesTrace) ctaObservatory.setAttribute("title", ui.momentLeavesTrace);
-  if (viewMoreButton && ui.momentLeavesTrace) viewMoreButton.setAttribute("title", ui.momentLeavesTrace);
+  const ctaObservatoryTooltip = document.getElementById("ctaObservatoryTooltip");
+  if (ctaObservatoryTooltip && ui.momentLeavesTrace) ctaObservatoryTooltip.textContent = ui.momentLeavesTrace;
+  const viewMoreTooltip = document.getElementById("viewMoreTooltip");
+  if (viewMoreTooltip && ui.momentLeavesTrace) viewMoreTooltip.textContent = ui.momentLeavesTrace;
+  const supportObservatoryTooltip = document.getElementById("supportObservatoryTooltip");
+  if (supportObservatoryTooltip && ui.supportObservatoryTooltip) supportObservatoryTooltip.textContent = ui.supportObservatoryTooltip;
 }
 // FUTURE: Keep scaffold switches explicit for non-active UI lines.
 const FUTURE_UI = {
@@ -2429,6 +2436,8 @@ function createMomentItemElement(m, options = {}) {
   }
 
   const momentId = m.id || `${m.timestamp || ""}-${(m.note || "").slice(0, 10)}`;
+  const localIds = new Set((loadMoments() || []).map((mom) => mom.id || `${mom.timestamp || ""}-${(mom.note || "").slice(0, 10)}`));
+  const isOwnMoment = localIds.has(momentId);
 
   const ui = UI_COPY[LANG] || UI_COPY.en;
   const relateBtn = document.createElement("button");
@@ -2475,7 +2484,6 @@ function createMomentItemElement(m, options = {}) {
   infoBtn.type = "button";
   infoBtn.className = "moment-relate-info-btn";
   infoBtn.setAttribute("aria-label", LANG === "es" ? "No estás solo" : "Not alone");
-  infoBtn.title = ui.momentRelateInfoTitle || (LANG === "es" ? "No estás solo" : "Not alone");
   infoBtn.textContent = "i";
 
   const infoTooltipText = ui.momentRelateInfoTitle || (LANG === "es" ? "No estás solo" : "Not alone");
@@ -2510,7 +2518,6 @@ function createMomentItemElement(m, options = {}) {
   removeBtn.type = "button";
   removeBtn.className = "moment-remove-btn text-button moment-control-symbol";
   removeBtn.setAttribute("aria-label", removeAria);
-  removeBtn.title = removeLabel;
   removeBtn.textContent = "\u00D7";
   const removeTooltip = document.createElement("span");
   removeTooltip.className = "moment-control-tooltip";
@@ -2556,7 +2563,6 @@ function createMomentItemElement(m, options = {}) {
   reportLink.href = reportHref;
   reportLink.className = "moment-report-btn text-button moment-control-symbol";
   reportLink.setAttribute("aria-label", reportAria);
-  reportLink.title = reportLabel;
   reportLink.rel = "noopener noreferrer";
   reportLink.textContent = "\u0021";
   const reportTooltip = document.createElement("span");
@@ -2581,7 +2587,7 @@ function createMomentItemElement(m, options = {}) {
   wrap.appendChild(relateBtn);
   wrap.appendChild(infoBtn);
   wrap.appendChild(infoTooltip);
-  wrap.appendChild(removeWrap);
+  if (isOwnMoment) wrap.appendChild(removeWrap);
   wrap.appendChild(reportWrap);
   li.appendChild(wrap);
   return li;
@@ -3372,17 +3378,28 @@ function renderHiddenFromView() {
     hiddenFromViewWrap.classList.add("hidden");
     hiddenFromViewWrap.hidden = true;
     hiddenFromViewList.innerHTML = "";
+    const descElEmpty = document.getElementById("hiddenFromViewDescription");
+    if (descElEmpty) descElEmpty.hidden = true;
     return;
   }
   hiddenFromViewWrap.classList.remove("hidden");
   hiddenFromViewWrap.hidden = false;
   const titleEl = hiddenFromViewWrap.querySelector(".hidden-from-view-title");
   if (titleEl) titleEl.textContent = ui.hiddenFromViewTitle || "Hidden from view";
+  const descEl = document.getElementById("hiddenFromViewDescription");
+  if (descEl) {
+    descEl.textContent = ui.hiddenFromViewDescription || "Moments you hid from this view. You can show them again below.";
+    descEl.hidden = false;
+  }
   hiddenFromViewList.innerHTML = "";
   const showAgain = ui.showAgainLabel || "Show again";
-  ids.forEach((id) => {
+  const momentLabel = LANG === "es" ? "Momento" : "Moment";
+  ids.forEach((id, index) => {
     const li = document.createElement("li");
     li.className = "hidden-from-view-item";
+    const label = document.createElement("span");
+    label.className = "hidden-from-view-item-label";
+    label.textContent = `${momentLabel} ${index + 1}`;
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "text-button hidden-from-view-show-again";
@@ -3393,6 +3410,7 @@ function renderHiddenFromView() {
       if (observatoryState?.sharedMoments) refreshObservatoryLists(observatoryState.sharedMoments);
       renderHiddenFromView();
     });
+    li.appendChild(label);
     li.appendChild(btn);
     hiddenFromViewList.appendChild(li);
   });

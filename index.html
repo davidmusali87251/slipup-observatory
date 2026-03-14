@@ -82,7 +82,10 @@
             <p id="atmReadingLine" class="atm-reading-line" role="status" aria-live="polite"></p>
             <p id="warmupHint" class="warmup-hint hidden" aria-live="polite"></p>
             <p id="transientReadingLine" class="transient-reading-line hidden" aria-live="polite"></p>
-            <a id="ctaObservatory" class="cta cta-observatory" href="./contribute.html" title="Every moment leaves a trace.">Contribute a moment</a>
+            <span class="cta-observatory-wrap">
+              <span id="ctaObservatoryTooltip" class="cta-observatory-tooltip" role="tooltip" aria-hidden="true"></span>
+              <a id="ctaObservatory" class="cta cta-observatory" href="./contribute.html">Contribute a moment</a>
+            </span>
             <p class="cta-microcopy">Let the atmosphere read this moment.</p>
             <div class="trust-microcopy-wrap">
               <p class="trust-microcopy">No account. Region only. Just shared moments.</p>
@@ -99,7 +102,10 @@
       <section class="panel panel-recent" aria-label="Recent shared moments">
         <div class="section-row">
           <h2 class="visually-hidden">Shared moments</h2>
-          <button id="viewMoreButton" class="text-button" type="button">View more</button>
+          <span class="view-more-wrap">
+            <span id="viewMoreTooltip" class="view-more-tooltip" role="tooltip" aria-hidden="true"></span>
+            <button id="viewMoreButton" class="text-button" type="button">View more</button>
+          </span>
         </div>
         <p id="recentContext" class="recent-context recent-context-hidden" aria-hidden="true"></p>
         <ul id="recentMoments" class="moment-list"></ul>
@@ -149,6 +155,7 @@
       </p>
       <section id="hidden-from-view-wrap" class="hidden-from-view-wrap hidden" aria-label="Hidden from view" hidden>
         <p class="hidden-from-view-title">Hidden from view</p>
+        <p class="hidden-from-view-description" id="hiddenFromViewDescription"></p>
         <ul id="hiddenFromViewList" class="hidden-from-view-list"></ul>
       </section>
       <p class="legal-links site-legal">
@@ -156,7 +163,10 @@
         <span aria-hidden="true">·</span>
         <a class="text-link" href="./terms.html">Terms</a>
         <span aria-hidden="true">·</span>
-        <a class="text-link support-observatory-link" href="https://paypal.me/slipupobservatory" target="_blank" rel="noopener noreferrer">Support the Observatory</a>
+        <span class="support-observatory-wrap">
+          <span id="supportObservatoryTooltip" class="support-observatory-tooltip" role="tooltip" aria-hidden="true"></span>
+          <a class="text-link support-observatory-link" href="https://paypal.me/slipupobservatory" target="_blank" rel="noopener noreferrer">Support the Observatory</a>
+        </span>
       </p>
     </main>
 

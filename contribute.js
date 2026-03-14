@@ -269,9 +269,18 @@ form.addEventListener("submit", async (event) => {
   }, redirectDelay);
 });
 
+/** Tooltip "Support the Observatory": mismo texto que en observatory (Donate via PayPal / Donar por PayPal). */
+function setSupportObservatoryTooltip() {
+  const el = document.getElementById("supportObservatoryTooltip");
+  if (!el) return;
+  const lang = (document.documentElement.getAttribute("lang") || "en").slice(0, 2);
+  el.textContent = lang === "es" ? "Donar por PayPal." : "Donate via PayPal.";
+}
+
 syncSaveState();
 updateNoteAnalysisLine();
 setRisePlaceholder();
 setRiseExamplesLive();
+setSupportObservatoryTooltip();
 reportObservatoryEvent("contribute_view");
 setMomentCountLine();
