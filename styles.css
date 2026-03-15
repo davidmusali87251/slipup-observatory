@@ -975,6 +975,7 @@ h2 {
   width: 100%;
   margin: 0.15rem 0 0.35rem;
   text-align: center;
+  white-space: nowrap;
 }
 .atmosphere-air .observatory-entry { margin-top: 0; }
 .atmosphere-air .atmosphere-orientation { margin-top: 0; margin-bottom: 0; }
@@ -990,6 +991,32 @@ h2 {
   margin-bottom: 0.5rem;
   padding: 1.1rem 0;
 }
+
+/* Panel unificado de lectura del observatorio: patrón + grado + resumen como un solo bloque tipo "clima" */
+.observatory-reading-panel {
+  --reading-panel-bg: color-mix(in oklab, var(--bg) 94%, var(--layer-horizon));
+  background: var(--reading-panel-bg);
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem 1.1rem;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 20rem;
+  border: 1px solid color-mix(in oklab, var(--muted) 25%, transparent);
+  box-shadow: 0 1px 0 color-mix(in oklab, var(--text) 4%, transparent);
+}
+.observatory-reading-panel .atmosphere-pattern-line {
+  margin-bottom: 0.4rem;
+}
+.observatory-reading-panel .degree-value-row {
+  margin: 0.1rem 0;
+}
+.observatory-reading-panel .climate-summary-line {
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+  font-size: 0.72rem;
+  opacity: 0.88;
+}
+
 /* #conditionLine: lectura de estado (quiet | balance | gathering | dense). Ubicado dentro de .degree-wrap para formar un solo bloque "lectura" (valor + escala + frase). */
 .atmosphere-air .condition-line {
   margin-top: 0.35rem;
@@ -1419,10 +1446,10 @@ html.theme-atmosphere .atm-reading-line {
   line-height: 1.35;
   opacity: 0.85;
   margin: 0.12rem 0 0.5rem;
-  max-width: 28ch;
   text-align: center;
   margin-left: auto;
   margin-right: auto;
+  white-space: nowrap;
 }
 
 .atmosphere-orientation {
@@ -4231,6 +4258,11 @@ body.contribute-ritual .page {
 
   .degree-wrap {
     gap: 0.25rem;
+  }
+
+  .observatory-reading-panel {
+    padding: 0.85rem 1rem 1rem;
+    max-width: 100%;
   }
 
   .observatory-hero .hero-instrument-line {
