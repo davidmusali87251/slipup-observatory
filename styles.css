@@ -3236,7 +3236,7 @@ html.theme-atmosphere .panel-recent::after {
   border-top: 1px solid color-mix(in oklab, #5B4B8A 28%, transparent);
 }
 
-/* Tierra: capa continua desde Horizon, transición observatorio (sin caja de panel) */
+/* Tierra: capa continua desde Horizon, transición observatorio (sin caja de panel). Borde superior en degradado horizonte → Strata. */
 .ground-strata.is-active {
   height: auto;
   opacity: 1;
@@ -3248,33 +3248,43 @@ html.theme-atmosphere .panel-recent::after {
   border-radius: 0;
   border: none;
   box-shadow: none;
-  background:
+  background-image:
+    linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--layer-ground-soft) 38%, var(--layer-horizon-soft)) 0%,
+      color-mix(in oklab, #5B4B8A 20%, transparent) 100%
+    ),
     linear-gradient(
       180deg,
       color-mix(in oklab, #5B4B8A 16%, transparent) 0%,
       color-mix(in oklab, #4a3a72 52%, #1a0a2e 8%) 42%,
       color-mix(in oklab, #2d1b4e 48%, #1a0a2e 14%) 100%
     );
+  background-size: 100% 36px, 100% 100%;
+  background-position: 0 0, 0 0;
+  background-repeat: no-repeat;
 }
 
-/* Transición observatorio: Horizon se funde en Strata (gradiente alto, sin corte) */
+/* Transición observatorio: Horizon se funde en Strata (gradiente alto sobre el borde, sin corte) */
 .ground-strata::before {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  top: -100px;
-  height: 120px;
+  top: -120px;
+  height: 140px;
   pointer-events: none;
   background: linear-gradient(
     180deg,
     transparent 0%,
-    color-mix(in oklab, #5B4B8A 6%, transparent) 20%,
-    color-mix(in oklab, #5B4B8A 14%, transparent) 45%,
-    color-mix(in oklab, #4a3a72 40%, transparent) 75%,
-    color-mix(in oklab, #4a3a72 55%, transparent) 100%
+    color-mix(in oklab, var(--layer-horizon-soft) 12%, transparent) 15%,
+    color-mix(in oklab, #5B4B8A 4%, transparent) 28%,
+    color-mix(in oklab, #5B4B8A 10%, transparent) 45%,
+    color-mix(in oklab, #5B4B8A 18%, transparent) 65%,
+    color-mix(in oklab, #4a3a72 38%, transparent) 85%,
+    color-mix(in oklab, #4a3a72 52%, transparent) 100%
   );
-  opacity: 0.9;
+  opacity: 0.92;
 }
 
 .ground-strata.is-active .strata-lines {
