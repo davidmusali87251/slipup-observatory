@@ -742,7 +742,7 @@ const UI_COPY = {
     mixLine: (type, mood) => `Mostly ${type}, ${mood}.`,
     eyebrowLayer: "Atmosphere",
     eyebrowContext: "Moments",
-    heroIdentityLine: "A shared reading of human moments.",
+    heroIdentityLine: "Shared human moments.",
     sharedFieldLine: "Shared field — last 48h",
     horizonTitle: "Horizon",
     horizonMoreLabel: "Deeper",
@@ -868,7 +868,7 @@ const UI_COPY = {
     mixLine: (type, mood) => `Sobre todo ${type}, ${mood}.`,
     eyebrowLayer: "Atmósfera",
     eyebrowContext: "Momentos",
-    heroIdentityLine: "Una lectura compartida de momentos humanos.",
+    heroIdentityLine: "Momentos humanos compartidos.",
     sharedFieldLine: "Campo compartido — últimas 48 h",
     horizonTitle: "Horizonte",
     horizonMoreLabel: "Más",
@@ -1023,11 +1023,8 @@ function applyUICopy() {
   if (viewMoreTooltip && ui.momentLeavesTrace) viewMoreTooltip.textContent = ui.momentLeavesTrace;
   const supportObservatoryTooltip = document.getElementById("supportObservatoryTooltip");
   if (supportObservatoryTooltip && ui.supportObservatoryTooltip) supportObservatoryTooltip.textContent = ui.supportObservatoryTooltip;
-  const strataSeedsBtn = document.getElementById("strataSeedsBtn");
-  if (strataSeedsBtn && ui.strataSeedsLabel) {
-    strataSeedsBtn.textContent = ui.strataSeedsLabel;
-    strataSeedsBtn.setAttribute("aria-label", ui.strataSeedsLabel + " — " + (LANG === "es" ? "registro personal" : "personal record"));
-  }
+  const strataSeedsEl = document.getElementById("strataSeedsBtn");
+  if (strataSeedsEl && ui.strataSeedsLabel) strataSeedsEl.textContent = ui.strataSeedsLabel;
 }
 // FUTURE: Keep scaffold switches explicit for non-active UI lines.
 const FUTURE_UI = {
