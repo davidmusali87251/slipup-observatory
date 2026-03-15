@@ -999,9 +999,6 @@ h2 {
   box-shadow: none;
   border-radius: 0;
 }
-.observatory-reading-panel .atmosphere-pattern-line {
-  margin-bottom: 0.4rem;
-}
 .observatory-reading-panel .degree-value-row {
   margin: 0.1rem 0;
 }
@@ -1440,7 +1437,7 @@ html.theme-atmosphere .atm-reading-line {
   letter-spacing: 0.12em;
   line-height: 1.35;
   opacity: 0.85;
-  margin: 0.12rem 0 0.5rem;
+  margin: 0.12rem 0 1rem;
   text-align: center;
   margin-left: auto;
   margin-right: auto;
@@ -2079,6 +2076,13 @@ html.theme-atmosphere .atm-reading-line {
   margin-top: 0.5rem;
   margin-bottom: 1rem;
   font-style: italic;
+}
+
+/* Patrón justo debajo de atmReadingLine, encima del degree-wrap */
+.atmosphere-air > .atmosphere-pattern-line {
+  text-align: center;
+  margin-top: 0.4rem;
+  margin-bottom: 0.6rem;
 }
 
 /* Patrón (type|mood) arriba del grado; el valor numérico va debajo */
