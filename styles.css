@@ -2078,10 +2078,10 @@ html.theme-atmosphere .atm-reading-line {
   font-style: italic;
 }
 
-/* Patrón justo debajo de atmReadingLine, encima del degree-wrap */
+/* Patrón justo debajo de atmReadingLine, unidos como un bloque */
 .atmosphere-air > .atmosphere-pattern-line {
   text-align: center;
-  margin-top: 0.4rem;
+  margin-top: 0.15rem;
   margin-bottom: 0.6rem;
 }
 
@@ -2127,7 +2127,7 @@ html.theme-atmosphere .atm-reading-line {
   opacity: 0.55;
 }
 .atmosphere-air .atm-reading-line {
-  margin: 0.12rem 0 0.5rem;
+  margin: 0.12rem 0 0.15rem;
   text-align: center;
 }
 .atmosphere-grounding .hero-instrument-line {
