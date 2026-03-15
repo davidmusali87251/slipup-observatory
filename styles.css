@@ -1137,7 +1137,7 @@ html.theme-atmosphere[data-atmosphere-state="observed"] .atmosphere-grounding::a
   top: -20px;
   height: 56px;
   background: radial-gradient(ellipse 80% 50% at 50% 20%, var(--horizon-base) 0%, transparent 60%);
-  filter: blur(14px);
+  filter: blur(18px);
   opacity: 1;
   pointer-events: none;
   transform: translateZ(0);
@@ -1336,7 +1336,7 @@ html.theme-atmosphere .atm-reading-line {
   border-radius: 999px;
   background: color-mix(in oklab, var(--scope-accent) 45%, #ffffff);
   transform: translate(-50%, -50%) scale(0.86);
-  opacity: 0.3;
+  opacity: 0.45;
   transition: opacity 260ms ease, transform 260ms ease;
 }
 
@@ -1679,10 +1679,11 @@ html.theme-atmosphere .atm-reading-line {
   transition: opacity 220ms ease;
 }
 
-/* Hero: número como lectura del cielo, integrado con la atmósfera (no blanco puro) */
+/* Hero: número como lectura del cielo, integrado con la atmósfera (no blanco puro). Presencia sutil ligada al campo (--degree-presence 0.94→1). */
 .observatory-hero .degree-value {
   color: #4a5c6e;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+  opacity: var(--degree-presence, 1);
 }
 
 .degree-value.is-pending {
@@ -2052,7 +2053,7 @@ html.theme-atmosphere .atm-reading-line {
   font-size: 0.45em;
   position: relative;
   top: -0.4em;
-  margin-left: 0.02em;
+  margin-left: -0.04em;
   font-weight: 400;
 }
 

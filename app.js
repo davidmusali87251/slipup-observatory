@@ -3917,10 +3917,12 @@ async function boot() {
   const isFieldQuiet = level < 0.18;
   if (prefersReducedMotion) {
     document.documentElement.removeAttribute("data-field-quiet");
-  } else if (isFieldQuiet) {
-    document.documentElement.setAttribute("data-field-quiet", "true");
+    if (degreeValue) degreeValue.style.removeProperty("--degree-presence");
   } else {
-    document.documentElement.removeAttribute("data-field-quiet");
+    if (isFieldQuiet) document.documentElement.setAttribute("data-field-quiet", "true");
+    else document.documentElement.removeAttribute("data-field-quiet");
+    const presence = 0.94 + 0.06 * Math.min(1, Math.max(0, level));
+    if (degreeValue) degreeValue.style.setProperty("--degree-presence", String(presence));
   }
 
   if (typeof window !== "undefined" && /[?&]debug=1/.test(window.location.search)) {
