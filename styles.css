@@ -971,8 +971,10 @@ h2 {
 /* Columna única: todos los elementos centrados en el mismo eje */
 .atmosphere-air .observatory-entry,
 .atmosphere-air .degree-wrap,
-.atmosphere-air .hero-instrument-line {
+.atmosphere-air .hero-identity-line {
   width: 100%;
+  margin: 0.15rem 0 0.35rem;
+  text-align: center;
 }
 .atmosphere-air .observatory-entry { margin-top: 0; }
 .atmosphere-air .atmosphere-orientation { margin-top: 0; margin-bottom: 0; }
@@ -2102,7 +2104,7 @@ html.theme-atmosphere .atm-reading-line {
   margin: 0.12rem 0 0.5rem;
   text-align: center;
 }
-.atmosphere-grounding .hero-identity-line {
+.atmosphere-grounding .hero-instrument-line {
   margin: 0.35rem 0 0.5rem;
   text-align: center;
 }

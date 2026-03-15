@@ -743,7 +743,7 @@ const UI_COPY = {
     mixLine: (type, mood) => `Mostly ${type}, ${mood}.`,
     eyebrowLayer: "Atmosphere",
     eyebrowContext: "Moments",
-    heroIdentityLine: "Where the human moments land.",
+    heroIdentityLine: "Where human moments land.",
     sharedFieldLine: "Shared field — last 48h",
     horizonTitle: "Horizon",
     horizonMoreLabel: "Deeper",
