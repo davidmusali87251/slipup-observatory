@@ -1371,8 +1371,9 @@ html.theme-atmosphere .atm-reading-line {
   margin: 0;
 }
 
-/* Hero: "Atmosphere" como etiqueta del canal del instrumento, no título editorial */
+/* Hero: "Atmosphere" — mismo estilo que NEARBY / Horizon (coherencia títulos de canal) */
 .observatory-hero .observatory-entry .eyebrow-layer {
+  color: #6b7d8f;
   font-size: 0.72rem;
   font-weight: 500;
   letter-spacing: 0.12em;
@@ -1407,19 +1408,19 @@ html.theme-atmosphere .atm-reading-line {
 }
 
 /* Definición del instrumento: qué es esto (canal → identidad → medición). No compite con el número. */
+/* Misma familia y peso que títulos de canal; frase en sentence case */
 .hero-identity-line {
-  font-family: var(--font-reading);
-  font-size: 0.78rem;
+  color: #6b7d8f;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
   line-height: 1.35;
-  letter-spacing: 0.03em;
-  color: var(--muted);
-  opacity: 0.78;
+  opacity: 0.85;
   margin: 0.12rem 0 0.5rem;
   max-width: 28ch;
   text-align: center;
   margin-left: auto;
   margin-right: auto;
-  font-weight: 400;
 }
 
 .atmosphere-orientation {
@@ -1502,7 +1503,7 @@ html.theme-atmosphere .atm-reading-line {
   }
 
   .hero-identity-line {
-    font-size: 0.82rem;
+    font-size: 0.75rem;
   }
 
   .observatory-hero .climate-summary-line {
@@ -1558,7 +1559,7 @@ html.theme-atmosphere .atm-reading-line {
   }
 
   .degree-value {
-    font-size: clamp(3.75rem, 24vw, 5.25rem);
+    font-size: clamp(8rem, 50vw, 12rem);
   }
 
   .atmosphere-air .condition-line {
@@ -2528,9 +2529,11 @@ html.theme-atmosphere .atm-reading-line {
   text-align: center;
   padding-top: 1.35rem;
   margin-bottom: 1.4rem;
-  letter-spacing: 0.08em;
-  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
   font-weight: 500;
+  text-transform: uppercase;
+  opacity: 0.85;
 }
 
 .horizon-line::before {
@@ -2710,8 +2713,13 @@ html.theme-atmosphere .panel-recent::after {
   );
 }
 
+/* Capa Horizon: transición continua, sin caja de panel */
 .panel-horizon {
   margin-top: var(--descent-gap-horizon);
+  border: none;
+  border-radius: 0;
+  backdrop-filter: none;
+  box-shadow: none;
   background:
     linear-gradient(
       180deg,
@@ -2720,29 +2728,28 @@ html.theme-atmosphere .panel-recent::after {
       color-mix(in srgb, var(--layer-ground) calc(24% + var(--atmo) * 0.1%), transparent) 100%
     ),
     color-mix(in srgb, var(--card) calc(92% - var(--atmo) * 0.2%), var(--layer-horizon-soft));
-  border-color: color-mix(in oklab, var(--card) 26%, transparent);
-  border-bottom: none;
   position: relative;
   overflow: hidden;
 }
 
-/* Transición observatorio: Horizon se funde hacia la tierra (sin corte) */
+/* Transición observatorio: Horizon se funde hacia Strata (gradiente largo, sin corte) */
 .panel-horizon::after {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 56%;
+  height: 72%;
   pointer-events: none;
   background: linear-gradient(
     180deg,
     #ffffff00 0%,
-    color-mix(in oklab, var(--layer-horizon-soft) 22%, transparent) 35%,
-    color-mix(in srgb, var(--layer-ground) calc(32% + var(--atmo) * 0.12%), transparent) 70%,
-    color-mix(in oklab, var(--layer-ground-soft) 58%, transparent) 100%
+    color-mix(in oklab, var(--layer-horizon-soft) 18%, transparent) 28%,
+    color-mix(in srgb, var(--layer-ground) calc(28% + var(--atmo) * 0.1%), transparent) 55%,
+    color-mix(in oklab, #5B4B8A 8%, transparent) 78%,
+    color-mix(in oklab, var(--layer-ground-soft) 52%, transparent) 100%
   );
-  opacity: 0.92;
+  opacity: 0.88;
 }
 
 /* Lectura: contraste un poco más suave que el cielo (luz que se amortigua) */
@@ -2797,11 +2804,9 @@ html.theme-atmosphere .panel-recent::after {
 .panel-horizon::before {
   content: "";
   display: block;
-  height: 30px;
+  height: 48px;
   margin: -1.25rem -1.25rem 0.7rem;
-  background: linear-gradient(180deg, transparent 0%, color-mix(in oklab, var(--layer-horizon-soft) 27%, transparent) 100%);
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
+  background: linear-gradient(180deg, transparent 0%, color-mix(in oklab, var(--layer-horizon-soft) 22%, transparent) 50%, transparent 100%);
 }
 
 .local-climate {
@@ -3223,21 +3228,18 @@ html.theme-atmosphere .panel-recent::after {
   border-top: 1px solid color-mix(in oklab, #5B4B8A 28%, transparent);
 }
 
-/* Tierra: panel redondeado, no tabla; lectura profunda con aire. */
+/* Tierra: capa continua desde Horizon, transición observatorio (sin caja de panel) */
 .ground-strata.is-active {
   height: auto;
   opacity: 1;
   pointer-events: auto;
   margin-top: var(--descent-gap-strata);
-  margin-left: 0.5rem;
-  margin-right: 0.5rem;
+  margin-left: 0;
+  margin-right: 0;
   padding: 1.25rem 1.1rem 2rem;
-  border-radius: 16px 16px 0 0;
-  border: 1px solid color-mix(in oklab, #5B4B8A 22%, transparent);
-  border-bottom: 0;
-  box-shadow:
-    inset 0 1px 0 color-mix(in oklab, #fff 8%, transparent),
-    0 -4px 20px color-mix(in oklab, #2d1b4e 18%, transparent);
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
   background:
     linear-gradient(
       180deg,
@@ -3247,37 +3249,39 @@ html.theme-atmosphere .panel-recent::after {
     );
 }
 
-/* Transición desde el horizonte hacia Strata */
+/* Transición observatorio: Horizon se funde en Strata (gradiente alto, sin corte) */
 .ground-strata::before {
   content: "";
   position: absolute;
   left: 0;
   right: 0;
-  top: -72px;
-  height: 80px;
+  top: -100px;
+  height: 120px;
   pointer-events: none;
   background: linear-gradient(
     180deg,
     transparent 0%,
-    color-mix(in oklab, #5B4B8A 12%, transparent) 25%,
-    color-mix(in oklab, #5B4B8A 22%, transparent) 50%,
-    color-mix(in oklab, #4a3a72 48%, transparent) 100%
+    color-mix(in oklab, #5B4B8A 6%, transparent) 20%,
+    color-mix(in oklab, #5B4B8A 14%, transparent) 45%,
+    color-mix(in oklab, #4a3a72 40%, transparent) 75%,
+    color-mix(in oklab, #4a3a72 55%, transparent) 100%
   );
-  opacity: 0.88;
+  opacity: 0.9;
 }
 
 .ground-strata.is-active .strata-lines {
   margin-top: 0.25rem;
 }
+/* Mismo tamaño y espaciado que ATMOSPHERE / NEARBY / Horizon; color adaptado a fondo Strata */
 .ground-strata .strata-seeds-label {
   margin: 0 0 0.5rem;
   padding: 0;
-  font-family: var(--font-reading);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: 500;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.82);
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
   text-decoration: none;
   border: none;
   background: none;
@@ -4193,7 +4197,7 @@ body.contribute-ritual .page {
   }
 
   .degree-value {
-    font-size: clamp(4rem, 20vw, 5.5rem);
+    font-size: clamp(9rem, 52vw, 13rem);
   }
 
   .degree-value .degree-unit {
@@ -4318,7 +4322,7 @@ body.contribute-ritual .page {
   }
 
   .degree-value {
-    font-size: clamp(3.75rem, 24vw, 5.25rem);
+    font-size: clamp(8rem, 55vw, 12rem);
   }
 
   /* Nodo de señal más compacto en pantallas muy estrechas */
