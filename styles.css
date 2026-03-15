@@ -1397,9 +1397,25 @@ html.theme-atmosphere .atm-reading-line {
   font-size: 0.84rem;
 }
 
+/* Definición del instrumento: qué es esto (canal → identidad → medición). No compite con el número. */
+.hero-identity-line {
+  font-family: var(--font-reading);
+  font-size: 0.78rem;
+  line-height: 1.35;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+  opacity: 0.78;
+  margin: 0.12rem 0 0.5rem;
+  max-width: 28ch;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  font-weight: 400;
+}
+
 /* Microseñal de campo compartido: da verdad a la atmósfera sin convertir en dashboard */
 .shared-field-line {
-  margin: 0.2rem 0 0;
+  margin: 0.1rem 0 0.35rem;
   font-size: 0.65rem;
   font-weight: 500;
   letter-spacing: 0.05em;
@@ -2059,7 +2075,7 @@ html.theme-atmosphere .atm-reading-line {
 
 /* Jerarquía: el grado como centro visual del bloque */
 .observatory-hero .degree-value-row {
-  margin: 0.35rem 0 0.9rem;
+  margin: 0.35rem 0 0.85rem;
 }
 .observatory-hero .hero-instrument-line {
   margin: 0.8rem 0;

@@ -742,6 +742,7 @@ const UI_COPY = {
     mixLine: (type, mood) => `Mostly ${type}, ${mood}.`,
     eyebrowLayer: "Atmosphere",
     eyebrowContext: "Moments",
+    heroIdentityLine: "A shared reading of human moments.",
     sharedFieldLine: "Shared field — last 48h",
     horizonTitle: "Horizon",
     horizonMoreLabel: "Deeper",
@@ -865,6 +866,7 @@ const UI_COPY = {
     mixLine: (type, mood) => `Sobre todo ${type}, ${mood}.`,
     eyebrowLayer: "Atmósfera",
     eyebrowContext: "Momentos",
+    heroIdentityLine: "Una lectura compartida de momentos humanos.",
     sharedFieldLine: "Campo compartido — últimas 48 h",
     horizonTitle: "Horizonte",
     horizonMoreLabel: "Más",
@@ -987,6 +989,8 @@ function applyUICopy() {
   if (eyebrowLayerEl) eyebrowLayerEl.textContent = ui.eyebrowLayer;
   const eyebrowContextEl = document.querySelector(".eyebrow-context");
   if (eyebrowContextEl) eyebrowContextEl.textContent = ui.eyebrowContext;
+  const heroIdentityEl = document.getElementById("heroIdentityLine");
+  if (heroIdentityEl && ui.heroIdentityLine) heroIdentityEl.textContent = ui.heroIdentityLine;
   const sharedFieldLineEl = document.getElementById("sharedFieldLine");
   if (sharedFieldLineEl && ui.sharedFieldLine) sharedFieldLineEl.textContent = ui.sharedFieldLine;
   const horizonTitleEl = document.querySelector(".horizon-line");
