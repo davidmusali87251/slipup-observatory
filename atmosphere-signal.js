@@ -36,12 +36,12 @@
 
   const LABELS = {
     en: {
-      quiet: ["quiet field", "field at rest", "still reading", "low signal", "calm horizon"],
+      quiet: ["quiet field", "field at rest", "Observation ongoing", "low signal", "calm horizon"],
       rising: ["signals rising", "field stirring", "readings building", "momentum gathering", "lift in the air"],
       dense: ["dense tonight", "thick reading", "field full", "heavy signal", "atmosphere charged"],
     },
     es: {
-      quiet: ["campo tranquilo", "campo en reposo", "lectura en calma", "señal baja", "horizonte quieto"],
+      quiet: ["campo tranquilo", "campo en reposo", "Observación en curso", "señal baja", "horizonte quieto"],
       rising: ["señales en ascenso", "campo en movimiento", "lectura en aumento", "impulso en el aire", "señales que suben"],
       dense: ["denso esta noche", "lectura densa", "campo lleno", "señal cargada", "atmósfera cargada"],
     },

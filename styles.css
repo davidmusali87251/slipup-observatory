@@ -1362,6 +1362,15 @@ html.theme-atmosphere .atm-reading-line {
   margin: 0;
 }
 
+/* Hero: "Atmosphere" como etiqueta del canal del instrumento, no título editorial */
+.observatory-hero .observatory-entry .eyebrow-layer {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
 .eyebrow-context {
   color: var(--muted);
   font-size: 0.88rem;
@@ -2025,16 +2034,44 @@ html.theme-atmosphere .atm-reading-line {
 }
 
 /* Patrón (type|mood) arriba del grado; el valor numérico va debajo */
+/* Estado del campo (type·mood): peso secundario para no competir con la medición */
 .degree-wrap .degree-pattern-line {
   margin-top: 0;
   margin-bottom: 0.35rem;
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   line-height: 1.4;
   letter-spacing: 0.06em;
   color: color-mix(in oklab, var(--muted) 92%, var(--layer-horizon));
-  opacity: 0.82;
+  opacity: 0.78;
   font-style: italic;
   font-family: var(--font-serif);
+}
+
+/* Unidad de grado: más pequeña y elevada para leer como medición */
+.degree-value .degree-unit {
+  font-size: 0.45em;
+  position: relative;
+  top: -0.4em;
+  margin-left: 0.02em;
+  font-weight: 400;
+}
+
+/* Jerarquía: el grado como centro visual del bloque */
+.observatory-hero .degree-value-row {
+  margin: 0.35rem 0 0.9rem;
+}
+.observatory-hero .hero-instrument-line {
+  margin: 0.8rem 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+.observatory-hero .climate-summary-line {
+  font-size: 0.7rem;
+  opacity: 0.65;
+}
+.observatory-hero .atm-reading-line {
+  font-size: 0.7rem;
+  opacity: 0.55;
 }
 
 .cta-observatory-wrap {
@@ -2631,6 +2668,24 @@ html.theme-atmosphere .atm-reading-line {
   opacity: 0.86;
 }
 
+/* Zona de condensación del campo: penumbra violeta muy suave entre horizonte y panel (observatorio) */
+html.theme-atmosphere .panel-recent::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -80px;
+  height: 80px;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(92, 61, 255, 0.05) 0%,
+    rgba(92, 61, 255, 0.02) 45%,
+    transparent 100%
+  );
+}
+
 .panel-horizon {
   margin-top: var(--descent-gap-horizon);
   background:
@@ -2746,16 +2801,18 @@ html.theme-atmosphere .atm-reading-line {
   opacity: 0.74;
 }
 
+/* "Nearby" como etiqueta de canal del instrumento (misma familia que Atmosphere) */
 .local-climate-line {
   color: #6b7d8f;
   border-top: 1px solid color-mix(in srgb, var(--line) 85%, #ffffff);
   text-align: center;
   padding-top: 1.15rem;
   margin-bottom: 1rem;
-  letter-spacing: 0.08em;
-  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
   font-weight: 500;
-  opacity: 0.88;
+  text-transform: uppercase;
+  opacity: 0.85;
 }
 
 .local-climate-line::before {
@@ -4090,6 +4147,10 @@ body.contribute-ritual .page {
     font-size: clamp(4rem, 20vw, 5.5rem);
   }
 
+  .degree-value .degree-unit {
+    top: -0.38em;
+  }
+
   .degree-scale-label {
     font-size: 0.55rem;
     margin-left: 0.35rem;
@@ -4097,6 +4158,17 @@ body.contribute-ritual .page {
 
   .degree-wrap {
     gap: 0.25rem;
+  }
+
+  .shared-field-line {
+    max-width: 96%;
+  }
+  .observatory-hero .hero-instrument-line {
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
+  }
+  .nearby-signals-line {
+    max-width: 95%;
   }
 
   .climate-instrument {
@@ -4241,6 +4313,27 @@ body.contribute-ritual .page {
 
   .panel {
     padding: 0.85rem 0.7rem;
+  }
+
+  /* Bloque lectura hero: evitar overflow y mantener legibilidad */
+  .shared-field-line {
+    max-width: 95%;
+    font-size: max(0.6rem, 2.2vw);
+  }
+  .observatory-hero .hero-instrument-line {
+    max-width: 100%;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+  .observatory-hero .climate-summary-line,
+  .observatory-hero .atm-reading-line {
+    font-size: max(0.65rem, 2.5vw);
+  }
+  .degree-value-row {
+    margin: 0.15rem 0 0.5rem;
+  }
+  .degree-value .degree-unit {
+    top: -0.35em;
   }
 }
 

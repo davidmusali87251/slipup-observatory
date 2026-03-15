@@ -54,8 +54,8 @@ export const READING_SUMMARY_BY_MIX = {
  */
 export function getReadingStatusLine(lang, total, seed = 0, dominantMix = "") {
   const lines = lang === "es"
-    ? { quiet: "Las señales se reúnen.", steady: ["Estable.", "Se mantiene."] }
-    : { quiet: "Signals are gathering.", steady: ["Steady.", "Holds."] };
+    ? { quiet: "Las señales se reúnen.", steady: ["Lectura estable.", "Se mantiene."] }
+    : { quiet: "Signals are gathering.", steady: ["Reading steady.", "Holds."] };
   if (total < 3) return lines.quiet;
   if (total >= 1000) {
     const raw = String(dominantMix || "").trim();

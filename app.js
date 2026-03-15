@@ -724,7 +724,7 @@ const UI_COPY = {
   en: {
     orientation: "",
     valueProp: "Collective reading from shared moments",
-    cta: "Let the atmosphere read this moment.",
+    cta: "Let the atmosphere read it.",
     heroInstrumentLine: "The field reads what rises.",
     emptyStateQuiet: "The atmosphere is quiet.",
     emptyStateSignal: "What settles here becomes signal.",
@@ -732,7 +732,7 @@ const UI_COPY = {
     supportObservatoryTooltip: "Donate via PayPal.",
     contributeInvite: "A shared atmosphere of human moments.\nLet one moment rise.",
     contributeFooterLine: "Let one moment rise.",
-    trust: "No account. Region only. Just shared moments.",
+    trust: "No account. Region only. Shared moments.",
     scopeLabel: "48h",
     recentFromRemote: "Across the atmosphere.",
     recentFromLocal: "Moments from this device only.",
@@ -847,7 +847,7 @@ const UI_COPY = {
   es: {
     orientation: "",
     valueProp: "Lectura colectiva de momentos compartidos",
-    cta: "Deja que la atmósfera lea este momento.",
+    cta: "Deja que la atmósfera lo lea.",
     heroInstrumentLine: "El campo lee lo que asciende.",
     emptyStateQuiet: "La atmósfera está en calma.",
     emptyStateSignal: "Lo que se asienta aquí se vuelve señal.",
@@ -855,7 +855,7 @@ const UI_COPY = {
     supportObservatoryTooltip: "Donar por PayPal.",
     contributeInvite: "Una atmósfera compartida de momentos humanos.\nDejá subir un momento.",
     contributeFooterLine: "Dejá subir un momento.",
-    trust: "Sin cuenta. Solo región. Solo momentos compartidos.",
+    trust: "Sin cuenta. Solo región. Momentos compartidos.",
     scopeLabel: "48 h",
     recentFromRemote: "En la atmósfera.",
     recentFromLocal: "Solo momentos de este dispositivo.",
@@ -1277,15 +1277,19 @@ function playDegreeSettle() {
   });
 }
 
-/** Actualiza el display del grado y, si cambió, reproduce la inercia del indicador. */
+/** Actualiza el display del grado y, si cambió, reproduce la inercia del indicador. Soporta estructura con .degree-num + .degree-unit. */
 function setDegreeDisplay(txt) {
   if (!degreeValue) return;
-  if (txt !== lastDisplayedDegreeStr) {
-    lastDisplayedDegreeStr = txt;
-    degreeValue.textContent = txt;
+  const numEl = degreeValue.querySelector(".degree-num");
+  const str = String(txt);
+  const numMatch = str.match(/^([\d.]+)/);
+  const numStr = numMatch ? numMatch[1] : str.replace(/°$/, "");
+  if (numStr !== lastDisplayedDegreeStr) {
+    lastDisplayedDegreeStr = numStr;
+    if (numEl) numEl.textContent = numStr; else degreeValue.textContent = txt;
     playDegreeSettle();
   } else {
-    degreeValue.textContent = txt;
+    if (numEl) numEl.textContent = numStr; else degreeValue.textContent = txt;
   }
 }
 const conditionLine = document.getElementById("conditionLine");
@@ -3324,11 +3328,12 @@ function animateDegree(from, to, ms) {
     const eased = 1 - (1 - t) * (1 - t);
     const current = from + (to - from) * eased;
     const txt = formatDegree(current);
-    degreeValue.textContent = txt;
+    setDegreeDisplay(txt);
     if (t < 1) {
       requestAnimationFrame(frame);
     } else {
-      lastDisplayedDegreeStr = finalTxt;
+      const numPart = (finalTxt.match(/^[\d.]+/) || [])[0];
+      if (numPart !== undefined) lastDisplayedDegreeStr = numPart;
       playDegreeSettle();
     }
   }
@@ -3371,10 +3376,15 @@ function renderPatternLayer(canonicalState) {
     ? ["Patrón en la lectura.", "Ritmo en la ventana.", "Eco colectivo en la lectura."]
     : ["Pattern in the reading.", "Rhythm in the window.", "Collective echo in the read."];
   const seed = (total * 7 + (dominant.length || 0)) | 0;
+  const moodDisplayHero = LANG === "es" ? { stressed: "Tenso" } : { stressed: "Tense" };
   const line = repetition?.hasPattern
     ? (tagMap[repetition.tag] || patternFallback[Math.abs(seed) % patternFallback.length])
     : dominant
-      ? dominant.split("|").map((s) => capitalizeForDisplay(s.trim())).join(" · ")
+      ? dominant.split("|").map((s, i) => {
+          const t = s.trim().toLowerCase();
+          if (i === 1 && moodDisplayHero[t]) return moodDisplayHero[t];
+          return capitalizeForDisplay(s.trim());
+        }).join(" · ")
       : "";
 
   if (!line) {
@@ -3663,13 +3673,11 @@ async function boot() {
       : BASELINE;
   if (hasStoredDisplay) {
     const d = formatDegree(optimisticStartDisplay);
-    degreeValue.textContent = d;
-    lastDisplayedDegreeStr = d;
+    setDegreeDisplay(d);
     document.body.style.setProperty("--atmo", String(optimisticStartDisplay));
   } else {
     // First load with no stored state: avoid flashing a temporary fixed number.
-    degreeValue.textContent = String(BASELINE) + "°";
-    lastDisplayedDegreeStr = String(BASELINE) + "°";
+    setDegreeDisplay(String(BASELINE) + "°");
     degreeValue.classList.add("is-pending");
     document.body.style.setProperty("--atmo", String(BASELINE));
     if (observatoryPanel) observatoryPanel.setAttribute("aria-busy", "true");
