@@ -731,6 +731,7 @@ const UI_COPY = {
     momentLeavesTrace: "Every moment leaves a trace.",
     supportObservatoryTooltip: "Donate via PayPal.",
     contributeInvite: "A shared atmosphere of human moments.\nLet one moment rise.",
+    ctaObservatoryLabel: "Contribute",
     contributeFooterLine: "Let one moment rise.",
     trust: "No account. Region only. Shared moments.",
     scopeLabel: "48h",
@@ -742,7 +743,7 @@ const UI_COPY = {
     mixLine: (type, mood) => `Mostly ${type}, ${mood}.`,
     eyebrowLayer: "Atmosphere",
     eyebrowContext: "Moments",
-    heroIdentityLine: "Shared human moments.",
+    heroIdentityLine: "Human moments.",
     sharedFieldLine: "Shared field — last 48h",
     horizonTitle: "Horizon",
     horizonMoreLabel: "Deeper",
@@ -857,6 +858,7 @@ const UI_COPY = {
     momentLeavesTrace: "Cada momento deja una traza.",
     supportObservatoryTooltip: "Donar por PayPal.",
     contributeInvite: "Una atmósfera compartida de momentos humanos.\nDejá subir un momento.",
+    ctaObservatoryLabel: "Contribuir",
     contributeFooterLine: "Dejá subir un momento.",
     trust: "Sin cuenta. Solo región. Momentos compartidos.",
     scopeLabel: "48 h",
@@ -868,7 +870,7 @@ const UI_COPY = {
     mixLine: (type, mood) => `Sobre todo ${type}, ${mood}.`,
     eyebrowLayer: "Atmósfera",
     eyebrowContext: "Momentos",
-    heroIdentityLine: "Momentos humanos compartidos.",
+    heroIdentityLine: "Momentos humanos.",
     sharedFieldLine: "Campo compartido — últimas 48 h",
     horizonTitle: "Horizonte",
     horizonMoreLabel: "Más",
@@ -1017,6 +1019,8 @@ function applyUICopy() {
   if (contributeFooterLink && ui.contributeFooterLine) contributeFooterLink.textContent = ui.contributeFooterLine;
   const heroInstrumentLine = document.getElementById("heroInstrumentLine");
   if (heroInstrumentLine && ui.heroInstrumentLine) heroInstrumentLine.textContent = ui.heroInstrumentLine;
+  const ctaObservatory = document.getElementById("ctaObservatory");
+  if (ctaObservatory && ui.ctaObservatoryLabel) ctaObservatory.textContent = ui.ctaObservatoryLabel;
   const ctaObservatoryTooltip = document.getElementById("ctaObservatoryTooltip");
   if (ctaObservatoryTooltip && ui.momentLeavesTrace) ctaObservatoryTooltip.textContent = ui.momentLeavesTrace;
   const viewMoreTooltip = document.getElementById("viewMoreTooltip");
@@ -2459,13 +2463,34 @@ function capitalizeNoteForDisplay(str) {
   return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 }
 
+/** Etiquetas observatory para type/mood en la lista de momentos: reflejo de la elección original, una palabra, estilo campo. */
+const MOMENT_TYPE_MOOD_DISPLAY = {
+  en: {
+    type: { observed: "Noted", fertile: "Opening", avoidable: "Recurrence" },
+    mood: { calm: "Calm", focus: "Focus", stressed: "Strain", curious: "Curious", tired: "Weary" },
+  },
+  es: {
+    type: { observed: "Anotado", fertile: "Apertura", avoidable: "Recurrencia" },
+    mood: { calm: "Calma", focus: "Foco", stressed: "Tensión", curious: "Curioso", tired: "Cansancio" },
+  },
+};
+
+function getMomentTypeMoodLabels(lang, type, mood) {
+  const l = (MOMENT_TYPE_MOOD_DISPLAY[lang] || MOMENT_TYPE_MOOD_DISPLAY.en);
+  const t = String(type || "").toLowerCase();
+  const m = String(mood || "").toLowerCase();
+  return {
+    typeLabel: (l.type && l.type[t]) || capitalizeForDisplay(type),
+    moodLabel: (l.mood && l.mood[m]) || capitalizeForDisplay(mood),
+  };
+}
+
 function createMomentItemElement(m, options = {}) {
   const inNearbyField = options.inNearbyField === true;
   const li = document.createElement("li");
   li.className = "moment-item" + (inNearbyField ? " moment-item-nearby" : "");
   const note = m.note ? m.note.trim() : "(no note)";
-  const typeLabel = capitalizeForDisplay(m.type);
-  const moodLabel = capitalizeForDisplay(m.mood);
+  const { typeLabel, moodLabel } = getMomentTypeMoodLabels(LANG, m.type, m.mood);
   const noteLabel = note === "(no note)" ? note : capitalizeNoteForDisplay(note);
   const timeStr = new Date(m.timestamp).toLocaleTimeString([], {
     hour: "2-digit",

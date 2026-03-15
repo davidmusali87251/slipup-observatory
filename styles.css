@@ -2098,6 +2098,14 @@ html.theme-atmosphere .atm-reading-line {
   font-size: 0.7rem;
   opacity: 0.55;
 }
+.atmosphere-air .atm-reading-line {
+  margin: 0.12rem 0 0.5rem;
+  text-align: center;
+}
+.atmosphere-grounding .hero-identity-line {
+  margin: 0.35rem 0 0.5rem;
+  text-align: center;
+}
 
 .cta-observatory-wrap {
   position: relative;
