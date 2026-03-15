@@ -798,6 +798,7 @@ const UI_COPY = {
       sedimentCollectiveEcho: "The field echoes.",
     },
     strataContextLine: "Below the surface, your moments settle into deeper record.",
+    strataSeedsLabel: "Your seeds",
     strataShareLine: "Share this trace",
     strataShareCopied: "Copied",
     viewMore: "View more",
@@ -822,13 +823,14 @@ const UI_COPY = {
     loading: "Loading…",
     localFieldMomentsLabel: "In the nearby field",
     nearbyIntroLine: "Reading nearby.",
-    nearbyMomentsLabel: "Moments nearby",
+    nearbyMomentsLabel: "Moments",
     nearbyReadingStable: ["Quiet.", "Steady.", "Holds."],
     nearbyReadingClearing: ["Light movement.", "Easing.", "Opening."],
     nearbyReadingCondensing: ["Forming.", "Tightening.", "Rising."],
     nearbyReadingFallback: ["Quiet.", "Light signal."],
     localFieldMomentsEmpty: "No shared moments in this scope yet.",
     localFieldEmptyQuiet: "The field is quiet.",
+    nearbyEmptyExamples: ["The field gathers here.", "Signals will rise.", "Reading forms in the scope."],
     nearbySignalsTitle: "Nearby signals",
     nearbyViewMoreLabel: "View more",
     metrics: {
@@ -921,6 +923,7 @@ const UI_COPY = {
       sedimentCollectiveEcho: "El campo hace eco.",
     },
     strataContextLine: "Bajo la superficie, tus momentos se asientan en un registro más profundo.",
+    strataSeedsLabel: "Tus semillas",
     strataShareLine: "Compartir esta traza",
     strataShareCopied: "Copiado",
     viewMore: "Ver más",
@@ -931,13 +934,14 @@ const UI_COPY = {
     sheetCountNearby: "Se muestran cercanos.",
     localFieldMomentsLabel: "En el campo cercano",
     nearbyIntroLine: "Lectura cercana.",
-    nearbyMomentsLabel: "Momentos cercanos",
+    nearbyMomentsLabel: "Momentos",
     nearbyReadingStable: ["Tranquilo.", "Estable.", "Se mantiene."],
     nearbyReadingClearing: ["Movimiento suave.", "Aflojando.", "Abriendo."],
     nearbyReadingCondensing: ["Formando.", "Apretando.", "Subiendo."],
     nearbyReadingFallback: ["Tranquilo.", "Señal ligera."],
     localFieldMomentsEmpty: "Aún no hay momentos compartidos en este ámbito.",
     localFieldEmptyQuiet: "El campo está quieto.",
+    nearbyEmptyExamples: ["El campo se reúne aquí.", "Las señales subirán.", "La lectura se forma en el ámbito."],
     nearbySignalsTitle: "Señales cercanas",
     nearbySignalsLine: "Señales cercanas",
     nearbyViewMoreLabel: "Ver más",
@@ -991,16 +995,12 @@ function applyUICopy() {
   if (eyebrowContextEl) eyebrowContextEl.textContent = ui.eyebrowContext;
   const heroIdentityEl = document.getElementById("heroIdentityLine");
   if (heroIdentityEl && ui.heroIdentityLine) heroIdentityEl.textContent = ui.heroIdentityLine;
-  const sharedFieldLineEl = document.getElementById("sharedFieldLine");
-  if (sharedFieldLineEl && ui.sharedFieldLine) sharedFieldLineEl.textContent = ui.sharedFieldLine;
   const horizonTitleEl = document.querySelector(".horizon-line");
   if (horizonTitleEl) horizonTitleEl.textContent = ui.horizonTitle;
   const horizonMoreBtn = document.getElementById("horizonMoreButton");
   if (horizonMoreBtn && ui.horizonMoreLabel) horizonMoreBtn.textContent = ui.horizonMoreLabel;
   const nearbyTitleEl = document.querySelector(".local-climate-line");
   if (nearbyTitleEl) nearbyTitleEl.textContent = ui.nearbyTitle;
-  const nearbySignalsLineEl = document.getElementById("nearbySignalsLine");
-  if (nearbySignalsLineEl && ui.nearbySignalsLine) nearbySignalsLineEl.textContent = ui.nearbySignalsLine;
   if (conditionLine) conditionLine.textContent = ui.conditionPending;
   if (viewMoreButton) viewMoreButton.textContent = ui.viewMore;
   const closeBtn = document.getElementById("shared-sheet-close");
@@ -1023,6 +1023,11 @@ function applyUICopy() {
   if (viewMoreTooltip && ui.momentLeavesTrace) viewMoreTooltip.textContent = ui.momentLeavesTrace;
   const supportObservatoryTooltip = document.getElementById("supportObservatoryTooltip");
   if (supportObservatoryTooltip && ui.supportObservatoryTooltip) supportObservatoryTooltip.textContent = ui.supportObservatoryTooltip;
+  const strataSeedsBtn = document.getElementById("strataSeedsBtn");
+  if (strataSeedsBtn && ui.strataSeedsLabel) {
+    strataSeedsBtn.textContent = ui.strataSeedsLabel;
+    strataSeedsBtn.setAttribute("aria-label", ui.strataSeedsLabel + " — " + (LANG === "es" ? "registro personal" : "personal record"));
+  }
 }
 // FUTURE: Keep scaffold switches explicit for non-active UI lines.
 const FUTURE_UI = {
@@ -3032,7 +3037,7 @@ function renderRegionalMomentsList(sharedMoments, fieldScope, allScopes = null) 
   const ui = UI_COPY[LANG] || UI_COPY.en;
   const hasScope = fieldScope?.geo && fieldScope.scope !== "global";
   if (localClimateMomentsLabel) {
-    localClimateMomentsLabel.textContent = ui.nearbyMomentsLabel || "Moments nearby";
+    localClimateMomentsLabel.textContent = ui.nearbyMomentsLabel || "Moments";
     localClimateMomentsLabel.classList.toggle("visually-hidden", !hasScope);
   }
   localClimateMoments.classList.toggle("hidden", !hasScope);
@@ -3050,6 +3055,9 @@ function renderRegionalMomentsList(sharedMoments, fieldScope, allScopes = null) 
   if (fullList.length === 0) {
     const emptyMsg = ui.localFieldMomentsEmpty || "No shared moments in this scope yet.";
     const quietLine = ui.localFieldEmptyQuiet || "The field is quiet.";
+    const examples = Array.isArray(ui.nearbyEmptyExamples) && ui.nearbyEmptyExamples.length > 0
+      ? ui.nearbyEmptyExamples
+      : ["The field gathers here.", "Signals will rise.", "Reading forms in the scope."];
     const nearest = findNearestScopeWithMoments(sharedMoments, fieldScope, allScopes);
 
     const msgLi = document.createElement("li");
@@ -3062,6 +3070,15 @@ function renderRegionalMomentsList(sharedMoments, fieldScope, allScopes = null) 
     quietSpan.className = "empty-quiet";
     quietSpan.textContent = quietLine;
     msgLi.appendChild(quietSpan);
+    const examplesWrap = document.createElement("span");
+    examplesWrap.className = "empty-examples";
+    examples.slice(0, 3).forEach((phrase) => {
+      const line = document.createElement("span");
+      line.className = "empty-example-line";
+      line.textContent = phrase;
+      examplesWrap.appendChild(line);
+    });
+    msgLi.appendChild(examplesWrap);
     localClimateMoments.appendChild(msgLi);
 
     if (nearest && nearest.list.length > 0) {
@@ -3434,19 +3451,15 @@ function triggerNearbyEcho() {
   if (nearbyEchoActive) return;
   nearbyEchoActive = true;
   const pulseMs = 560 + Math.random() * 80;
-  const signalsLine = document.getElementById("nearbySignalsLine");
   const introLine = document.getElementById("localClimateIntro");
-  if (signalsLine) {
-    signalsLine.style.setProperty("--echo-pulse-duration", `${pulseMs}ms`);
-    signalsLine.classList.add("echo-pulse");
-    setTimeout(() => {
-      signalsLine.classList.remove("echo-pulse");
-      signalsLine.style.removeProperty("--echo-pulse-duration");
-    }, pulseMs);
-  }
   if (introLine) {
-    introLine.classList.add("echo-fade");
-    setTimeout(() => introLine.classList.remove("echo-fade"), 200);
+    introLine.style.setProperty("--echo-pulse-duration", `${pulseMs}ms`);
+    introLine.classList.add("echo-pulse", "echo-fade");
+    setTimeout(() => {
+      introLine.classList.remove("echo-pulse");
+      introLine.style.removeProperty("--echo-pulse-duration");
+      setTimeout(() => introLine.classList.remove("echo-fade"), 200);
+    }, pulseMs);
   }
   setTimeout(() => { nearbyEchoActive = false; }, Math.max(pulseMs, 200));
 }

@@ -66,8 +66,8 @@
             <div class="observatory-entry">
               <p class="eyebrow-layer">Atmosphere — Current</p>
             </div>
+            <p id="heroInstrumentLine" class="hero-instrument-line">The field reads what rises.</p>
             <p id="heroIdentityLine" class="hero-identity-line">A shared reading of human moments.</p>
-            <p id="sharedFieldLine" class="shared-field-line"></p>
             <p class="atmosphere-orientation" aria-hidden="true"></p>
             <div class="degree-wrap" aria-label="Atmosphere reading in degrees">
               <p id="atmosphere-pattern-line" class="atmosphere-pattern-line degree-pattern-line hidden" aria-live="polite"></p>
@@ -76,7 +76,6 @@
                 <span id="degreeScaleLabel" class="degree-scale-label" aria-hidden="true">0–100 scale</span>
               </div>
             </div>
-            <p id="heroInstrumentLine" class="hero-instrument-line">The field reads what rises.</p>
           </div>
           <div class="atmosphere-grounding" aria-label="Toward the horizon">
             <div id="horizonPulseBar" class="horizon-pulse-bar" aria-hidden="true"></div>
@@ -116,7 +115,6 @@
       <section id="local-climate" class="local-climate" aria-label="Nearby field" data-layer="nearby">
         <h2 class="visually-hidden">Nearby field</h2>
         <p class="local-climate-line">Nearby</p>
-        <p id="nearbySignalsLine" class="nearby-signals-line"></p>
         <p id="localClimateIntro" class="local-climate-intro">Local field reading.</p>
         <p id="localClimatePrimary" class="local-climate-primary"></p>
         <p id="localClimateMomentsLabel" class="local-climate-moments-label"></p>
@@ -147,6 +145,9 @@
 
       <section id="ground-strata" class="ground-strata" aria-label="Deep record" data-layer="strata" hidden>
         <h2 class="visually-hidden">Strata</h2>
+        <p class="strata-seeds-wrap">
+          <button type="button" id="strataSeedsBtn" class="strata-seeds-btn text-button" aria-label="Your seeds — personal record">Your seeds</button>
+        </p>
         <ul id="strataLines" class="strata-lines"></ul>
         <p id="strataShareWrap" class="strata-share-wrap hidden" hidden><button type="button" class="text-button strata-share-btn" aria-label="Share this trace">Share this trace</button></p>
         <p id="strataMetricsLine" class="strata-metrics-line climate-metrics-line strata-panel-hidden" role="status" aria-live="polite" aria-hidden="true"></p>

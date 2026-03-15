@@ -1413,21 +1413,6 @@ html.theme-atmosphere .atm-reading-line {
   font-weight: 400;
 }
 
-/* Microseñal de campo compartido: da verdad a la atmósfera sin convertir en dashboard */
-.shared-field-line {
-  margin: 0.1rem 0 0.35rem;
-  font-size: 0.65rem;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-  color: var(--muted);
-  opacity: 0.72;
-  line-height: 1.35;
-  text-align: center;
-  max-width: 28ch;
-  margin-left: auto;
-  margin-right: auto;
-}
-
 .atmosphere-orientation {
   margin-top: -0.42rem;
   font-size: 0.72rem;
@@ -2077,8 +2062,9 @@ html.theme-atmosphere .atm-reading-line {
 .observatory-hero .degree-value-row {
   margin: 0.35rem 0 0.85rem;
 }
+/* Debajo del eyebrow ATMOSPHERE; poco margen arriba, aire antes de la identidad */
 .observatory-hero .hero-instrument-line {
-  margin: 0.8rem 0;
+  margin: 0.15rem 0 0.35rem;
   font-size: 0.85rem;
   line-height: 1.5;
 }
@@ -2863,12 +2849,14 @@ html.theme-atmosphere .panel-recent::after {
   100% { opacity: 0.72; }
 }
 
-.nearby-signals-line.echo-pulse {
+.nearby-signals-line.echo-pulse,
+.local-climate-intro.echo-pulse {
   animation: nearby-echo-pulse var(--echo-pulse-duration, 600ms) ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .nearby-signals-line.echo-pulse { animation: none; }
+  .nearby-signals-line.echo-pulse,
+  .local-climate-intro.echo-pulse { animation: none; }
 }
 
 /* Eco en la lectura local: fade breve (200ms) */
@@ -3082,9 +3070,19 @@ html.theme-atmosphere .panel-recent::after {
   font-style: italic;
 }
 .local-climate-moments .moment-item-empty .empty-examples {
+  display: block;
+  margin-top: 0.6rem;
   font-size: 0.78rem;
   color: var(--muted);
   opacity: 0.88;
+}
+.local-climate-moments .moment-item-empty .empty-example-line {
+  display: block;
+  margin-top: 0.22rem;
+  font-style: italic;
+}
+.local-climate-moments .moment-item-empty .empty-example-line:first-child {
+  margin-top: 0;
 }
 
 /* Ritmo del scroll: espacio para que el ojo respire antes de "Señales cercanas" (silencio → eco). */
@@ -3249,6 +3247,24 @@ html.theme-atmosphere .panel-recent::after {
 
 .ground-strata.is-active .strata-lines {
   margin-top: 0.25rem;
+}
+.ground-strata .strata-seeds-wrap {
+  margin: 0 0 0.5rem;
+  padding: 0;
+}
+.ground-strata .strata-seeds-btn {
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.72);
+  text-transform: uppercase;
+  padding: 0.2rem 0.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  background: transparent;
+}
+.ground-strata .strata-seeds-btn:hover {
+  color: rgba(255, 255, 255, 0.95);
+  border-color: rgba(255, 255, 255, 0.35);
 }
 .ground-strata.is-active .strata-share-wrap {
   margin-top: 1.25rem;
@@ -4177,9 +4193,6 @@ body.contribute-ritual .page {
     gap: 0.25rem;
   }
 
-  .shared-field-line {
-    max-width: 96%;
-  }
   .observatory-hero .hero-instrument-line {
     padding-left: 0.2rem;
     padding-right: 0.2rem;
@@ -4333,10 +4346,6 @@ body.contribute-ritual .page {
   }
 
   /* Bloque lectura hero: evitar overflow y mantener legibilidad */
-  .shared-field-line {
-    max-width: 95%;
-    font-size: max(0.6rem, 2.2vw);
-  }
   .observatory-hero .hero-instrument-line {
     max-width: 100%;
     padding-left: 0.25rem;
