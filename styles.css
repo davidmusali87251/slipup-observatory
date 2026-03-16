@@ -972,12 +972,11 @@ h2 {
 }
 .observatory-hero .atmosphere-air .hero-identity-line { order: 1; }
 .observatory-hero .atmosphere-air .observatory-seo-intro { order: 2; }
-.observatory-hero .atmosphere-air .atmosphere-pattern-line { order: 3; }
-.observatory-hero .atmosphere-air .observatory-entry { order: 4; }
-.observatory-hero .atmosphere-air .atm-reading-line { order: 5; }
-.observatory-hero .atmosphere-air .atmospheric-weather-line { order: 6; }
-.observatory-hero .atmosphere-air .atmosphere-orientation { order: 7; }
-.observatory-hero .atmosphere-air .degree-wrap { order: 8; }
+.observatory-hero .atmosphere-air .observatory-entry { order: 3; }
+.observatory-hero .atmosphere-air .atm-reading-line { order: 4; }
+.observatory-hero .atmosphere-air .atmospheric-weather-line { order: 5; }
+.observatory-hero .atmosphere-air .atmosphere-orientation { order: 6; }
+.observatory-hero .atmosphere-air .degree-wrap { order: 7; }
 
 /* Columna única: todos los elementos centrados en el mismo eje */
 .atmosphere-air .observatory-entry,
@@ -1545,9 +1544,6 @@ html.theme-atmosphere .atm-reading-line {
     font-size: 0.85rem;
     opacity: 0.7;
   }
-  .observatory-hero .atmosphere-pattern-line {
-    font-size: 0.85rem;
-  }
   .observatory-hero .climate-summary-line {
     font-size: 0.82rem;
     opacity: 0.85;
@@ -1678,9 +1674,6 @@ html.theme-atmosphere .atm-reading-line {
     margin-bottom: 1rem;
   }
   .observatory-hero .atm-reading-line {
-    font-size: 0.82rem;
-  }
-  .observatory-hero .atmosphere-pattern-line {
     font-size: 0.82rem;
   }
   .observatory-hero .climate-summary-line {
@@ -2189,23 +2182,12 @@ html.theme-atmosphere .atm-reading-line {
   opacity: 0.82;
 }
 
-.atmosphere-pattern-line {
-  font-size: 0.8rem;
-  font-family: var(--font-serif);
-  color: color-mix(in oklab, var(--muted) 90%, var(--layer-horizon));
   line-height: 1.85;
   letter-spacing: 0.04em;
   opacity: 0.84;
   margin-top: 0.5rem;
   margin-bottom: 1rem;
   font-style: italic;
-}
-
-/* Patrón justo debajo de atmReadingLine, unidos como un bloque */
-.atmosphere-air > .atmosphere-pattern-line {
-  text-align: center;
-  margin-top: 0.05rem;
-  margin-bottom: 1.75rem;
 }
 
 /* Patrón (type|mood) arriba del grado; el valor numérico va debajo */
@@ -4232,7 +4214,6 @@ body.contribute-ritual .page {
 .ground-strata .strata-lines,
 .climate-metrics-line,
 .climate-summary-line,
-.atmosphere-pattern-line,
 .condition-line,
 .shared-sheet-count {
   text-transform: none;
@@ -4578,9 +4559,6 @@ body.contribute-ritual .page {
     max-width: 26ch;
   }
 
-  .atmosphere-pattern-line {
-    font-size: 0.78rem;
-  }
 
   .moment-item {
     font-size: 0.8rem;
@@ -4657,9 +4635,6 @@ body.contribute-ritual .page {
     font-size: 0.78rem;
   }
   .observatory-hero .atm-reading-line,
-  .observatory-hero .atmosphere-pattern-line {
-    font-size: 0.8rem;
-  }
   .observatory-hero .climate-summary-line {
     font-size: 0.78rem;
   }

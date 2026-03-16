@@ -1348,7 +1348,6 @@ const horizonSecondary = document.getElementById("horizonSecondary");
 const horizonTimeOfDayLine = document.getElementById("horizonTimeOfDayLine");
 const horizonMoreButton = document.getElementById("horizonMoreButton");
 const heroEl = document.getElementById("observatory-hero");
-const atmospherePatternLine = document.getElementById("atmosphere-pattern-line");
 const transientReadingLine = document.getElementById("transientReadingLine");
 const warmupHint = document.getElementById("warmupHint");
 const sheetBackdrop = document.getElementById("sheet-backdrop");
@@ -3561,11 +3560,7 @@ function renderPatternLayer(canonicalState) {
   heroEl.classList.toggle("observatory--pattern", Boolean(repetition?.hasPattern));
   renderScopeInstrument(canonicalState);
   const total = Number(canonicalState?.total) || 0;
-  if (total < 6) {
-    atmospherePatternLine.textContent = "";
-    atmospherePatternLine.classList.add("hidden");
-    return;
-  }
+  if (total < 6) return;
 
   const dominant = canonicalState?.dominantMix || "";
   const tagMap = LANG === "es"
@@ -3597,14 +3592,7 @@ function renderPatternLayer(canonicalState) {
         }).join(" · ")
       : "";
 
-  if (!line) {
-    atmospherePatternLine.textContent = "";
-    atmospherePatternLine.classList.add("hidden");
-    return;
-  }
-
-  atmospherePatternLine.textContent = line;
-  atmospherePatternLine.classList.remove("hidden");
+  if (!line) return;
 }
 
 async function loadSharedMoments(localMoments) {
@@ -3642,7 +3630,7 @@ function startHeroEngine() {
   clearHeroEngine();
   if (prefersReducedMotion || !observatoryState) return;
   const s = observatoryState;
-  if (!climateSummaryLine || !atmosphericWeatherLine || !atmospherePatternLine) return;
+  if (!climateSummaryLine || !atmosphericWeatherLine) return;
   heroEngineIntervals.push(setInterval(function () {
     if (window.atmosphereSignal && window.atmosphereSignal.update && s.sharedMoments) {
       window.atmosphereSignal.update(s.sharedMoments);
