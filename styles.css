@@ -4797,7 +4797,7 @@ section.panel.panel-recent {
   }
 }
 
-/* Botón "+" agregación: marco que lo define sin romper el estilo observatorio. */
+/* Botón señal/eco •)) → •))) : resonancia, no like. Micro-animación al presionar. */
 .moment-relate-controls .moment-relate-btn {
   margin-top: 0;
 }
@@ -4808,7 +4808,7 @@ section.panel.panel-recent {
   font-size: 0.72rem;
   font-weight: 600;
   line-height: 1.2;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.06em;
   font-family: var(--font-sans);
   color: color-mix(in oklab, var(--relate-accent) 78%, var(--text));
   background: color-mix(in oklab, var(--relate-accent-soft) 14%, var(--bg));
@@ -4819,7 +4819,18 @@ section.panel.panel-recent {
     inset 0 1px 0 color-mix(in oklab, #fff 50%, transparent);
   cursor: pointer;
   opacity: 0.92;
-  transition: opacity 0.2s ease, border-color 0.2s ease, color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  transition: opacity 0.2s ease, border-color 0.2s ease, color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.18s ease;
+}
+.moment-relate-btn--pulse {
+  animation: moment-relate-echo 0.18s ease;
+}
+@keyframes moment-relate-echo {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .moment-relate-btn--pulse { animation: none; }
 }
 
 .moment-relate-btn:hover {

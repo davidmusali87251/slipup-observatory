@@ -725,7 +725,6 @@ const UI_COPY = {
     orientation: "",
     valueProp: "Collective reading from shared moments",
     cta: "Let the atmosphere read it.",
-    heroInstrumentLine: "The field reads what rises.",
     emptyStateQuiet: "The atmosphere is quiet.",
     emptyStateSignal: "What settles here becomes signal.",
     momentLeavesTrace: "Every moment leaves a trace.",
@@ -852,7 +851,6 @@ const UI_COPY = {
     orientation: "",
     valueProp: "Lectura colectiva de momentos compartidos",
     cta: "Deja que la atmósfera lo lea.",
-    heroInstrumentLine: "El campo lee lo que asciende.",
     emptyStateQuiet: "La atmósfera está en calma.",
     emptyStateSignal: "Lo que se asienta aquí se vuelve señal.",
     momentLeavesTrace: "Cada momento deja una traza.",
@@ -1017,8 +1015,6 @@ function applyUICopy() {
   }
   const contributeFooterLink = document.getElementById("contributeFooterLink");
   if (contributeFooterLink && ui.contributeFooterLine) contributeFooterLink.textContent = ui.contributeFooterLine;
-  const heroInstrumentLine = document.getElementById("heroInstrumentLine");
-  if (heroInstrumentLine && ui.heroInstrumentLine) heroInstrumentLine.textContent = ui.heroInstrumentLine;
   const ctaObservatory = document.getElementById("ctaObservatory");
   if (ctaObservatory && ui.ctaObservatoryLabel) ctaObservatory.textContent = ui.ctaObservatoryLabel;
   const ctaObservatoryTooltip = document.getElementById("ctaObservatoryTooltip");
@@ -2520,10 +2516,13 @@ function createMomentItemElement(m, options = {}) {
   relateBtn.setAttribute("aria-label", ui.momentRelateAria || "Mark that this resonates with you too");
   relateBtn.dataset.relateCount = String(typeof m.relate_count === "number" ? m.relate_count : 0);
 
+  const SIGNAL_IDLE = "\u2022))";
+  const SIGNAL_ACTIVE = "\u2022)))";
+
   function updateRelateLabel() {
     const count = parseInt(relateBtn.dataset.relateCount, 10) || 0;
     const you = getRelateState(momentId);
-    const symbol = "+";
+    const symbol = you ? SIGNAL_ACTIVE : SIGNAL_IDLE;
     const text = count > 0 ? `${symbol} ${count}` : symbol;
     relateBtn.textContent = text;
     relateBtn.classList.toggle("is-active", you);
@@ -2532,6 +2531,9 @@ function createMomentItemElement(m, options = {}) {
   updateRelateLabel();
   relateBtn.addEventListener("click", async () => {
     if (getRelateState(momentId)) return;
+    relateBtn.classList.add("moment-relate-btn--pulse");
+    const pulseDuration = 180;
+    setTimeout(() => relateBtn.classList.remove("moment-relate-btn--pulse"), pulseDuration);
     if (m.id && isRemoteReady()) {
       relateBtn.disabled = true;
       const res = await postRelateMoment(m.id);
