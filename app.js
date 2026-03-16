@@ -149,7 +149,7 @@ const LANG = (typeof document !== "undefined" && document.documentElement?.lang?
  */
 const MIX_LINE_OBSERVATORY = {
   en: {
-    "observed|calm": ["A quiet line in the field.", "The read holds steady.", "Calm observation in the window.", "Calm in the mix.", "The reading holds steady."],
+    "observed|calm": ["A quiet line in the field.", "The read holds steady.", "Calm observation in the field.", "Calm in the mix.", "The reading holds steady."],
     "observed|focus": ["Focused sight on the line.", "The field shows steady focus.", "A clear, focused read.", "Steady focus in the reading.", "The read stays clear."],
     "observed|stressed": ["Observation under strain.", "The line carries tension.", "Stressed but still watching.", "Tension in the reading.", "Watching under strain."],
     "observed|curious": ["The line tilts curious.", "Curiosity in the reading.", "A curious, steady watch.", "The read tilts toward curiosity.", "Curious watch in the mix."],
@@ -189,7 +189,7 @@ const READING_STRUCTURES = {
   en: [
     (type, mood) => `The reading holds ${type} moments in ${mood}.`,
     (type, mood) => `${type} moments move through ${mood}.`,
-    (type, mood) => `A layer of ${type} moments appears in ${mood}.`,
+    (type, mood) => `The field holds ${type} moments in ${mood}.`,
     (type, mood) => `${mood} carries ${type} signals.`,
     (type, mood) => `The field shows ${type} moments in ${mood}.`,
     (type, mood) => `${type} moments settle into ${mood}.`,
@@ -208,7 +208,7 @@ const MOOD_NOUN = { en: { calm: "calm", focus: "focus", stressed: "stress", curi
 /** Motor atmosférico de lenguaje: sujeto + verbo + objeto. Generación combinatoria determinista por seed (mismo momento → misma frase). Fases: gathering < 50, forming < 300, breathing >= 300. */
 const ATMOSPHERE_LINE = {
   subject: {
-    en: ["The atmosphere", "The field", "The reading", "The air", "The sky", "The layer", "The signal field", "The shared air"],
+    en: ["The atmosphere", "The field", "The reading", "The air", "The sky", "The signal field", "The shared air"],
     es: ["La atmósfera", "El campo", "La lectura", "El aire", "El cielo", "La capa", "El campo de señales", "El aire compartido"],
   },
   verb: {
@@ -485,16 +485,16 @@ const COPY_VARIANTS = {
     },
     strataFallback: [
       "Your private and shared moments settle below the surface.",
-      "Your private and shared moments rest together in deeper layers.",
+      "Your private and shared moments rest together below the surface.",
       "Below the surface, your moments settle side by side.",
-      "Deeper layers hold your shared and private moments together.",
+      "Your deeper record holds shared and private moments together.",
       "Your shared and private moments keep settling in deep record.",
-      "Your deeper layers keep gathering settled moments.",
+      "Below the surface, your moments keep settling.",
       "Your record below keeps compacting over time.",
     ],
     strataEarly: [
       "Your deep record is still forming.",
-      "Only a light layer has settled in your deep record.",
+      "Only a first sediment has settled in your deep record.",
       "Your deep record is beginning to gather moments.",
       "Your deeper record is just beginning to settle.",
       "Only first sediments are visible in your deep record.",
@@ -639,27 +639,27 @@ const COPY_VARIANTS = {
     strataFallback: [
       "Shared and private moments settle into your deeper record.",
       "Shared and private moments rest in your deeper record.",
-      "In deeper layers, your moments settle side by side.",
+      "Below the surface, your moments settle side by side.",
       "Your deeper record gathers shared and private moments together.",
-      "Shared and private moments keep settling in your deeper layers.",
-      "Your deeper layers keep settling shared and private moments.",
-      "Your record below keeps compacting in quiet layers.",
+      "Shared and private moments keep settling in your deeper record.",
+      "Below the surface, shared and private moments keep settling.",
+      "Your record below keeps compacting in quiet.",
     ],
     strataEarly: [
       "Your deep record is still taking shape.",
-      "Only a thin layer has settled in your deep record.",
+      "Only a first sediment has settled in your deep record.",
       "Your deep record is beginning to gather moments.",
       "Your deeper record is still in first sediment.",
-      "Only first layers are visible in your deep record.",
+      "Only first sediments are visible in your deep record.",
     ],
   },
   narrative_en: {
     condition: {
-      quiet: ["The atmosphere is still gathering.", "First signals only.", "Still gathering."],
-      steady: ["The reading holds steady.", "Steady. Calm field.", "The field is calm."],
-      balance: ["The mix is rebalancing.", "Settling into balance.", "Re-centering."],
-      gathering: ["Pressure is rising.", "The reading is tightening.", "Density building."],
-      dense: ["The atmosphere is full.", "Dense with signal.", "Strong reading."],
+      quiet: ["Still gathering.", "First signals only."],
+      steady: ["The reading holds steady.", "The field is calm."],
+      balance: ["Settling into balance.", "Re-centering."],
+      gathering: ["Pressure is rising.", "The reading is tightening."],
+      dense: ["The atmosphere is full.", "Dense with signal."],
     },
     horizon: {
       empty: ["No horizon yet.", "Horizon open.", "Open."],
@@ -682,16 +682,16 @@ const COPY_VARIANTS = {
       fallback: ["Light signal.", "Wider field."],
       regional: ["Reading from this zone.", "This scope shapes the line."],
     },
-    strataFallback: ["Moments settle into deeper layers.", "Your record deepens.", "Layers keep settling."],
-    strataEarly: ["Your deep record is still forming.", "First layers only.", "The deep is still open."],
+    strataFallback: ["Moments settle below the surface.", "Your record deepens."],
+    strataEarly: ["Your deep record is still forming.", "First sediments only."],
   },
   narrative_es: {
     condition: {
-      quiet: ["La atmósfera sigue reuniendo.", "Solo las primeras señales.", "Aún reuniendo."],
-      steady: ["La lectura se mantiene estable.", "Estable. Campo en calma.", "El campo está en calma."],
-      balance: ["La mezcla se reequilibra.", "Asentándose en balance.", "Recentrando."],
-      gathering: ["La presión sube.", "La lectura se condensa.", "La densidad crece."],
-      dense: ["La atmósfera está llena.", "Denso de señal.", "Lectura fuerte."],
+      quiet: ["Aún reuniendo.", "Solo las primeras señales."],
+      steady: ["La lectura se mantiene estable.", "El campo está en calma."],
+      balance: ["Asentándose en balance.", "Recentrando."],
+      gathering: ["La presión sube.", "La lectura se condensa."],
+      dense: ["La atmósfera está llena.", "Denso de señal."],
     },
     horizon: {
       empty: ["Aún no hay horizonte.", "Horizonte abierto.", "Abierto."],
@@ -714,25 +714,25 @@ const COPY_VARIANTS = {
       fallback: ["Señal liviana.", "Campo amplio."],
       regional: ["Leyendo esta zona.", "Este alcance da forma a la línea."],
     },
-    strataFallback: ["Los momentos se asientan en capas profundas.", "Tu registro se profundiza.", "Las capas siguen asentándose."],
-    strataEarly: ["Tu registro profundo sigue formándose.", "Solo las primeras capas.", "Lo profundo sigue abierto."],
+    strataFallback: ["Los momentos se asientan bajo la superficie.", "Tu registro se profundiza."],
+    strataEarly: ["Tu registro profundo sigue formándose.", "Solo los primeros sedimentos."],
   },
 };
 const COPY = COPY_VARIANTS[COPY_MODE === "narrative" ? "narrative_" + LANG : COPY_MODE] || COPY_VARIANTS.poetic;
 
-/** Atmospheric Weather: lectura 48h. Lenguaje simple y juvenil, estados de la materia. */
+/** Atmospheric Weather: la frase que faltaba por estado. */
 const ATMOSPHERIC_WEATHER_LABELS = {
   en: {
-    calm: ["All calm.", "Light and easy.", "Nothing heavy.", "Clear and still.", "Easy drift."],
-    reflective: ["Taking it in.", "Inside weather.", "Long echoes.", "Waiting.", "Quiet signal."],
-    tension: ["Restless.", "Heavy in the air.", "A lot going on.", "Things are tight.", "Weight."],
-    release: ["Clear sky.", "Light is back.", "Open air.", "Letting go.", "Ease."],
+    calm: ["All calm.", "Clear and still.", "Easy drift."],
+    reflective: ["Taking it in.", "Long echoes.", "Quiet signal."],
+    tension: ["Heavy in the air.", "Weight."],
+    release: ["Clear sky.", "Open air.", "Ease."],
   },
   es: {
-    calm: ["Todo en calma.", "Ligero y suave.", "Nada pesado.", "Claro y quieto.", "Deriva tranquila."],
-    reflective: ["Se está procesando.", "Clima adentro.", "Ecos largos.", "En espera.", "Señal baja."],
-    tension: ["Inquieto.", "Pesado en el aire.", "Hay mucho.", "Todo apretado.", "Peso."],
-    release: ["Cielo claro.", "Vuelve la luz.", "Aire abierto.", "Soltando.", "Alivio."],
+    calm: ["Todo en calma.", "Claro y quieto.", "Deriva tranquila."],
+    reflective: ["Se está procesando.", "Ecos largos.", "Señal baja."],
+    tension: ["Pesado en el aire.", "Peso."],
+    release: ["Cielo claro.", "Aire abierto.", "Alivio."],
   },
 };
 
@@ -800,7 +800,7 @@ const UI_COPY = {
       sedimentAvoidableReturnsLate: "Avoidable tension returns late.",
       sedimentFertileDominant: "Fertile moments show up in the mix.",
       sedimentStillForming: "Your deep record is still forming.",
-      sedimentFirstLayers: "First layers only.",
+      sedimentFirstLayers: "First sediments only.",
       sedimentPatternBeginning: "A pattern is beginning to settle.",
       sedimentTentativePatternForming: "A line begins to appear.",
       sedimentTentativeObservedCalm: "Observed calm appears after stress.",
@@ -931,7 +931,7 @@ const UI_COPY = {
       sedimentAvoidableReturnsLate: "La tensión evitable vuelve tarde.",
       sedimentFertileDominant: "Los momentos fértiles aparecen en la mezcla.",
       sedimentStillForming: "Tu registro profundo sigue formándose.",
-      sedimentFirstLayers: "Solo las primeras capas.",
+      sedimentFirstLayers: "Solo los primeros sedimentos.",
       sedimentPatternBeginning: "Un patrón empieza a asentarse.",
       sedimentTentativePatternForming: "Una línea empieza a aparecer.",
       sedimentTentativeObservedCalm: "La calma observada aparece tras el estrés.",
@@ -3565,18 +3565,18 @@ function renderPatternLayer(canonicalState) {
   const dominant = canonicalState?.dominantMix || "";
   const tagMap = LANG === "es"
     ? {
-        pattern_a: ["Tensión repetida en la lectura.", "La lectura sigue—con tensión.", "Tensión en la lectura—mirá qué cambia."],
-        pattern_b: ["Estado de ánimo repetido en el campo.", "El campo sostiene un estado—ahora.", "Estado en el campo—seguí leyendo."],
-        pattern_c: ["Agrupamiento en la ventana.", "Se agrupa en la ventana—ahora.", "La ventana muestra un grupo—mirá."],
+        pattern_a: ["Tensión en la lectura—mirá qué cambia."],
+        pattern_b: ["El campo sostiene un estado—ahora."],
+        pattern_c: ["Las señales se agrupan en el campo."],
       }
     : {
-        pattern_a: ["Repeated strain in the read.", "The read keeps going—with strain.", "Strain in the read—see what shifts."],
-        pattern_b: ["Repeated mood in the field.", "The field holds a mood—now.", "Mood in the field—keep reading."],
-        pattern_c: ["Clustering in the window.", "Clustering in the window—now.", "The window shows a cluster—see it."],
+        pattern_a: ["Strain in the read—see what shifts."],
+        pattern_b: ["The field holds a mood—now."],
+        pattern_c: ["Signals clustering in the field."],
       };
   const patternFallback = LANG === "es"
-    ? ["Patrón en la lectura—sigue.", "Ritmo en la ventana—mirá qué sigue.", "Eco colectivo en la lectura.", "La lectura tiene patrón—ahora.", "El campo hace eco—seguí leyendo."]
-    : ["Pattern in the reading—it continues.", "Rhythm in the window—see what's next.", "Collective echo in the read.", "The read has a pattern—now.", "Echo in the field—keep reading."];
+    ? ["La lectura tiene patrón—ahora.", "El campo hace eco.", "Ritmo en el campo—mirá qué sigue."]
+    : ["The read has a pattern—now.", "Echo in the field.", "Rhythm in the field—see what's next."];
   const seed = (total * 7 + (dominant.length || 0)) | 0;
   const moodDisplayHero = LANG === "es" ? { stressed: "Tenso" } : { stressed: "Tense" };
   const patternOpts = repetition?.hasPattern && tagMap[repetition.tag]
