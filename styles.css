@@ -1,14 +1,16 @@
 /* SlipUp™ Observatory */
 :root {
-  /* ─── Control tipográfico general (coherencia en toda la página) ───
-   * Familia: --font-ui = controles, labels, listas, inputs. --font-reading = grado, condition, summary, CTA, strata.
-   * Cursiva: solo lectura interpretativa (strata-line, condition-line, pattern, contribute intro, ejemplos).
-   * Escala: usar estas variables para mantener proporción; ajustar aquí para cambiar globalmente.
+  /* ─── Tipografía unificada (una sola familia para todo el observatorio) ───
+   * Una fuente para todas las capas: Orbital, Atmosphere, Nearby, Horizon, Strata y Contribute.
+   * Coherencia: mismo tipo en lectura (grado, condition, horizon, strata) y en UI (topbar, listas, labels).
+   * Cursiva: solo lectura interpretativa (strata-line, condition-line, contribute examples).
    */
-  --font-sans: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --font-serif: Georgia, "Times New Roman", "Liberation Serif", serif;
-  --font-ui: var(--font-sans);
-  --font-reading: var(--font-serif);
+  --font-observatory: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-ui: var(--font-observatory);
+  --font-reading: var(--font-observatory);
+  /* Legacy: mismo valor para no romper referencias directas */
+  --font-sans: var(--font-observatory);
+  --font-serif: var(--font-observatory);
 
   /* Escala de tamaños (rem). Display = grado/hero; headline = títulos sección; lead = resumen; body/small/caption/label = UI. */
   --text-display: clamp(3.25rem, 20vw, 4.75rem);
@@ -82,14 +84,11 @@
   }
 }
 
-/* ─── Uso de tipografía (respetar al tocar estilos) ───
- * Serif (--font-reading): grado, condition-line, climate-summary-line, horizon primary/secondary,
- *   CTA observatory, strata-context, strata-line, contribute-rise-tone-intro, contribute-rise-examples,
- *   pattern/interpretación, Relate headline, moment-note en algunos contextos.
- * Cursiva (font-style: italic): strata-line, condition-line, pattern-line, contribute examples,
- *   quote-like blocks, moment-note italic. No usar cursiva en UI (labels, botones, inputs).
- * Sans (--font-ui): body por defecto, topbar, panels, listas, inputs, labels, botones, legal.
- * Al añadir texto nuevo: lectura atmosférica → serif (y cursiva si es interpretativa); UI → sans.
+/* ─── Uso de tipografía (una familia para todo el observatorio) ───
+ * --font-observatory (y por tanto --font-ui, --font-reading): toda la interfaz y lectura.
+ * Capas: títulos (.layer-title), grado, condition, horizon, strata, contribute usan la misma familia.
+ * Cursiva (font-style: italic): solo lectura interpretativa (strata-line, condition-line, contribute examples).
+ * Al añadir texto: usar var(--font-ui) o var(--font-reading); ambos apuntan a --font-observatory.
  */
 
 * {
@@ -1456,14 +1455,9 @@ html.theme-atmosphere .atm-reading-line {
   margin: 0;
 }
 
-/* Hero: "Atmosphere" — mismo estilo que NEARBY / Horizon (coherencia títulos de canal) */
-.observatory-hero .observatory-entry .eyebrow-layer {
-  color: #6b7d8f;
-  font-size: 0.72rem;
-  font-weight: 500;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  opacity: 0.85;
+/* Hero: "Atmosphere" usa .layer-title; un poco menos padding para no separar en exceso */
+.observatory-hero .layer-title {
+  padding-top: 0.85rem;
 }
 
 .eyebrow-context {
@@ -1537,7 +1531,7 @@ html.theme-atmosphere .atm-reading-line {
     gap: 1rem;
     padding-top: 0.75rem;
   }
-  .observatory-hero .observatory-entry .eyebrow-layer {
+  .observatory-hero .layer-title {
     font-size: 0.82rem;
   }
   .observatory-hero .atm-reading-line {
@@ -1665,8 +1659,10 @@ html.theme-atmosphere .atm-reading-line {
     opacity: 0.8;
   }
 
-  .observatory-entry .eyebrow-layer,
   .observatory-entry .eyebrow-context {
+    font-size: 0.8rem;
+  }
+  .observatory-hero .layer-title {
     font-size: 0.8rem;
   }
   .observatory-hero .hero-identity-line {
@@ -2651,6 +2647,20 @@ html.theme-atmosphere .atm-reading-line {
   margin: 0 0 0.25rem;
   letter-spacing: 0.02em;
 }
+
+.orbital-title.layer-title {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #6b7d8f;
+  letter-spacing: 0.12em;
+  margin: 0;
+}
+
+/* Primera capa: sin borde superior para no cortar el inicio */
+.panel-orbital .layer-title {
+  border-top: none;
+  padding-top: 0;
+}
 .orbital-subtitle {
   font-size: 0.88rem;
   font-style: italic;
@@ -2801,28 +2811,7 @@ html.theme-atmosphere .atm-reading-line {
 }
 
 .horizon-line {
-  color: #6b7d8f;
-  border-top: 1px solid var(--line);
-  text-align: center;
-  padding-top: 1.35rem;
-  margin-bottom: 1.4rem;
-  letter-spacing: 0.12em;
-  font-size: 0.72rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  opacity: 0.85;
-}
-
-.horizon-line::before {
-  content: "";
-  display: inline-block;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: 0.35;
-  margin-right: 0.45rem;
-  vertical-align: 0.2em;
+  /* Hereda .layer-title */
 }
 
 .horizon-primary {
@@ -3107,8 +3096,8 @@ html.theme-atmosphere .panel-recent::after {
   opacity: 0.74;
 }
 
-/* "Nearby" como etiqueta de canal del instrumento (misma familia que Atmosphere) */
-.local-climate-line {
+/* Título unificado de capa (Orbital, Atmosphere, Nearby, Horizon, Strata) — estilo referencia: Nearby */
+.layer-title {
   color: #6b7d8f;
   border-top: 1px solid color-mix(in srgb, var(--line) 85%, #ffffff);
   text-align: center;
@@ -3121,7 +3110,7 @@ html.theme-atmosphere .panel-recent::after {
   opacity: 0.85;
 }
 
-.local-climate-line::before {
+.layer-title::before {
   content: "";
   display: inline-block;
   width: 3px;
@@ -3131,6 +3120,18 @@ html.theme-atmosphere .panel-recent::after {
   opacity: 0.3;
   margin-right: 0.4rem;
   vertical-align: 0.15em;
+}
+
+/* Strata: mismo estilo sobre fondo oscuro */
+.ground-strata .layer-title {
+  color: rgba(255, 255, 255, 0.85);
+  border-top-color: rgba(255, 255, 255, 0.2);
+  padding-top: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.local-climate-line {
+  /* Hereda .layer-title; sin reglas propias para mantener una sola fuente de verdad */
 }
 
 /* Eco local del campo: subline que recontextualiza Nearby como capa del observatorio */
@@ -4631,7 +4632,7 @@ body.contribute-ritual .page {
     font-size: 0.95rem;
     margin-bottom: 0.9rem;
   }
-  .observatory-hero .observatory-entry .eyebrow-layer {
+  .observatory-hero .layer-title {
     font-size: 0.78rem;
   }
   .observatory-hero .atm-reading-line,
