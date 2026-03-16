@@ -1,0 +1,368 @@
+================================================================================
+LISTA COMPLETA DE FRASES — Hero (4 elementos)
+================================================================================
+
+--------- 1. atmReadingLine (atmosphere-signal.js — LABELS) ---------
+
+EN — quiet (13):
+Holding its breath.
+Calm before something rises.
+Resting for now.
+Nothing moving yet.
+Still reading.
+The read is here.
+Quiet in the field.
+Waiting.
+Calm layer.
+No lift yet.
+Still air.
+Right now.
+Something will stir.
+
+EN — rising (14):
+Something is rising.
+Stirring now.
+A shift in the air.
+Waking up.
+Moments gathering.
+The read is rising.
+Here and now.
+Lift in the air.
+Waking.
+Signals gathering.
+Going up.
+Moving.
+See what's in the air.
+It's happening.
+
+EN — dense (12):
+Full tonight.
+Heavy with signal.
+The air is charged.
+Thick read.
+Weight in the layer.
+A lot in the field.
+Full.
+Carrying weight.
+Charged.
+Heavy reading.
+Dense with moments.
+The layer speaks.
+
+ES — quiet (13):
+Contiene la respiración.
+Calma antes de que suba algo.
+Descansando por ahora.
+Nada se mueve aún.
+Sigue leyendo.
+La lectura está aquí.
+Quieto en el campo.
+Esperando.
+Capa en calma.
+Sin subida aún.
+Aire quieto.
+Ahora mismo.
+Algo se va a mover.
+
+ES — rising (14):
+Algo está subiendo.
+Se agita ahora.
+Un cambio en el aire.
+Despertando.
+Los momentos se juntan.
+La lectura sube.
+Aquí y ahora.
+Subida en el aire.
+Despertando.
+Las señales se juntan.
+Subiendo.
+En movimiento.
+Mirá qué hay en el aire.
+Está pasando.
+
+ES — dense (12):
+Lleno esta noche.
+Pesado de señal.
+El aire está cargado.
+Lectura densa.
+Peso en la capa.
+Mucho en el campo.
+Lleno.
+Lleva peso.
+Cargado.
+Lectura pesada.
+Denso de momentos.
+La capa habla.
+
+
+--------- 2. atmosphericWeatherLine (app.js — ATMOSPHERIC_WEATHER_LABELS) ---------
+
+EN — calm (5):
+All calm.
+Light and easy.
+Nothing heavy.
+Clear and still.
+Easy drift.
+
+EN — reflective (5):
+Taking it in.
+Inside weather.
+Long echoes.
+Waiting.
+Quiet signal.
+
+EN — tension (5):
+Restless.
+Heavy in the air.
+A lot going on.
+Things are tight.
+Weight.
+
+EN — release (5):
+Clear sky.
+Light is back.
+Open air.
+Letting go.
+Ease.
+
+ES — calm (5):
+Todo en calma.
+Ligero y suave.
+Nada pesado.
+Claro y quieto.
+Deriva tranquila.
+
+ES — reflective (5):
+Se está procesando.
+Clima adentro.
+Ecos largos.
+En espera.
+Señal baja.
+
+ES — tension (5):
+Inquieto.
+Pesado en el aire.
+Hay mucho.
+Todo apretado.
+Peso.
+
+ES — release (5):
+Cielo claro.
+Vuelve la luz.
+Aire abierto.
+Soltando.
+Alivio.
+
+
+--------- 3. atmosphere-pattern-line (app.js — tagMap + patternFallback) ---------
+
+EN — pattern_a (3):
+Repeated strain in the read.
+The read keeps going—with strain.
+Strain in the read—see what shifts.
+
+EN — pattern_b (3):
+Repeated mood in the field.
+The field holds a mood—now.
+Mood in the field—keep reading.
+
+EN — pattern_c (3):
+Clustering in the window.
+Clustering in the window—now.
+The window shows a cluster—see it.
+
+EN — fallback (5):
+Pattern in the reading—it continues.
+Rhythm in the window—see what's next.
+Collective echo in the read.
+The read has a pattern—now.
+Echo in the field—keep reading.
+
+ES — pattern_a (3):
+Tensión repetida en la lectura.
+La lectura sigue—con tensión.
+Tensión en la lectura—mirá qué cambia.
+
+ES — pattern_b (3):
+Estado de ánimo repetido en el campo.
+El campo sostiene un estado—ahora.
+Estado en el campo—seguí leyendo.
+
+ES — pattern_c (3):
+Agrupamiento en la ventana.
+Se agrupa en la ventana—ahora.
+La ventana muestra un grupo—mirá.
+
+ES — fallback (5):
+Patrón en la lectura—sigue.
+Ritmo en la ventana—mirá qué sigue.
+Eco colectivo en la lectura.
+La lectura tiene patrón—ahora.
+El campo hace eco—seguí leyendo.
+
+
+--------- 4. climateSummaryLine (uiCopy.js) ---------
+
+--- READING_SUMMARY_STEADY — EN (60) ---
+The field is listening.
+Moments have a place here.
+The air carries what we send.
+We read the same sky.
+Something sent is in the field.
+The observatory holds the line.
+The signal landed.
+The field remembers what rises.
+We're reading together.
+What goes in the air remains.
+The read includes what lands.
+The moment entered the field.
+The sky holds what we share.
+The reading holds what rises.
+The atmosphere notes what lands.
+The line joined the mix.
+The field sees what rises.
+We're in the same window.
+The contribution holds.
+The read gathers what we send.
+Something landed.
+The observatory reads the field.
+The air carries the moment.
+We share this reading.
+The field gathers what rises.
+The field is open to what rises.
+What is sent joins the read.
+The sky reads what we offer.
+The atmosphere holds the read.
+The read holds what we share.
+The signal is in the air.
+The field welcomes what rises.
+We're reading the same sky.
+The line landed in the field.
+The observatory carries the trace.
+The air holds the contribution.
+We're part of the same reading.
+Signals settle in the air.
+The field listens to what we send.
+What was added is now in the field.
+The sky includes the line.
+Contributions live in the air.
+We read what we share.
+The field notes what lands.
+The moment lives in the read.
+The observatory reads what we share.
+The air reads.
+What was sent remains.
+We're in the same field.
+The line joins the reading.
+The read continues—check back.
+Something is shifting in the field—now.
+The field is reading again.
+What we share keeps the read alive.
+The reading holds—see what rises next.
+The field keeps reading.
+The read is moving—now.
+Come see what the field holds.
+The atmosphere is reading—stay with it.
+The read goes on.
+
+--- READING_SUMMARY_STEADY — ES (60) ---
+El campo está escuchando.
+Los momentos tienen un lugar aquí.
+El aire lleva lo que enviamos.
+Leemos el mismo cielo.
+Algo enviado está en el campo.
+El observatorio sostiene la línea.
+La señal aterrizó.
+El campo recuerda lo que sube.
+Estamos leyendo juntos.
+Lo que sube al aire permanece.
+La lectura incluye lo que aterriza.
+El momento entró en el campo.
+El cielo sostiene lo que compartimos.
+La lectura sostiene lo que sube.
+La atmósfera nota lo que aterriza.
+La línea se sumó a la mezcla.
+El campo ve lo que sube.
+Estamos en la misma ventana.
+La contribución se mantiene.
+La lectura reúne lo que enviamos.
+Algo aterrizó.
+El observatorio lee el campo.
+El aire lleva el momento.
+Compartimos esta lectura.
+El campo reúne lo que sube.
+El campo está abierto a lo que sube.
+Lo enviado se suma a la lectura.
+El cielo lee lo que ofrecemos.
+La atmósfera sostiene la lectura.
+La lectura sostiene lo que compartimos.
+La señal está en el aire.
+El campo recibe lo que sube.
+Leemos el mismo cielo.
+La línea aterrizó en el campo.
+El observatorio lleva la traza.
+El aire sostiene la contribución.
+Somos parte de la misma lectura.
+Las señales se asientan en el aire.
+El campo escucha lo que enviamos.
+Lo sumado está ahora en el campo.
+El cielo incluye la línea.
+Las contribuciones viven en el aire.
+Leemos lo que compartimos.
+El campo nota lo que aterriza.
+El momento vive en la lectura.
+El observatorio lee lo que compartimos.
+El aire lee.
+Lo enviado permanece.
+Estamos en el mismo campo.
+La línea se suma a la lectura.
+La lectura sigue—volvé a mirar.
+Algo se mueve en el campo—ahora.
+El campo está leyendo de nuevo.
+Lo que compartimos mantiene la lectura viva.
+La lectura se mantiene—mirá qué sube.
+El campo sigue leyendo.
+La lectura se mueve—ahora.
+Vení a ver qué sostiene el campo.
+La atmósfera está leyendo—quedate.
+La lectura continúa.
+
+--- READING_SUMMARY_FALLBACK — EN (13, total ≥ 1000 sin mix) ---
+The reading holds.
+The field steadies.
+A layer forms.
+Signals settle.
+The mix holds.
+Steady in the window.
+The reading steadies.
+Moments in the field.
+The read holds a collective rhythm.
+Calm gathers after strain.
+The field echoes.
+The read continues—come back.
+The field is full—see it now.
+
+--- READING_SUMMARY_FALLBACK — ES (13) ---
+La lectura se mantiene.
+El campo se estabiliza.
+Se forma una capa.
+Las señales se asientan.
+La mezcla se mantiene.
+Estable en la ventana.
+La lectura se estabiliza.
+Momentos en el campo.
+La lectura sostiene un ritmo colectivo.
+La calma se reúne tras la tensión.
+El campo hace eco.
+La lectura sigue—volvé.
+El campo está lleno—mirá ahora.
+
+--- total < 3 (una frase por idioma) ---
+EN: Signals are gathering.
+ES: Las señales se reúnen.
+
+--- READING_SUMMARY_BY_MIX (uiCopy.js): 15 combinaciones type|mood × 5 frases cada una, EN y ES. Ver uiCopy.js líneas 142–177. ---
+
+================================================================================
+FIN LISTA
+================================================================================

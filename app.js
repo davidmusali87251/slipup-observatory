@@ -720,19 +720,19 @@ const COPY_VARIANTS = {
 };
 const COPY = COPY_VARIANTS[COPY_MODE === "narrative" ? "narrative_" + LANG : COPY_MODE] || COPY_VARIANTS.poetic;
 
-/** Atmospheric Weather: estados poéticos del campo (últimas 48h). No analytics. */
+/** Atmospheric Weather: lectura 48h. Lenguaje simple y juvenil, estados de la materia. */
 const ATMOSPHERIC_WEATHER_LABELS = {
   en: {
-    calm: ["Quiet field", "Soft air", "Still sky", "Slow drift", "Calm layer"],
-    reflective: ["Deep thoughts", "Inner weather", "Long echoes", "Quiet processing", "Still reading"],
-    tension: ["Restless air", "Heavy signals", "Dense field", "Uneasy current", "Weight in the air"],
-    release: ["Clear sky", "Light return", "Open air", "Field relaxing", "Lift in the air"],
+    calm: ["All calm.", "Light and easy.", "Nothing heavy.", "Clear and still.", "Easy drift."],
+    reflective: ["Taking it in.", "Inside weather.", "Long echoes.", "Waiting.", "Quiet signal."],
+    tension: ["Restless.", "Heavy in the air.", "A lot going on.", "Things are tight.", "Weight."],
+    release: ["Clear sky.", "Light is back.", "Open air.", "Letting go.", "Ease."],
   },
   es: {
-    calm: ["Campo quieto", "Aire suave", "Cielo quieto", "Deriva lenta", "Capa calmada"],
-    reflective: ["Pensamiento profundo", "Clima interior", "Ecos largos", "Procesando en calma", "Lectura en calma"],
-    tension: ["Aire inquieto", "Señales densas", "Campo denso", "Corriente pesada", "Peso en el aire"],
-    release: ["Cielo claro", "Vuelve la luz", "Aire abierto", "Campo relajado", "Subida en el aire"],
+    calm: ["Todo en calma.", "Ligero y suave.", "Nada pesado.", "Claro y quieto.", "Deriva tranquila."],
+    reflective: ["Se está procesando.", "Clima adentro.", "Ecos largos.", "En espera.", "Señal baja."],
+    tension: ["Inquieto.", "Pesado en el aire.", "Hay mucho.", "Todo apretado.", "Peso."],
+    release: ["Cielo claro.", "Vuelve la luz.", "Aire abierto.", "Soltando.", "Alivio."],
   },
 };
 
@@ -3625,6 +3625,46 @@ async function loadSharedMoments(localMoments) {
 /** Estado actual del observatorio para re-renderizar listas (Across the atmosphere + Nearby) con datos frescos sin recargar. */
 let observatoryState = null;
 
+/** Hero Engine: rotación de las 4 líneas del hero a ritmos distintos (sensación de sistema vivo, invitación a volver). */
+const HERO_ENGINE_MS = { line1: 10000, line2: 15000, line3: 20000, line4: 45000 };
+let heroEngineIntervals = [];
+
+function clearHeroEngine() {
+  heroEngineIntervals.forEach(function (id) { clearInterval(id); });
+  heroEngineIntervals.length = 0;
+}
+
+function startHeroEngine() {
+  clearHeroEngine();
+  if (prefersReducedMotion || !observatoryState) return;
+  const s = observatoryState;
+  if (!climateSummaryLine || !atmosphericWeatherLine || !atmospherePatternLine) return;
+  heroEngineIntervals.push(setInterval(function () {
+    if (window.atmosphereSignal && window.atmosphereSignal.update && s.sharedMoments) {
+      window.atmosphereSignal.update(s.sharedMoments);
+    }
+  }, HERO_ENGINE_MS.line1));
+  heroEngineIntervals.push(setInterval(function () {
+    const shared48h = getRecentWindow(s.sharedMoments || []);
+    const weather = getAtmosphericWeather(shared48h);
+    if (atmosphericWeatherLine && weather && weather.label) {
+      atmosphericWeatherLine.textContent = weather.label;
+      atmosphericWeatherLine.classList.remove("hidden");
+    }
+  }, HERO_ENGINE_MS.line2));
+  heroEngineIntervals.push(setInterval(function () {
+    if (s.canonicalState) renderPatternLayer(s.canonicalState);
+  }, HERO_ENGINE_MS.line3));
+  heroEngineIntervals.push(setInterval(function () {
+    const total = Number(s.canonicalState && s.canonicalState.total) || 0;
+    if (total > 0 && climateSummaryLine) {
+      const seed = (total * 7 + Math.round(Number(s.canonicalState && s.canonicalState.computedDegree) || 0) + Math.floor(Date.now() / 1000)) | 0;
+      climateSummaryLine.textContent = getReadingStatusLine(LANG, total, seed, s.canonicalState && s.canonicalState.dominantMix);
+      climateSummaryLine.classList.remove("hidden");
+    }
+  }, HERO_ENGINE_MS.line4));
+}
+
 /** Timeout del eco de Nearby; se cancela si se programa otro antes de que dispare. */
 let nearbyEchoTimeoutId = null;
 /** Evita superposición si un repaint dispara otro eco antes de que termine el actual. */
@@ -4167,6 +4207,7 @@ async function boot() {
     observatoryPipeline,
     fieldLensModel,
   };
+  startHeroEngine();
 
   const level = (canonicalState?.computedDegree ?? 0) / 100;
   const isFieldQuiet = level < 0.18;
