@@ -1276,6 +1276,20 @@ html.theme-atmosphere .horizon-pulse-bar::before {
 .atmosphere-grounding .atmospheric-weather-caption {
   margin-top: 0.4rem;
 }
+.atmospheric-weather-caption-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+.atmospheric-weather-caption-wrap .atmospheric-weather-caption {
+  margin: 0;
+}
+.atmospheric-weather-caption-wrap .instrument-info-btn {
+  flex-shrink: 0;
+}
 .atm-reading-line.atm-reading-updating {
   opacity: 0;
 }
