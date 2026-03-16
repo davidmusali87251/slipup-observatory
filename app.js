@@ -1043,6 +1043,8 @@ function applyUICopy() {
   }
   const contributeFooterLink = document.getElementById("contributeFooterLink");
   if (contributeFooterLink && ui.contributeFooterLine) contributeFooterLink.textContent = ui.contributeFooterLine;
+  const orbitalContributeLink = document.getElementById("orbitalContributeLink");
+  if (orbitalContributeLink && ui.ctaObservatoryLabel) orbitalContributeLink.textContent = ui.ctaObservatoryLabel;
   const ctaObservatory = document.getElementById("ctaObservatory");
   if (ctaObservatory && ui.ctaObservatoryLabel) ctaObservatory.textContent = ui.ctaObservatoryLabel;
   const ctaObservatoryTooltip = document.getElementById("ctaObservatoryTooltip");

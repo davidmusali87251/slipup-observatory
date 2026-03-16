@@ -2686,6 +2686,20 @@ html.theme-atmosphere .atm-reading-line {
   opacity: 0.85;
 }
 
+/* Contribute en orbital: último elemento de la capa, invertido respecto al footer (arriba vs abajo). */
+.orbital-contribute-wrap {
+  margin: 0.5rem 0 0;
+  text-align: right;
+}
+.orbital-contribute-link {
+  font-family: var(--font-observatory);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.orbital-contribute-link:hover {
+  color: var(--text);
+}
+
 .orbital-seed-blocks {
   margin-top: 1.25rem;
   padding-top: 0.75rem;
