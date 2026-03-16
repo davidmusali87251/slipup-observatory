@@ -4,7 +4,7 @@
  * Primer módulo extraído desde app.js para reducir tamaño y facilitar pruebas.
  */
 
-/** 100 frases para 3–999 momentos: voz del observatorio (versión refinada: menos redundancia, más voz del campo, frases más cortas). */
+/** Frases para 3–999 momentos: voz del observatorio + ligero pull para volver (continuidad, ahora, ver qué pasa). */
 export const READING_SUMMARY_STEADY = {
   en: [
     "The field is listening.",
@@ -57,6 +57,16 @@ export const READING_SUMMARY_STEADY = {
     "What was sent remains.",
     "We're in the same field.",
     "The line joins the reading.",
+    "The read continues—check back.",
+    "Something is shifting in the field—now.",
+    "The field is reading again.",
+    "What we share keeps the read alive.",
+    "The reading holds—see what rises next.",
+    "The field keeps reading.",
+    "The read is moving—now.",
+    "Come see what the field holds.",
+    "The atmosphere is reading—stay with it.",
+    "The read goes on.",
   ],
   es: [
     "El campo está escuchando.",
@@ -109,13 +119,23 @@ export const READING_SUMMARY_STEADY = {
     "Lo enviado permanece.",
     "Estamos en el mismo campo.",
     "La línea se suma a la lectura.",
+    "La lectura sigue—volvé a mirar.",
+    "Algo se mueve en el campo—ahora.",
+    "El campo está leyendo de nuevo.",
+    "Lo que compartimos mantiene la lectura viva.",
+    "La lectura se mantiene—mirá qué sube.",
+    "El campo sigue leyendo.",
+    "La lectura se mueve—ahora.",
+    "Vení a ver qué sostiene el campo.",
+    "La atmósfera está leyendo—quedate.",
+    "La lectura continúa.",
   ],
 };
 
-/** Fallback cuando total >= 1000 y no hay dominantMix. Incluye frases de eco/ritmo colectivo. */
+/** Fallback cuando total >= 1000 y no hay dominantMix. Incluye eco/ritmo colectivo + pull. */
 export const READING_SUMMARY_FALLBACK = {
-  en: ["The reading holds.", "The field steadies.", "A layer forms.", "Signals settle.", "The mix holds.", "Steady in the window.", "The reading steadies.", "Moments in the field.", "The read holds a collective rhythm.", "Calm gathers after strain.", "The field echoes."],
-  es: ["La lectura se mantiene.", "El campo se estabiliza.", "Se forma una capa.", "Las señales se asientan.", "La mezcla se mantiene.", "Estable en la ventana.", "La lectura se estabiliza.", "Momentos en el campo.", "La lectura sostiene un ritmo colectivo.", "La calma se reúne tras la tensión.", "El campo hace eco."],
+  en: ["The reading holds.", "The field steadies.", "A layer forms.", "Signals settle.", "The mix holds.", "Steady in the window.", "The reading steadies.", "Moments in the field.", "The read holds a collective rhythm.", "Calm gathers after strain.", "The field echoes.", "The read continues—come back.", "The field is full—see it now."],
+  es: ["La lectura se mantiene.", "El campo se estabiliza.", "Se forma una capa.", "Las señales se asientan.", "La mezcla se mantiene.", "Estable en la ventana.", "La lectura se estabiliza.", "Momentos en el campo.", "La lectura sostiene un ritmo colectivo.", "La calma se reúne tras la tensión.", "El campo hace eco.", "La lectura sigue—volvé.", "El campo está lleno—mirá ahora."],
 };
 
 /** 75 frases por type×mood para total >= 1000. */

@@ -3412,18 +3412,27 @@ function renderPatternLayer(canonicalState) {
   }
 
   const dominant = canonicalState?.dominantMix || "";
-  const tagMap = {
-    pattern_a: "Repeated strain in the read.",
-    pattern_b: "Repeated mood in the field.",
-    pattern_c: "Clustering in the window.",
-  };
+  const tagMap = LANG === "es"
+    ? {
+        pattern_a: ["Tensión repetida en la lectura.", "La lectura sigue—con tensión.", "Tensión en la lectura—mirá qué cambia."],
+        pattern_b: ["Estado de ánimo repetido en el campo.", "El campo sostiene un estado—ahora.", "Estado en el campo—seguí leyendo."],
+        pattern_c: ["Agrupamiento en la ventana.", "Se agrupa en la ventana—ahora.", "La ventana muestra un grupo—mirá."],
+      }
+    : {
+        pattern_a: ["Repeated strain in the read.", "The read keeps going—with strain.", "Strain in the read—see what shifts."],
+        pattern_b: ["Repeated mood in the field.", "The field holds a mood—now.", "Mood in the field—keep reading."],
+        pattern_c: ["Clustering in the window.", "Clustering in the window—now.", "The window shows a cluster—see it."],
+      };
   const patternFallback = LANG === "es"
-    ? ["Patrón en la lectura.", "Ritmo en la ventana.", "Eco colectivo en la lectura."]
-    : ["Pattern in the reading.", "Rhythm in the window.", "Collective echo in the read."];
+    ? ["Patrón en la lectura—sigue.", "Ritmo en la ventana—mirá qué sigue.", "Eco colectivo en la lectura.", "La lectura tiene patrón—ahora.", "El campo hace eco—seguí leyendo."]
+    : ["Pattern in the reading—it continues.", "Rhythm in the window—see what's next.", "Collective echo in the read.", "The read has a pattern—now.", "Echo in the field—keep reading."];
   const seed = (total * 7 + (dominant.length || 0)) | 0;
   const moodDisplayHero = LANG === "es" ? { stressed: "Tenso" } : { stressed: "Tense" };
+  const patternOpts = repetition?.hasPattern && tagMap[repetition.tag]
+    ? tagMap[repetition.tag]
+    : patternFallback;
   const line = repetition?.hasPattern
-    ? (tagMap[repetition.tag] || patternFallback[Math.abs(seed) % patternFallback.length])
+    ? patternOpts[Math.abs(seed) % patternOpts.length]
     : dominant
       ? dominant.split("|").map((s, i) => {
           const t = s.trim().toLowerCase();

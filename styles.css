@@ -1144,7 +1144,7 @@ html.theme-atmosphere[data-atmosphere-state="observed"] .atmosphere-grounding::a
 .atmosphere-grounding .climate-summary-line { margin-top: 0; }
 .atmosphere-grounding .cta-observatory { margin-top: 0; }
 
-/* Señal atmosférica: horizonte en doble capa (difuso + pulso reactivo) */
+/* Señal atmosférica: horizonte en doble capa (difuso + pulso reactivo). Centrado como el radar. */
 .horizon-pulse-bar {
   --horizon-base: rgba(92, 61, 255, 0.06);
   --horizon-mid: rgba(92, 61, 255, 0.12);
@@ -1158,6 +1158,12 @@ html.theme-atmosphere[data-atmosphere-state="observed"] .atmosphere-grounding::a
   border-radius: 6px;
   overflow: visible;
   transition: box-shadow var(--pulse-duration) cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.observatory-hero .atmosphere-grounding .horizon-pulse-bar {
+  left: 50%;
+  transform: translateX(-50%);
+  margin-left: 0;
+  margin-right: 0;
 }
 .horizon-pulse-bar::before {
   content: "";
