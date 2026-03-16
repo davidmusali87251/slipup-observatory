@@ -972,10 +972,11 @@ h2 {
 .observatory-hero .atmosphere-air .hero-identity-line { order: 1; }
 .observatory-hero .atmosphere-air .observatory-seo-intro { order: 2; }
 .observatory-hero .atmosphere-air .observatory-entry { order: 3; }
-.observatory-hero .atmosphere-air .atm-reading-line { order: 4; }
-.observatory-hero .atmosphere-air .atmospheric-weather-line { order: 5; }
-.observatory-hero .atmosphere-air .atmosphere-orientation { order: 6; }
-.observatory-hero .atmosphere-air .degree-wrap { order: 7; }
+.observatory-hero .atmosphere-air .daily-tone-line { order: 4; }
+.observatory-hero .atmosphere-air .atm-reading-line { order: 5; }
+.observatory-hero .atmosphere-air .atmospheric-weather-line { order: 6; }
+.observatory-hero .atmosphere-air .atmosphere-orientation { order: 7; }
+.observatory-hero .atmosphere-air .degree-wrap { order: 8; }
 
 /* Columna única: todos los elementos centrados en el mismo eje */
 .atmosphere-air .observatory-entry,
@@ -2176,6 +2177,50 @@ html.theme-atmosphere .atm-reading-line {
 
 .transient-reading-line.is-visible {
   opacity: 0.82;
+}
+
+/* Ritmo diario: una línea por franja (mañana / tarde / noche). */
+.daily-tone-line {
+  font-family: var(--font-observatory);
+  font-size: 0.78rem;
+  color: var(--muted);
+  opacity: 0.82;
+  margin: 0.15rem 0 0.35rem;
+  text-align: center;
+  line-height: 1.35;
+}
+.daily-tone-line.hidden {
+  display: none;
+}
+html.theme-atmosphere .daily-tone-line {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* Observatory pulse: señal breve cuando algo cambió en el campo. */
+.observatory-pulse {
+  margin-top: 0.5rem;
+  font-family: var(--font-observatory);
+  font-size: 0.75rem;
+  color: var(--muted);
+  opacity: 0;
+  line-height: 1.4;
+  transition: opacity 500ms ease;
+}
+.observatory-pulse.is-visible {
+  opacity: 0.88;
+}
+.observatory-pulse.hidden {
+  display: none;
+}
+.observatory-pulse-label {
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+.observatory-pulse-label::after {
+  content: " ";
+}
+html.theme-atmosphere .observatory-pulse {
+  color: rgba(255, 255, 255, 0.8);
 }
 
   line-height: 1.85;

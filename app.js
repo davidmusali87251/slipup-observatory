@@ -68,6 +68,10 @@ const DISPLAY_DEGREE_KEY = "slipup_v2_display_degree";
 const FIELD_SCOPE_KEY = "slipup_v2_field_scope";
 const RELATE_STORAGE_KEY = "slipup_v2_relate";
 const HIDDEN_MOMENT_IDS_KEY = "slipup_v2_hidden_moment_ids";
+const PULSE_STATE_KEY = "slipup_v2_pulse_state";
+const LAST_PULSE_KEY = "slipup_v2_last_pulse";
+/** Probabilidad de mostrar pulse cuando el estado cambió (rareza → más significativo). */
+const PULSE_RARITY = 0.6;
 
 function getHiddenMomentIds() {
   try {
@@ -757,6 +761,16 @@ const UI_COPY = {
     conditionError: "Something went wrong. Refresh the page.",
     conditionOffline: "Reading from this device only.",
     mixLine: (type, mood) => `Mostly ${type}, ${mood}.`,
+    todayInTheField: "Today in the field",
+    dailyToneMorning: "The field is forming.",
+    dailyToneAfternoon: "Signals are arriving.",
+    dailyToneNight: "The air is heavy tonight.",
+    observatoryPulseLabel: "Observatory pulse",
+    pulsePhrases: ["The field stirred.", "The field just shifted.", "Signals increased.", "Something moved in the field.", "The atmosphere shifted."],
+    nightPulsePhrases: ["The night field is unusually dense.", "Something is stirring tonight."],
+    rarePulsePhrases: ["The field feels different tonight.", "The observatory noticed something unusual."],
+    lastPulseLabel: "Last pulse",
+    yourSignalEntered: "Your signal entered the field.",
     eyebrowLayer: "Atmosphere",
     eyebrowContext: "Moments",
     heroIdentityLine: "Where human moments meet",
@@ -889,6 +903,16 @@ const UI_COPY = {
     conditionError: "Algo ha fallado. Recarga la página.",
     conditionOffline: "Leyendo solo desde este dispositivo.",
     mixLine: (type, mood) => `Sobre todo ${type}, ${mood}.`,
+    todayInTheField: "Hoy en el campo",
+    dailyToneMorning: "El campo se está formando.",
+    dailyToneAfternoon: "Las señales están llegando.",
+    dailyToneNight: "El aire pesa esta noche.",
+    observatoryPulseLabel: "Pulso del observatorio",
+    pulsePhrases: ["El campo se agitó.", "El campo acaba de cambiar.", "Las señales aumentaron.", "Algo se movió en el campo.", "La atmósfera cambió."],
+    nightPulsePhrases: ["El campo nocturno está inusualmente denso.", "Algo se agita esta noche."],
+    rarePulsePhrases: ["El campo se siente distinto esta noche.", "El observatorio notó algo inusual."],
+    lastPulseLabel: "Último pulso",
+    yourSignalEntered: "Tu señal entró al campo.",
     eyebrowLayer: "Atmósfera",
     eyebrowContext: "Momentos",
     heroIdentityLine: "Donde se encuentran los momentos humanos",
@@ -1018,7 +1042,9 @@ function applyUICopy() {
   const instrumentEl = document.getElementById("climateInstrument");
   if (instrumentEl && ui.instrumentAriaLabel) instrumentEl.setAttribute("aria-label", ui.instrumentAriaLabel);
   const eyebrowLayerEl = document.querySelector(".eyebrow-layer");
-  if (eyebrowLayerEl) eyebrowLayerEl.textContent = ui.eyebrowLayer;
+  if (eyebrowLayerEl) eyebrowLayerEl.textContent = ui.todayInTheField || ui.eyebrowLayer;
+  const observatoryPulseLabelEl = document.getElementById("observatoryPulseLabel");
+  if (observatoryPulseLabelEl && ui.observatoryPulseLabel) observatoryPulseLabelEl.textContent = ui.observatoryPulseLabel;
   const eyebrowContextEl = document.querySelector(".eyebrow-context");
   if (eyebrowContextEl) eyebrowContextEl.textContent = ui.eyebrowContext;
   const heroIdentityEl = document.getElementById("heroIdentityLine");
@@ -1351,6 +1377,9 @@ const horizonTimeOfDayLine = document.getElementById("horizonTimeOfDayLine");
 const horizonMoreButton = document.getElementById("horizonMoreButton");
 const heroEl = document.getElementById("observatory-hero");
 const transientReadingLine = document.getElementById("transientReadingLine");
+const dailyToneLine = document.getElementById("dailyToneLine");
+const observatoryPulseWrap = document.getElementById("observatoryPulseWrap");
+const observatoryPulseMessage = document.getElementById("observatoryPulseMessage");
 const warmupHint = document.getElementById("warmupHint");
 const sheetBackdrop = document.getElementById("sheet-backdrop");
 const sharedSheet = document.getElementById("shared-sheet");
@@ -2211,6 +2240,58 @@ function getStoredDisplayDegree() {
 
 function setStoredDisplayDegree(value) {
   localStorage.setItem(DISPLAY_DEGREE_KEY, String(value));
+}
+
+/** Ritmo diario: mañana / tarde / noche para "daily field" reading. */
+function getTimeOfDayBand() {
+  const h = new Date().getHours();
+  if (h >= 5 && h < 12) return "morning";
+  if (h >= 12 && h < 19) return "afternoon";
+  return "night";
+}
+
+/** Ventana nocturna 22:00–02:00 para pulse especial (ritual nocturno). */
+function isNightPulseWindow() {
+  const h = new Date().getHours();
+  return h >= 22 || h < 2;
+}
+
+/** ~1 vez cada 7 días: día para pulse "raro" (secret moment). */
+function isRarePulseDay() {
+  const daysSinceEpoch = Math.floor(Date.now() / 86400000);
+  return daysSinceEpoch % 7 === 0;
+}
+
+function getPulseState() {
+  try {
+    const raw = localStorage.getItem(PULSE_STATE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function setPulseState(state) {
+  try {
+    localStorage.setItem(PULSE_STATE_KEY, JSON.stringify(state));
+  } catch (_) {}
+}
+
+function getLastPulse() {
+  try {
+    const raw = localStorage.getItem(LAST_PULSE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch {
+    return null;
+  }
+}
+
+function setLastPulse(payload) {
+  try {
+    localStorage.setItem(LAST_PULSE_KEY, JSON.stringify(payload));
+  } catch (_) {}
 }
 
 function getRelateState(momentId) {
@@ -3542,8 +3623,11 @@ function animateDegree(from, to, ms) {
   requestAnimationFrame(frame);
 }
 
-function showTransientReading(total = 0, seed = 0, lang = "en") {
-  const phrase = getAtmosphereLine(seed, lang, total);
+function showTransientReading(total = 0, seed = 0, lang = "en", contributed = false) {
+  const ui = UI_COPY[lang] || UI_COPY.en;
+  const phrase = contributed && ui.yourSignalEntered
+    ? ui.yourSignalEntered
+    : getAtmosphereLine(seed, lang, total);
   transientReadingLine.textContent = phrase;
   transientReadingLine.classList.remove("hidden");
   transientReadingLine.classList.add("is-visible");
@@ -3555,6 +3639,26 @@ function showTransientReading(total = 0, seed = 0, lang = "en") {
       transientReadingLine.textContent = "";
     }, 550);
   }, 2500);
+}
+
+/** Observatory pulse: señal breve cuando algo cambió en el campo. Aparece, dura ~4 s, se va. */
+function showObservatoryPulse(message, isLastPulse = false) {
+  if (!observatoryPulseWrap || !observatoryPulseMessage) return;
+  const ui = UI_COPY[LANG] || UI_COPY.en;
+  const label = isLastPulse && ui.lastPulseLabel ? ui.lastPulseLabel : (ui.observatoryPulseLabel || "Observatory pulse");
+  const labelEl = document.getElementById("observatoryPulseLabel");
+  if (labelEl) labelEl.textContent = label;
+  observatoryPulseMessage.textContent = message;
+  observatoryPulseWrap.classList.remove("hidden");
+  observatoryPulseWrap.classList.add("is-visible");
+
+  window.setTimeout(() => {
+    observatoryPulseWrap.classList.remove("is-visible");
+    window.setTimeout(() => {
+      observatoryPulseWrap.classList.add("hidden");
+      observatoryPulseMessage.textContent = "";
+    }, 500);
+  }, 4000);
 }
 
 function renderPatternLayer(canonicalState) {
@@ -4010,6 +4114,21 @@ async function boot() {
   );
   const localClimate = calculateClimate(getSharedMoments(moments));
   const computedDegree = climateTruth.computedDegree;
+
+  // Ritmo diario: tono según hora (mañana / tarde / noche).
+  if (dailyToneLine) {
+    const ui = UI_COPY[LANG] || UI_COPY.en;
+    const band = getTimeOfDayBand();
+    const toneKey = band === "morning" ? "dailyToneMorning" : band === "afternoon" ? "dailyToneAfternoon" : "dailyToneNight";
+    const toneText = ui[toneKey];
+    if (toneText) {
+      dailyToneLine.textContent = toneText;
+      dailyToneLine.classList.remove("hidden");
+    } else {
+      dailyToneLine.classList.add("hidden");
+    }
+  }
+
   const startDisplay = Number.isFinite(previousDisplay)
     ? previousDisplay
     : Number.isFinite(previousComputed)
@@ -4032,7 +4151,7 @@ async function boot() {
     }
     settleDuration = clamp(3000 + Math.abs(delta) * 70 + patternVolatilityMs, 3000, 8000);
     const transientSeed = query.get("s") !== null ? (parseInt(query.get("s"), 10) || 0) : (Date.now() + (canonicalState?.total ?? 0) * 7) | 0;
-    showTransientReading(canonicalState?.total ?? 0, transientSeed, LANG);
+    showTransientReading(canonicalState?.total ?? 0, transientSeed, LANG, true);
     if (heroEl) {
       heroEl.classList.add("observatory-hero-ritual");
       try { window.atmosphere?.bump?.(); } catch (_) {}
@@ -4057,6 +4176,46 @@ async function boot() {
 
   setStoredComputedDegree(computedDegree);
   setStoredDisplayDegree(computedDegree);
+
+  // Observatory pulse: mostrar señal breve si el campo cambió respecto a la última visita.
+  const total = Number(canonicalState?.total) || 0;
+  const condition = canonicalState?.condition || "";
+  const currentPulseState = { total, degree: computedDegree, condition };
+  const prevPulseState = getPulseState();
+  const stateChanged =
+    prevPulseState != null &&
+    (prevPulseState.total !== total ||
+      (Number.isFinite(prevPulseState.degree) && Math.abs(prevPulseState.degree - computedDegree) > 0.5) ||
+      prevPulseState.condition !== condition);
+  let showedPulseThisSession = false;
+  const pulseRarityRoll = stateChanged && Math.random() < PULSE_RARITY;
+  if (pulseRarityRoll && observatoryPulseWrap && observatoryPulseMessage) {
+    const ui = UI_COPY[LANG] || UI_COPY.en;
+    let phrases = ui.pulsePhrases || [];
+    if (isRarePulseDay() && (ui.rarePulsePhrases || []).length > 0) {
+      phrases = ui.rarePulsePhrases;
+    } else if (isNightPulseWindow() && (ui.nightPulsePhrases || []).length > 0) {
+      phrases = ui.nightPulsePhrases;
+    }
+    if (phrases.length > 0) {
+      const seed = (total + Math.round(computedDegree) + (condition.length || 0)) | 0;
+      const msg = phrases[Math.abs(seed) % phrases.length];
+      showObservatoryPulse(msg, false);
+      setLastPulse({ text: msg, date: new Date().toISOString().slice(0, 10) });
+      showedPulseThisSession = true;
+    }
+  }
+  setPulseState(currentPulseState);
+  if (!showedPulseThisSession) {
+    window.setTimeout(() => {
+      const last = getLastPulse();
+      const today = new Date().toISOString().slice(0, 10);
+      if (last && last.date === today && last.text && observatoryPulseWrap) {
+        showObservatoryPulse(last.text, true);
+      }
+    }, 3200);
+  }
+
   if (conditionLine) {
     const ui = UI_COPY[LANG] || UI_COPY.en;
     if (isRemoteReady() && sharedResult.source === "local" && climateTruth.source === "local") {
