@@ -974,10 +974,9 @@ h2 {
 .observatory-hero .atmosphere-air .observatory-entry { order: 2; }
 .observatory-hero .atmosphere-air .atm-reading-line { order: 3; }
 .observatory-hero .atmosphere-air .atmospheric-weather-line { order: 4; }
-.observatory-hero .atmosphere-air .atmospheric-weather-caption { order: 5; }
-.observatory-hero .atmosphere-air .atmosphere-pattern-line { order: 6; }
-.observatory-hero .atmosphere-air .atmosphere-orientation { order: 7; }
-.observatory-hero .atmosphere-air .degree-wrap { order: 8; }
+.observatory-hero .atmosphere-air .atmosphere-pattern-line { order: 5; }
+.observatory-hero .atmosphere-air .atmosphere-orientation { order: 6; }
+.observatory-hero .atmosphere-air .degree-wrap { order: 7; }
 
 /* Columna única: todos los elementos centrados en el mismo eje */
 .atmosphere-air .observatory-entry,
@@ -1273,6 +1272,9 @@ html.theme-atmosphere .horizon-pulse-bar::before {
   max-width: 28ch;
   margin-left: auto;
   margin-right: auto;
+}
+.atmosphere-grounding .atmospheric-weather-caption {
+  margin-top: 0.4rem;
 }
 .atm-reading-line.atm-reading-updating {
   opacity: 0;
