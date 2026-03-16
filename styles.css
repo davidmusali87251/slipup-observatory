@@ -973,9 +973,11 @@ h2 {
 .observatory-hero .atmosphere-air .hero-identity-line { order: 1; }
 .observatory-hero .atmosphere-air .observatory-entry { order: 2; }
 .observatory-hero .atmosphere-air .atm-reading-line { order: 3; }
-.observatory-hero .atmosphere-air .atmosphere-pattern-line { order: 4; }
-.observatory-hero .atmosphere-air .atmosphere-orientation { order: 5; }
-.observatory-hero .atmosphere-air .degree-wrap { order: 6; }
+.observatory-hero .atmosphere-air .atmospheric-weather-line { order: 4; }
+.observatory-hero .atmosphere-air .atmospheric-weather-caption { order: 5; }
+.observatory-hero .atmosphere-air .atmosphere-pattern-line { order: 6; }
+.observatory-hero .atmosphere-air .atmosphere-orientation { order: 7; }
+.observatory-hero .atmosphere-air .degree-wrap { order: 8; }
 
 /* Columna única: todos los elementos centrados en el mismo eje */
 .atmosphere-air .observatory-entry,
@@ -1251,6 +1253,26 @@ html.theme-atmosphere .horizon-pulse-bar::before {
   margin: 0 0 0.4rem;
   min-height: 1.2em;
   transition: opacity 220ms ease;
+}
+
+.atmospheric-weather-line {
+  font-size: var(--text-label);
+  font-family: var(--font-reading);
+  letter-spacing: var(--tracking-label);
+  color: var(--muted);
+  opacity: 0.85;
+  margin: 0 0 0.2rem;
+  min-height: 1.2em;
+}
+.atmospheric-weather-caption {
+  font-size: 0.7rem;
+  font-style: italic;
+  color: var(--muted);
+  opacity: 0.65;
+  margin: 0 0 0.35rem;
+  max-width: 28ch;
+  margin-left: auto;
+  margin-right: auto;
 }
 .atm-reading-line.atm-reading-updating {
   opacity: 0;
@@ -4664,6 +4686,69 @@ section.panel.panel-recent {
   content: none;
 }
 
+/* The Resonance Field: aura por nivel de resonancias (densidad atmosférica, no contador). */
+.shared-sheet-list .moment-item {
+  position: relative;
+}
+#recentMoments.moment-list .moment-item[data-resonance="1"],
+.shared-sheet-list .moment-item[data-resonance="1"],
+.local-climate-moments .moment-item[data-resonance="1"] {
+  box-shadow: 0 0 12px color-mix(in oklab, var(--relate-accent) 8%, transparent);
+}
+#recentMoments.moment-list .moment-item[data-resonance="3"],
+.shared-sheet-list .moment-item[data-resonance="3"],
+.local-climate-moments .moment-item[data-resonance="3"] {
+  box-shadow: 0 0 20px color-mix(in oklab, var(--relate-accent) 12%, transparent);
+}
+#recentMoments.moment-list .moment-item[data-resonance="7"],
+.shared-sheet-list .moment-item[data-resonance="7"],
+.local-climate-moments .moment-item[data-resonance="7"] {
+  box-shadow: 0 0 28px color-mix(in oklab, var(--relate-accent) 18%, transparent);
+  animation: moment-resonance-aura-pulse 4s ease-in-out infinite;
+}
+#recentMoments.moment-list .moment-item[data-resonance="15"],
+.shared-sheet-list .moment-item[data-resonance="15"],
+.local-climate-moments .moment-item[data-resonance="15"] {
+  box-shadow: 0 0 32px color-mix(in oklab, var(--relate-accent) 22%, transparent);
+}
+@keyframes moment-resonance-aura-pulse {
+  0%, 100% { opacity: 0.92; }
+  50% { opacity: 1; }
+}
+#recentMoments.moment-list .moment-item.moment-item--resonance-pulse,
+.shared-sheet-list .moment-item.moment-item--resonance-pulse,
+.local-climate-moments .moment-item.moment-item--resonance-pulse {
+  overflow: visible;
+}
+#recentMoments.moment-list .moment-item.moment-item--resonance-pulse::after,
+.shared-sheet-list .moment-item.moment-item--resonance-pulse::after,
+.local-climate-moments .moment-item.moment-item--resonance-pulse::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 10px;
+  box-shadow: 0 0 24px color-mix(in oklab, var(--relate-accent) 28%, transparent);
+  opacity: 0.6;
+  pointer-events: none;
+  animation: moment-resonance-brief-halo 0.45s ease-out forwards;
+}
+@keyframes moment-resonance-brief-halo {
+  to { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #recentMoments.moment-list .moment-item[data-resonance="7"],
+  .shared-sheet-list .moment-item[data-resonance="7"],
+  .local-climate-moments .moment-item[data-resonance="7"] {
+    animation: none;
+  }
+  #recentMoments.moment-list .moment-item.moment-item--resonance-pulse::after,
+  .shared-sheet-list .moment-item.moment-item--resonance-pulse::after,
+  .local-climate-moments .moment-item.moment-item--resonance-pulse::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   #recentMoments.moment-list .moment-item:hover {
     background: color-mix(in oklab, #ffffff 65%, transparent);
@@ -4793,6 +4878,53 @@ section.panel.panel-recent {
   margin-top: 0.28rem;
 }
 
+/* Micro-frase al resonar: visible ~1s, luego se oculta. */
+.moment-resonance-feedback {
+  font-size: 0.65rem;
+  font-style: italic;
+  color: color-mix(in oklab, var(--relate-accent) 75%, var(--muted));
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+  max-width: 10ch;
+}
+.moment-resonance-feedback.is-visible {
+  opacity: 0.9;
+}
+
+/* Moment Constellations: indicador sutil, no analytics. */
+.moment-constellation-wrap {
+  margin-top: 0.4rem;
+  padding: 0.25rem 0;
+  border-top: 1px solid color-mix(in oklab, var(--line) 25%, transparent);
+}
+.moment-constellation-line {
+  font-size: 0.7rem;
+  font-style: italic;
+  color: var(--muted);
+  opacity: 0.8;
+  margin: 0 0 0.25rem;
+}
+.moment-constellation-related {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.68rem;
+  color: var(--muted);
+  opacity: 0.75;
+}
+.moment-constellation-related li {
+  padding: 0.08rem 0;
+  padding-left: 0.5rem;
+  position: relative;
+}
+.moment-constellation-related li::before {
+  content: "\2022";
+  position: absolute;
+  left: 0;
+  opacity: 0.6;
+}
+
 #recentMoments.moment-list .moment-item .moment-relate-controls {
   align-self: flex-end;
 }
@@ -4914,6 +5046,8 @@ section.panel.panel-recent {
   margin-top: 0;
 }
 .moment-relate-btn {
+  position: relative;
+  overflow: visible;
   align-self: flex-start;
   margin-top: 0.25rem;
   padding: 0.32rem 0.65rem;
@@ -4933,6 +5067,23 @@ section.panel.panel-recent {
   opacity: 0.92;
   transition: opacity 0.2s ease, border-color 0.2s ease, color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, transform 0.18s ease;
 }
+.moment-relate-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: color-mix(in oklab, var(--relate-accent) 35%, transparent);
+  opacity: 0;
+  transform: scale(0);
+  pointer-events: none;
+}
+.moment-relate-btn--ripple::before {
+  animation: moment-relate-ripple 0.4s ease-out forwards;
+}
+@keyframes moment-relate-ripple {
+  0% { transform: scale(0); opacity: 0.55; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
 .moment-relate-btn--pulse {
   animation: moment-relate-echo 0.18s ease;
 }
@@ -4941,8 +5092,26 @@ section.panel.panel-recent {
   50% { transform: scale(1.06); }
   100% { transform: scale(1); }
 }
+.moment-relate-btn--glow {
+  animation: moment-relate-glow 0.4s ease-out forwards;
+}
+@keyframes moment-relate-glow {
+  0% {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--relate-accent) 18%, transparent),
+      0 0 14px color-mix(in oklab, var(--relate-accent) 32%, transparent),
+      inset 0 1px 0 color-mix(in oklab, #fff 50%, transparent);
+  }
+  100% {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--relate-accent) 18%, transparent),
+      inset 0 1px 0 color-mix(in oklab, #fff 50%, transparent);
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   .moment-relate-btn--pulse { animation: none; }
+  .moment-relate-btn--ripple::before { animation: none; }
+  .moment-relate-btn--glow { animation: none; }
 }
 
 .moment-relate-btn:hover {

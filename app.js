@@ -720,6 +720,22 @@ const COPY_VARIANTS = {
 };
 const COPY = COPY_VARIANTS[COPY_MODE === "narrative" ? "narrative_" + LANG : COPY_MODE] || COPY_VARIANTS.poetic;
 
+/** Atmospheric Weather: estados poéticos del campo (últimas 48h). No analytics. */
+const ATMOSPHERIC_WEATHER_LABELS = {
+  en: {
+    calm: ["Quiet field", "Soft air", "Still sky", "Slow drift", "Calm layer"],
+    reflective: ["Deep thoughts", "Inner weather", "Long echoes", "Quiet processing", "Still reading"],
+    tension: ["Restless air", "Heavy signals", "Dense field", "Uneasy current", "Weight in the air"],
+    release: ["Clear sky", "Light return", "Open air", "Field relaxing", "Lift in the air"],
+  },
+  es: {
+    calm: ["Campo quieto", "Aire suave", "Cielo quieto", "Deriva lenta", "Capa calmada"],
+    reflective: ["Pensamiento profundo", "Clima interior", "Ecos largos", "Procesando en calma", "Lectura en calma"],
+    tension: ["Aire inquieto", "Señales densas", "Campo denso", "Corriente pesada", "Peso en el aire"],
+    release: ["Cielo claro", "Vuelve la luz", "Aire abierto", "Campo relajado", "Subida en el aire"],
+  },
+};
+
 const UI_COPY = {
   en: {
     orientation: "",
@@ -811,6 +827,10 @@ const UI_COPY = {
     momentRelateLabelYou: "Not alone · you",
     momentRelateAria: "Mark that this resonates with you too",
     momentRelateInfoTitle: "Not alone",
+    resonanceFeedback: ["Signal shared.", "You are not alone.", "Another observer.", "Field expanded."],
+    atmosphericWeatherCaption: "The atmosphere reflects the last 48 hours of moments.",
+    momentConstellationLine: "This moment is part of a constellation.",
+    momentConstellationRelatedLabel: "Connected moments",
     momentRemoveLabel: "Remove",
     momentRemoveAria: "Remove this moment from your view",
     momentReportLabel: "Report",
@@ -949,6 +969,10 @@ const UI_COPY = {
     momentRelateLabelYou: "No estás solo · tú",
     momentRelateAria: "Señalar que esto también resuena contigo",
     momentRelateInfoTitle: "No estás solo",
+    resonanceFeedback: ["Señal compartida.", "No estás solo.", "Otro observador.", "Campo expandido."],
+    atmosphericWeatherCaption: "La atmósfera refleja las últimas 48 horas de momentos.",
+    momentConstellationLine: "Este momento forma parte de una constelación.",
+    momentConstellationRelatedLabel: "Momentos conectados",
     momentRemoveLabel: "Quitar",
     momentRemoveAria: "Quitar este momento de tu vista",
     momentReportLabel: "Denunciar",
@@ -1299,6 +1323,8 @@ function setDegreeDisplay(txt) {
   }
 }
 const conditionLine = document.getElementById("conditionLine");
+const atmosphericWeatherLine = document.getElementById("atmosphericWeatherLine");
+const atmosphericWeatherCaption = document.getElementById("atmosphericWeatherCaption");
 const climateSummaryLine = document.getElementById("climateSummaryLine");
 const climateMetricsLine = document.getElementById("climateMetricsLine");
 const climateInstrument = document.getElementById("climateInstrument");
@@ -1349,6 +1375,7 @@ const SHARED_SHEET_PAGE_SIZE = 25;
 const SHEET_TRANSITION_MS = 280;
 
 let sharedSheetFullList = [];
+let sharedSheetConstellations = null;
 let sharedSheetVisibleCount = 0;
 let sharedSheetSentinel = null;
 let sharedSheetIncrementalObserver = null;
@@ -1946,6 +1973,36 @@ function getRecentWindow(moments) {
   return moments.filter((m) => now - new Date(m.timestamp).getTime() <= twoDaysMs);
 }
 
+/** Atmospheric Weather: lectura poética del estado del campo (últimas 48h). No analytics. */
+function getAtmosphericWeather(moments48h) {
+  if (!Array.isArray(moments48h) || moments48h.length < 3) return null;
+  const { byType } = compositionCounts(moments48h);
+  const total = moments48h.length;
+  const avoidableRatio = byType.avoidable / total;
+  const fertileRatio = byType.fertile / total;
+  const observedRatio = byType.observed / total;
+  const seed = total + Math.round(avoidableRatio * 10 + fertileRatio * 10);
+  const lang = LANG === "es" ? "es" : "en";
+  const lib = ATMOSPHERIC_WEATHER_LABELS[lang];
+  let state;
+  let labels;
+  if (avoidableRatio >= 0.4) {
+    state = "tension";
+    labels = lib.tension;
+  } else if (fertileRatio >= 0.4) {
+    state = "release";
+    labels = lib.release;
+  } else if (observedRatio >= 0.5) {
+    state = "reflective";
+    labels = lib.reflective;
+  } else {
+    state = "calm";
+    labels = lib.calm;
+  }
+  const label = labels[Math.abs(seed) % labels.length];
+  return { state, label };
+}
+
 const WINDOW_HOURS = 48;
 
 /** Agrega momentos de la ventana 48h en 48 buckets horarios. Cada bucket: { total, typeCounts, hourIndex }. */
@@ -2481,6 +2538,41 @@ function getMomentTypeMoodLabels(lang, type, mood) {
   };
 }
 
+/** Id estable para un momento (debe coincidir con createMomentItemElement). */
+function getMomentStableId(m) {
+  return m.id || `${m.timestamp || ""}-${(m.note || "").slice(0, 10)}`;
+}
+
+/** Moment Constellations: detecta clusters de 4+ momentos con mismo mood en 48h. Devuelve mapa por id de momento. */
+function getConstellations(moments) {
+  const window48h = getRecentWindow(moments || []);
+  if (window48h.length < 4) return { byMomentId: {} };
+  const byMood = new Map();
+  window48h.forEach((m) => {
+    const mood = String(m.mood || "observed").toLowerCase();
+    if (!byMood.has(mood)) byMood.set(mood, []);
+    byMood.get(mood).push(m);
+  });
+  const byMomentId = Object.create(null);
+  byMood.forEach((group, key) => {
+    if (group.length < 4) return;
+    group.forEach((m) => {
+      const related = group.filter((other) => other !== m);
+      byMomentId[getMomentStableId(m)] = { key, related };
+    });
+  });
+  return { byMomentId };
+}
+
+/** Maps relate count to resonance tier for The Resonance Field (aura levels). */
+function getResonanceTier(count) {
+  if (count >= 15) return "15";
+  if (count >= 7) return "7";
+  if (count >= 3) return "3";
+  if (count >= 1) return "1";
+  return "0";
+}
+
 function createMomentItemElement(m, options = {}) {
   const inNearbyField = options.inNearbyField === true;
   const li = document.createElement("li");
@@ -2515,12 +2607,18 @@ function createMomentItemElement(m, options = {}) {
   relateBtn.className = "moment-relate-btn";
   relateBtn.setAttribute("aria-label", ui.momentRelateAria || "Mark that this resonates with you too");
   relateBtn.dataset.relateCount = String(typeof m.relate_count === "number" ? m.relate_count : 0);
+  li.dataset.resonance = getResonanceTier(parseInt(relateBtn.dataset.relateCount, 10) || 0);
 
   const SIGNAL_IDLE = "\u2022))";
   const SIGNAL_ACTIVE = "\u2022)))";
 
+  const resonanceFeedbackEl = document.createElement("span");
+  resonanceFeedbackEl.className = "moment-resonance-feedback";
+  resonanceFeedbackEl.setAttribute("aria-live", "polite");
+
   function updateRelateLabel() {
     const count = parseInt(relateBtn.dataset.relateCount, 10) || 0;
+    li.dataset.resonance = getResonanceTier(count);
     const you = getRelateState(momentId);
     const symbol = you ? SIGNAL_ACTIVE : SIGNAL_IDLE;
     const text = count > 0 ? `${symbol} ${count}` : symbol;
@@ -2531,9 +2629,22 @@ function createMomentItemElement(m, options = {}) {
   updateRelateLabel();
   relateBtn.addEventListener("click", async () => {
     if (getRelateState(momentId)) return;
-    relateBtn.classList.add("moment-relate-btn--pulse");
+    const card = relateBtn.closest(".moment-item");
+    if (card) {
+      card.classList.add("moment-item--resonance-pulse");
+      setTimeout(() => card.classList.remove("moment-item--resonance-pulse"), 450);
+    }
+    relateBtn.classList.add("moment-relate-btn--pulse", "moment-relate-btn--ripple", "moment-relate-btn--glow");
     const pulseDuration = 180;
+    const rippleDuration = 420;
+    const glowDuration = 400;
     setTimeout(() => relateBtn.classList.remove("moment-relate-btn--pulse"), pulseDuration);
+    setTimeout(() => relateBtn.classList.remove("moment-relate-btn--ripple"), rippleDuration);
+    setTimeout(() => relateBtn.classList.remove("moment-relate-btn--glow"), glowDuration);
+    const phrases = (ui.resonanceFeedback || (LANG === "es" ? ["Campo expandido."] : ["Field expanded."]));
+    resonanceFeedbackEl.textContent = phrases[Math.floor(Math.random() * phrases.length)];
+    resonanceFeedbackEl.classList.add("is-visible");
+    setTimeout(() => resonanceFeedbackEl.classList.remove("is-visible"), 1000);
     if (m.id && isRemoteReady()) {
       relateBtn.disabled = true;
       const res = await postRelateMoment(m.id);
@@ -2663,20 +2774,49 @@ function createMomentItemElement(m, options = {}) {
   const wrap = document.createElement("div");
   wrap.className = "moment-relate-controls";
   wrap.appendChild(relateBtn);
+  wrap.appendChild(resonanceFeedbackEl);
   wrap.appendChild(infoBtn);
   wrap.appendChild(infoTooltip);
   if (isOwnMoment) wrap.appendChild(removeWrap);
   wrap.appendChild(reportWrap);
+
+  const constellation = options.constellation;
+  if (constellation && constellation.related && constellation.related.length > 0) {
+    const wrapConst = document.createElement("div");
+    wrapConst.className = "moment-constellation-wrap";
+    const line = document.createElement("p");
+    line.className = "moment-constellation-line";
+    line.textContent = ui.momentConstellationLine || "This moment is part of a constellation.";
+    wrapConst.appendChild(line);
+    const maxRelated = 4;
+    const related = constellation.related.slice(0, maxRelated);
+    const ul = document.createElement("ul");
+    ul.className = "moment-constellation-related";
+    ul.setAttribute("aria-label", ui.momentConstellationRelatedLabel || "Connected moments");
+    related.forEach((other) => {
+      const liItem = document.createElement("li");
+      const otherNote = (other.note || "").trim() || "(no note)";
+      liItem.textContent = otherNote === "(no note)" ? otherNote : capitalizeNoteForDisplay(otherNote);
+      ul.appendChild(liItem);
+    });
+    wrapConst.appendChild(ul);
+    li.appendChild(wrapConst);
+  }
+
   li.appendChild(wrap);
   return li;
 }
 
-function renderMomentItems(targetElement, items) {
+function renderMomentItems(targetElement, items, constellations) {
   targetElement.innerHTML = "";
-  items.forEach((m) => targetElement.appendChild(createMomentItemElement(m)));
+  const byId = constellations?.byMomentId || {};
+  items.forEach((m) => {
+    const constellation = byId[getMomentStableId(m)];
+    targetElement.appendChild(createMomentItemElement(m, { constellation }));
+  });
 }
 
-function renderRecent(sharedMoments) {
+function renderRecent(sharedMoments, constellations) {
   recentMoments.innerHTML = "";
   const list = sharedMoments.slice(0, RENDER_LIMIT);
 
@@ -2697,7 +2837,7 @@ function renderRecent(sharedMoments) {
     return;
   }
 
-  renderMomentItems(recentMoments, list);
+  renderMomentItems(recentMoments, list, constellations);
 }
 
 function teardownSharedSheetIncrementalScroll() {
@@ -2710,6 +2850,7 @@ function teardownSharedSheetIncrementalScroll() {
   }
   sharedSheetSentinel = null;
   sharedSheetFullList = [];
+  sharedSheetConstellations = null;
   sharedSheetVisibleCount = 0;
 }
 
@@ -2717,8 +2858,10 @@ function appendNextPageSharedSheet() {
   if (sharedSheetVisibleCount >= sharedSheetFullList.length || !sharedSheetSentinel) return;
   const nextEnd = Math.min(sharedSheetVisibleCount + SHARED_SHEET_PAGE_SIZE, sharedSheetFullList.length);
   const chunk = sharedSheetFullList.slice(sharedSheetVisibleCount, nextEnd);
+  const byId = sharedSheetConstellations?.byMomentId || {};
   chunk.forEach((m) => {
-    sharedSheetList.insertBefore(createMomentItemElement(m), sharedSheetSentinel);
+    const constellation = byId[getMomentStableId(m)];
+    sharedSheetList.insertBefore(createMomentItemElement(m, { constellation }), sharedSheetSentinel);
   });
   sharedSheetVisibleCount = nextEnd;
   if (sharedSheetVisibleCount >= sharedSheetFullList.length) {
@@ -2747,14 +2890,16 @@ function renderSharedSheetList(sharedMoments, countLabel = "") {
   sharedSheetList.classList.remove("hidden");
 
   if (list.length <= SHARED_SHEET_PAGE_SIZE) {
-    renderMomentItems(sharedSheetList, list);
+    const constellations = getConstellations(list);
+    renderMomentItems(sharedSheetList, list, constellations);
     return;
   }
 
   sharedSheetFullList = list;
+  sharedSheetConstellations = getConstellations(list);
   sharedSheetVisibleCount = Math.min(SHARED_SHEET_PAGE_SIZE, list.length);
   const firstChunk = list.slice(0, sharedSheetVisibleCount);
-  renderMomentItems(sharedSheetList, firstChunk);
+  renderMomentItems(sharedSheetList, firstChunk, sharedSheetConstellations);
 
   sharedSheetSentinel = document.createElement("li");
   sharedSheetSentinel.className = "shared-sheet-sentinel";
@@ -3122,7 +3267,12 @@ function renderRegionalMomentsList(sharedMoments, fieldScope, allScopes = null) 
     if (viewMoreWrapEmpty) viewMoreWrapEmpty.classList.add("hidden");
     return;
   }
-  listToShow.forEach((m) => localClimateMoments.appendChild(createMomentItemElement(m, { inNearbyField: true })));
+  const constellations = getConstellations(sharedMoments);
+  const byId = constellations?.byMomentId || {};
+  listToShow.forEach((m) => {
+    const constellation = byId[getMomentStableId(m)];
+    localClimateMoments.appendChild(createMomentItemElement(m, { inNearbyField: true, constellation }));
+  });
 
   const viewMoreWrap = document.getElementById("nearbyViewMoreWrap");
   if (viewMoreWrap) {
@@ -3557,7 +3707,8 @@ function renderHiddenFromView() {
 function refreshObservatoryLists(sharedMoments) {
   if (!observatoryState || !Array.isArray(sharedMoments)) return;
   const filtered = filterHiddenMoments(sharedMoments);
-  renderRecent(filtered);
+  const constellations = getConstellations(filtered);
+  renderRecent(filtered, constellations);
   renderLocalClimate(
     observatoryState.localClimateTruth,
     observatoryState.canonicalState,
@@ -3920,6 +4071,28 @@ async function boot() {
     }
   }
 
+  const shared48h = getRecentWindow(sharedMoments || []);
+  const weather = getAtmosphericWeather(shared48h);
+  const uiForWeather = UI_COPY[LANG] || UI_COPY.en;
+  if (atmosphericWeatherLine) {
+    if (weather?.label) {
+      atmosphericWeatherLine.textContent = weather.label;
+      atmosphericWeatherLine.classList.remove("hidden");
+    } else {
+      atmosphericWeatherLine.textContent = "";
+      atmosphericWeatherLine.classList.add("hidden");
+    }
+  }
+  if (atmosphericWeatherCaption) {
+    if (weather?.label) {
+      atmosphericWeatherCaption.textContent = uiForWeather.atmosphericWeatherCaption || (LANG === "es" ? "La atmósfera refleja las últimas 48 horas de momentos." : "The atmosphere reflects the last 48 hours of moments.");
+      atmosphericWeatherCaption.classList.remove("hidden");
+    } else {
+      atmosphericWeatherCaption.textContent = "";
+      atmosphericWeatherCaption.classList.add("hidden");
+    }
+  }
+
   if (typeof window.atmosphereSignal !== "undefined" && window.atmosphereSignal.update) {
     try {
       window.__slipupMomentsCache = sharedMoments;
@@ -3937,7 +4110,8 @@ async function boot() {
   renderFutureConfidenceLine(canonicalState, observatoryPipeline);
   renderPatternLayer(canonicalState);
   const sharedFiltered = filterHiddenMoments(sharedMoments);
-  renderRecent(sharedFiltered);
+  const constellations = getConstellations(sharedFiltered);
+  renderRecent(sharedFiltered, constellations);
   renderHorizon(canonicalState, sharedMoments, observatoryPipeline);
   renderLocalClimate(
     localClimateTruth,
