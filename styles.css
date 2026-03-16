@@ -2405,10 +2405,19 @@ html.theme-atmosphere .atm-reading-line {
   text-underline-offset: 2px;
 }
 
-/* Support the Observatory: wrap + tooltip de diseño */
+/* Support the Observatory: wrap + tooltip + caption motivacional */
 .support-observatory-wrap {
   position: relative;
-  display: inline;
+  display: inline-block;
+}
+.support-observatory-caption {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.7rem;
+  line-height: 1.35;
+  letter-spacing: 0.04em;
+  color: color-mix(in oklab, var(--text) 75%, var(--muted));
+  font-weight: 400;
 }
 .support-observatory-tooltip {
   position: absolute;

@@ -744,7 +744,8 @@ const UI_COPY = {
     emptyStateQuiet: "The atmosphere is quiet.",
     emptyStateSignal: "What settles here becomes signal.",
     momentLeavesTrace: "Every moment leaves a trace.",
-    supportObservatoryTooltip: "Donate via PayPal.",
+    supportObservatoryTooltip: "Your support keeps the observatory ad-free and the field alive.",
+    supportObservatoryCaption: "Keep the field alive.",
     contributeInvite: "A shared atmosphere of human moments.\nLet one moment rise.",
     ctaObservatoryLabel: "Contribute",
     contributeFooterLine: "Let one moment rise.",
@@ -875,7 +876,8 @@ const UI_COPY = {
     emptyStateQuiet: "La atmósfera está en calma.",
     emptyStateSignal: "Lo que se asienta aquí se vuelve señal.",
     momentLeavesTrace: "Cada momento deja una traza.",
-    supportObservatoryTooltip: "Donar por PayPal.",
+    supportObservatoryTooltip: "Tu apoyo mantiene el observatorio sin anuncios y el campo vivo.",
+    supportObservatoryCaption: "Mantené el campo vivo.",
     contributeInvite: "Una atmósfera compartida de momentos humanos.\nDejá subir un momento.",
     ctaObservatoryLabel: "Contribuir",
     contributeFooterLine: "Dejá subir un momento.",
@@ -1049,6 +1051,8 @@ function applyUICopy() {
   if (viewMoreTooltip && ui.momentLeavesTrace) viewMoreTooltip.textContent = ui.momentLeavesTrace;
   const supportObservatoryTooltip = document.getElementById("supportObservatoryTooltip");
   if (supportObservatoryTooltip && ui.supportObservatoryTooltip) supportObservatoryTooltip.textContent = ui.supportObservatoryTooltip;
+  const supportObservatoryCaption = document.getElementById("supportObservatoryCaption");
+  if (supportObservatoryCaption && ui.supportObservatoryCaption) supportObservatoryCaption.textContent = ui.supportObservatoryCaption;
   const strataSeedsEl = document.getElementById("strataSeedsBtn");
   if (strataSeedsEl && ui.strataSeedsLabel) strataSeedsEl.textContent = ui.strataSeedsLabel;
 }
