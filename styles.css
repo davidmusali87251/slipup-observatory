@@ -1465,12 +1465,34 @@ html.theme-atmosphere .atm-reading-line {
 .observatory-hero .hero-identity-line {
   margin-top: -2cm;
 }
+/* Móvil: hero más grande, título principal destacado y separado */
 @media (max-width: 520px) {
   .observatory-hero .hero-identity-line {
     margin-top: -0.35rem;
+    font-size: 1rem;
+    letter-spacing: 0.1em;
+    margin-bottom: 1.25rem;
   }
   .observatory-hero .atmosphere-air .observatory-entry {
     margin-top: 0;
+  }
+  .observatory-hero .atmosphere-air {
+    gap: 1.1rem;
+    padding-top: 0.75rem;
+  }
+  .observatory-hero .observatory-entry .eyebrow-layer {
+    font-size: 0.82rem;
+  }
+  .observatory-hero .atm-reading-line {
+    font-size: 0.85rem;
+    opacity: 0.7;
+  }
+  .observatory-hero .atmosphere-pattern-line {
+    font-size: 0.85rem;
+  }
+  .observatory-hero .climate-summary-line {
+    font-size: 0.82rem;
+    opacity: 0.85;
   }
 }
 
@@ -1591,7 +1613,20 @@ html.theme-atmosphere .atm-reading-line {
 
   .observatory-entry .eyebrow-layer,
   .observatory-entry .eyebrow-context {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
+  }
+  .observatory-hero .hero-identity-line {
+    font-size: 0.98rem;
+    margin-bottom: 1rem;
+  }
+  .observatory-hero .atm-reading-line {
+    font-size: 0.82rem;
+  }
+  .observatory-hero .atmosphere-pattern-line {
+    font-size: 0.82rem;
+  }
+  .observatory-hero .climate-summary-line {
+    font-size: 0.8rem;
   }
 
   .atmosphere-meta-line {
@@ -1600,7 +1635,7 @@ html.theme-atmosphere .atm-reading-line {
   }
 
   .atmosphere-air {
-    gap: 0.4rem;
+    gap: 1rem;
     padding-left: 0.2rem;
     padding-right: 0.2rem;
   }
@@ -1610,7 +1645,7 @@ html.theme-atmosphere .atm-reading-line {
   }
 
   .degree-value {
-    font-size: clamp(9.2rem, 57.5vw, 13.8rem);
+    font-size: clamp(11rem, 68vw, 16rem);
   }
 
   .atmosphere-air .condition-line {
@@ -4293,7 +4328,7 @@ body.contribute-ritual .page {
   }
 
   .degree-value {
-    font-size: clamp(10.35rem, 60vw, 15rem);
+    font-size: clamp(12rem, 72vw, 17rem);
   }
 
   .degree-value .degree-unit {
@@ -4419,7 +4454,25 @@ body.contribute-ritual .page {
   }
 
   .degree-value {
-    font-size: clamp(9.2rem, 63vw, 13.8rem);
+    font-size: clamp(11rem, 75vw, 16rem);
+  }
+
+  .observatory-hero .hero-identity-line {
+    font-size: 0.95rem;
+    margin-bottom: 0.9rem;
+  }
+  .observatory-hero .observatory-entry .eyebrow-layer {
+    font-size: 0.78rem;
+  }
+  .observatory-hero .atm-reading-line,
+  .observatory-hero .atmosphere-pattern-line {
+    font-size: 0.8rem;
+  }
+  .observatory-hero .climate-summary-line {
+    font-size: 0.78rem;
+  }
+  .observatory-hero .atmosphere-air {
+    gap: 0.9rem;
   }
 
   .observatory-hero .topbar.topbar-fixed {
