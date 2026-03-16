@@ -48,6 +48,8 @@ jobs:
           cp atmosphere.js atmosphere-signal.js atmosphere-analytics-snippet.js atm-tune-panel.js _site/
           cp favicon.svg CNAME _site/ 2>/dev/null || true
           cp sitemap.xml _site/ 2>/dev/null || true
+          cp robots.txt _site/ 2>/dev/null || true
+          touch _site/.nojekyll
           cp -r assets _site/ 2>/dev/null || true
           BUILD_ID="${{ github.sha }}"
           for f in _site/*.html; do
