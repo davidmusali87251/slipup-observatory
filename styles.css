@@ -2552,6 +2552,10 @@ html.theme-atmosphere .atm-reading-line {
 .panel-orbital {
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+  text-align: right;
   max-width: 720px;
   margin: 0 auto;
   padding: calc(env(safe-area-inset-top, 0px) + 3rem) 1rem 2rem;
@@ -2653,6 +2657,7 @@ html.theme-atmosphere .atm-reading-line {
   border-top: 1px solid color-mix(in oklab, var(--line) 30%, transparent);
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 0.5rem 1rem;
 }
 .orbital-seed-label {
