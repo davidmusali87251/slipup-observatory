@@ -47,6 +47,8 @@ jobs:
           cp app.js contribute.js remote.js modelConstants.js uiCopy.js styles.css _site/
           cp atmosphere.js atmosphere-signal.js atmosphere-analytics-snippet.js atm-tune-panel.js _site/
           cp favicon.svg CNAME _site/ 2>/dev/null || true
+          cp sitemap.xml _site/ 2>/dev/null || true
+          cp -r assets _site/ 2>/dev/null || true
           BUILD_ID="${{ github.sha }}"
           for f in _site/*.html; do
             sed -i "s|{{BUILD_ID}}|${BUILD_ID}|g" "$f"

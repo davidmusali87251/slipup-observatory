@@ -39,6 +39,10 @@ El workflow **`.github/workflows/deploy-pages.yml`** despliega a GitHub Pages y 
    - `USE_REMOTE_SHARED` — `true` para activar el backend remoto en producción.
 3. Cada **push a `main`** (o ejecución manual del workflow) hace el build, genera `remote.js` con esos valores y despliega. El sitio desplegado mostrará datos de Supabase.
 
+### Redirección canónica (SEO)
+
+Para consolidar SEO y evitar dividir backlinks, conviene que **solo** `www.slipup.io` sea la URL canónica. Configura un **redirect 301** de `slipup.io` → `www.slipup.io` en tu proveedor de dominio o CDN. Ejemplo (Cloudflare): regla de redirección `slipup.io/*` → `https://www.slipup.io/$1` (301). Así Google y las redes sociales usan una sola versión del sitio. El repo incluye **sitemap.xml** (raíz); puedes enviarlo en Google Search Console para mejorar la indexación.
+
 ## Archivos que conviene dejar solo para nosotros (no en repo público)
 
 - **`supabase/.temp/`** — Generados por la CLI de Supabase (project-ref, versiones, etc.). Ya están en `.gitignore`. Si alguna vez se commitearon, quitar del repo con: `git rm -r --cached supabase/.temp/` y commit (los archivos siguen en disco pero dejan de estar en el árbol).

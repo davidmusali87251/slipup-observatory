@@ -971,21 +971,29 @@ h2 {
   margin-right: auto;
 }
 .observatory-hero .atmosphere-air .hero-identity-line { order: 1; }
-.observatory-hero .atmosphere-air .atmosphere-pattern-line { order: 2; }
-.observatory-hero .atmosphere-air .observatory-entry { order: 3; }
-.observatory-hero .atmosphere-air .atm-reading-line { order: 4; }
-.observatory-hero .atmosphere-air .atmospheric-weather-line { order: 5; }
-.observatory-hero .atmosphere-air .atmosphere-orientation { order: 6; }
-.observatory-hero .atmosphere-air .degree-wrap { order: 7; }
+.observatory-hero .atmosphere-air .observatory-seo-intro { order: 2; }
+.observatory-hero .atmosphere-air .atmosphere-pattern-line { order: 3; }
+.observatory-hero .atmosphere-air .observatory-entry { order: 4; }
+.observatory-hero .atmosphere-air .atm-reading-line { order: 5; }
+.observatory-hero .atmosphere-air .atmospheric-weather-line { order: 6; }
+.observatory-hero .atmosphere-air .atmosphere-orientation { order: 7; }
+.observatory-hero .atmosphere-air .degree-wrap { order: 8; }
 
 /* Columna única: todos los elementos centrados en el mismo eje */
 .atmosphere-air .observatory-entry,
 .atmosphere-air .degree-wrap,
-.atmosphere-air .hero-identity-line {
+.atmosphere-air .hero-identity-line,
+.atmosphere-air .observatory-seo-intro {
   width: 100%;
   margin: 0.15rem 0 0.35rem;
   text-align: center;
-  white-space: nowrap;
+}
+.atmosphere-air .hero-identity-line { white-space: nowrap; }
+.atmosphere-air .observatory-seo-intro {
+  white-space: normal;
+  max-width: 36ch;
+  margin-left: auto;
+  margin-right: auto;
 }
 .atmosphere-air .observatory-entry { margin-top: 0; }
 .observatory-hero .atmosphere-air .observatory-entry {
@@ -1503,6 +1511,16 @@ html.theme-atmosphere .atm-reading-line {
 .observatory-hero .hero-identity-line {
   margin-top: 0;
   margin-bottom: 0.5rem;
+}
+.observatory-seo-intro {
+  color: #6b7d8f;
+  font-size: 0.65rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  opacity: 0.75;
+  margin-top: 0;
+  margin-bottom: 0.6rem;
 }
 /* Móvil: hero más grande, título principal destacado y separado; sin solapamientos */
 @media (max-width: 520px) {

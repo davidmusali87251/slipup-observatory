@@ -84,3 +84,5 @@ desktop.ini
 *.jpeg
 *.gif
 !favicon.svg
+# Imagen social para og:image (necesaria en el sitio)
+!assets/social/og-slipup.png
