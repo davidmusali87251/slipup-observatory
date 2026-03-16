@@ -2545,6 +2545,125 @@ html.theme-atmosphere .atm-reading-line {
   box-sizing: border-box;
 }
 
+/* Capa superior del observatorio: Orbital (scroll up). Régimen visual distinto: alta, fría, instrumentada. */
+#orbital {
+  scroll-margin-top: 4rem;
+}
+.panel-orbital {
+  position: relative;
+  overflow: hidden;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: calc(env(safe-area-inset-top, 0px) + 3rem) 1rem 2rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--line) 35%, transparent);
+}
+.panel-orbital > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Fondo orbital: tinte alto/frío, puntos muy tenues, sensación de capa superior. */
+.panel-orbital::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 140% 80% at 50% 0%, color-mix(in oklab, var(--bg) 92%, #7a8aa0) 0%, transparent 55%),
+    radial-gradient(circle at 22px 22px, color-mix(in oklab, var(--line) 5%, transparent) 1px, transparent 1px);
+  background-size: 100% 100%, 44px 44px;
+  background-repeat: no-repeat, repeat;
+  opacity: 0.88;
+  transition: opacity 2s ease;
+}
+.panel-orbital.is-in-view::before {
+  opacity: 0.94;
+}
+
+/* Instrumento en espera: anillo como campo de observación, no ícono. Más grande, más sutil. */
+.panel-orbital::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 48%;
+  transform: translate(-50%, -50%);
+  width: min(320px, 85vw);
+  height: min(320px, 85vw);
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 50%;
+  border: 1px solid color-mix(in oklab, var(--line) 16%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in oklab, var(--line) 6%, transparent) inset;
+  opacity: 0.5;
+  transition: opacity 2.5s ease;
+}
+.panel-orbital.is-in-view::after {
+  opacity: 0.58;
+}
+@media (prefers-reduced-motion: reduce) {
+  .panel-orbital::before,
+  .panel-orbital::after {
+    transition: none;
+  }
+}
+.orbital-kicker {
+  font-size: 0.73rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.84;
+  margin-bottom: 0.35rem;
+}
+.orbital-title {
+  font-size: clamp(1.25rem, 2.8vw, 1.75rem);
+  font-weight: 530;
+  color: var(--text);
+  margin: 0 0 0.25rem;
+  letter-spacing: 0.02em;
+}
+.orbital-subtitle {
+  font-size: 0.88rem;
+  font-style: italic;
+  color: var(--muted);
+  margin: 0 0 0.75rem;
+}
+.orbital-copy {
+  color: color-mix(in oklab, var(--text) 88%, var(--muted));
+  line-height: 1.5;
+  margin-bottom: 0.6rem;
+  max-width: 56ch;
+}
+
+.orbital-transition-line {
+  font-size: 0.75rem;
+  font-style: italic;
+  color: var(--muted);
+  opacity: 0;
+  margin-bottom: 0.5rem;
+  transition: opacity 0.4s ease;
+}
+.orbital-transition-line:not(.hidden) {
+  opacity: 0.85;
+}
+
+.orbital-seed-blocks {
+  margin-top: 1.25rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in oklab, var(--line) 30%, transparent);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+.orbital-seed-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.6;
+  margin: 0;
+}
+
 .ai-page {
   min-height: 100vh;
 }

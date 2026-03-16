@@ -829,6 +829,7 @@ const UI_COPY = {
     momentRelateInfoTitle: "Not alone",
     resonanceFeedback: ["Signal shared.", "You are not alone.", "Another observer.", "Field expanded."],
     atmosphericWeatherCaption: "The atmosphere reflects the last 48 hours of moments.",
+    orbitalTransitionLine: "Entering orbital view",
     momentConstellationLine: "This moment is part of a constellation.",
     momentConstellationRelatedLabel: "Connected moments",
     momentRemoveLabel: "Remove",
@@ -971,6 +972,7 @@ const UI_COPY = {
     momentRelateInfoTitle: "No estás solo",
     resonanceFeedback: ["Señal compartida.", "No estás solo.", "Otro observador.", "Campo expandido."],
     atmosphericWeatherCaption: "La atmósfera refleja las últimas 48 horas de momentos.",
+    orbitalTransitionLine: "Entrando a vista orbital",
     momentConstellationLine: "Este momento forma parte de una constelación.",
     momentConstellationRelatedLabel: "Momentos conectados",
     momentRemoveLabel: "Quitar",
@@ -3860,8 +3862,37 @@ function updateClimateDebugPanel(canonicalState) {
   `;
 }
 
+function initOrbitalLayer() {
+  const orbitalSection = document.getElementById("orbital");
+  const transitionLine = document.getElementById("orbitalTransitionLine");
+  if (!orbitalSection || !transitionLine) return;
+  const ui = UI_COPY[LANG] || UI_COPY.en;
+  const label = ui.orbitalTransitionLine || "Entering orbital view";
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          transitionLine.textContent = label;
+          transitionLine.classList.remove("hidden");
+          orbitalSection.classList.add("is-in-view");
+        } else {
+          orbitalSection.classList.remove("is-in-view");
+        }
+      });
+    },
+    { threshold: 0.2, rootMargin: "0px" }
+  );
+  observer.observe(orbitalSection);
+}
+
 async function boot() {
   applyUICopy();
+
+  const hash = (window.location.hash || "").trim();
+  const hero = document.getElementById("observatory-hero");
+  if (hero && (!hash || hash === "#top")) {
+    requestAnimationFrame(() => hero.scrollIntoView({ behavior: "auto", block: "start" }));
+  }
 
   const moments = loadMoments();
   const previousComputed = getStoredComputedDegree();
@@ -4155,6 +4186,7 @@ async function boot() {
   }
 
   renderHiddenFromView();
+  initOrbitalLayer();
 
   viewMoreButton.onclick = () => openSharedSheet(filterHiddenMoments(observatoryState?.sharedMoments ?? []));
 

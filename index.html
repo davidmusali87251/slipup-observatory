@@ -35,6 +35,20 @@
   <body>
     <main id="top" class="page">
       <section id="upper-atmosphere" class="upper-atmosphere" aria-hidden="true"></section>
+      <section id="orbital" class="panel panel-orbital" aria-label="Orbital layer" data-layer="orbital">
+        <h2 class="visually-hidden">Orbital</h2>
+        <p id="orbitalTransitionLine" class="orbital-transition-line hidden" role="status" aria-live="polite"></p>
+        <p class="orbital-kicker">Upper layer</p>
+        <h3 class="orbital-title">Orbital</h3>
+        <p class="orbital-subtitle">Instrument observation</p>
+        <p class="orbital-copy">Patterns become visible above the atmosphere. Constellations, field readings, and instrument observations are forming here.</p>
+        <p class="orbital-copy">Scroll down to the atmosphere, or explore the rest of the observatory.</p>
+        <div class="orbital-seed-blocks" aria-hidden="true">
+          <p class="orbital-seed-label">Constellations</p>
+          <p class="orbital-seed-label">Field readings</p>
+          <p class="orbital-seed-label">Signal clusters</p>
+        </div>
+      </section>
       <section id="observatory-hero" class="observatory-hero hero-breathe" aria-label="Observatory hero">
         <div id="atmSignals" class="atm-signals" aria-hidden="true"></div>
         <header class="topbar topbar-fixed">
@@ -42,7 +56,7 @@
             SlipUp™ Observatory
             <span class="topbar-tooltip" aria-hidden="true">Reading from the last 48 hours.</span>
           </a>
-          <a href="./ai.html" class="topbar-ai">AI sector ↑</a>
+          <a href="#orbital" class="topbar-ai">Orbital ↑</a>
         </header>
         <p class="atmosphere-value-prop visually-hidden" aria-hidden="true">Collective reading from shared moments</p>
 
