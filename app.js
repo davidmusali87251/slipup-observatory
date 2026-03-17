@@ -783,8 +783,6 @@ const UI_COPY = {
     eyebrowContext: "Moments",
     heroBridgeLine: "A place to share small human moments.",
     heroBridgeSub1: "Write a short moment from your day.",
-    heroBridgeSub2: "It becomes part of a shared atmosphere.",
-    heroIdentityLine: "Where human moments meet",
     sharedFieldLine: "Shared field — last 48h",
     horizonTitle: "Horizon",
     horizonMoreLabel: "Deeper",
@@ -931,8 +929,6 @@ const UI_COPY = {
     eyebrowContext: "Momentos",
     heroBridgeLine: "Un lugar para compartir pequeños momentos humanos.",
     heroBridgeSub1: "Escribí un momento corto de tu día.",
-    heroBridgeSub2: "Pasa a ser parte de una atmósfera compartida.",
-    heroIdentityLine: "Donde se encuentran los momentos humanos",
     sharedFieldLine: "Campo compartido — últimas 48 h",
     horizonTitle: "Horizonte",
     horizonMoreLabel: "Más",
@@ -1068,10 +1064,6 @@ function applyUICopy() {
   if (heroBridgeLineEl && ui.heroBridgeLine) heroBridgeLineEl.textContent = ui.heroBridgeLine;
   const heroBridgeSub1El = document.getElementById("heroBridgeSub1");
   if (heroBridgeSub1El && ui.heroBridgeSub1) heroBridgeSub1El.textContent = ui.heroBridgeSub1;
-  const heroBridgeSub2El = document.getElementById("heroBridgeSub2");
-  if (heroBridgeSub2El && ui.heroBridgeSub2) heroBridgeSub2El.textContent = ui.heroBridgeSub2;
-  const heroIdentityEl = document.getElementById("heroIdentityLine");
-  if (heroIdentityEl && ui.heroIdentityLine) heroIdentityEl.textContent = ui.heroIdentityLine;
   const horizonTitleEl = document.querySelector(".horizon-line");
   if (horizonTitleEl) horizonTitleEl.textContent = ui.horizonTitle;
   const horizonMoreBtn = document.getElementById("horizonMoreButton");
