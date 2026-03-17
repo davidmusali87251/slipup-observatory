@@ -121,6 +121,20 @@ Frontend keeps local fallback enabled by default:
 - Keep language non-judgmental (`condense / clear / stabilize`).
 - Avoid ranking, gamification, alerts, and moral framing.
 
+## Soft Resonance — Integrity Rules
+
+The observatory uses a **Soft Resonance** layer after contribution: reorder and phrase bias remain probabilistic, decaying, and non-deterministic. To preserve this as emergent behaviour (not logic), do not break these rules:
+
+- **Never** explicitly identify a user's moment (no highlight, no "this is yours").
+- **Never** guarantee matching or visibility (no "we'll show your moment").
+- **Never** inject synthetic moments (only reorder real data; never add fake items).
+- **Always** keep resonance probabilistic (e.g. apply reorder only with probability &lt; 1), decaying (intensity decreases over the window), and non-deterministic (noise, variable window).
+- Resonance must feel like **emergence**, not like a feature the user can "game".
+
+**Influence limit:** resonance must not dominate the system. In practice, keep resonance influence at or below 30–40% of the final result (e.g. reorder probability, seed nudge magnitude). If reorder becomes too obvious or the climate always "reflects" the moment, the effect breaks.
+
+Do not add visible metrics, explicit feedback, or "clarity" here; the system works because it stays at the edge of what is perceptible.
+
 ## License
 
 See [LICENSE](LICENSE).

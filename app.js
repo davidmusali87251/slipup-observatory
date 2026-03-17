@@ -70,6 +70,11 @@ const RELATE_STORAGE_KEY = "slipup_v2_relate";
 const HIDDEN_MOMENT_IDS_KEY = "slipup_v2_hidden_moment_ids";
 const PULSE_STATE_KEY = "slipup_v2_pulse_state";
 const LAST_PULSE_KEY = "slipup_v2_last_pulse";
+const LAST_MOMENT_KEY = "slipup_v2_last_moment";
+/** Ventana de resonancia: sesgo suave en listas/frases tras contribuir (30 min). Sin marcar ni garantizar.
+ * Guardrail: resonancia nunca debe dominar; influencia ≤ ~30–40% del resultado (prob. reorder, magnitud seed).
+ * Ver README "Soft Resonance — Integrity Rules". */
+const RESONANCE_WINDOW_MS = 30 * 60 * 1000;
 /** Probabilidad de mostrar pulse cuando el estado cambió (rareza → más significativo). */
 const PULSE_RARITY = 0.6;
 
@@ -771,8 +776,14 @@ const UI_COPY = {
     rarePulsePhrases: ["The field feels different tonight.", "The observatory noticed something unusual."],
     lastPulseLabel: "Last pulse",
     yourSignalEntered: "Your signal entered the field.",
+    postContributePhase1: ["Your moment entered the field.", "Signal received.", "A new trace in the atmosphere."],
+    postContributePhase2: ["It is now part of the reading.", "The field adjusts.", "The atmosphere shifts slightly."],
+    postContributeSummaryLine: ["You are part of this reading.", "The field now includes you."],
     eyebrowLayer: "Atmosphere",
     eyebrowContext: "Moments",
+    heroBridgeLine: "A place to share small human moments.",
+    heroBridgeSub1: "Write a short moment from your day.",
+    heroBridgeSub2: "It becomes part of a shared atmosphere.",
     heroIdentityLine: "Where human moments meet",
     sharedFieldLine: "Shared field — last 48h",
     horizonTitle: "Horizon",
@@ -913,8 +924,14 @@ const UI_COPY = {
     rarePulsePhrases: ["El campo se siente distinto esta noche.", "El observatorio notó algo inusual."],
     lastPulseLabel: "Último pulso",
     yourSignalEntered: "Tu señal entró al campo.",
+    postContributePhase1: ["Tu momento entró al campo.", "Señal recibida.", "Una nueva huella en la atmósfera."],
+    postContributePhase2: ["Ya es parte de la lectura.", "El campo se ajusta.", "La atmósfera se mueve un poco."],
+    postContributeSummaryLine: ["Sos parte de esta lectura.", "El campo ahora te incluye."],
     eyebrowLayer: "Atmósfera",
     eyebrowContext: "Momentos",
+    heroBridgeLine: "Un lugar para compartir pequeños momentos humanos.",
+    heroBridgeSub1: "Escribí un momento corto de tu día.",
+    heroBridgeSub2: "Pasa a ser parte de una atmósfera compartida.",
     heroIdentityLine: "Donde se encuentran los momentos humanos",
     sharedFieldLine: "Campo compartido — últimas 48 h",
     horizonTitle: "Horizonte",
@@ -1047,6 +1064,12 @@ function applyUICopy() {
   if (observatoryPulseLabelEl && ui.observatoryPulseLabel) observatoryPulseLabelEl.textContent = ui.observatoryPulseLabel;
   const eyebrowContextEl = document.querySelector(".eyebrow-context");
   if (eyebrowContextEl) eyebrowContextEl.textContent = ui.eyebrowContext;
+  const heroBridgeLineEl = document.getElementById("heroBridgeLine");
+  if (heroBridgeLineEl && ui.heroBridgeLine) heroBridgeLineEl.textContent = ui.heroBridgeLine;
+  const heroBridgeSub1El = document.getElementById("heroBridgeSub1");
+  if (heroBridgeSub1El && ui.heroBridgeSub1) heroBridgeSub1El.textContent = ui.heroBridgeSub1;
+  const heroBridgeSub2El = document.getElementById("heroBridgeSub2");
+  if (heroBridgeSub2El && ui.heroBridgeSub2) heroBridgeSub2El.textContent = ui.heroBridgeSub2;
   const heroIdentityEl = document.getElementById("heroIdentityLine");
   if (heroIdentityEl && ui.heroIdentityLine) heroIdentityEl.textContent = ui.heroIdentityLine;
   const horizonTitleEl = document.querySelector(".horizon-line");
@@ -2288,6 +2311,70 @@ function getLastPulse() {
   }
 }
 
+/** Hash estable para variación de seed (no criptográfico). */
+function simpleStringHash(str) {
+  let h = 2166136261;
+  const s = String(str || "");
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return Math.abs(h);
+}
+
+/**
+ * Tono blando desde el note (solo señales léxicas). Nunca matching literal ni identidad.
+ * Sirve para variar el seed de lectura; no se muestra al usuario.
+ */
+function detectResonanceTone(note) {
+  const n = String(note || "").toLowerCase();
+  if (!n.trim()) return "neutral";
+  const quiet = /\b(alone|quiet|silent|empty|invisible|lost|small|soft|still)\b|solo|callad|vací|pequeñ|quieto/i.test(n);
+  const tense = /\b(stress|angry|fear|panic|heavy|tired|anxious|worried)\b|estrés|miedo|pesad|cansad|ansios/i.test(n);
+  const reflective = /\b(thought|wonder|feel|remember|today|maybe|why|hope)\b|pienso|hoy|tal vez|siento/i.test(n);
+  if (tense && !quiet) return "tense";
+  if (quiet) return "quiet";
+  if (reflective) return "reflective";
+  return "neutral";
+}
+
+function resonanceMomentScore(m, r) {
+  if (!r) return 0;
+  const sameType = String(m.type || "") === String(r.type || "");
+  const sameMood = String(m.mood || "") === String(r.mood || "");
+  let s = 0;
+  if (sameType && sameMood) s = 2;
+  else if (sameMood) s = 1;
+  else if (sameType) s = 0.5;
+  s += (Math.random() - 0.5) * 0.3;
+  return s;
+}
+
+function sortMomentsByResonanceScore(list, resonance) {
+  return list
+    .map((m, i) => ({ m, i, s: resonanceMomentScore(m, resonance) }))
+    .sort((a, b) => b.s - a.s || a.i - b.i)
+    .map(({ m }) => m);
+}
+
+/** Soft Resonance: contexto + intensity 1→0 (decaimiento suave; ventana variable 25–35 min). */
+function getResonanceContext() {
+  try {
+    const raw = localStorage.getItem(LAST_MOMENT_KEY);
+    if (!raw) return null;
+    const last = JSON.parse(raw);
+    if (!last || !last.timestamp) return null;
+    const windowMs = last.windowMs || RESONANCE_WINDOW_MS;
+    const age = Date.now() - last.timestamp;
+    if (age > windowMs) return null;
+    const linear = 1 - age / windowMs;
+    const intensity = Math.pow(linear, 1.3);
+    return { ...last, intensity };
+  } catch {
+    return null;
+  }
+}
+
 function setLastPulse(payload) {
   try {
     localStorage.setItem(LAST_PULSE_KEY, JSON.stringify(payload));
@@ -2906,7 +2993,14 @@ function renderMomentItems(targetElement, items, constellations) {
 
 function renderRecent(sharedMoments, constellations) {
   recentMoments.innerHTML = "";
-  const list = sharedMoments.slice(0, RENDER_LIMIT);
+  let list = sharedMoments.slice(0, RENDER_LIMIT);
+
+  let delayResonanceRender = false;
+  const resonance = getResonanceContext();
+  if (resonance && list.length > 1 && Math.random() < 0.65 * resonance.intensity) {
+    list = sortMomentsByResonanceScore(list, resonance);
+    delayResonanceRender = true;
+  }
 
   if (list.length === 0) {
     const ui = UI_COPY[LANG] || UI_COPY.en;
@@ -2925,7 +3019,12 @@ function renderRecent(sharedMoments, constellations) {
     return;
   }
 
-  renderMomentItems(recentMoments, list, constellations);
+  if (delayResonanceRender) {
+    const delayMs = 80 + Math.random() * 40;
+    setTimeout(() => renderMomentItems(recentMoments, list, constellations), delayMs);
+  } else {
+    renderMomentItems(recentMoments, list, constellations);
+  }
 }
 
 function teardownSharedSheetIncrementalScroll() {
@@ -2959,7 +3058,11 @@ function appendNextPageSharedSheet() {
 
 function renderSharedSheetList(sharedMoments, countLabel = "") {
   teardownSharedSheetIncrementalScroll();
-  const list = sharedMoments.slice(0, SHARED_SHEET_MAX_ITEMS);
+  let list = sharedMoments.slice(0, SHARED_SHEET_MAX_ITEMS);
+  const resonance = getResonanceContext();
+  if (resonance && list.length > 1 && Math.random() < 0.65 * resonance.intensity) {
+    list = sortMomentsByResonanceScore(list, resonance);
+  }
   sharedSheetList.innerHTML = "";
 
   if (sharedSheetCount) {
@@ -3623,22 +3726,57 @@ function animateDegree(from, to, ms) {
   requestAnimationFrame(frame);
 }
 
-function showTransientReading(total = 0, seed = 0, lang = "en", contributed = false) {
-  const ui = UI_COPY[lang] || UI_COPY.en;
-  const phrase = contributed && ui.yourSignalEntered
-    ? ui.yourSignalEntered
-    : getAtmosphereLine(seed, lang, total);
-  transientReadingLine.textContent = phrase;
+function setTransientLine(text) {
+  if (!transientReadingLine) return;
+  transientReadingLine.textContent = text;
   transientReadingLine.classList.remove("hidden");
   transientReadingLine.classList.add("is-visible");
+}
+
+function clearTransientLine() {
+  if (!transientReadingLine) return;
+  transientReadingLine.classList.remove("is-visible");
+  window.setTimeout(() => {
+    transientReadingLine.classList.add("hidden");
+    transientReadingLine.textContent = "";
+  }, 400);
+}
+
+/** Micro-experiencia post-contribute: absorción → disolución → retorno. 1.5–3 s, sin modales. */
+function triggerPostContributeSequence(canonicalState, lang) {
+  const ui = UI_COPY[lang] || UI_COPY.en;
+  const p1 = ui.postContributePhase1 || [];
+  const p2 = ui.postContributePhase2 || [];
+  const summaryLines = ui.postContributeSummaryLine || [];
+  const total = Number(canonicalState?.total) ?? 0;
+  const seed = (total * 7 + Math.round(Number(canonicalState?.computedDegree) || 0)) | 0;
+  const phase1Text = p1.length ? p1[Math.abs(seed) % p1.length] : ui.yourSignalEntered;
+  const phase2Text = p2.length ? p2[Math.abs(seed + 1) % p2.length] : "The atmosphere shifts slightly.";
+
+  setTransientLine(phase1Text);
 
   window.setTimeout(() => {
-    transientReadingLine.classList.remove("is-visible");
-    window.setTimeout(() => {
-      transientReadingLine.classList.add("hidden");
-      transientReadingLine.textContent = "";
-    }, 550);
-  }, 2500);
+    setTransientLine(phase2Text);
+  }, 500);
+
+  window.setTimeout(() => {
+    clearTransientLine();
+    if (summaryLines.length > 0 && climateSummaryLine) {
+      const summaryText = summaryLines[Math.abs(seed + 2) % summaryLines.length];
+      climateSummaryLine.textContent = summaryText;
+      climateSummaryLine.classList.remove("hidden");
+      window.setTimeout(() => {
+        climateSummaryLine.textContent = getReadingStatusLine(lang, total, seed, canonicalState?.dominantMix);
+      }, 2500);
+    }
+  }, 500 + 1200);
+}
+
+function showTransientReading(total = 0, seed = 0, lang = "en", contributed = false) {
+  if (contributed) return;
+  const phrase = getAtmosphereLine(seed, lang, total);
+  setTransientLine(phrase);
+  window.setTimeout(() => clearTransientLine(), 2500);
 }
 
 /** Observatory pulse: señal breve cuando algo cambió en el campo. Aparece, dura ~4 s, se va. */
@@ -4150,8 +4288,7 @@ async function boot() {
       firstPhaseTarget = clamp(startDisplay + localDirection * 1.2, 0, SCALE);
     }
     settleDuration = clamp(3000 + Math.abs(delta) * 70 + patternVolatilityMs, 3000, 8000);
-    const transientSeed = query.get("s") !== null ? (parseInt(query.get("s"), 10) || 0) : (Date.now() + (canonicalState?.total ?? 0) * 7) | 0;
-    showTransientReading(canonicalState?.total ?? 0, transientSeed, LANG, true);
+    triggerPostContributeSequence(canonicalState, LANG);
     if (heroEl) {
       heroEl.classList.add("observatory-hero-ritual");
       try { window.atmosphere?.bump?.(); } catch (_) {}
@@ -4285,7 +4422,14 @@ async function boot() {
   if (climateSummaryLine) {
     const total = Number(canonicalState?.total) || 0;
     const degree = Number(canonicalState?.computedDegree) || BASELINE;
-    const seed = (total * 7 + Math.round(degree)) | 0;
+    const resonance = getResonanceContext();
+    let seedNudge = 0;
+    if (resonance) {
+      const tone = detectResonanceTone(resonance.note);
+      const bias = simpleStringHash(`${resonance.type}|${resonance.mood}|${tone}`) % 5;
+      seedNudge = bias + Math.floor(4 * resonance.intensity);
+    }
+    const seed = (total * 7 + Math.round(degree) + seedNudge) | 0;
     if (total > 0) {
       climateSummaryLine.textContent = getReadingStatusLine(LANG, total, seed, canonicalState?.dominantMix);
       climateSummaryLine.classList.remove("hidden");
