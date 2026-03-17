@@ -190,6 +190,7 @@ consentInput?.addEventListener("change", () => {
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (form.dataset.submitting === "1") return;
   formStatus.textContent = "";
 
   if (!typeInput.value || !moodInput.value) {
@@ -212,6 +213,20 @@ form.addEventListener("submit", async (event) => {
     return;
   }
 
+  const lang = (document.documentElement.getAttribute("lang") || "en").startsWith("es") ? "es" : "en";
+  form.dataset.submitting = "1";
+  if (saveButton) {
+    saveButton.disabled = true;
+    saveButton.setAttribute("aria-busy", "true");
+  }
+  formStatus.textContent = sharedInput.checked
+    ? lang === "es"
+      ? "Enviando al campo compartido…"
+      : "Sending to the shared field…"
+    : lang === "es"
+      ? "La lectura se ajusta."
+      : "The reading adjusts.";
+
   const localMoment = makeMoment();
   const moments = loadMoments();
   moments.push(localMoment);
@@ -230,7 +245,6 @@ form.addEventListener("submit", async (event) => {
       { t: "Registrado en la atmósfera.", w: 1 },
     ],
   };
-  const lang = (document.documentElement.getAttribute("lang") || "en").startsWith("es") ? "es" : "en";
   const pool = ritualPhrases[lang];
   const totalW = pool.reduce((s, p) => s + p.w, 0);
   const pickRitual = () => {
@@ -243,7 +257,7 @@ form.addEventListener("submit", async (event) => {
   };
 
   if (!sharedInput.checked) {
-    formStatus.textContent = "The reading adjusts.";
+    /* Mensaje ya mostrado arriba (feedback inmediato). */
   } else {
     const remoteResult = await postMomentRemote(makeRemoteMomentPayload());
     if (remoteResult.ok) {

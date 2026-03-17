@@ -990,6 +990,9 @@ h2 {
   line-height: 1.35;
   color: var(--muted);
 }
+.hero-bridge-sub:first-of-type {
+  font-size: 0.82rem;
+}
 html.theme-atmosphere .hero-bridge-line {
   color: rgba(255, 255, 255, 0.82);
 }
@@ -1005,6 +1008,10 @@ html.theme-atmosphere .hero-bridge-sub {
   from { opacity: 0; }
   to { opacity: 0.55; }
 }
+@keyframes hero-bridge-fade-in-sub-first {
+  from { opacity: 0; }
+  to { opacity: 0.5; }
+}
 .hero-bridge-line {
   animation: hero-bridge-fade-in 0.2s ease-out forwards;
 }
@@ -1013,6 +1020,7 @@ html.theme-atmosphere .hero-bridge-sub {
   animation: hero-bridge-fade-in-sub 0.35s ease-out forwards;
 }
 .hero-bridge-sub:first-of-type {
+  animation-name: hero-bridge-fade-in-sub-first;
   animation-delay: 0.2s;
 }
 .hero-bridge-sub:last-of-type {
@@ -1025,7 +1033,8 @@ html.theme-atmosphere .hero-bridge-sub {
     animation-delay: 0s;
   }
   .hero-bridge-line { opacity: 0.8; }
-  .hero-bridge-sub { opacity: 0.55; }
+  .hero-bridge-sub:first-of-type { opacity: 0.5; }
+  .hero-bridge-sub:last-of-type { opacity: 0.55; }
 }
 
 .observatory-hero .atmosphere-air .hero-identity-line { order: 1; }
@@ -1049,9 +1058,9 @@ html.theme-atmosphere .hero-bridge-sub {
   text-align: center;
 }
 .atmosphere-air .hero-bridge-line { margin-bottom: 0.25rem; }
-.atmosphere-air .hero-bridge-sub:first-of-type { margin-bottom: 0.3rem; }
-.atmosphere-air .hero-bridge-sub:last-of-type { margin-bottom: 0.75rem; }
-.atmosphere-air .hero-identity-line { white-space: nowrap; }
+.atmosphere-air .hero-bridge-sub:first-of-type { margin-bottom: 0.55rem; }
+.atmosphere-air .hero-bridge-sub:last-of-type { margin-bottom: 1rem; }
+.atmosphere-air .hero-identity-line { margin-top: 0.85rem; white-space: nowrap; }
 .atmosphere-air .observatory-seo-intro {
   white-space: normal;
   max-width: 36ch;
@@ -4401,6 +4410,10 @@ body.contribute-ritual .page {
   line-height: 1.38;
   color: #607189;
   opacity: 0.82;
+}
+
+.contribute-page #saveButton:disabled[aria-busy="true"] {
+  cursor: wait;
 }
 
 .contribute-page .contribute-cta-hint {
