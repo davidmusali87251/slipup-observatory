@@ -1049,11 +1049,11 @@ html.theme-atmosphere .hero-bridge-sub {
 .observatory-hero .atmosphere-air .hero-identity-line { order: 1; }
 .observatory-hero .atmosphere-air .observatory-seo-intro { order: 2; }
 .observatory-hero .atmosphere-air .observatory-entry { order: 3; }
-.observatory-hero .atmosphere-air .daily-tone-line { order: 4; }
-.observatory-hero .atmosphere-air .atm-reading-line { order: 5; }
-.observatory-hero .atmosphere-air .atmospheric-weather-line { order: 6; }
-.observatory-hero .atmosphere-air .atmosphere-orientation { order: 7; }
-.observatory-hero .atmosphere-air .degree-wrap { order: 8; }
+.observatory-hero .atmosphere-air .degree-wrap { order: 4; }
+.observatory-hero .atmosphere-air .daily-tone-line { order: 5; }
+.observatory-hero .atmosphere-air .atm-reading-line { order: 6; }
+.observatory-hero .atmosphere-air .atmospheric-weather-line { order: 7; }
+.observatory-hero .atmosphere-air .atmosphere-orientation { order: 8; }
 
 /* Columna única: todos los elementos centrados en el mismo eje */
 .atmosphere-air .hero-bridge-line,
