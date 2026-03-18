@@ -1037,6 +1037,15 @@ html.theme-atmosphere .hero-bridge-sub {
   .hero-bridge-sub:last-of-type { opacity: 0.55; }
 }
 
+.hero-bridge-line.hero-bridge-settled,
+.hero-bridge-sub.hero-bridge-settled {
+  opacity: 0.68;
+  transition: opacity 600ms ease;
+}
+.hero-bridge-sub.hero-bridge-settled {
+  opacity: 0.52;
+}
+
 .observatory-hero .atmosphere-air .hero-identity-line { order: 1; }
 .observatory-hero .atmosphere-air .observatory-seo-intro { order: 2; }
 .observatory-hero .atmosphere-air .observatory-entry { order: 3; }
@@ -1321,6 +1330,29 @@ html.theme-atmosphere .horizon-pulse-bar::before {
 @media (prefers-reduced-motion: reduce) {
   .horizon-pulse-bar { transition: none; }
   .horizon-pulse-bar::after { transition: none; }
+}
+
+.hero-scroll-hint {
+  margin: 0.1rem 0 0.35rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 600ms ease, transform 600ms ease;
+  pointer-events: none;
+  user-select: none;
+}
+
+.hero-scroll-hint.hero-scroll-hint--visible {
+  opacity: 0.7;
+  transform: translateY(0);
+}
+
+.hero-scroll-hint.hero-scroll-hint--hidden {
+  opacity: 0;
+  transform: translateY(4px);
 }
 
 .atm-reading-line {

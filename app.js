@@ -783,6 +783,7 @@ const UI_COPY = {
     eyebrowContext: "Moments",
     heroBridgeLine: "A place to share small human moments.",
     heroBridgeSub1: "Write a short moment from your day.",
+    heroScrollHint: "The field reveals as you move ↓",
     sharedFieldLine: "Shared field — last 48h",
     horizonTitle: "Horizon",
     horizonMoreLabel: "Deeper",
@@ -929,6 +930,7 @@ const UI_COPY = {
     eyebrowContext: "Momentos",
     heroBridgeLine: "Un lugar para compartir pequeños momentos humanos.",
     heroBridgeSub1: "Escribí un momento corto de tu día.",
+    heroScrollHint: "El campo se revela al moverte ↓",
     sharedFieldLine: "Campo compartido — últimas 48 h",
     horizonTitle: "Horizonte",
     horizonMoreLabel: "Más",
@@ -1064,6 +1066,8 @@ function applyUICopy() {
   if (heroBridgeLineEl && ui.heroBridgeLine) heroBridgeLineEl.textContent = ui.heroBridgeLine;
   const heroBridgeSub1El = document.getElementById("heroBridgeSub1");
   if (heroBridgeSub1El && ui.heroBridgeSub1) heroBridgeSub1El.textContent = ui.heroBridgeSub1;
+  const heroScrollHintEl = document.getElementById("heroScrollHint");
+  if (heroScrollHintEl && ui.heroScrollHint) heroScrollHintEl.textContent = ui.heroScrollHint;
   const horizonTitleEl = document.querySelector(".horizon-line");
   if (horizonTitleEl) horizonTitleEl.textContent = ui.horizonTitle;
   const horizonMoreBtn = document.getElementById("horizonMoreButton");
@@ -2983,6 +2987,61 @@ function renderMomentItems(targetElement, items, constellations) {
   });
 }
 
+function initHeroOnboarding() {
+  if (typeof window === "undefined" || !heroEl) return;
+  const scrollHint = document.getElementById("heroScrollHint");
+  const bridgeLine = document.getElementById("heroBridgeLine");
+  const bridgeSub = document.getElementById("heroBridgeSub1");
+  if (!scrollHint) return;
+
+  let shown = false;
+  let dismissed = false;
+
+  const settleBridge = () => {
+    if (!bridgeLine && !bridgeSub) return;
+    if (bridgeLine) bridgeLine.classList.add("hero-bridge-settled");
+    if (bridgeSub) bridgeSub.classList.add("hero-bridge-settled");
+  };
+
+  const showHint = () => {
+    if (dismissed || shown) return;
+    shown = true;
+    scrollHint.classList.add("hero-scroll-hint--visible");
+    scrollHint.classList.remove("hero-scroll-hint--hidden");
+  };
+
+  const hideHint = () => {
+    if (!shown || dismissed) return;
+    dismissed = true;
+    scrollHint.classList.add("hero-scroll-hint--hidden");
+    scrollHint.classList.remove("hero-scroll-hint--visible");
+    scrollHint.setAttribute("aria-hidden", "true");
+  };
+
+  if (prefersReducedMotion) {
+    showHint();
+  } else {
+    window.setTimeout(showHint, 1400);
+  }
+
+  window.setTimeout(settleBridge, 3600);
+
+  const onScroll = () => {
+    if (dismissed) return;
+    if (window.scrollY > 24) {
+      settleBridge();
+      hideHint();
+      window.removeEventListener("scroll", onScroll);
+    }
+  };
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+
+  window.setTimeout(() => {
+    if (!dismissed) hideHint();
+  }, 9000);
+}
+
 function renderRecent(sharedMoments, constellations) {
   recentMoments.innerHTML = "";
   let list = sharedMoments.slice(0, RENDER_LIMIT);
@@ -4497,6 +4556,7 @@ async function boot() {
     fieldLensModel,
   };
   startHeroEngine();
+  initHeroOnboarding();
 
   const level = (canonicalState?.computedDegree ?? 0) / 100;
   const isFieldQuiet = level < 0.18;
