@@ -2708,12 +2708,23 @@ html.theme-atmosphere .observatory-pulse {
   min-height: var(--site-legal-height);
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   flex-wrap: wrap;
   gap: 0.45rem;
   background: color-mix(in oklab, var(--bg) 97%, var(--bg-deep));
   border-top: 1px solid color-mix(in oklab, var(--line) 75%, transparent);
   box-sizing: border-box;
+}
+
+.site-legal-left {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.site-legal-strata-link {
+  margin-left: auto;
 }
 
 /* Capa superior del observatorio: Orbital (scroll up). Régimen visual distinto: alta, fría, instrumentada. */
