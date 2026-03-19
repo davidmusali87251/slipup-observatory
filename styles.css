@@ -477,6 +477,70 @@ html.theme-atmosphere .contribute-page .contribute-rise-tone .field-tone-label {
   font-weight: 500;
 }
 
+html.theme-atmosphere .contribute-page .contribute-rise-tone:not(.contribute-rise-tone--revealed) .contribute-tone-interactive {
+  opacity: 0.4;
+  filter: saturate(0.92);
+  pointer-events: none;
+  transition:
+    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.5s ease;
+}
+html.theme-atmosphere .contribute-page .contribute-rise-tone--revealed .contribute-tone-interactive {
+  opacity: 1;
+  filter: none;
+}
+html.theme-atmosphere .contribute-page .contribute-kind-state-label {
+  color: color-mix(in oklab, var(--soft) 62%, var(--text));
+  opacity: 0.9;
+}
+html.theme-atmosphere .contribute-page .contribute-kind-state--observed .contribute-kind-state-surface {
+  background: color-mix(in oklab, var(--bg-deep) 35%, rgba(255, 255, 255, 0.04));
+  border-color: color-mix(in oklab, var(--line) 32%, transparent);
+}
+html.theme-atmosphere .contribute-page .contribute-kind-state--avoidable .contribute-kind-state-surface {
+  background: color-mix(in oklab, var(--bg-deep) 55%, rgba(0, 0, 0, 0.12));
+  border-color: color-mix(in oklab, var(--line) 52%, transparent);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+}
+html.theme-atmosphere .contribute-page .contribute-kind-state--fertile .contribute-kind-state-surface {
+  background: color-mix(in oklab, var(--bg-deep) 28%, rgba(255, 255, 255, 0.07));
+  border-color: color-mix(in oklab, var(--line) 22%, transparent);
+  transform: translateY(-0.5px);
+}
+html.theme-atmosphere .contribute-page .contribute-kind-state:hover .contribute-kind-state-surface {
+  border-color: color-mix(in oklab, var(--line) 65%, rgba(139, 108, 255, 0.15));
+}
+html.theme-atmosphere .contribute-page .contribute-kind-state:has(:checked) .contribute-kind-state-label {
+  color: color-mix(in oklab, var(--text) 92%, var(--soft));
+  opacity: 1;
+}
+html.theme-atmosphere .contribute-page .contribute-kind-state:has(:checked) .contribute-kind-state-surface {
+  border-color: color-mix(in oklab, var(--line) 58%, rgba(139, 108, 255, 0.2));
+}
+html.theme-atmosphere .contribute-page .contribute-kind-state:has(:focus-visible) .contribute-kind-state-surface {
+  box-shadow:
+    0 0 0 2px rgba(92, 61, 255, 0.28),
+    0 2px 10px rgba(0, 0, 0, 0.2);
+}
+html.theme-atmosphere #contributeForm[data-kind-preview="observed"] #noteInput {
+  box-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.16),
+    0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  filter: brightness(0.99);
+}
+html.theme-atmosphere #contributeForm[data-kind-preview="avoidable"] #noteInput {
+  box-shadow:
+    0 2px 16px rgba(0, 0, 0, 0.26),
+    0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  filter: brightness(0.97);
+}
+html.theme-atmosphere #contributeForm[data-kind-preview="fertile"] #noteInput {
+  box-shadow:
+    0 2px 14px rgba(0, 0, 0, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.09) inset;
+  filter: brightness(1.03);
+}
+
 html.theme-atmosphere .contribute-page .field > span {
   color: color-mix(in oklab, var(--text) 78%, var(--soft));
 }
@@ -582,7 +646,6 @@ html.theme-atmosphere .contribute-page .contribute-back-link {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
-html.theme-atmosphere .contribute-page #typeInput,
 html.theme-atmosphere .contribute-page #moodInput,
 html.theme-atmosphere .contribute-page #noteInput {
   color: var(--text);
@@ -866,9 +929,7 @@ html.theme-atmosphere .observatory-hero[data-field-entry="present"]::after {
 html.theme-atmosphere .observatory-hero[data-field-entry="present"] .panel.panel-observatory {
   filter: brightness(1.022);
   transform: scale(1.006);
-  box-shadow:
-    0 0 0 1px color-mix(in oklab, #fff 86%, transparent),
-    0 1.25rem 2.65rem -0.48rem color-mix(in oklab, var(--layer-ground) 21%, transparent);
+  box-shadow: 0 1.25rem 2.65rem -0.48rem color-mix(in oklab, var(--layer-ground) 21%, transparent);
 }
 
 .observatory-hero.observatory--pattern::before {
@@ -1163,9 +1224,7 @@ h2 {
       color-mix(in oklab, var(--layer-horizon) 70%, var(--card)) 100%
     ),
     var(--card);
-  box-shadow:
-    0 0 0 1px color-mix(in oklab, #fff 85%, transparent),
-    0 1.2rem 2.5rem -0.5rem color-mix(in oklab, var(--layer-ground) 18%, transparent);
+  box-shadow: 0 1.2rem 2.5rem -0.5rem color-mix(in oklab, var(--layer-ground) 18%, transparent);
 }
 
 .panel-observatory > * {
@@ -4985,10 +5044,139 @@ body.contribute-ritual .page {
   color: var(--muted);
   font-family: var(--font-reading);
 }
+.contribute-tone-interactive {
+  display: grid;
+  gap: 0.75rem;
+}
+.contribute-rise-tone:not(.contribute-rise-tone--revealed) .contribute-tone-interactive {
+  opacity: 0.36;
+  filter: saturate(0.94);
+  pointer-events: none;
+  transition:
+    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.5s ease;
+}
+.contribute-rise-tone--revealed .contribute-tone-interactive {
+  opacity: 1;
+  filter: none;
+}
+.contribute-kind-states {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem 0.35rem;
+  align-items: stretch;
+}
+.contribute-kind-state {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 2.85rem;
+  margin: 0;
+  padding: 0.5rem 0.4rem;
+  cursor: pointer;
+  border-radius: 13px;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.48s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.contribute-kind-state input[type="radio"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.contribute-kind-state-surface {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  border: 1px solid transparent;
+  background: transparent;
+  transition:
+    background 0.5s ease,
+    border-color 0.5s ease,
+    box-shadow 0.55s ease,
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.contribute-kind-state-label {
+  position: relative;
+  z-index: 1;
+  font-size: 0.69rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-align: center;
+  line-height: 1.25;
+  color: color-mix(in oklab, var(--muted) 58%, var(--text));
+  opacity: 0.9;
+  transition:
+    opacity 0.48s ease,
+    color 0.48s ease;
+  font-family: var(--font-reading);
+}
+.contribute-kind-state--observed .contribute-kind-state-surface {
+  background: color-mix(in oklab, #faf7ff 88%, #e8ecf4);
+  border-color: color-mix(in oklab, var(--muted) 14%, transparent);
+}
+.contribute-kind-state--avoidable .contribute-kind-state-surface {
+  background: color-mix(in oklab, #2f455b 6%, #f3f0fa);
+  border-color: color-mix(in oklab, var(--muted) 24%, transparent);
+  box-shadow: 0 1px 5px rgba(15, 24, 38, 0.07);
+}
+.contribute-kind-state--fertile .contribute-kind-state-surface {
+  background: color-mix(in oklab, #ffffff 78%, #faf7ff);
+  border-color: color-mix(in oklab, var(--muted) 12%, transparent);
+  transform: translateY(-0.5px);
+}
+.contribute-kind-state:hover .contribute-kind-state-surface {
+  border-color: color-mix(in oklab, var(--muted) 34%, transparent);
+}
+.contribute-kind-state:has(:checked) .contribute-kind-state-label {
+  opacity: 1;
+  color: color-mix(in oklab, var(--text) 90%, var(--muted));
+}
+.contribute-kind-state:has(:checked) .contribute-kind-state-surface {
+  border-color: color-mix(in oklab, var(--muted) 40%, transparent);
+}
+.contribute-kind-state:has(:focus-visible) {
+  outline: none;
+}
+.contribute-kind-state:has(:focus-visible) .contribute-kind-state-surface {
+  box-shadow: 0 0 0 2px color-mix(in oklab, #8fa9c9 38%, transparent);
+}
+#contributeForm[data-kind-preview="observed"] #noteInput {
+  box-shadow:
+    0 1px 0 #ffffffde inset,
+    0 2px 8px color-mix(in oklab, #2f455b 5%, transparent);
+  filter: brightness(0.995);
+}
+#contributeForm[data-kind-preview="avoidable"] #noteInput {
+  box-shadow:
+    0 1px 0 #ffffffc5 inset,
+    0 2px 11px color-mix(in oklab, #2f455b 9%, transparent);
+  filter: brightness(0.97);
+}
+#contributeForm[data-kind-preview="fertile"] #noteInput {
+  box-shadow:
+    0 1px 0 #fffffff2 inset,
+    0 2px 9px color-mix(in oklab, #fff 55%, transparent);
+  filter: brightness(1.025);
+}
+#contributeForm #noteInput {
+  transition:
+    border-color 0.45s ease,
+    box-shadow 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.48s ease,
+    filter 0.52s ease;
+}
+
 .contribute-rise-tone-fields {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem 1rem;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
 }
 .contribute-rise-tone .field-tone {
   margin: 0;
@@ -5001,12 +5189,27 @@ body.contribute-ritual .page {
   font-weight: 400;
 }
 @media (max-width: 420px) {
+  .contribute-kind-states {
+    grid-template-columns: 1fr;
+    gap: 0.42rem;
+  }
   .contribute-rise-tone-fields {
     grid-template-columns: 1fr;
     gap: 0.6rem;
   }
   .contribute-rise-tone {
     padding: 0.7rem 0.8rem 0.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contribute-kind-state,
+  .contribute-kind-state-surface,
+  .contribute-kind-state-label,
+  .contribute-rise-tone:not(.contribute-rise-tone--revealed) .contribute-tone-interactive,
+  .contribute-rise-tone--revealed .contribute-tone-interactive,
+  #contributeForm[data-kind-preview] #noteInput {
+    transition: none;
   }
 }
 
@@ -5082,7 +5285,6 @@ body.contribute-ritual .page {
     background 180ms ease;
 }
 
-.contribute-page #typeInput,
 .contribute-page #moodInput,
 .contribute-page #noteInput {
   font-family: var(--font-sans);

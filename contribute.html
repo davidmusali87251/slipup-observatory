@@ -38,30 +38,6 @@
         <p class="contribute-field-line">Contribute to the field.</p>
         <p id="contributeMomentCountLine" class="contribute-rise-from" data-fallback="Moments rising across the atmosphere.">Moments rising across the atmosphere.</p>
         <form id="contributeForm" class="contribute-rise-form" novalidate>
-          <div class="contribute-rise-tone" aria-describedby="contributeToneHint">
-            <p id="contributeToneHint" class="contribute-rise-tone-intro">Kind and tone</p>
-            <div class="contribute-rise-tone-fields">
-              <label class="field field-tone">
-                <span class="field-tone-label">Kind</span>
-                <select id="typeInput" name="type" required aria-describedby="contributeToneHint">
-                  <option value="fertile">Fertile moment</option>
-                  <option value="avoidable">Avoidable moment</option>
-                  <option value="observed">Observed moment</option>
-                </select>
-              </label>
-              <label class="field field-tone">
-                <span class="field-tone-label">Tone</span>
-                <select id="moodInput" name="mood" required aria-describedby="contributeToneHint">
-                  <option value="calm">Calm</option>
-                  <option value="focus">Focus</option>
-                  <option value="stressed">Stressed</option>
-                  <option value="curious">Curious</option>
-                  <option value="tired">Tired</option>
-                </select>
-              </label>
-            </div>
-          </div>
-
           <p class="contribute-rise-examples-intro" aria-hidden="true">
             <span class="contribute-rise-examples-intro-text">Moments rise like</span>
             <span id="contributeRiseExamplesLive" class="contribute-rise-examples-live"></span>
@@ -79,6 +55,41 @@
             <small class="field-hint" aria-hidden="true">max 19</small>
             <p id="noteAnalysisLine" class="note-analysis-line" aria-live="polite" aria-label="How this field is read by the observatory"></p>
           </label>
+
+          <div class="contribute-rise-tone" aria-describedby="contributeToneHint">
+            <p id="contributeToneHint" class="contribute-rise-tone-intro">Kind and tone</p>
+            <div class="contribute-tone-interactive">
+              <div class="contribute-kind-states" role="radiogroup" aria-labelledby="contributeToneHint">
+                <label class="contribute-kind-state contribute-kind-state--observed">
+                  <input type="radio" name="type" value="observed" checked autocomplete="off" />
+                  <span class="contribute-kind-state-surface" aria-hidden="true"></span>
+                  <span class="contribute-kind-state-label">Observed moment</span>
+                </label>
+                <label class="contribute-kind-state contribute-kind-state--avoidable">
+                  <input type="radio" name="type" value="avoidable" autocomplete="off" />
+                  <span class="contribute-kind-state-surface" aria-hidden="true"></span>
+                  <span class="contribute-kind-state-label">Avoidable moment</span>
+                </label>
+                <label class="contribute-kind-state contribute-kind-state--fertile">
+                  <input type="radio" name="type" value="fertile" autocomplete="off" />
+                  <span class="contribute-kind-state-surface" aria-hidden="true"></span>
+                  <span class="contribute-kind-state-label">Fertile moment</span>
+                </label>
+              </div>
+              <div class="contribute-rise-tone-fields">
+                <label class="field field-tone field-tone-mood">
+                  <span class="field-tone-label">Tone</span>
+                  <select id="moodInput" name="mood" required aria-describedby="contributeToneHint">
+                    <option value="calm">Calm</option>
+                    <option value="focus">Focus</option>
+                    <option value="stressed">Stressed</option>
+                    <option value="curious">Curious</option>
+                    <option value="tired">Tired</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+          </div>
 
           <label class="field field-inline" for="sharedInput">
             <input id="sharedInput" name="shared" type="checkbox" checked />

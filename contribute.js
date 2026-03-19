@@ -7,7 +7,8 @@ import { getNoteSignalBreakdown } from "./modelConstants.js";
 const STORAGE_KEY = "slipup_v2_moments";
 
 const form = document.getElementById("contributeForm");
-const typeInput = document.getElementById("typeInput");
+const toneWrap = form?.querySelector(".contribute-rise-tone");
+const kindStatesEl = form?.querySelector(".contribute-kind-states");
 const moodInput = document.getElementById("moodInput");
 const noteInput = document.getElementById("noteInput");
 const sharedInput = document.getElementById("sharedInput");
@@ -16,6 +17,73 @@ const saveButton = document.getElementById("saveButton");
 const formStatus = document.getElementById("formStatus");
 const noteAnalysisLine = document.getElementById("noteAnalysisLine");
 const ALLOWED_MOODS = new Set(["calm", "focus", "stressed", "curious", "tired"]);
+const ALLOWED_TYPES = new Set(["fertile", "avoidable", "observed"]);
+
+let typeTouched = false;
+let kindSuggestTimer = null;
+
+function getSelectedType() {
+  const el = form?.querySelector('input[name="type"]:checked');
+  const v = el?.value;
+  return v && ALLOWED_TYPES.has(v) ? v : "observed";
+}
+
+function setKindPreview(kind) {
+  if (!form) return;
+  if (kind && ALLOWED_TYPES.has(kind)) form.dataset.kindPreview = kind;
+  else form.removeAttribute("data-kind-preview");
+}
+
+function updateToneReveal() {
+  const has = (noteInput?.value?.trim()?.length ?? 0) > 0;
+  if (!has) typeTouched = false;
+  toneWrap?.classList.toggle("contribute-rise-tone--revealed", has);
+  if (kindStatesEl) {
+    if (has) {
+      kindStatesEl.removeAttribute("aria-disabled");
+    } else {
+      kindStatesEl.setAttribute("aria-disabled", "true");
+    }
+  }
+  form?.querySelectorAll('input[name="type"]').forEach((r) => {
+    if (has) {
+      r.removeAttribute("tabindex");
+      r.removeAttribute("aria-disabled");
+    } else {
+      r.setAttribute("tabindex", "-1");
+      r.setAttribute("aria-disabled", "true");
+    }
+  });
+  if (moodInput) {
+    if (has) {
+      moodInput.removeAttribute("tabindex");
+      moodInput.removeAttribute("aria-disabled");
+    } else {
+      moodInput.setAttribute("tabindex", "-1");
+      moodInput.setAttribute("aria-disabled", "true");
+    }
+  }
+}
+
+/** Pre-sugiere kind según señales de la nota; solo si el usuario aún no eligió explícitamente. */
+function suggestKindFromNote() {
+  if (typeTouched) return;
+  const raw = noteInput?.value?.trim() ?? "";
+  if (!raw) return;
+  const b = getNoteSignalBreakdown(raw);
+  const r = b.matchedReactive.length;
+  const f = b.matchedReflective.length;
+  let v = "observed";
+  if (r > f) v = "avoidable";
+  else if (f > r) v = "fertile";
+  const inp = form?.querySelector(`input[name="type"][value="${v}"]`);
+  if (inp) inp.checked = true;
+}
+
+function scheduleKindSuggest() {
+  clearTimeout(kindSuggestTimer);
+  kindSuggestTimer = setTimeout(() => suggestKindFromNote(), 420);
+}
 
 /** Short, everyday examples for Rise placeholder (all ≤19 chars). Rotates on load to model naming, not explaining. */
 const RISE_EXAMPLES = [
@@ -144,7 +212,7 @@ function makeMoment() {
     id: crypto.randomUUID(),
     created_at: new Date().toISOString(),
     client_day: todayClientDay(),
-    type: typeInput.value,
+    type: getSelectedType(),
     mood,
     note,
     timestamp: new Date().toISOString(),
@@ -155,7 +223,7 @@ function makeMoment() {
 
 function makeRemoteMomentPayload() {
   return {
-    type: typeInput.value,
+    type: getSelectedType(),
     mood: ALLOWED_MOODS.has(moodInput.value) ? moodInput.value : "calm",
     note: noteInput.value,
     shared: sharedInput.checked,
@@ -179,6 +247,8 @@ noteInput.addEventListener("input", () => {
   }
   syncSaveState();
   updateNoteAnalysisLine();
+  updateToneReveal();
+  scheduleKindSuggest();
 });
 
 consentInput?.addEventListener("change", () => {
@@ -193,11 +263,7 @@ form.addEventListener("submit", async (event) => {
   if (form.dataset.submitting === "1") return;
   formStatus.textContent = "";
 
-  if (!typeInput.value || !moodInput.value) {
-    formStatus.textContent = "Type and mood are required.";
-    return;
-  }
-  if (!ALLOWED_MOODS.has(moodInput.value)) {
+  if (!moodInput.value || !ALLOWED_MOODS.has(moodInput.value)) {
     formStatus.textContent = "Choose a mood.";
     return;
   }
@@ -281,7 +347,7 @@ form.addEventListener("submit", async (event) => {
     localStorage.setItem(
       "slipup_v2_last_moment",
       JSON.stringify({
-        type: typeInput.value,
+        type: getSelectedType(),
         mood: moodInput.value,
         note: (noteInput.value || "").replace(/\s+/g, " ").trim().slice(0, 80),
         timestamp: Date.now(),
@@ -306,8 +372,36 @@ function setSupportObservatoryTooltip() {
   if (caption) caption.textContent = lang === "es" ? "Mantené el campo vivo." : "Keep the field alive.";
 }
 
+if (kindStatesEl && form) {
+  kindStatesEl.querySelectorAll(".contribute-kind-state").forEach((label) => {
+    const radio = label.querySelector('input[name="type"]');
+    if (!radio) return;
+    label.addEventListener("pointerenter", () => setKindPreview(radio.value));
+    label.addEventListener("pointerleave", () => {
+      requestAnimationFrame(() => {
+        if (!kindStatesEl.matches(":hover")) setKindPreview(getSelectedType());
+      });
+    });
+  });
+  form.querySelectorAll('input[name="type"]').forEach((radio) => {
+    radio.addEventListener("change", () => {
+      typeTouched = true;
+      setKindPreview(getSelectedType());
+    });
+    radio.addEventListener("focus", () => setKindPreview(radio.value));
+    radio.addEventListener("blur", () => {
+      setTimeout(() => {
+        const ae = document.activeElement;
+        if (!kindStatesEl.contains(ae)) setKindPreview(getSelectedType());
+      }, 0);
+    });
+  });
+}
+
 syncSaveState();
 updateNoteAnalysisLine();
+updateToneReveal();
+scheduleKindSuggest();
 setRisePlaceholder();
 setRiseExamplesLive();
 setSupportObservatoryTooltip();
