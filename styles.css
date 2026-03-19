@@ -1852,6 +1852,7 @@ html.theme-atmosphere .horizon-pulse-bar::before {
 .atmospheric-weather-caption-wrap .trust-microcopy {
   margin: 0;
   text-align: center;
+  white-space: nowrap;
 }
 .atmospheric-weather-caption-wrap .atmospheric-weather-caption {
   margin: 0;
