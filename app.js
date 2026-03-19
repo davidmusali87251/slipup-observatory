@@ -2361,25 +2361,6 @@ function detectResonanceTone(note) {
   return "neutral";
 }
 
-function resonanceMomentScore(m, r) {
-  if (!r) return 0;
-  const sameType = String(m.type || "") === String(r.type || "");
-  const sameMood = String(m.mood || "") === String(r.mood || "");
-  let s = 0;
-  if (sameType && sameMood) s = 2;
-  else if (sameMood) s = 1;
-  else if (sameType) s = 0.5;
-  s += (Math.random() - 0.5) * 0.3;
-  return s;
-}
-
-function sortMomentsByResonanceScore(list, resonance) {
-  return list
-    .map((m, i) => ({ m, i, s: resonanceMomentScore(m, resonance) }))
-    .sort((a, b) => b.s - a.s || a.i - b.i)
-    .map(({ m }) => m);
-}
-
 /** Soft Resonance: contexto + intensity 1→0 (decaimiento suave; ventana variable 25–35 min). */
 function getResonanceContext() {
   try {
@@ -2741,6 +2722,18 @@ function getMomentStableId(m) {
   return m.id || `${m.timestamp || ""}-${(m.note || "").slice(0, 10)}`;
 }
 
+function getMomentRecencyMs(m) {
+  const raw = m && (m.timestamp || m.created_at);
+  const t = raw ? new Date(raw).getTime() : 0;
+  return Number.isFinite(t) ? t : 0;
+}
+
+/** Recent / sheet: más recientes primero (orden de entrada estable; no barajar por resonancia). */
+function sortMomentsByRecencyFirst(list) {
+  if (!list || list.length < 2) return list || [];
+  return [...list].sort((a, b) => getMomentRecencyMs(b) - getMomentRecencyMs(a));
+}
+
 /** Moment Constellations: detecta clusters de 4+ momentos con mismo mood en 48h. Devuelve mapa por id de momento. */
 function getConstellations(moments) {
   const window48h = getRecentWindow(moments || []);
@@ -2755,8 +2748,11 @@ function getConstellations(moments) {
   byMood.forEach((group, key) => {
     if (group.length < 4) return;
     group.forEach((m) => {
-      const related = group.filter((other) => other !== m);
-      byMomentId[getMomentStableId(m)] = { key, related };
+      const mid = getMomentStableId(m);
+      const related = group
+        .filter((other) => getMomentStableId(other) !== mid)
+        .sort((a, b) => getMomentRecencyMs(b) - getMomentRecencyMs(a));
+      byMomentId[mid] = { key, related };
     });
   });
   return { byMomentId };
@@ -2789,10 +2785,18 @@ function createMomentItemElement(m, options = {}) {
     li.innerHTML = `<span class="moment-note">${escapeHtml(noteLabel)}</span><span class="moment-context">${escapeHtml(context)}</span>`;
   } else {
     const meta = regionLabel || timeStr;
-    li.innerHTML =
-      `<span class="moment-note">${escapeHtml(noteLabel)}</span>` +
-      `<span class="moment-type-mood">${escapeHtml(typeLabel + " · " + moodLabel)}</span>` +
-      `<span class="moment-meta">${escapeHtml(meta)}</span>`;
+    const noteEl = document.createElement("span");
+    noteEl.className = "moment-note";
+    noteEl.textContent = noteLabel;
+    const typeMoodEl = document.createElement("span");
+    typeMoodEl.className = "moment-type-mood";
+    typeMoodEl.textContent = `${typeLabel} · ${moodLabel}`;
+    const metaEl = document.createElement("span");
+    metaEl.className = "moment-meta";
+    metaEl.textContent = meta;
+    li.appendChild(noteEl);
+    li.appendChild(typeMoodEl);
+    li.appendChild(metaEl);
   }
 
   const momentId = m.id || `${m.timestamp || ""}-${(m.note || "").slice(0, 10)}`;
@@ -3071,14 +3075,7 @@ function initHeroOnboarding() {
 
 function renderRecent(sharedMoments, constellations) {
   recentMoments.innerHTML = "";
-  let list = sharedMoments.slice(0, RENDER_LIMIT);
-
-  let delayResonanceRender = false;
-  const resonance = getResonanceContext();
-  if (resonance && list.length > 1 && Math.random() < 0.65 * resonance.intensity) {
-    list = sortMomentsByResonanceScore(list, resonance);
-    delayResonanceRender = true;
-  }
+  let list = sortMomentsByRecencyFirst(sharedMoments.slice(0, RENDER_LIMIT));
 
   if (list.length === 0) {
     const ui = UI_COPY[LANG] || UI_COPY.en;
@@ -3097,12 +3094,7 @@ function renderRecent(sharedMoments, constellations) {
     return;
   }
 
-  if (delayResonanceRender) {
-    const delayMs = 80 + Math.random() * 40;
-    setTimeout(() => renderMomentItems(recentMoments, list, constellations), delayMs);
-  } else {
-    renderMomentItems(recentMoments, list, constellations);
-  }
+  renderMomentItems(recentMoments, list, constellations);
 }
 
 function teardownSharedSheetIncrementalScroll() {
@@ -3136,11 +3128,7 @@ function appendNextPageSharedSheet() {
 
 function renderSharedSheetList(sharedMoments, countLabel = "") {
   teardownSharedSheetIncrementalScroll();
-  let list = sharedMoments.slice(0, SHARED_SHEET_MAX_ITEMS);
-  const resonance = getResonanceContext();
-  if (resonance && list.length > 1 && Math.random() < 0.65 * resonance.intensity) {
-    list = sortMomentsByResonanceScore(list, resonance);
-  }
+  let list = sortMomentsByRecencyFirst(sharedMoments.slice(0, SHARED_SHEET_MAX_ITEMS));
   sharedSheetList.innerHTML = "";
 
   if (sharedSheetCount) {
