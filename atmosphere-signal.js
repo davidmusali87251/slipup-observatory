@@ -195,7 +195,7 @@
     if (labelEl) {
       const newText = state.label ? clampReadingLine(state.label) : "";
       if (newText !== labelEl.textContent) {
-        if (!reduceMotion() && state.label) {
+        if (!reduceMotion() && state.label && !opts.immediateLabel) {
           labelEl.classList.add("atm-reading-updating");
           setTimeout(function () {
             labelEl.textContent = newText;
@@ -253,29 +253,29 @@
     opts = opts || {};
     var now = Date.now();
     var pulseDelay = opts.pulseDelay;
-    if (!pulseDelay && now - lastUpdateTs < UPDATE_THROTTLE_MS) return;
+    if (!opts.bypassThrottle && !pulseDelay && now - lastUpdateTs < UPDATE_THROTTLE_MS) return;
     lastUpdateTs = now;
 
     var score = computeScore(moments);
     var state = getState(score);
     var dominantType = getDominantType(moments);
-    var baseOpts = { score: score, dominantType: dominantType };
+    var visOpts = { score: score, dominantType: dominantType, immediateLabel: opts.immediateLabel };
     var levelChanged = lastLevel !== undefined && Math.abs(state.level - lastLevel) > 0.05;
 
     if (pulseDelay > 0 && !reduceMotion()) {
-      applyVisuals(state, false, false, Object.assign({ pulseDelayMs: pulseDelay }, baseOpts));
+      applyVisuals(state, false, false, Object.assign({ pulseDelayMs: pulseDelay }, visOpts));
       setTimeout(function () {
-        applyVisuals(state, state.level > 0.35, true, Object.assign({ pulseDelayMs: pulseDelay }, baseOpts));
+        applyVisuals(state, state.level > 0.35, true, Object.assign({ pulseDelayMs: pulseDelay, immediateLabel: opts.immediateLabel }, visOpts));
         lastLevel = state.level;
       }, pulseDelay);
     } else if (levelChanged && !reduceMotion()) {
       lastLevel = state.level;
-      applyVisuals(state, false, false, baseOpts);
+      applyVisuals(state, false, false, visOpts);
       setTimeout(function () {
-        applyVisuals(state, state.level > 0.35, true, baseOpts);
+        applyVisuals(state, state.level > 0.35, true, visOpts);
       }, REACTION_DELAY_MS);
     } else {
-      applyVisuals(state, undefined, true, baseOpts);
+      applyVisuals(state, undefined, true, visOpts);
       lastLevel = state.level;
     }
   }

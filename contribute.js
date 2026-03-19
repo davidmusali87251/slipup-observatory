@@ -276,26 +276,24 @@ form.addEventListener("submit", async (event) => {
 
   reportObservatoryEvent("contribute_done");
 
-  if (sharedInput.checked) {
-    try {
-      const windowMs = 25 * 60 * 1000 + Math.random() * 10 * 60 * 1000;
-      localStorage.setItem(
-        "slipup_v2_last_moment",
-        JSON.stringify({
-          type: typeInput.value,
-          mood: moodInput.value,
-          note: (noteInput.value || "").replace(/\s+/g, " ").trim().slice(0, 80),
-          timestamp: Date.now(),
-          windowMs,
-        })
-      );
-    } catch (_) {}
-  }
+  try {
+    const windowMs = 25 * 60 * 1000 + Math.random() * 10 * 60 * 1000;
+    localStorage.setItem(
+      "slipup_v2_last_moment",
+      JSON.stringify({
+        type: typeInput.value,
+        mood: moodInput.value,
+        note: (noteInput.value || "").replace(/\s+/g, " ").trim().slice(0, 80),
+        timestamp: Date.now(),
+        windowMs,
+      })
+    );
+  } catch (_) {}
 
   const seedParam = sharedInput.checked ? "&s=" + simpleHash(localMoment.id) : "";
   const redirectDelay = sharedInput.checked ? 2200 : 1400;
   setTimeout(() => {
-    window.location.href = sharedInput.checked ? "./index.html?contributed=1" + seedParam : "./index.html";
+    window.location.href = "./index.html?contributed=1" + seedParam;
   }, redirectDelay);
 });
 

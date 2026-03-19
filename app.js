@@ -9,6 +9,7 @@ import {
   postRelateMoment,
 } from "./remote.js";
 import { getReadingStatusLine, clampHeroReadingLine } from "./uiCopy.js";
+import { getFieldEchoReflection } from "./fieldEchoCopy.js";
 import {
   BASELINE,
   SCALE,
@@ -766,7 +767,7 @@ const UI_COPY = {
     conditionError: "Something went wrong. Refresh the page.",
     conditionOffline: "Reading from this device only.",
     mixLine: (type, mood) => `Mostly ${type}, ${mood}.`,
-    todayInTheField: "Today in the field",
+    todayInTheField: "Today in the world",
     dailyToneMorning: "The field is forming.",
     dailyToneAfternoon: "Signals are arriving.",
     dailyToneNight: "The air is heavy tonight.",
@@ -779,6 +780,7 @@ const UI_COPY = {
     postContributePhase1: ["Your moment entered the field.", "Signal received.", "A new trace in the atmosphere."],
     postContributePhase2: ["It is now part of the reading.", "The field adjusts.", "The atmosphere shifts slightly."],
     postContributeSummaryLine: ["You're in the read.", "Field counts you in."],
+    fieldEchoAriaPrefix: "Field response",
     eyebrowLayer: "Atmosphere",
     eyebrowContext: "Moments",
     heroBridgeLine: "A small place to share human moments.",
@@ -913,7 +915,7 @@ const UI_COPY = {
     conditionError: "Algo ha fallado. Recarga la página.",
     conditionOffline: "Leyendo solo desde este dispositivo.",
     mixLine: (type, mood) => `Sobre todo ${type}, ${mood}.`,
-    todayInTheField: "Hoy en el campo",
+    todayInTheField: "Hoy en el mundo",
     dailyToneMorning: "El campo se está formando.",
     dailyToneAfternoon: "Las señales están llegando.",
     dailyToneNight: "El aire pesa esta noche.",
@@ -926,6 +928,7 @@ const UI_COPY = {
     postContributePhase1: ["Tu momento entró al campo.", "Señal recibida.", "Una nueva huella en la atmósfera."],
     postContributePhase2: ["Ya es parte de la lectura.", "El campo se ajusta.", "La atmósfera se mueve un poco."],
     postContributeSummaryLine: ["Sos parte del campo.", "Campo ya con vos."],
+    fieldEchoAriaPrefix: "Respuesta del campo",
     eyebrowLayer: "Atmósfera",
     eyebrowContext: "Momentos",
     heroBridgeLine: "Un pequeño lugar para compartir momentos humanos.",
@@ -1379,6 +1382,7 @@ const conditionLine = document.getElementById("conditionLine");
 const atmosphericWeatherLine = document.getElementById("atmosphericWeatherLine");
 const atmosphericWeatherCaption = document.getElementById("atmosphericWeatherCaption");
 const climateSummaryLine = document.getElementById("climateSummaryLine");
+const heroFieldEchoLine = document.getElementById("heroFieldEchoLine");
 const climateMetricsLine = document.getElementById("climateMetricsLine");
 const climateInstrument = document.getElementById("climateInstrument");
 const observatoryScopeRange = document.getElementById("observatoryScopeRange");
@@ -3793,6 +3797,64 @@ function clearTransientLine() {
   }, 400);
 }
 
+/** Último momento guardado en contribute (ventana corta) para eco interpretativo en el hero. */
+function getLastContributedMomentSnapshot() {
+  try {
+    const raw = localStorage.getItem(LAST_MOMENT_KEY);
+    if (!raw) return null;
+    const o = JSON.parse(raw);
+    if (!o || typeof o.timestamp !== "number") return null;
+    const windowMs = Number(o.windowMs);
+    const win = Number.isFinite(windowMs) && windowMs > 0 ? windowMs : 25 * 60 * 1000;
+    if (Date.now() - o.timestamp > win) return null;
+    return {
+      type: String(o.type || "observed"),
+      mood: String(o.mood || "calm"),
+      note: String(o.note || "").slice(0, 80),
+    };
+  } catch {
+    return null;
+  }
+}
+
+function hideHeroFieldEcho() {
+  if (!heroFieldEchoLine) return;
+  heroFieldEchoLine.classList.remove("is-visible");
+  window.setTimeout(() => {
+    heroFieldEchoLine.textContent = "";
+    heroFieldEchoLine.classList.add("hidden");
+    heroFieldEchoLine.removeAttribute("aria-label");
+  }, 400);
+}
+
+/**
+ * Muestra una reflexión corta del campo (kind + tone + señal de la nota), con tipografía de cita en CSS.
+ * @param {string} lang
+ * @param {number} seed
+ */
+function showHeroFieldEchoMoment(lang, seed) {
+  const snap = getLastContributedMomentSnapshot();
+  if (!snap || !heroFieldEchoLine) return;
+  const L = lang === "es" ? "es" : "en";
+  const text = getFieldEchoReflection(snap, L, seed);
+  if (!text) return;
+  const ui = UI_COPY[lang] || UI_COPY.en;
+  heroFieldEchoLine.textContent = text;
+  heroFieldEchoLine.setAttribute(
+    "aria-label",
+    `${ui.fieldEchoAriaPrefix || "Field response"}: ${text}`
+  );
+  heroFieldEchoLine.classList.remove("hidden");
+  void heroFieldEchoLine.offsetWidth;
+  heroFieldEchoLine.classList.add("is-visible");
+  if (heroFieldEchoTimeoutId) window.clearTimeout(heroFieldEchoTimeoutId);
+  const hideMs = 15000;
+  heroFieldEchoTimeoutId = window.setTimeout(() => {
+    heroFieldEchoTimeoutId = null;
+    hideHeroFieldEcho();
+  }, hideMs);
+}
+
 /** Micro-experiencia post-contribute: absorción → disolución → retorno. 1.5–3 s, sin modales. */
 function triggerPostContributeSequence(canonicalState, lang) {
   const ui = UI_COPY[lang] || UI_COPY.en;
@@ -3820,6 +3882,7 @@ function triggerPostContributeSequence(canonicalState, lang) {
         climateSummaryLine.textContent = getReadingStatusLine(lang, total, seed, canonicalState?.dominantMix);
       }, 2500);
     }
+    showHeroFieldEchoMoment(lang, seed + 11);
   }, 500 + 1200);
 }
 
@@ -3915,6 +3978,8 @@ let observatoryState = null;
 /** Hero Engine: rotación de las 4 líneas del hero a ritmos distintos (sensación de sistema vivo, invitación a volver). */
 const HERO_ENGINE_MS = { line1: 10000, line2: 15000, line3: 20000, line4: 45000 };
 let heroEngineIntervals = [];
+/** Timeout para ocultar la línea de eco del campo tras contribute. */
+let heroFieldEchoTimeoutId = null;
 
 function clearHeroEngine() {
   heroEngineIntervals.forEach(function (id) { clearInterval(id); });
@@ -4212,6 +4277,35 @@ function initOrbitalLayer() {
   observer.observe(orbitalSection);
 }
 
+/**
+ * Hero: líneas de lectura (resumen + tag + atmReadingLine) con datos ya disponibles en local,
+ * sin esperar red. Tras boot se sobrescriben con clima/momentos remotos cuando lleguen.
+ */
+function paintHeroReadingEarly(localMoments) {
+  try {
+    const shared = getSharedMoments(localMoments);
+    const shared48 = getRecentWindow(shared);
+    const lc = calculateClimate(shared);
+    const earlyTotal = Math.max(Number(lc?.total) || 0, shared48.length);
+    const seed = (earlyTotal * 7 + Math.round(Number(lc?.computedDegree) || BASELINE)) | 0;
+    if (climateSummaryLine) {
+      climateSummaryLine.textContent = getReadingStatusLine(LANG, earlyTotal, seed, "");
+      climateSummaryLine.classList.remove("hidden");
+    }
+    const weather = getAtmosphericWeather(shared48);
+    if (atmosphericWeatherLine && weather?.label) {
+      atmosphericWeatherLine.textContent = clampHeroReadingLine(weather.label);
+      atmosphericWeatherLine.classList.remove("hidden");
+    }
+    try {
+      window.__slipupMomentsCache = shared;
+    } catch (_) {}
+    if (typeof window.atmosphereSignal !== "undefined" && window.atmosphereSignal.update) {
+      window.atmosphereSignal.update(shared, { bypassThrottle: true, immediateLabel: true });
+    }
+  } catch (_) {}
+}
+
 async function boot() {
   applyUICopy();
 
@@ -4241,6 +4335,8 @@ async function boot() {
     document.body.style.setProperty("--atmo", String(BASELINE));
     if (observatoryPanel) observatoryPanel.setAttribute("aria-busy", "true");
   }
+
+  paintHeroReadingEarly(moments);
 
   const [sharedResult, climateTruth, geoIndexResult] = await Promise.all([
     loadSharedMoments(moments),
@@ -4516,7 +4612,9 @@ async function boot() {
     try {
       window.__slipupMomentsCache = sharedMoments;
       /* Tras contribuir: horizonte reacciona en 2–4 s (condensación → señal). */
-      const opts = contributed ? { pulseDelay: 2000 + Math.random() * 2000 } : {};
+      const opts = contributed
+        ? { pulseDelay: 2000 + Math.random() * 2000, bypassThrottle: true }
+        : { bypassThrottle: true };
       window.atmosphereSignal.update(sharedMoments, opts);
     } catch (_) {}
   }
