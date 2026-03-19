@@ -1837,6 +1837,7 @@ html.theme-atmosphere .horizon-pulse-bar::before {
   margin-top: 0.4rem;
 }
 .atmospheric-weather-caption-wrap {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1848,6 +1849,13 @@ html.theme-atmosphere .horizon-pulse-bar::before {
   margin-left: auto;
   margin-right: auto;
   text-align: center;
+  padding: 0.35rem 0.55rem;
+  border-radius: 0.6rem;
+  background: color-mix(in oklab, var(--bg) 82%, transparent);
+  border: 1px solid color-mix(in oklab, var(--line) 32%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--soft) 8%, transparent) inset,
+    0 0 14px color-mix(in oklab, var(--soft) 12%, transparent);
 }
 .atmospheric-weather-caption-wrap .trust-microcopy {
   margin: 0;
@@ -1858,6 +1866,11 @@ html.theme-atmosphere .horizon-pulse-bar::before {
   margin: 0;
   text-align: center;
   max-width: 28ch;
+  color: color-mix(in oklab, var(--text) 92%, var(--soft));
+  opacity: 0.92;
+  text-shadow:
+    0 0 10px rgba(201, 196, 255, 0.15),
+    0 1px 2px rgba(0, 0, 0, 0.4);
 }
 .atmospheric-weather-caption-wrap .instrument-info-btn {
   flex-shrink: 0;
