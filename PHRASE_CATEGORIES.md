@@ -22,7 +22,7 @@ Sin AI para generar respuestas, las frases deben ser **conceptuales pero siempre
 | **Título principal** | `app.js` | `UI_COPY.en.heroIdentityLine` / `UI_COPY.es.heroIdentityLine` | "Where human moments meet" — una sola frase por idioma. |
 | **Eyebrow (capa)** | `app.js` | `UI_COPY.en.eyebrowLayer` / `UI_COPY.es.eyebrowLayer` | "Atmosphere" / "Atmósfera". En HTML está "Atmosphere — Current"; si querés "— Current" en ambos idiomas, unificarlo en estas claves. |
 | **Value prop** | `app.js` | `UI_COPY.en.valueProp` / `UI_COPY.es.valueProp` | "Collective reading from shared moments" — debajo del hero, una frase. |
-| **CTA microcopy** | `index.html` + `app.js` | Texto en `<p class="cta-microcopy">` y opcionalmente en UI_COPY | "Let the atmosphere read this moment." — invitación a contribuir. |
+| **CTA microcopy** | `index.html` + `app.js` | Texto en `<p class="cta-microcopy">` y opcionalmente en UI_COPY | "Let the atmosphere read it." — invitación a contribuir. |
 
 ---
 
