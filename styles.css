@@ -1258,18 +1258,14 @@ html.theme-atmosphere .observatory-hero .hero-bridge-sub.hero-bridge-settled {
 
 .observatory-hero .atmosphere-air .hero-identity-line { order: 1; }
 .observatory-hero .atmosphere-air .observatory-seo-intro { order: 2; }
-.observatory-hero .atmosphere-air .observatory-entry { order: 3; }
-.observatory-hero .atmosphere-air .degree-wrap { order: 4; }
+.observatory-hero .atmosphere-air .hero-weather-panel { order: 4; }
 .observatory-hero .atmosphere-air .daily-tone-line { order: 5; }
-.observatory-hero .atmosphere-air .atm-reading-line { order: 6; }
-.observatory-hero .atmosphere-air .atmospheric-weather-line { order: 7; }
 .observatory-hero .atmosphere-air .atmosphere-orientation { order: 8; }
 
 /* Columna única: todos los elementos centrados en el mismo eje */
 .atmosphere-air .hero-bridge-line,
 .atmosphere-air .hero-bridge-sub,
-.atmosphere-air .observatory-entry,
-.atmosphere-air .degree-wrap,
+.atmosphere-air .hero-weather-panel,
 .atmosphere-air .hero-identity-line,
 .atmosphere-air .observatory-seo-intro {
   width: 100%;
@@ -1286,11 +1282,6 @@ html.theme-atmosphere .observatory-hero .hero-bridge-sub.hero-bridge-settled {
   margin-left: auto;
   margin-right: auto;
 }
-.atmosphere-air .observatory-entry { margin-top: 0; }
-.observatory-hero .atmosphere-air .observatory-entry {
-  margin-top: 0;
-  margin-bottom: 0.2rem;
-}
 .atmosphere-air .atmosphere-orientation { margin-top: 0; margin-bottom: 0; }
 .atmosphere-air .degree-wrap {
   margin-top: var(--atmo-ascend);
@@ -1298,15 +1289,50 @@ html.theme-atmosphere .observatory-hero .hero-bridge-sub.hero-bridge-settled {
   padding: 0.35rem 0;
 }
 
-/* Hero: más aire alrededor del número para que sea el centro del instrumento */
-.observatory-hero .atmosphere-air .degree-wrap {
-  margin-top: 1.25rem;
+/* Hero: panel de lectura tipo “clima” (ubicación → grado → tres líneas) */
+.observatory-hero .atmosphere-air .hero-weather-panel.degree-wrap {
+  margin-top: 1.1rem;
   margin-bottom: 0.5rem;
-  padding: 1.1rem 0;
+  padding: 1rem 1.15rem 1.15rem;
+  max-width: min(100%, 22.5rem);
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  box-sizing: border-box;
+  background: color-mix(in oklab, var(--card) 78%, transparent);
+  border: 1px solid color-mix(in oklab, var(--line) 72%, transparent);
+  box-shadow:
+    0 4px 22px color-mix(in oklab, var(--text) 7%, transparent),
+    inset 0 1px 0 color-mix(in oklab, #fff 45%, transparent);
+  backdrop-filter: blur(12px);
 }
 
-/* Orden de lectura observatorio: patrón → grado → resumen. Sin recuadro ni fondo: solo estructura, no panel visible. */
-.observatory-reading-panel {
+html.theme-atmosphere .observatory-hero .hero-weather-panel.degree-wrap {
+  background: color-mix(in oklab, var(--bg-deep) 58%, rgba(20, 18, 48, 0.92));
+  border-color: color-mix(in oklab, var(--line) 50%, rgba(139, 108, 255, 0.28));
+  box-shadow:
+    0 6px 32px rgba(0, 0, 0, 0.38),
+    0 0 0 1px rgba(139, 108, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.observatory-hero .hero-weather-panel .observatory-entry {
+  margin: 0;
+  width: 100%;
+}
+
+.observatory-hero .hero-weather-panel .layer-title {
+  border-top: none;
+  padding-top: 0;
+  margin-bottom: 0.15rem;
+}
+
+/* Orden de lectura observatorio: patrón → grado → resumen. El hero usa tarjeta (.hero-weather-panel). */
+.observatory-reading-panel:not(.hero-weather-panel) {
   background: none;
   border: none;
   box-shadow: none;
@@ -1315,11 +1341,38 @@ html.theme-atmosphere .observatory-hero .hero-bridge-sub.hero-bridge-settled {
 .observatory-reading-panel .degree-value-row {
   margin: 0.1rem 0;
 }
-.observatory-reading-panel .climate-summary-line {
+.observatory-reading-panel:not(.hero-weather-panel) .climate-summary-line {
   margin-top: 0.5rem;
   margin-bottom: 0;
   font-size: 0.72rem;
   opacity: 0.88;
+}
+
+/* Tres líneas de estado bajo el grado — jerarquía tipo widget meteorológico */
+.observatory-hero .hero-weather-panel .climate-summary-line {
+  margin: 0.15rem 0 0;
+  font-style: normal;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  opacity: 0.92;
+}
+.observatory-hero .hero-weather-panel .climate-summary-line::before,
+.observatory-hero .hero-weather-panel .climate-summary-line::after {
+  content: none;
+}
+.observatory-hero .hero-weather-panel .atm-reading-line {
+  margin: 0.1rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  opacity: 0.88;
+}
+.observatory-hero .hero-weather-panel .atmospheric-weather-line {
+  margin: 0.15rem 0 0;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 1.35;
+  opacity: 0.82;
 }
 
 /* #conditionLine: lectura de estado (quiet | balance | gathering | dense). Ubicado dentro de .degree-wrap para formar un solo bloque "lectura" (valor + escala + frase). */
@@ -1848,15 +1901,17 @@ html.theme-atmosphere .atm-reading-line {
     padding-top: 0.75rem;
   }
   .observatory-hero .layer-title {
-    font-size: 0.82rem;
+    font-size: clamp(0.9rem, 4.1vw, 1.08rem);
+    font-weight: 600;
+    letter-spacing: 0.1em;
   }
-  .observatory-hero .atm-reading-line {
-    font-size: 0.85rem;
-    opacity: 0.7;
+  .observatory-hero .hero-weather-panel .atm-reading-line {
+    font-size: 0.8rem;
+    opacity: 0.88;
   }
-  .observatory-hero .climate-summary-line {
-    font-size: 0.82rem;
-    opacity: 0.85;
+  .observatory-hero .hero-weather-panel .climate-summary-line {
+    font-size: 0.86rem;
+    opacity: 0.93;
   }
 }
 
@@ -1943,8 +1998,8 @@ html.theme-atmosphere .atm-reading-line {
     font-size: 0.75rem;
   }
 
-  .observatory-hero .climate-summary-line {
-    font-size: 0.8rem;
+  .observatory-hero .hero-weather-panel .climate-summary-line {
+    font-size: 0.84rem;
   }
 
   .local-climate-intro {
@@ -1979,16 +2034,18 @@ html.theme-atmosphere .atm-reading-line {
     font-size: 0.8rem;
   }
   .observatory-hero .layer-title {
-    font-size: 0.8rem;
+    font-size: clamp(0.88rem, 4vw, 1.05rem);
+    font-weight: 600;
+    letter-spacing: 0.1em;
   }
   .observatory-hero .hero-identity-line {
     font-size: 0.98rem;
     margin-bottom: 1rem;
   }
-  .observatory-hero .atm-reading-line {
-    font-size: 0.82rem;
+  .observatory-hero .hero-weather-panel .atm-reading-line {
+    font-size: 0.78rem;
   }
-  .observatory-hero .climate-summary-line {
+  .observatory-hero .hero-weather-panel .climate-summary-line {
     font-size: 0.8rem;
   }
 
@@ -2003,8 +2060,9 @@ html.theme-atmosphere .atm-reading-line {
     padding-right: 0.2rem;
   }
 
-  .atmosphere-air .degree-wrap {
-    margin-top: 0.6rem;
+  .atmosphere-air .hero-weather-panel.degree-wrap {
+    margin-top: 0.65rem;
+    padding: 0.85rem 0.95rem 1rem;
   }
 
   .degree-value {
@@ -2430,12 +2488,6 @@ html.theme-atmosphere .atm-reading-line {
   font-style: italic;
 }
 
-/* Hero: línea de lectura más pequeña para que el número sea el centro del instrumento */
-.observatory-hero .climate-summary-line {
-  font-size: 0.72rem;
-  opacity: 0.82;
-}
-
 .observatory-hero .contribute-invite-line {
   font-size: 0.72rem;
   opacity: 0.85;
@@ -2568,26 +2620,18 @@ html.theme-atmosphere .observatory-pulse {
 .observatory-hero .degree-value-row {
   margin: 0.35rem 0 0.85rem;
 }
+.observatory-hero .hero-weather-panel .degree-value-row {
+  margin: 0.05rem 0 0.2rem;
+}
 /* Debajo del eyebrow ATMOSPHERE; poco margen arriba, aire antes de la identidad */
 .observatory-hero .hero-instrument-line {
   margin: 0.15rem 0 0.35rem;
   font-size: 0.85rem;
   line-height: 1.5;
 }
-.observatory-hero .climate-summary-line {
-  font-size: 0.7rem;
-  opacity: 0.65;
-}
-.observatory-hero .atm-reading-line {
-  font-size: 0.7rem;
-  opacity: 0.55;
-}
 .atmosphere-air .atm-reading-line {
   margin: 0.12rem 0 0.05rem;
   text-align: center;
-}
-.observatory-hero .atmosphere-air .atm-reading-line {
-  margin-top: 0.85rem;
 }
 
 /* Hero (tema atmósfera): contraste luminoso en textos — legibles sin perder misterio */
@@ -2616,15 +2660,15 @@ html.theme-atmosphere .observatory-hero .degree-value {
     0 0 80px rgba(92, 61, 255, 0.14),
     0 2px 5px rgba(0, 0, 0, 0.48);
 }
-html.theme-atmosphere .observatory-hero .climate-summary-line {
+html.theme-atmosphere .observatory-hero .hero-weather-panel .climate-summary-line {
   color: color-mix(in oklab, var(--text) 96%, #ffffff);
   opacity: 0.96;
   text-shadow:
     0 0 16px rgba(201, 196, 255, 0.2),
     0 1px 3px rgba(0, 0, 0, 0.45);
 }
-html.theme-atmosphere .observatory-hero .atmosphere-air .atm-reading-line,
-html.theme-atmosphere .observatory-hero .atmosphere-air .atmospheric-weather-line {
+html.theme-atmosphere .observatory-hero .hero-weather-panel .atm-reading-line,
+html.theme-atmosphere .observatory-hero .hero-weather-panel .atmospheric-weather-line {
   color: #f2efff;
   opacity: 0.94;
   text-shadow:
@@ -3015,6 +3059,44 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
 
 .site-legal-strata-link {
   margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* Barra legal fija: en pantallas estrechas no forzar una sola fila (Strata ↓ fuera de pantalla). */
+@media (max-width: 600px) {
+  .page:has(.site-legal) {
+    padding-bottom: calc(var(--page-pad-bottom) + 4.35rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  .page .site-legal {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.35rem;
+    min-height: auto;
+    padding-top: 0.35rem;
+    padding-bottom: max(0.45rem, env(safe-area-inset-bottom, 0px));
+    padding-left: max(0.5rem, env(safe-area-inset-left, 0px));
+    padding-right: max(0.5rem, env(safe-area-inset-right, 0px));
+    max-width: 100vw;
+    box-sizing: border-box;
+  }
+
+  .site-legal-left {
+    justify-content: center;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 100%;
+    row-gap: 0.28rem;
+  }
+
+  .site-legal-strata-link {
+    margin-left: 0;
+    width: 100%;
+    max-width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+  }
 }
 
 /* Capa superior del observatorio: Orbital (scroll up). Régimen visual distinto: alta, fría, instrumentada. */
@@ -3597,6 +3679,60 @@ html.theme-atmosphere .panel-recent::after {
 
 .local-climate-line {
   /* Hereda .layer-title; sin reglas propias para mantener una sola fuente de verdad */
+}
+
+/* Móvil: títulos de capa más grandes — misma escala, peso y familia que Nearby (.layer-title) */
+@media (max-width: 520px) {
+  .layer-title {
+    font-family: var(--font-ui);
+    font-size: clamp(0.9rem, 4.1vw, 1.08rem);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    opacity: 0.94;
+  }
+
+  .orbital-title.layer-title {
+    font-family: var(--font-ui);
+    font-size: clamp(0.9rem, 4.1vw, 1.08rem);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: #6b7d8f;
+    opacity: 0.94;
+  }
+
+  .ground-strata .layer-title {
+    font-size: clamp(0.9rem, 4.1vw, 1.08rem);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+  }
+
+  .ground-strata .strata-seeds-label {
+    font-family: var(--font-ui);
+    font-size: clamp(0.9rem, 4.1vw, 1.08rem);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+  }
+
+  /* Tema oscuro: mismo “acento” que el hero / Nearby (soft + halo), no gris plano */
+  html.theme-atmosphere .panel-orbital .orbital-title.layer-title,
+  html.theme-atmosphere .local-climate .layer-title,
+  html.theme-atmosphere .panel-horizon .layer-title {
+    color: color-mix(in oklab, var(--soft) 72%, var(--text));
+    text-shadow:
+      0 0 16px rgba(201, 196, 255, 0.2),
+      0 1px 2px rgba(0, 0, 0, 0.42);
+    opacity: 0.97;
+    border-top-color: color-mix(in oklab, var(--line) 50%, rgba(139, 108, 255, 0.12));
+  }
+
+  html.theme-atmosphere .ground-strata .layer-title,
+  html.theme-atmosphere .ground-strata .strata-seeds-label {
+    color: color-mix(in oklab, var(--soft) 82%, #ffffff);
+    text-shadow:
+      0 0 14px rgba(201, 196, 255, 0.22),
+      0 1px 2px rgba(0, 0, 0, 0.48);
+    opacity: 0.96;
+  }
 }
 
 /* Eco local del campo: subline que recontextualiza Nearby como capa del observatorio */
@@ -5103,11 +5239,13 @@ body.contribute-ritual .page {
     margin-bottom: 0.9rem;
   }
   .observatory-hero .layer-title {
-    font-size: 0.78rem;
+    font-size: clamp(0.86rem, 3.9vw, 1.02rem);
+    font-weight: 600;
+    letter-spacing: 0.1em;
   }
-  .observatory-hero .atm-reading-line,
-  .observatory-hero .climate-summary-line {
-    font-size: 0.78rem;
+  .observatory-hero .hero-weather-panel .atm-reading-line,
+  .observatory-hero .hero-weather-panel .climate-summary-line {
+    font-size: 0.76rem;
   }
   .observatory-hero .atmosphere-air {
     gap: 0.9rem;
@@ -5172,9 +5310,9 @@ body.contribute-ritual .page {
     padding-right: 0.25rem;
     font-size: 0.85rem;
   }
-  .observatory-hero .climate-summary-line,
-  .observatory-hero .atm-reading-line {
-    font-size: max(0.8rem, 2.5vw);
+  .observatory-hero .hero-weather-panel .climate-summary-line,
+  .observatory-hero .hero-weather-panel .atm-reading-line {
+    font-size: max(0.78rem, 2.4vw);
   }
   .degree-value-row {
     margin: 0.15rem 0 0.5rem;
