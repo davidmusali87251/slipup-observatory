@@ -181,6 +181,23 @@ html.theme-atmosphere body {
     var(--sky-deep) 100%
   );
   color: var(--text);
+  transition: background 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Entrada contribute: acercamiento al mismo campo, no corte de “nueva pantalla”. */
+@keyframes contribute-chamber-settle {
+  from {
+    opacity: 0.94;
+    filter: brightness(0.99);
+  }
+  to {
+    opacity: 1;
+    filter: brightness(1);
+  }
+}
+
+html.theme-atmosphere main.page.contribute-page {
+  animation: contribute-chamber-settle calc(var(--tempo-field) * 1.3) cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 /* Capa fija: niebla violeta radial (atmósfera, no fondo plano). Royal como emanación. Escala con --mist-opacity. */
@@ -247,8 +264,7 @@ html.theme-atmosphere[data-atmosphere-state="observed"] {
   --violet-mist: rgba(168, 156, 255, 0.18);
 }
 
-/* Royal solo en horizonte, señales y hover (intencional, no saturado) */
-html.theme-atmosphere .cta-observatory:hover,
+/* Royal solo en horizonte, señales y hover (intencional, no saturado). CTA principal: sin salto a glow — continuidad, no comando. */
 html.theme-atmosphere .topbar-brand:hover,
 html.theme-atmosphere .topbar-ai:hover {
   color: var(--glow);
@@ -289,25 +305,31 @@ html.theme-atmosphere .cta-observatory {
   background: rgba(139, 108, 255, 0.08);
 }
 html.theme-atmosphere .cta-observatory {
-  opacity: 0.88;
+  opacity: 0.82;
   font-weight: 400;
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.05),
-    0 2px 9px rgba(0, 0, 0, 0.14);
+    0 1px 0 rgba(255, 255, 255, 0.04),
+    0 2px 8px rgba(0, 0, 0, 0.1);
   transition:
-    border-color var(--tempo-field) ease,
-    background-color var(--tempo-field) ease,
-    box-shadow var(--tempo-field) ease,
-    opacity var(--tempo-field) ease;
+    border-color 0.62s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.62s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.68s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.55s ease,
+    opacity 0.55s ease,
+    filter 0.55s ease;
 }
 html.theme-atmosphere .cta-observatory:hover {
-  color: var(--text);
-  border-color: rgba(139, 108, 255, 0.48);
-  background: rgba(139, 108, 255, 0.14);
-  opacity: 0.92;
+  color: color-mix(in oklab, var(--text) 94%, var(--glow));
+  border-color: rgba(139, 108, 255, 0.38);
+  background: rgba(139, 108, 255, 0.1);
+  opacity: 0.88;
   box-shadow:
-    0 0 18px rgba(139, 108, 255, 0.1),
-    0 2px 10px rgba(0, 0, 0, 0.14);
+    0 0 10px rgba(139, 108, 255, 0.06),
+    0 2px 9px rgba(0, 0, 0, 0.11);
+}
+html.theme-atmosphere .cta-observatory:active {
+  opacity: 0.8;
+  transition-duration: 0.35s;
 }
 html.theme-atmosphere .contribute-footer-link {
   color: color-mix(in oklab, var(--text) 92%, var(--soft));
@@ -404,25 +426,57 @@ html.theme-atmosphere .contribute-rise-example-line {
   border-left-color: rgba(139, 108, 255, 0.28);
 }
 
-/* Contribute panel: más contraste sobre fondo oscuro — misma paleta (text/soft/royal), sin blanco puro */
+/* Contribute = cámara interior del mismo campo: continuidad de niebla/horizonte, menos peso “formulario”. */
 html.theme-atmosphere .contribute-page .panel-contribute {
   --contribute-accent: #8a9fd4;
 }
 
 html.theme-atmosphere .contribute-page .panel-contribute::before {
-  opacity: 0.88;
+  opacity: 0.58;
+  inset: -25% -18% -35% -18%;
+  top: -28%;
   background:
     radial-gradient(
-      ellipse 90% 70% at 50% -15%,
-      color-mix(in oklab, var(--contribute-accent) 22%, transparent) 0%,
-      color-mix(in oklab, var(--contribute-accent) 9%, transparent) 38%,
-      transparent 68%
+      ellipse 115% 75% at 50% 42%,
+      rgba(92, 61, 255, 0.07) 0%,
+      rgba(50, 35, 120, 0.04) 28%,
+      transparent 62%
     ),
     radial-gradient(
-      ellipse 100% 80% at 50% 25%,
-      rgba(139, 108, 255, 0.08) 0%,
-      transparent 72%
+      ellipse 95% 65% at 50% 18%,
+      color-mix(in oklab, var(--contribute-accent) 12%, transparent) 0%,
+      color-mix(in oklab, var(--contribute-accent) 5%, transparent) 40%,
+      transparent 70%
     );
+  transition: opacity var(--tempo-field) ease;
+}
+
+html.theme-atmosphere .contribute-page .field select,
+html.theme-atmosphere .contribute-page .field input[type="text"] {
+  background: rgba(11, 12, 26, 0.38);
+  border-color: rgba(139, 108, 255, 0.13);
+  box-shadow:
+    0 2px 14px rgba(0, 0, 0, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.025) inset;
+  transition:
+    border-color var(--tempo-field) cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow var(--tempo-field) cubic-bezier(0.22, 1, 0.36, 1),
+    background-color var(--tempo-field) ease,
+    filter var(--tempo-field) ease;
+}
+html.theme-atmosphere .contribute-page .field select:hover,
+html.theme-atmosphere .contribute-page .field input[type="text"]:hover {
+  border-color: rgba(139, 108, 255, 0.22);
+}
+html.theme-atmosphere .contribute-page .field select:focus,
+html.theme-atmosphere .contribute-page .field input[type="text"]:focus {
+  /* Asentar: superficie más densa, casi sin “anillo de app” */
+  border-color: rgba(139, 108, 255, 0.16);
+  background: rgba(14, 16, 34, 0.52);
+  box-shadow:
+    0 2px 20px rgba(0, 0, 0, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.055) inset;
+  filter: brightness(1.04);
 }
 
 html.theme-atmosphere .contribute-page .topbar h1 {
@@ -459,12 +513,15 @@ html.theme-atmosphere .contribute-page .contribute-rise-from {
 }
 
 html.theme-atmosphere .contribute-page .contribute-rise-tone {
-  background: color-mix(in oklab, var(--bg-deep) 72%, rgba(36, 32, 88, 0.45));
-  border-color: color-mix(in oklab, var(--line) 58%, rgba(139, 108, 255, 0.22));
+  background: color-mix(in oklab, var(--bg-deep) 78%, rgba(36, 32, 88, 0.32));
+  border-color: color-mix(in oklab, var(--line) 52%, rgba(139, 108, 255, 0.14));
   box-shadow:
-    0 2px 18px rgba(0, 0, 0, 0.28),
-    0 0 0 1px rgba(139, 108, 255, 0.1),
-    0 1px 0 rgba(255, 255, 255, 0.07) inset;
+    0 2px 16px rgba(0, 0, 0, 0.18),
+    0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  transition:
+    background var(--tempo-field) ease,
+    border-color var(--tempo-field) ease,
+    box-shadow var(--tempo-field) ease;
 }
 
 html.theme-atmosphere .contribute-page .contribute-rise-tone-intro {
@@ -482,12 +539,15 @@ html.theme-atmosphere .contribute-page .contribute-rise-tone:not(.contribute-ris
   filter: saturate(0.92);
   pointer-events: none;
   transition:
-    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
-    filter 0.5s ease;
+    opacity var(--tempo-field) cubic-bezier(0.22, 1, 0.36, 1),
+    filter var(--tempo-field) ease;
 }
 html.theme-atmosphere .contribute-page .contribute-rise-tone--revealed .contribute-tone-interactive {
   opacity: 1;
   filter: none;
+  transition:
+    opacity var(--tempo-field) cubic-bezier(0.22, 1, 0.36, 1),
+    filter var(--tempo-field) ease;
 }
 html.theme-atmosphere .contribute-page .contribute-kind-state-label {
   color: color-mix(in oklab, var(--soft) 62%, var(--text));
@@ -600,33 +660,51 @@ html.theme-atmosphere .contribute-page .legal-links .text-link:hover {
 }
 
 html.theme-atmosphere .contribute-page #saveButton.cta {
-  color: #f7f8ff;
+  color: color-mix(in oklab, var(--text) 68%, var(--muted));
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, var(--scope-accent, #7f8fb2) 62%, #2a3446) 0%,
-    color-mix(in oklab, var(--scope-accent, #7f8fb2) 48%, #1f2b3a) 100%
+    color-mix(in oklab, var(--bg-deep) 94%, rgba(127, 143, 178, 0.12)) 0%,
+    color-mix(in oklab, var(--bg-deep) 98%, rgba(127, 143, 178, 0.06)) 100%
   );
-  border-color: color-mix(in oklab, var(--scope-accent, #7f8fb2) 70%, #dfe8f5);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  border-color: color-mix(in oklab, var(--line) 55%, rgba(139, 108, 255, 0.09));
+  text-shadow: none;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  filter: brightness(1);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.14) inset,
-    0 0 22px rgba(139, 108, 255, 0.18),
-    0 3px 12px rgba(0, 0, 0, 0.28);
+    0 1px 0 rgba(255, 255, 255, 0.045) inset,
+    0 2px 8px rgba(0, 0, 0, 0.1);
+  transition:
+    background var(--tempo-field) cubic-bezier(0.22, 1, 0.36, 1),
+    border-color var(--tempo-field) ease,
+    box-shadow var(--tempo-field) ease,
+    color var(--tempo-field) ease,
+    filter var(--tempo-field) ease,
+    opacity var(--tempo-field) ease;
 }
 
 html.theme-atmosphere .contribute-page #saveButton.cta:hover {
+  color: color-mix(in oklab, var(--text) 71%, var(--muted));
+  border-color: color-mix(in oklab, var(--line) 52%, rgba(139, 108, 255, 0.1));
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, var(--scope-accent, #7f8fb2) 68%, #2c3750) 0%,
-    color-mix(in oklab, var(--scope-accent, #7f8fb2) 54%, #223045) 100%
+    color-mix(in oklab, var(--bg-deep) 92%, rgba(127, 143, 178, 0.14)) 0%,
+    color-mix(in oklab, var(--bg-deep) 97%, rgba(127, 143, 178, 0.08)) 100%
   );
-  border-color: color-mix(in oklab, var(--scope-accent, #7f8fb2) 78%, #ecf2ff);
-  color: #ffffff;
+  filter: brightness(1.015);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 2px 9px rgba(0, 0, 0, 0.09);
 }
 
 html.theme-atmosphere .contribute-page #saveButton.cta:focus-visible {
-  outline: 2px solid color-mix(in oklab, #edf4ff 74%, var(--scope-accent, #7f8fb2));
-  outline-offset: 2px;
+  outline: 1px solid color-mix(in oklab, var(--line) 70%, rgba(139, 108, 255, 0.2));
+  outline-offset: 3px;
+}
+
+html.theme-atmosphere .contribute-page #saveButton.cta:active {
+  filter: brightness(0.99);
+  transition-duration: calc(var(--tempo-field) * 0.45);
 }
 
 html.theme-atmosphere .contribute-page .contribute-cta-hint {
@@ -649,6 +727,19 @@ html.theme-atmosphere .contribute-page .contribute-back-link {
 html.theme-atmosphere .contribute-page #moodInput,
 html.theme-atmosphere .contribute-page #noteInput {
   color: var(--text);
+}
+
+html.theme-atmosphere .contribute-page .contribute-layer-eyebrow {
+  font-weight: 600;
+  letter-spacing: 0.075em;
+}
+
+html.theme-atmosphere .contribute-page #contributeForm #noteInput {
+  transition:
+    border-color var(--tempo-field) ease,
+    box-shadow var(--tempo-field) cubic-bezier(0.22, 1, 0.36, 1),
+    background-color var(--tempo-field) ease,
+    filter var(--tempo-field) ease;
 }
 
 /* Panel Recent: contraste legible en tema oscuro */
@@ -685,8 +776,8 @@ html.theme-atmosphere #recentMoments.moment-list .moment-item > span.moment-meta
     padding-right: 0.85rem;
   }
   html.theme-atmosphere .cta-observatory {
-    border-color: rgba(139, 108, 255, 0.36);
-    background: rgba(139, 108, 255, 0.09);
+    border-color: rgba(139, 108, 255, 0.3);
+    background: rgba(139, 108, 255, 0.07);
   }
   html.theme-atmosphere .text-link.contribute-footer-link {
     color: var(--text);
@@ -1462,8 +1553,9 @@ html.theme-atmosphere .observatory-hero .hero-bridge-sub.hero-bridge-settled {
   grid-template-columns: minmax(5.25rem, auto) minmax(0, max-content);
   align-items: center;
   justify-content: center;
+  justify-items: center;
   gap: 0.95rem 1.45rem;
-  text-align: start;
+  text-align: center;
   background: none;
   border: none;
   border-radius: 0;
@@ -1483,21 +1575,23 @@ html.theme-atmosphere .observatory-hero .atmosphere-air .hero-reading-split.hero
   align-items: center;
   justify-content: center;
   min-width: 0;
-  padding: 0.2rem 0.35rem 0.35rem 0.15rem;
+  padding: 0.2rem 0.25rem 0.35rem;
+  justify-self: center;
 }
 
 .hero-reading-lines-col {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   gap: 0.32rem;
   min-width: 0;
   max-width: 19ch;
-  padding-left: 1.1rem;
-  margin: 0 auto 0 0;
-  text-align: left;
+  padding: 0 0.45rem 0 1.05rem;
+  margin: 0 auto;
+  text-align: center;
   border-left: 1px solid color-mix(in oklab, var(--line) 38%, transparent);
+  justify-self: center;
 }
 
 html.theme-atmosphere .hero-reading-lines-col {
@@ -1543,7 +1637,7 @@ html.theme-atmosphere .hero-reading-lines-col {
   font-size: 0.82rem;
   line-height: 1.5;
   opacity: 0.92;
-  text-align: left;
+  text-align: center;
   max-width: none;
 }
 .observatory-hero .hero-weather-panel .climate-summary-line::before,
@@ -1555,7 +1649,7 @@ html.theme-atmosphere .hero-reading-lines-col {
   font-size: 0.76rem;
   line-height: 1.48;
   opacity: 0.88;
-  text-align: left;
+  text-align: center;
 }
 .observatory-hero .hero-weather-panel .atmospheric-weather-line {
   margin: 0;
@@ -1564,7 +1658,7 @@ html.theme-atmosphere .hero-reading-lines-col {
   text-transform: uppercase;
   line-height: 1.4;
   opacity: 0.82;
-  text-align: left;
+  text-align: center;
 }
 
 /* Cuarta línea: eco del campo tras contribute — reflexión breve (no cita el texto del usuario). */
@@ -1573,7 +1667,7 @@ html.theme-atmosphere .hero-reading-lines-col {
   padding: 0;
   font-size: 0.7rem;
   line-height: 1.45;
-  text-align: left;
+  text-align: center;
   max-width: 21ch;
   font-style: italic;
   font-family: var(--font-serif);
@@ -1839,10 +1933,8 @@ html.theme-atmosphere .observatory-hero .atmosphere-grounding .hero-bridge-sub--
   transition: box-shadow var(--pulse-duration) cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .observatory-hero .atmosphere-grounding .horizon-pulse-bar {
-  left: 50%;
-  transform: translateX(-50%);
-  margin-left: 0;
-  margin-right: 0;
+  align-self: center;
+  flex-shrink: 0;
 }
 .horizon-pulse-bar::before {
   content: "";
@@ -3060,17 +3152,17 @@ html.theme-atmosphere .observatory-hero .atmosphere-grounding .hero-bridge-sub--
     0 1px 2px rgba(0, 0, 0, 0.48);
 }
 html.theme-atmosphere .observatory-hero .cta-observatory {
-  color: color-mix(in oklab, var(--text) 90%, #ffffff);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.32);
+  color: color-mix(in oklab, var(--text) 92%, var(--soft));
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.26);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.06),
-    0 0 14px rgba(139, 108, 255, 0.1),
-    0 2px 9px rgba(0, 0, 0, 0.16);
+    0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 10px rgba(139, 108, 255, 0.07),
+    0 2px 8px rgba(0, 0, 0, 0.12);
 }
 html.theme-atmosphere .observatory-hero .cta-observatory:hover {
   box-shadow:
-    0 0 20px rgba(139, 108, 255, 0.14),
-    0 2px 10px rgba(0, 0, 0, 0.13);
+    0 0 12px rgba(139, 108, 255, 0.08),
+    0 2px 9px rgba(0, 0, 0, 0.1);
 }
 html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden) {
   color: #e4e0f8;
@@ -3121,24 +3213,24 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
   justify-content: center;
   min-height: 40px;
   padding: 0.5rem 0.95rem;
-  border: 1px solid color-mix(in oklab, var(--text) 16%, transparent);
-  background: color-mix(in oklab, #ffffff 45%, transparent);
-  color: color-mix(in oklab, var(--text) 80%, var(--muted));
+  border: 1px solid color-mix(in oklab, var(--text) 14%, transparent);
+  background: color-mix(in oklab, #ffffff 40%, transparent);
+  color: color-mix(in oklab, var(--text) 76%, var(--muted));
   box-shadow:
-    0 1px 0 color-mix(in oklab, #ffffff 70%, transparent),
-    0 2px 8px color-mix(in oklab, var(--text) 6%, transparent);
+    0 1px 0 color-mix(in oklab, #ffffff 55%, transparent),
+    0 2px 7px color-mix(in oklab, var(--text) 5%, transparent);
   font-family: var(--font-serif);
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  opacity: 0.88;
+  font-weight: 400;
+  letter-spacing: 0.065em;
+  opacity: 0.82;
   position: relative;
   overflow: hidden;
   transition:
-    border-color 160ms ease,
-    background 160ms ease,
-    color 160ms ease,
-    opacity 160ms ease,
-    box-shadow 200ms ease;
+    border-color 0.58s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.58s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.55s ease,
+    opacity 0.55s ease,
+    box-shadow 0.62s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 /* Reflejo / brillo sutil en el borde superior del botón */
@@ -3157,31 +3249,31 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
     transparent 100%
   );
   pointer-events: none;
-  opacity: 0.9;
-  transition: opacity 180ms ease;
+  opacity: 0.75;
+  transition: opacity 0.55s ease;
 }
 
 .cta-observatory:hover {
-  border-color: color-mix(in oklab, var(--text) 24%, transparent);
-  background: color-mix(in oklab, #ffffff 56%, transparent);
-  color: color-mix(in oklab, var(--text) 86%, var(--muted));
-  opacity: 0.94;
+  border-color: color-mix(in oklab, var(--text) 20%, transparent);
+  background: color-mix(in oklab, #ffffff 48%, transparent);
+  color: color-mix(in oklab, var(--text) 82%, var(--muted));
+  opacity: 0.88;
   box-shadow:
-    0 1px 0 color-mix(in oklab, #ffffff 85%, transparent),
-    0 3px 12px color-mix(in oklab, var(--text) 10%, transparent);
+    0 1px 0 color-mix(in oklab, #ffffff 70%, transparent),
+    0 2px 10px color-mix(in oklab, var(--text) 7%, transparent);
 }
 
 .cta-observatory:hover::before {
-  opacity: 1;
+  opacity: 0.88;
 }
 
 .cta-observatory:focus-visible {
-  outline: 2px solid color-mix(in oklab, var(--text) 30%, #ffffff);
+  outline: 2px solid color-mix(in oklab, var(--text) 22%, #ffffff);
   outline-offset: 2px;
 }
 
 .cta-observatory:active {
-  opacity: 0.88;
+  opacity: 0.78;
 }
 
 .cta-microcopy {
@@ -4932,22 +5024,6 @@ html.theme-atmosphere .panel-recent::after {
   padding-top: var(--page-pad-top);
 }
 
-/* Respuesta ritual al enviar momento: microtransición 1–2 s (respuesta del campo, no efecto UI). */
-@keyframes contribute-ritual-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 transparent; }
-  35% { box-shadow: 0 0 2.5rem 0.35rem color-mix(in oklab, var(--layer-air) 18%, transparent); }
-}
-
-body.contribute-ritual .page {
-  animation: contribute-ritual-pulse 1.6s ease-out forwards;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  body.contribute-ritual .page {
-    animation: none;
-  }
-}
-
 .contribute-page .topbar {
   display: flex;
   flex-direction: column;
@@ -5210,6 +5286,17 @@ body.contribute-ritual .page {
   .contribute-rise-tone--revealed .contribute-tone-interactive,
   #contributeForm[data-kind-preview] #noteInput {
     transition: none;
+  }
+  html.theme-atmosphere .contribute-page .field select,
+  html.theme-atmosphere .contribute-page .field input[type="text"],
+  html.theme-atmosphere .contribute-page #contributeForm #noteInput,
+  html.theme-atmosphere .contribute-page #saveButton.cta,
+  html.theme-atmosphere .contribute-page .panel-contribute::before,
+  html.theme-atmosphere .contribute-page .contribute-rise-tone {
+    transition: none;
+  }
+  html.theme-atmosphere main.page.contribute-page {
+    animation: none;
   }
 }
 

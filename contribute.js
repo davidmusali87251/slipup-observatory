@@ -328,9 +328,7 @@ form.addEventListener("submit", async (event) => {
     const remoteResult = await postMomentRemote(makeRemoteMomentPayload());
     if (remoteResult.ok) {
       formStatus.textContent = pickRitual();
-      document.body.classList.add("contribute-ritual");
       try { window.atmosphere?.bump?.(); } catch (_) {}
-      setTimeout(() => document.body.classList.remove("contribute-ritual"), 1600);
     } else if (remoteResult.status === 422) {
       formStatus.textContent = "Saved locally. Shared sync couldn't accept this moment.";
     } else if (remoteResult.status === 429) {
