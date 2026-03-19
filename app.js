@@ -1458,6 +1458,11 @@ function getHeroSelfFadingPhraseMs() {
   return 15000;
 }
 
+/** Tras contribuir: no arrancar Hero Engine hasta pasar fases + destello + inicio del eco (evita pisar #transient-reading-line y climateSummary con atmosphereSignal). */
+function getPostContributeHeroQuietMs() {
+  return getHeroSelfFadingPhraseMs() * 4 + 12000;
+}
+
 /**
  * Variables reales del instrumento y condiciones para observarlas.
  * Pensado para escala: early (pocos), building (cientos), firm (miles/millones).
@@ -3801,8 +3806,14 @@ function animateDegree(from, to, ms) {
 
 function setTransientLine(text) {
   if (!transientReadingLine) return;
+  const wasHidden = transientReadingLine.classList.contains("hidden");
   transientReadingLine.textContent = text;
   transientReadingLine.classList.remove("hidden");
+  /* Salir de display:none y reiniciar transición de opacidad de forma fiable */
+  if (wasHidden) {
+    transientReadingLine.classList.remove("is-visible");
+    void transientReadingLine.offsetWidth;
+  }
   transientReadingLine.classList.add("is-visible");
 }
 
@@ -3857,6 +3868,8 @@ function showHeroFieldEchoMoment(lang) {
 
 /** Micro-experiencia post-contribute: 15 s por frase (getHeroSelfFadingPhraseMs) → destello en summary → eco global en hero. */
 function triggerPostContributeSequence(canonicalState, lang) {
+  dismissObservatoryPulseNow();
+
   const ui = UI_COPY[lang] || UI_COPY.en;
   const p1 = ui.postContributePhase1 || [];
   const p2 = ui.postContributePhase2 || [];
@@ -3875,34 +3888,50 @@ function triggerPostContributeSequence(canonicalState, lang) {
   const phase2Ms = phraseMs;
   const summaryFlashMs = phraseMs;
 
+  if (postContributePhaseTimeoutIds.length) {
+    postContributePhaseTimeoutIds.forEach((id) => window.clearTimeout(id));
+    postContributePhaseTimeoutIds.length = 0;
+  }
+
   setTransientLine(phase1Text);
 
-  window.setTimeout(() => {
-    setTransientLine(phase2Text);
-  }, phase1Ms);
-
-  window.setTimeout(() => {
-    clearTransientLine();
-    const fixedSummary =
-      typeof ui.postContributeSummaryFlashLine === "string" && ui.postContributeSummaryFlashLine.trim();
-    if (climateSummaryLine) {
-      if (fixedSummary) {
-        climateSummaryLine.textContent = clampHeroReadingLine(fixedSummary);
-        climateSummaryLine.classList.remove("hidden");
-        window.setTimeout(() => {
-          climateSummaryLine.textContent = getReadingStatusLine(lang, total, seed, canonicalState?.dominantMix);
-        }, summaryFlashMs);
-      } else if (summaryLines.length > 0) {
-        const summaryText = summaryLines[Math.abs(seed + 2) % summaryLines.length];
-        climateSummaryLine.textContent = clampHeroReadingLine(summaryText);
-        climateSummaryLine.classList.remove("hidden");
-        window.setTimeout(() => {
-          climateSummaryLine.textContent = getReadingStatusLine(lang, total, seed, canonicalState?.dominantMix);
-        }, summaryFlashMs);
+  postContributePhaseTimeoutIds.push(
+    window.setTimeout(() => {
+      /* Nueva transición suave al cambiar de fase */
+      if (transientReadingLine) {
+        transientReadingLine.classList.remove("is-visible");
+        void transientReadingLine.offsetWidth;
+        transientReadingLine.textContent = phase2Text;
+        transientReadingLine.classList.add("is-visible");
       }
-    }
-    showHeroFieldEchoMoment(lang);
-  }, phase1Ms + phase2Ms);
+    }, phase1Ms)
+  );
+
+  postContributePhaseTimeoutIds.push(
+    window.setTimeout(() => {
+      clearTransientLine();
+      postContributePhaseTimeoutIds.length = 0;
+      const fixedSummary =
+        typeof ui.postContributeSummaryFlashLine === "string" && ui.postContributeSummaryFlashLine.trim();
+      if (climateSummaryLine) {
+        if (fixedSummary) {
+          climateSummaryLine.textContent = clampHeroReadingLine(fixedSummary);
+          climateSummaryLine.classList.remove("hidden");
+          window.setTimeout(() => {
+            climateSummaryLine.textContent = getReadingStatusLine(lang, total, seed, canonicalState?.dominantMix);
+          }, summaryFlashMs);
+        } else if (summaryLines.length > 0) {
+          const summaryText = summaryLines[Math.abs(seed + 2) % summaryLines.length];
+          climateSummaryLine.textContent = clampHeroReadingLine(summaryText);
+          climateSummaryLine.classList.remove("hidden");
+          window.setTimeout(() => {
+            climateSummaryLine.textContent = getReadingStatusLine(lang, total, seed, canonicalState?.dominantMix);
+          }, summaryFlashMs);
+        }
+      }
+      showHeroFieldEchoMoment(lang);
+    }, phase1Ms + phase2Ms)
+  );
 }
 
 function showTransientReading(total = 0, seed = 0, lang = "en", contributed = false) {
@@ -3912,9 +3941,34 @@ function showTransientReading(total = 0, seed = 0, lang = "en", contributed = fa
   window.setTimeout(() => clearTransientLine(), getHeroSelfFadingPhraseMs());
 }
 
+function dismissObservatoryPulseNow() {
+  if (observatoryPulseHideTimeoutId) {
+    window.clearTimeout(observatoryPulseHideTimeoutId);
+    observatoryPulseHideTimeoutId = null;
+  }
+  if (observatoryPulseCleanupTimeoutId) {
+    window.clearTimeout(observatoryPulseCleanupTimeoutId);
+    observatoryPulseCleanupTimeoutId = null;
+  }
+  if (lastPulseScheduleTimeoutId) {
+    window.clearTimeout(lastPulseScheduleTimeoutId);
+    lastPulseScheduleTimeoutId = null;
+  }
+  if (observatoryPulseWrap) {
+    observatoryPulseWrap.classList.remove("is-visible");
+    observatoryPulseWrap.classList.add("hidden");
+  }
+  if (observatoryPulseMessage) observatoryPulseMessage.textContent = "";
+}
+
 /** Observatory pulse: algo cambió en el campo; misma ventana de lectura que otras frases que se van solas. */
 function showObservatoryPulse(message, isLastPulse = false) {
   if (!observatoryPulseWrap || !observatoryPulseMessage) return;
+  if (observatoryPulseHideTimeoutId) window.clearTimeout(observatoryPulseHideTimeoutId);
+  if (observatoryPulseCleanupTimeoutId) window.clearTimeout(observatoryPulseCleanupTimeoutId);
+  observatoryPulseHideTimeoutId = null;
+  observatoryPulseCleanupTimeoutId = null;
+
   const ui = UI_COPY[LANG] || UI_COPY.en;
   const label = isLastPulse && ui.lastPulseLabel ? ui.lastPulseLabel : (ui.observatoryPulseLabel || "Observatory pulse");
   const labelEl = document.getElementById("observatoryPulseLabel");
@@ -3923,9 +3977,11 @@ function showObservatoryPulse(message, isLastPulse = false) {
   observatoryPulseWrap.classList.remove("hidden");
   observatoryPulseWrap.classList.add("is-visible");
 
-  window.setTimeout(() => {
+  observatoryPulseHideTimeoutId = window.setTimeout(() => {
+    observatoryPulseHideTimeoutId = null;
     observatoryPulseWrap.classList.remove("is-visible");
-    window.setTimeout(() => {
+    observatoryPulseCleanupTimeoutId = window.setTimeout(() => {
+      observatoryPulseCleanupTimeoutId = null;
       observatoryPulseWrap.classList.add("hidden");
       observatoryPulseMessage.textContent = "";
     }, 500);
@@ -3999,6 +4055,11 @@ const HERO_ENGINE_MS = { line1: 20000, line2: 32000, line3: 42000, line4: 78000 
 let heroEngineIntervals = [];
 /** Timeout para ocultar la línea de eco del campo tras contribute. */
 let heroFieldEchoTimeoutId = null;
+/** IDs de la secuencia post-contribute (evitar solapamientos si se reprograma). */
+const postContributePhaseTimeoutIds = [];
+let observatoryPulseHideTimeoutId = null;
+let observatoryPulseCleanupTimeoutId = null;
+let lastPulseScheduleTimeoutId = null;
 
 function clearHeroEngine() {
   heroEngineIntervals.forEach(function (id) { clearInterval(id); });
@@ -4480,7 +4541,7 @@ async function boot() {
   setStoredComputedDegree(computedDegree);
   setStoredDisplayDegree(computedDegree);
 
-  // Observatory pulse: mostrar señal breve si el campo cambió respecto a la última visita.
+  // Observatory pulse: no competir con la secuencia post-contribute (#transient-reading-line + eco).
   const total = Number(canonicalState?.total) || 0;
   const condition = canonicalState?.condition || "";
   const currentPulseState = { total, degree: computedDegree, condition };
@@ -4490,33 +4551,36 @@ async function boot() {
     (prevPulseState.total !== total ||
       (Number.isFinite(prevPulseState.degree) && Math.abs(prevPulseState.degree - computedDegree) > 0.5) ||
       prevPulseState.condition !== condition);
-  let showedPulseThisSession = false;
-  const pulseRarityRoll = stateChanged && Math.random() < PULSE_RARITY;
-  if (pulseRarityRoll && observatoryPulseWrap && observatoryPulseMessage) {
-    const ui = UI_COPY[LANG] || UI_COPY.en;
-    let phrases = ui.pulsePhrases || [];
-    if (isRarePulseDay() && (ui.rarePulsePhrases || []).length > 0) {
-      phrases = ui.rarePulsePhrases;
-    } else if (isNightPulseWindow() && (ui.nightPulsePhrases || []).length > 0) {
-      phrases = ui.nightPulsePhrases;
-    }
-    if (phrases.length > 0) {
-      const seed = (total + Math.round(computedDegree) + (condition.length || 0)) | 0;
-      const msg = phrases[Math.abs(seed) % phrases.length];
-      showObservatoryPulse(msg, false);
-      setLastPulse({ text: msg, date: new Date().toISOString().slice(0, 10) });
-      showedPulseThisSession = true;
-    }
-  }
   setPulseState(currentPulseState);
-  if (!showedPulseThisSession) {
-    window.setTimeout(() => {
-      const last = getLastPulse();
-      const today = new Date().toISOString().slice(0, 10);
-      if (last && last.date === today && last.text && observatoryPulseWrap) {
-        showObservatoryPulse(last.text, true);
+  if (!contributed) {
+    let showedPulseThisSession = false;
+    const pulseRarityRoll = stateChanged && Math.random() < PULSE_RARITY;
+    if (pulseRarityRoll && observatoryPulseWrap && observatoryPulseMessage) {
+      const ui = UI_COPY[LANG] || UI_COPY.en;
+      let phrases = ui.pulsePhrases || [];
+      if (isRarePulseDay() && (ui.rarePulsePhrases || []).length > 0) {
+        phrases = ui.rarePulsePhrases;
+      } else if (isNightPulseWindow() && (ui.nightPulsePhrases || []).length > 0) {
+        phrases = ui.nightPulsePhrases;
       }
-    }, 3200);
+      if (phrases.length > 0) {
+        const seed = (total + Math.round(computedDegree) + (condition.length || 0)) | 0;
+        const msg = phrases[Math.abs(seed) % phrases.length];
+        showObservatoryPulse(msg, false);
+        setLastPulse({ text: msg, date: new Date().toISOString().slice(0, 10) });
+        showedPulseThisSession = true;
+      }
+    }
+    if (!showedPulseThisSession) {
+      lastPulseScheduleTimeoutId = window.setTimeout(() => {
+        lastPulseScheduleTimeoutId = null;
+        const last = getLastPulse();
+        const today = new Date().toISOString().slice(0, 10);
+        if (last && last.date === today && last.text && observatoryPulseWrap) {
+          showObservatoryPulse(last.text, true);
+        }
+      }, 3200);
+    }
   }
 
   if (conditionLine) {
@@ -4667,7 +4731,11 @@ async function boot() {
     observatoryPipeline,
     fieldLensModel,
   };
-  startHeroEngine();
+  if (contributed && !prefersReducedMotion) {
+    window.setTimeout(() => startHeroEngine(), getPostContributeHeroQuietMs());
+  } else {
+    startHeroEngine();
+  }
   initHeroOnboarding();
 
   const level = (canonicalState?.computedDegree ?? 0) / 100;
