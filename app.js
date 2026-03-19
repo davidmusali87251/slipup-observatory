@@ -9,7 +9,6 @@ import {
   postRelateMoment,
 } from "./remote.js";
 import { getReadingStatusLine, clampHeroReadingLine } from "./uiCopy.js";
-import { getFieldEchoReflection } from "./fieldEchoCopy.js";
 import {
   BASELINE,
   SCALE,
@@ -780,6 +779,13 @@ const UI_COPY = {
     postContributePhase1: ["Your moment entered the field.", "Signal received.", "A new trace in the atmosphere."],
     postContributePhase2: ["It is now part of the reading.", "The field adjusts.", "The atmosphere shifts slightly."],
     postContributeSummaryLine: ["You're in the read.", "Field counts you in."],
+    /** Una frase fija para todos los usuarios tras contribuir (micro-fase 1 del bloque bajo el grado). */
+    postContributePhase1Line: "Your moment entered the field.",
+    postContributePhase2Line: "It is now part of the reading.",
+    /** Destello breve en climateSummaryLine antes de volver a la lectura habitual. */
+    postContributeSummaryFlashLine: "You're in the read.",
+    /** Misma línea para todos (eco del campo en el hero; lectura acotada ≤19). */
+    postContributeGlobalEchoLine: "A trace holds here.",
     fieldEchoAriaPrefix: "Field response",
     eyebrowLayer: "Atmosphere",
     eyebrowContext: "Moments",
@@ -928,6 +934,10 @@ const UI_COPY = {
     postContributePhase1: ["Tu momento entró al campo.", "Señal recibida.", "Una nueva huella en la atmósfera."],
     postContributePhase2: ["Ya es parte de la lectura.", "El campo se ajusta.", "La atmósfera se mueve un poco."],
     postContributeSummaryLine: ["Sos parte del campo.", "Campo ya con vos."],
+    postContributePhase1Line: "Tu momento entró al campo.",
+    postContributePhase2Line: "Ya es parte de la lectura.",
+    postContributeSummaryFlashLine: "Sos parte del campo.",
+    postContributeGlobalEchoLine: "La traza queda acá.",
     fieldEchoAriaPrefix: "Respuesta del campo",
     eyebrowLayer: "Atmósfera",
     eyebrowContext: "Momentos",
@@ -3797,26 +3807,6 @@ function clearTransientLine() {
   }, 400);
 }
 
-/** Último momento guardado en contribute (ventana corta) para eco interpretativo en el hero. */
-function getLastContributedMomentSnapshot() {
-  try {
-    const raw = localStorage.getItem(LAST_MOMENT_KEY);
-    if (!raw) return null;
-    const o = JSON.parse(raw);
-    if (!o || typeof o.timestamp !== "number") return null;
-    const windowMs = Number(o.windowMs);
-    const win = Number.isFinite(windowMs) && windowMs > 0 ? windowMs : 25 * 60 * 1000;
-    if (Date.now() - o.timestamp > win) return null;
-    return {
-      type: String(o.type || "observed"),
-      mood: String(o.mood || "calm"),
-      note: String(o.note || "").slice(0, 80),
-    };
-  } catch {
-    return null;
-  }
-}
-
 function hideHeroFieldEcho() {
   if (!heroFieldEchoLine) return;
   heroFieldEchoLine.classList.remove("is-visible");
@@ -3828,17 +3818,19 @@ function hideHeroFieldEcho() {
 }
 
 /**
- * Muestra una reflexión corta del campo (kind + tone + señal de la nota), con tipografía de cita en CSS.
+ * Eco del campo en el hero tras contribuir: **misma frase para todos** (copy en UI_COPY.postContributeGlobalEchoLine).
+ * Tiempo largo para lectura tranquila; respeta prefers-reduced-motion.
  * @param {string} lang
- * @param {number} seed
  */
-function showHeroFieldEchoMoment(lang, seed) {
-  const snap = getLastContributedMomentSnapshot();
-  if (!snap || !heroFieldEchoLine) return;
+function showHeroFieldEchoMoment(lang) {
+  if (!heroFieldEchoLine) return;
   const L = lang === "es" ? "es" : "en";
-  const text = getFieldEchoReflection(snap, L, seed);
+  const ui = UI_COPY[L] || UI_COPY.en;
+  const raw =
+    (typeof ui.postContributeGlobalEchoLine === "string" && ui.postContributeGlobalEchoLine.trim()) ||
+    (L === "es" ? "La traza queda acá." : "A trace holds here.");
+  const text = clampHeroReadingLine(raw);
   if (!text) return;
-  const ui = UI_COPY[lang] || UI_COPY.en;
   heroFieldEchoLine.textContent = text;
   heroFieldEchoLine.setAttribute(
     "aria-label",
@@ -3848,14 +3840,14 @@ function showHeroFieldEchoMoment(lang, seed) {
   void heroFieldEchoLine.offsetWidth;
   heroFieldEchoLine.classList.add("is-visible");
   if (heroFieldEchoTimeoutId) window.clearTimeout(heroFieldEchoTimeoutId);
-  const hideMs = 15000;
+  const hideMs = prefersReducedMotion ? 16000 : 28000;
   heroFieldEchoTimeoutId = window.setTimeout(() => {
     heroFieldEchoTimeoutId = null;
     hideHeroFieldEcho();
   }, hideMs);
 }
 
-/** Micro-experiencia post-contribute: absorción → disolución → retorno. 1.5–3 s, sin modales. */
+/** Micro-experiencia post-contribute: fases lentas para leer → destello en summary → eco global en hero. */
 function triggerPostContributeSequence(canonicalState, lang) {
   const ui = UI_COPY[lang] || UI_COPY.en;
   const p1 = ui.postContributePhase1 || [];
@@ -3863,27 +3855,45 @@ function triggerPostContributeSequence(canonicalState, lang) {
   const summaryLines = ui.postContributeSummaryLine || [];
   const total = Number(canonicalState?.total) ?? 0;
   const seed = (total * 7 + Math.round(Number(canonicalState?.computedDegree) || 0)) | 0;
-  const phase1Text = p1.length ? p1[Math.abs(seed) % p1.length] : ui.yourSignalEntered;
-  const phase2Text = p2.length ? p2[Math.abs(seed + 1) % p2.length] : "The atmosphere shifts slightly.";
+  const phase1Text =
+    (typeof ui.postContributePhase1Line === "string" && ui.postContributePhase1Line.trim()) ||
+    (p1.length ? p1[Math.abs(seed) % p1.length] : ui.yourSignalEntered);
+  const phase2Text =
+    (typeof ui.postContributePhase2Line === "string" && ui.postContributePhase2Line.trim()) ||
+    (p2.length ? p2[Math.abs(seed + 1) % p2.length] : "The atmosphere shifts slightly.");
+
+  const phase1Ms = prefersReducedMotion ? 3800 : 7000;
+  const phase2Ms = prefersReducedMotion ? 3800 : 7000;
+  const summaryFlashMs = prefersReducedMotion ? 4500 : 9500;
 
   setTransientLine(phase1Text);
 
   window.setTimeout(() => {
     setTransientLine(phase2Text);
-  }, 500);
+  }, phase1Ms);
 
   window.setTimeout(() => {
     clearTransientLine();
-    if (summaryLines.length > 0 && climateSummaryLine) {
-      const summaryText = summaryLines[Math.abs(seed + 2) % summaryLines.length];
-      climateSummaryLine.textContent = clampHeroReadingLine(summaryText);
-      climateSummaryLine.classList.remove("hidden");
-      window.setTimeout(() => {
-        climateSummaryLine.textContent = getReadingStatusLine(lang, total, seed, canonicalState?.dominantMix);
-      }, 2500);
+    const fixedSummary =
+      typeof ui.postContributeSummaryFlashLine === "string" && ui.postContributeSummaryFlashLine.trim();
+    if (climateSummaryLine) {
+      if (fixedSummary) {
+        climateSummaryLine.textContent = clampHeroReadingLine(fixedSummary);
+        climateSummaryLine.classList.remove("hidden");
+        window.setTimeout(() => {
+          climateSummaryLine.textContent = getReadingStatusLine(lang, total, seed, canonicalState?.dominantMix);
+        }, summaryFlashMs);
+      } else if (summaryLines.length > 0) {
+        const summaryText = summaryLines[Math.abs(seed + 2) % summaryLines.length];
+        climateSummaryLine.textContent = clampHeroReadingLine(summaryText);
+        climateSummaryLine.classList.remove("hidden");
+        window.setTimeout(() => {
+          climateSummaryLine.textContent = getReadingStatusLine(lang, total, seed, canonicalState?.dominantMix);
+        }, summaryFlashMs);
+      }
     }
-    showHeroFieldEchoMoment(lang, seed + 11);
-  }, 500 + 1200);
+    showHeroFieldEchoMoment(lang);
+  }, phase1Ms + phase2Ms);
 }
 
 function showTransientReading(total = 0, seed = 0, lang = "en", contributed = false) {
