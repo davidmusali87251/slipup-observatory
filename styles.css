@@ -1304,7 +1304,7 @@ html.theme-atmosphere .observatory-hero .hero-bridge-sub.hero-bridge-settled {
   margin-right: auto;
   margin-top: 0.35rem;
   margin-bottom: 0.35rem;
-  gap: 1.55rem;
+  gap: 1.95rem;
   box-sizing: border-box;
 }
 
@@ -1841,12 +1841,16 @@ html.theme-atmosphere .horizon-pulse-bar::before {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
+  gap: 0.12rem;
   margin-top: 0.35rem;
   width: 100%;
   max-width: 34ch;
   margin-left: auto;
   margin-right: auto;
+  text-align: center;
+}
+.atmospheric-weather-caption-wrap .trust-microcopy {
+  margin: 0;
   text-align: center;
 }
 .atmospheric-weather-caption-wrap .atmospheric-weather-caption {
@@ -3275,21 +3279,26 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
 /* Barra legal fija: en pantallas estrechas no forzar una sola fila (Strata ↓ fuera de pantalla). */
 @media (max-width: 600px) {
   .page:has(.site-legal) {
-    padding-bottom: calc(var(--page-pad-bottom) + 4.35rem + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(var(--page-pad-bottom) + env(safe-area-inset-bottom, 0px));
   }
 
   .page .site-legal {
+    position: static;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 0.35rem;
     min-height: auto;
-    padding-top: 0.35rem;
+    margin-top: 1rem;
+    padding-top: 0.4rem;
     padding-bottom: max(0.45rem, env(safe-area-inset-bottom, 0px));
     padding-left: max(0.5rem, env(safe-area-inset-left, 0px));
     padding-right: max(0.5rem, env(safe-area-inset-right, 0px));
     max-width: 100vw;
     box-sizing: border-box;
+    background: transparent;
+    border-top: 1px solid color-mix(in oklab, var(--line) 30%, transparent);
+    box-shadow: none;
   }
 
   .site-legal-left {
@@ -3302,10 +3311,26 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
 
   .site-legal-strata-link {
     margin-left: 0;
-    width: 100%;
-    max-width: 100%;
+    width: auto;
+    max-width: none;
+    display: inline-block;
+    margin-top: 0.1rem;
     text-align: center;
     box-sizing: border-box;
+    font-family: var(--font-observatory);
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+    color: color-mix(in oklab, var(--text) 88%, var(--soft));
+    text-decoration: none;
+    transition: color 0.2s ease;
+    text-shadow:
+      0 0 14px rgba(139, 108, 255, 0.14),
+      0 1px 2px rgba(0, 0, 0, 0.45);
+  }
+  .site-legal-strata-link:hover {
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 }
 
