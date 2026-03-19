@@ -57,7 +57,7 @@ Para consolidar SEO y evitar dividir backlinks, conviene que **solo** `www.slipu
 
 - This baseline intentionally avoids V1 carryover.
 - No ranking, gamification, alerts, or moral language.
-- **Backlog / mejoras:** ver [BACKLOG.md](BACKLOG.md) para mejoras identificadas (modularización, tests, reversión Remove, BUILD_ID, etc.).
+- **Backlog / mejoras:** si trabajás en local, podés mantener un `BACKLOG.md` en la raíz (está en `.gitignore`; no va al repo público). Ahí conviene anotar mejoras identificadas (modularización, tests, reversión Remove, BUILD_ID, etc.).
 
 ## Edge Setup (Supabase)
 
