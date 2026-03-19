@@ -44,7 +44,7 @@ jobs:
           set -e
           mkdir -p _site
           cp index.html contribute.html terms.html privacy.html ai.html _site/
-          cp app.js contribute.js remote.js modelConstants.js uiCopy.js styles.css _site/
+          cp app.js contribute.js remote.js modelConstants.js uiCopy.js fieldEchoCopy.js styles.css _site/
           cp atmosphere.js atmosphere-signal.js atmosphere-analytics-snippet.js atm-tune-panel.js _site/
           cp favicon.svg CNAME _site/ 2>/dev/null || true
           cp sitemap.xml _site/ 2>/dev/null || true

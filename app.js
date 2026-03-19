@@ -4009,7 +4009,7 @@ function startHeroEngine() {
   }, HERO_ENGINE_MS.line3));
   heroEngineIntervals.push(setInterval(function () {
     const total = Number(s.canonicalState && s.canonicalState.total) || 0;
-    if (total > 0 && climateSummaryLine) {
+    if (climateSummaryLine) {
       const seed = (total * 7 + Math.round(Number(s.canonicalState && s.canonicalState.computedDegree) || 0) + Math.floor(Date.now() / 1000)) | 0;
       climateSummaryLine.textContent = getReadingStatusLine(LANG, total, seed, s.canonicalState && s.canonicalState.dominantMix);
       climateSummaryLine.classList.remove("hidden");
@@ -4577,13 +4577,8 @@ async function boot() {
       seedNudge = bias + Math.floor(4 * resonance.intensity);
     }
     const seed = (total * 7 + Math.round(degree) + seedNudge) | 0;
-    if (total > 0) {
-      climateSummaryLine.textContent = getReadingStatusLine(LANG, total, seed, canonicalState?.dominantMix);
-      climateSummaryLine.classList.remove("hidden");
-    } else {
-      climateSummaryLine.textContent = "";
-      climateSummaryLine.classList.add("hidden");
-    }
+    climateSummaryLine.textContent = getReadingStatusLine(LANG, total, seed, canonicalState?.dominantMix);
+    climateSummaryLine.classList.remove("hidden");
   }
 
   const shared48h = getRecentWindow(sharedMoments || []);
