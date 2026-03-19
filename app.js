@@ -4374,8 +4374,66 @@ function paintHeroReadingEarly(localMoments) {
   } catch (_) {}
 }
 
+/**
+ * Cruce perceptual del campo (index): presencia → data-field-entry=present;
+ * clic en el panel fuera de controles continúa a contribute (sin cursor “landing page”).
+ */
+function initFieldEntryShift() {
+  if (typeof window === "undefined") return;
+  const hero = document.getElementById("observatory-hero");
+  const panel = document.getElementById("observatory");
+  if (!hero || !panel) return;
+
+  if (!hero.dataset.fieldEntry) hero.dataset.fieldEntry = "latent";
+
+  const ENGAGE_MS = 720;
+  let dwellTimer = null;
+
+  function engagePresence() {
+    if (hero.dataset.fieldEntry === "present") return;
+    hero.dataset.fieldEntry = "present";
+  }
+
+  function scheduleDwell() {
+    window.clearTimeout(dwellTimer);
+    dwellTimer = window.setTimeout(engagePresence, ENGAGE_MS);
+  }
+
+  function cancelDwell() {
+    window.clearTimeout(dwellTimer);
+    dwellTimer = null;
+  }
+
+  hero.addEventListener("pointerenter", scheduleDwell, { passive: true });
+  hero.addEventListener("pointerleave", cancelDwell, { passive: true });
+
+  const onScrollEngage = () => {
+    if (window.scrollY > 6) {
+      engagePresence();
+      window.removeEventListener("scroll", onScrollEngage);
+    }
+  };
+  window.addEventListener("scroll", onScrollEngage, { passive: true });
+
+  hero.addEventListener("touchstart", engagePresence, { passive: true });
+
+  const interactiveSel =
+    "a[href], button, input, select, textarea, [role='button'], label, .instrument-info-btn, .instrument-info-popover";
+
+  panel.addEventListener("click", (e) => {
+    const t = e.target;
+    if (!(t instanceof Element)) return;
+    if (t.closest(interactiveSel)) return;
+    if (e.defaultPrevented) return;
+    if (typeof e.button === "number" && e.button !== 0) return;
+    engagePresence();
+    window.location.href = "./contribute.html";
+  });
+}
+
 async function boot() {
   applyUICopy();
+  initFieldEntryShift();
 
   const hash = (window.location.hash || "").trim();
   const hero = document.getElementById("observatory-hero");
