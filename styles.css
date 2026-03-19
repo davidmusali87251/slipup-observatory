@@ -1127,6 +1127,12 @@ h2 {
   margin-left: auto;
   margin-right: auto;
 }
+
+/* Hero: un poco más de ancho para centrar grado + columna 19ch. */
+.observatory-hero .atmosphere-air {
+  max-width: min(40ch, 100%);
+}
+
 /* Dual-layer hero: capa puente humana (entrada) antes del sistema simbólico. */
 .hero-bridge-line {
   order: 0;
@@ -1296,12 +1302,12 @@ html.theme-atmosphere .observatory-hero .hero-bridge-sub.hero-bridge-settled {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: min(100%, 28rem);
+  max-width: min(100%, 32rem);
   margin-left: auto;
   margin-right: auto;
   margin-top: 0.35rem;
   margin-bottom: 0.35rem;
-  gap: 1.35rem;
+  gap: 1.55rem;
   box-sizing: border-box;
 }
 
@@ -1325,14 +1331,16 @@ html.theme-atmosphere .observatory-hero .hero-bridge-sub.hero-bridge-settled {
   margin-bottom: 0;
   margin-left: auto;
   margin-right: auto;
-  padding: 0.15rem 0 0.35rem;
+  padding: 0.35rem 0.5rem 0.45rem;
   max-width: 100%;
-  width: 100%;
+  width: fit-content;
+  min-width: min(100%, 17.5rem);
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  grid-template-columns: minmax(5.25rem, auto) minmax(0, max-content);
   align-items: center;
-  gap: 0.85rem 1.15rem;
+  justify-content: center;
+  gap: 0.95rem 1.45rem;
   text-align: start;
   background: none;
   border: none;
@@ -1350,20 +1358,22 @@ html.theme-atmosphere .observatory-hero .atmosphere-air .hero-reading-split.hero
 .hero-reading-degree-col {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   min-width: 0;
+  padding: 0.2rem 0.35rem 0.35rem 0.15rem;
 }
 
 .hero-reading-lines-col {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  align-items: flex-start;
   justify-content: center;
-  gap: 0.35rem;
+  gap: 0.32rem;
   min-width: 0;
-  padding-left: 1rem;
-  margin: 0;
+  max-width: 19ch;
+  padding-left: 1.1rem;
+  margin: 0 auto 0 0;
   text-align: left;
   border-left: 1px solid color-mix(in oklab, var(--line) 38%, transparent);
 }
@@ -1374,15 +1384,16 @@ html.theme-atmosphere .hero-reading-lines-col {
 
 /* Grado hero en split: grande a la izquierda, sin explosión de tamaño en narrow viewports */
 .observatory-hero .hero-reading-split .degree-value {
-  font-size: clamp(3rem, 10vw, 5.35rem);
-  line-height: 0.95;
-  text-align: left;
-  padding-right: 0.12em;
+  font-size: clamp(3.2rem, 11.5vw, 6rem);
+  line-height: 0.92;
+  text-align: center;
+  padding-right: 0.08em;
+  padding-left: 0.04em;
 }
 
 .observatory-hero .hero-reading-split .degree-value-row {
   margin: 0;
-  justify-content: flex-start;
+  justify-content: center;
   width: 100%;
 }
 
@@ -1463,7 +1474,7 @@ html.theme-atmosphere .hero-reading-lines-col {
     align-items: center;
     text-align: center;
     width: 100%;
-    max-width: 28ch;
+    max-width: 19ch;
   }
 
   html.theme-atmosphere .hero-reading-lines-col {

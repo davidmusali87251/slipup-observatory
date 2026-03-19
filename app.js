@@ -8,7 +8,7 @@ import {
   isRemoteReady,
   postRelateMoment,
 } from "./remote.js";
-import { getReadingStatusLine } from "./uiCopy.js";
+import { getReadingStatusLine, clampHeroReadingLine } from "./uiCopy.js";
 import {
   BASELINE,
   SCALE,
@@ -778,7 +778,7 @@ const UI_COPY = {
     yourSignalEntered: "Your signal entered the field.",
     postContributePhase1: ["Your moment entered the field.", "Signal received.", "A new trace in the atmosphere."],
     postContributePhase2: ["It is now part of the reading.", "The field adjusts.", "The atmosphere shifts slightly."],
-    postContributeSummaryLine: ["You are part of this reading.", "The field now includes you."],
+    postContributeSummaryLine: ["You're in the read.", "Field counts you in."],
     eyebrowLayer: "Atmosphere",
     eyebrowContext: "Moments",
     heroBridgeLine: "A place to share small human moments.",
@@ -925,7 +925,7 @@ const UI_COPY = {
     yourSignalEntered: "Tu señal entró al campo.",
     postContributePhase1: ["Tu momento entró al campo.", "Señal recibida.", "Una nueva huella en la atmósfera."],
     postContributePhase2: ["Ya es parte de la lectura.", "El campo se ajusta.", "La atmósfera se mueve un poco."],
-    postContributeSummaryLine: ["Sos parte de esta lectura.", "El campo ahora te incluye."],
+    postContributeSummaryLine: ["Sos parte del campo.", "Campo ya con vos."],
     eyebrowLayer: "Atmósfera",
     eyebrowContext: "Momentos",
     heroBridgeLine: "Un lugar para compartir pequeños momentos humanos.",
@@ -3814,7 +3814,7 @@ function triggerPostContributeSequence(canonicalState, lang) {
     clearTransientLine();
     if (summaryLines.length > 0 && climateSummaryLine) {
       const summaryText = summaryLines[Math.abs(seed + 2) % summaryLines.length];
-      climateSummaryLine.textContent = summaryText;
+      climateSummaryLine.textContent = clampHeroReadingLine(summaryText);
       climateSummaryLine.classList.remove("hidden");
       window.setTimeout(() => {
         climateSummaryLine.textContent = getReadingStatusLine(lang, total, seed, canonicalState?.dominantMix);
@@ -3935,7 +3935,7 @@ function startHeroEngine() {
     const shared48h = getRecentWindow(s.sharedMoments || []);
     const weather = getAtmosphericWeather(shared48h);
     if (atmosphericWeatherLine && weather && weather.label) {
-      atmosphericWeatherLine.textContent = weather.label;
+      atmosphericWeatherLine.textContent = clampHeroReadingLine(weather.label);
       atmosphericWeatherLine.classList.remove("hidden");
     }
   }, HERO_ENGINE_MS.line2));
@@ -4495,7 +4495,7 @@ async function boot() {
   const uiForWeather = UI_COPY[LANG] || UI_COPY.en;
   if (atmosphericWeatherLine) {
     if (weather?.label) {
-      atmosphericWeatherLine.textContent = weather.label;
+      atmosphericWeatherLine.textContent = clampHeroReadingLine(weather.label);
       atmosphericWeatherLine.classList.remove("hidden");
     } else {
       atmosphericWeatherLine.textContent = "";

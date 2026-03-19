@@ -35,17 +35,19 @@
   };
 
   /* Frases atmReadingLine: estados de la materia. Lenguaje simple y juvenil, primera lectura. */
+  /* Cada etiqueta ≤19 caracteres (columna hero). */
+  const HERO_LINE_MAX = 19;
   const LABELS = {
     en: {
       quiet: [
         "Holding its breath.",
-        "Calm before something rises.",
+        "Calm before a stir.",
         "Quiet in the field.",
         "Still air.",
         "Something will stir.",
       ],
       rising: [
-        "Something is rising.",
+        "Something is rising",
         "Stirring now.",
         "Moments gathering.",
         "Lift in the air.",
@@ -55,29 +57,29 @@
         "Full.",
         "Heavy with signal.",
         "The air is charged.",
-        "Weight in the field.",
+        "Weight in the field",
         "The field speaks.",
       ],
     },
     es: {
       quiet: [
-        "Contiene la respiración.",
-        "Calma antes de que suba algo.",
+        "Aliento contenido.",
+        "Todo quieto aún.",
         "Quieto en el campo.",
         "Aire quieto.",
-        "Algo se va a mover.",
+        "Algo va a moverse.",
       ],
       rising: [
-        "Algo está subiendo.",
+        "Algo está subiendo",
         "Se agita ahora.",
-        "Los momentos se juntan.",
-        "Subida en el aire.",
+        "Momentos se juntan.",
+        "Sube en el aire.",
         "Está pasando.",
       ],
       dense: [
         "Lleno.",
         "Pesado de señal.",
-        "El aire está cargado.",
+        "Aire cargado.",
         "Peso en el campo.",
         "El campo habla.",
       ],
@@ -86,6 +88,18 @@
 
   function pickLabel(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  function clampReadingLine(s) {
+    if (typeof s !== "string" || s.length === 0) return s;
+    var t = s.trim();
+    if (t.length <= HERO_LINE_MAX) return t;
+    var cut = t.slice(0, HERO_LINE_MAX + 1);
+    var sp = cut.lastIndexOf(" ");
+    if (sp > 8) cut = cut.slice(0, sp);
+    else cut = cut.slice(0, HERO_LINE_MAX);
+    cut = cut.trimEnd();
+    return cut.length < t.length ? cut + "…" : cut;
   }
 
   function lang() {
@@ -179,7 +193,7 @@
       }
     }
     if (labelEl) {
-      const newText = state.label ? state.label : "";
+      const newText = state.label ? clampReadingLine(state.label) : "";
       if (newText !== labelEl.textContent) {
         if (!reduceMotion() && state.label) {
           labelEl.classList.add("atm-reading-updating");
