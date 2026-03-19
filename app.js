@@ -1451,6 +1451,14 @@ let sharedSheetIncrementalObserver = null;
 const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
 
 /**
+ * Frases del hero / grounding que se ocultan solas: **15 s** visibles (lectura).
+ * Cubre: #transient-reading-line, fases post-contribute + destello en summary, pulso observatorio, cierre auto del heroScrollHint.
+ */
+function getHeroSelfFadingPhraseMs() {
+  return 15000;
+}
+
+/**
  * Variables reales del instrumento y condiciones para observarlas.
  * Pensado para escala: early (pocos), building (cientos), firm (miles/millones).
  *
@@ -3053,7 +3061,7 @@ function initHeroOnboarding() {
 
   window.setTimeout(() => {
     if (!dismissed) hideHint();
-  }, 9000);
+  }, getHeroSelfFadingPhraseMs());
 }
 
 function renderRecent(sharedMoments, constellations) {
@@ -3840,14 +3848,14 @@ function showHeroFieldEchoMoment(lang) {
   void heroFieldEchoLine.offsetWidth;
   heroFieldEchoLine.classList.add("is-visible");
   if (heroFieldEchoTimeoutId) window.clearTimeout(heroFieldEchoTimeoutId);
-  const hideMs = prefersReducedMotion ? 16000 : 28000;
+  const hideMs = Math.max(getHeroSelfFadingPhraseMs(), prefersReducedMotion ? 18000 : 28000);
   heroFieldEchoTimeoutId = window.setTimeout(() => {
     heroFieldEchoTimeoutId = null;
     hideHeroFieldEcho();
   }, hideMs);
 }
 
-/** Micro-experiencia post-contribute: fases lentas para leer → destello en summary → eco global en hero. */
+/** Micro-experiencia post-contribute: 15 s por frase (getHeroSelfFadingPhraseMs) → destello en summary → eco global en hero. */
 function triggerPostContributeSequence(canonicalState, lang) {
   const ui = UI_COPY[lang] || UI_COPY.en;
   const p1 = ui.postContributePhase1 || [];
@@ -3862,9 +3870,10 @@ function triggerPostContributeSequence(canonicalState, lang) {
     (typeof ui.postContributePhase2Line === "string" && ui.postContributePhase2Line.trim()) ||
     (p2.length ? p2[Math.abs(seed + 1) % p2.length] : "The atmosphere shifts slightly.");
 
-  const phase1Ms = prefersReducedMotion ? 3800 : 7000;
-  const phase2Ms = prefersReducedMotion ? 3800 : 7000;
-  const summaryFlashMs = prefersReducedMotion ? 4500 : 9500;
+  const phraseMs = getHeroSelfFadingPhraseMs();
+  const phase1Ms = phraseMs;
+  const phase2Ms = phraseMs;
+  const summaryFlashMs = phraseMs;
 
   setTransientLine(phase1Text);
 
@@ -3900,10 +3909,10 @@ function showTransientReading(total = 0, seed = 0, lang = "en", contributed = fa
   if (contributed) return;
   const phrase = getAtmosphereLine(seed, lang, total);
   setTransientLine(phrase);
-  window.setTimeout(() => clearTransientLine(), 2500);
+  window.setTimeout(() => clearTransientLine(), getHeroSelfFadingPhraseMs());
 }
 
-/** Observatory pulse: señal breve cuando algo cambió en el campo. Aparece, dura ~4 s, se va. */
+/** Observatory pulse: algo cambió en el campo; misma ventana de lectura que otras frases que se van solas. */
 function showObservatoryPulse(message, isLastPulse = false) {
   if (!observatoryPulseWrap || !observatoryPulseMessage) return;
   const ui = UI_COPY[LANG] || UI_COPY.en;
@@ -3920,7 +3929,7 @@ function showObservatoryPulse(message, isLastPulse = false) {
       observatoryPulseWrap.classList.add("hidden");
       observatoryPulseMessage.textContent = "";
     }, 500);
-  }, 4000);
+  }, getHeroSelfFadingPhraseMs());
 }
 
 function renderPatternLayer(canonicalState) {
@@ -3985,8 +3994,8 @@ async function loadSharedMoments(localMoments) {
 /** Estado actual del observatorio para re-renderizar listas (Across the atmosphere + Nearby) con datos frescos sin recargar. */
 let observatoryState = null;
 
-/** Hero Engine: rotación de las 4 líneas del hero a ritmos distintos (sensación de sistema vivo, invitación a volver). */
-const HERO_ENGINE_MS = { line1: 10000, line2: 15000, line3: 20000, line4: 45000 };
+/** Hero Engine: rotación del hero a ritmos distintos (más lento = más tiempo para leer cada estado). */
+const HERO_ENGINE_MS = { line1: 20000, line2: 32000, line3: 42000, line4: 78000 };
 let heroEngineIntervals = [];
 /** Timeout para ocultar la línea de eco del campo tras contribute. */
 let heroFieldEchoTimeoutId = null;
