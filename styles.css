@@ -1611,17 +1611,35 @@ html.theme-atmosphere[data-atmosphere-state="observed"] .atmosphere-grounding::a
 /* Misma columna centrada en grounding (textos a ancho completo para alinear eje) */
 .atmosphere-grounding .atm-reading-line,
 .atmosphere-grounding .climate-summary-line,
-.atmosphere-grounding .cta-microcopy,
-.atmosphere-grounding .hero-bridge-sub--grounding,
+.atmosphere-grounding .cta-bridge-copy-stack,
 .atmosphere-grounding .trust-microcopy-wrap {
   width: 100%;
   max-width: 34ch;
   box-sizing: border-box;
 }
 
+/* Microcopy + línea puente: un bloque compacto (pegados) */
+.cta-bridge-copy-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.18rem;
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.cta-bridge-copy-stack .cta-microcopy {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.cta-bridge-copy-stack .hero-bridge-sub--grounding {
+  margin: 0;
+}
+
 /* Puente secundario bajo CTA (invitación a escribir) */
 .observatory-hero .atmosphere-grounding .hero-bridge-sub--grounding {
-  margin: 0.5rem auto 0;
   order: 0;
   animation-name: hero-bridge-fade-in-sub;
   animation-delay: 0.55s;
