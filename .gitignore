@@ -55,6 +55,8 @@ config.local.*
 .npmrc.local
 
 # ─── No necesarios para que funcione la página ───
+# Inventario de copy / notas internas (no hace falta en el repo público)
+PHRASE_CATEGORIES.md
 # Cuerpo de PR generado localmente (gh pr create --body-file)
 .pr-body.md
 # Dependencias (se instalan con npm install)
