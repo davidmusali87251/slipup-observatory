@@ -1870,13 +1870,6 @@ html.theme-atmosphere .horizon-pulse-bar::before {
   margin-left: auto;
   margin-right: auto;
   text-align: center;
-  padding: 0.35rem 0.55rem;
-  border-radius: 0.6rem;
-  background: color-mix(in oklab, var(--bg) 82%, transparent);
-  border: 1px solid color-mix(in oklab, var(--line) 32%, transparent);
-  box-shadow:
-    0 0 0 1px color-mix(in oklab, var(--soft) 8%, transparent) inset,
-    0 0 14px color-mix(in oklab, var(--soft) 12%, transparent);
 }
 .atmospheric-weather-caption-wrap .trust-microcopy {
   margin: 0;
