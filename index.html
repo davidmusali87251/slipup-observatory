@@ -82,22 +82,28 @@
             <p id="heroBridgeLine" class="hero-bridge-line">A place to share small human moments.</p>
             <p id="heroBridgeSub1" class="hero-bridge-sub">Write a short moment from your day.</p>
             <p class="atmosphere-orientation" aria-hidden="true"></p>
-            <div
-              class="hero-weather-panel degree-wrap observatory-reading-panel"
-              aria-label="Atmosphere reading"
-            >
-              <div class="observatory-entry hero-weather-panel-header">
+            <div class="hero-reading-stack">
+              <div class="hero-field-eyebrow-wrap">
                 <p class="eyebrow-layer layer-title">Today in the field</p>
               </div>
-              <div class="degree-value-row hero-weather-panel-degree">
-                <p id="degreeValue" class="degree-value">
-                  <span class="degree-num">28</span><sup class="degree-unit" aria-hidden="true">°</sup>
-                </p>
-                <span id="degreeScaleLabel" class="degree-scale-label" aria-hidden="true">0–100 scale</span>
+              <div
+                class="hero-reading-split degree-wrap observatory-reading-panel hero-weather-panel"
+                aria-label="Atmosphere reading"
+              >
+                <div class="hero-reading-degree-col">
+                  <div class="degree-value-row hero-weather-panel-degree">
+                    <p id="degreeValue" class="degree-value">
+                      <span class="degree-num">28</span><sup class="degree-unit" aria-hidden="true">°</sup>
+                    </p>
+                    <span id="degreeScaleLabel" class="degree-scale-label" aria-hidden="true">0–100 scale</span>
+                  </div>
+                </div>
+                <div class="hero-reading-lines-col">
+                  <p id="climateSummaryLine" class="climate-summary-line hero-weather-line hero-weather-line--summary" role="status" aria-live="polite"></p>
+                  <p id="atmReadingLine" class="atm-reading-line hero-weather-line hero-weather-line--reading" role="status" aria-live="polite"></p>
+                  <p id="atmosphericWeatherLine" class="atmospheric-weather-line hero-weather-line hero-weather-line--tag hidden" role="status" aria-live="polite"></p>
+                </div>
               </div>
-              <p id="climateSummaryLine" class="climate-summary-line hero-weather-line hero-weather-line--summary" role="status" aria-live="polite"></p>
-              <p id="atmReadingLine" class="atm-reading-line hero-weather-line hero-weather-line--reading" role="status" aria-live="polite"></p>
-              <p id="atmosphericWeatherLine" class="atmospheric-weather-line hero-weather-line hero-weather-line--tag hidden" role="status" aria-live="polite"></p>
             </div>
           </div>
           <div class="atmosphere-grounding" aria-label="Toward the horizon">

@@ -1258,13 +1258,14 @@ html.theme-atmosphere .observatory-hero .hero-bridge-sub.hero-bridge-settled {
 
 .observatory-hero .atmosphere-air .hero-identity-line { order: 1; }
 .observatory-hero .atmosphere-air .observatory-seo-intro { order: 2; }
-.observatory-hero .atmosphere-air .hero-weather-panel { order: 4; }
+.observatory-hero .atmosphere-air .hero-reading-stack { order: 4; }
 .observatory-hero .atmosphere-air .daily-tone-line { order: 5; }
 .observatory-hero .atmosphere-air .atmosphere-orientation { order: 8; }
 
 /* Columna única: todos los elementos centrados en el mismo eje */
 .atmosphere-air .hero-bridge-line,
 .atmosphere-air .hero-bridge-sub,
+.atmosphere-air .hero-reading-stack,
 .atmosphere-air .hero-weather-panel,
 .atmosphere-air .hero-identity-line,
 .atmosphere-air .observatory-seo-intro {
@@ -1289,49 +1290,103 @@ html.theme-atmosphere .observatory-hero .hero-bridge-sub.hero-bridge-settled {
   padding: 0.35rem 0;
 }
 
-/* Hero: panel de lectura tipo “clima” (ubicación → grado → tres líneas) */
-.observatory-hero .atmosphere-air .hero-weather-panel.degree-wrap {
-  margin-top: 1.1rem;
-  margin-bottom: 0.5rem;
-  padding: 1rem 1.15rem 1.15rem;
-  max-width: min(100%, 22.5rem);
-  margin-left: auto;
-  margin-right: auto;
-  border-radius: 22px;
+/* Hero: lectura observatorio — ceja separada + rejilla grado | frases (sin tarjeta “widget clima”) */
+.hero-reading-stack {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.35rem;
+  width: 100%;
+  max-width: min(100%, 28rem);
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 0.35rem;
+  margin-bottom: 0.35rem;
+  gap: 1.35rem;
   box-sizing: border-box;
-  background: color-mix(in oklab, var(--card) 78%, transparent);
-  border: 1px solid color-mix(in oklab, var(--line) 72%, transparent);
-  box-shadow:
-    0 4px 22px color-mix(in oklab, var(--text) 7%, transparent),
-    inset 0 1px 0 color-mix(in oklab, #fff 45%, transparent);
-  backdrop-filter: blur(12px);
 }
 
-html.theme-atmosphere .observatory-hero .hero-weather-panel.degree-wrap {
-  background: color-mix(in oklab, var(--bg-deep) 58%, rgba(20, 18, 48, 0.92));
-  border-color: color-mix(in oklab, var(--line) 50%, rgba(139, 108, 255, 0.28));
-  box-shadow:
-    0 6px 32px rgba(0, 0, 0, 0.38),
-    0 0 0 1px rgba(139, 108, 255, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.07);
-}
-
-.observatory-hero .hero-weather-panel .observatory-entry {
+.hero-field-eyebrow-wrap {
+  width: 100%;
   margin: 0;
+  padding: 0 0.25rem;
+  text-align: center;
+}
+
+.hero-field-eyebrow-wrap .layer-title {
+  border-top: none;
+  padding-top: 0;
+  margin: 0;
+  letter-spacing: 0.14em;
+  opacity: 0.92;
+}
+
+.observatory-hero .atmosphere-air .hero-reading-split.hero-weather-panel.degree-wrap {
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0.15rem 0 0.35rem;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  align-items: center;
+  gap: 0.85rem 1.15rem;
+  text-align: start;
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+html.theme-atmosphere .observatory-hero .atmosphere-air .hero-reading-split.hero-weather-panel.degree-wrap {
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
+.hero-reading-degree-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-width: 0;
+}
+
+.hero-reading-lines-col {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.35rem;
+  min-width: 0;
+  padding-left: 1rem;
+  margin: 0;
+  text-align: left;
+  border-left: 1px solid color-mix(in oklab, var(--line) 38%, transparent);
+}
+
+html.theme-atmosphere .hero-reading-lines-col {
+  border-left-color: color-mix(in oklab, var(--line) 42%, rgba(139, 108, 255, 0.22));
+}
+
+/* Grado hero en split: grande a la izquierda, sin explosión de tamaño en narrow viewports */
+.observatory-hero .hero-reading-split .degree-value {
+  font-size: clamp(3rem, 10vw, 5.35rem);
+  line-height: 0.95;
+  text-align: left;
+  padding-right: 0.12em;
+}
+
+.observatory-hero .hero-reading-split .degree-value-row {
+  margin: 0;
+  justify-content: flex-start;
   width: 100%;
 }
 
-.observatory-hero .hero-weather-panel .layer-title {
-  border-top: none;
-  padding-top: 0;
-  margin-bottom: 0.15rem;
-}
-
-/* Orden de lectura observatorio: patrón → grado → resumen. El hero usa tarjeta (.hero-weather-panel). */
+/* Orden de lectura observatorio: ceja → grado | resumen + lecturas. */
 .observatory-reading-panel:not(.hero-weather-panel) {
   background: none;
   border: none;
@@ -1348,31 +1403,78 @@ html.theme-atmosphere .observatory-hero .hero-weather-panel.degree-wrap {
   opacity: 0.88;
 }
 
-/* Tres líneas de estado bajo el grado — jerarquía tipo widget meteorológico */
+/* Tres líneas — columna derecha, lectura continua (observatorio, no widget) */
 .observatory-hero .hero-weather-panel .climate-summary-line {
-  margin: 0.15rem 0 0;
+  margin: 0;
   font-style: normal;
-  font-size: 0.78rem;
-  line-height: 1.45;
+  font-size: 0.82rem;
+  line-height: 1.5;
   opacity: 0.92;
+  text-align: left;
+  max-width: none;
 }
 .observatory-hero .hero-weather-panel .climate-summary-line::before,
 .observatory-hero .hero-weather-panel .climate-summary-line::after {
   content: none;
 }
 .observatory-hero .hero-weather-panel .atm-reading-line {
-  margin: 0.1rem 0 0;
-  font-size: 0.72rem;
-  line-height: 1.4;
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.48;
   opacity: 0.88;
+  text-align: left;
 }
 .observatory-hero .hero-weather-panel .atmospheric-weather-line {
-  margin: 0.15rem 0 0;
-  font-size: 0.65rem;
-  letter-spacing: 0.08em;
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  line-height: 1.35;
+  line-height: 1.4;
   opacity: 0.82;
+  text-align: left;
+}
+
+/* Muy estrecho: una columna, ceja y lectura siguen centradas en el bloque */
+@media (max-width: 340px) {
+  .observatory-hero .atmosphere-air .hero-reading-split.hero-weather-panel.degree-wrap {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+    gap: 0.65rem;
+  }
+
+  .hero-reading-degree-col {
+    align-items: center;
+  }
+
+  .observatory-hero .hero-reading-split .degree-value {
+    text-align: center;
+  }
+
+  .observatory-hero .hero-reading-split .degree-value-row {
+    justify-content: center;
+  }
+
+  .hero-reading-lines-col {
+    padding-left: 0;
+    border-left: none;
+    padding-top: 0.5rem;
+    border-top: 1px solid color-mix(in oklab, var(--line) 32%, transparent);
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    max-width: 28ch;
+  }
+
+  html.theme-atmosphere .hero-reading-lines-col {
+    border-top-color: color-mix(in oklab, var(--line) 40%, rgba(139, 108, 255, 0.18));
+  }
+
+  .observatory-hero .hero-weather-panel .climate-summary-line,
+  .observatory-hero .hero-weather-panel .atm-reading-line,
+  .observatory-hero .hero-weather-panel .atmospheric-weather-line {
+    text-align: center;
+  }
 }
 
 /* #conditionLine: lectura de estado (quiet | balance | gathering | dense). Ubicado dentro de .degree-wrap para formar un solo bloque "lectura" (valor + escala + frase). */
@@ -1892,9 +1994,9 @@ html.theme-atmosphere .atm-reading-line {
     letter-spacing: 0.1em;
     margin-bottom: 1rem;
   }
-  .observatory-hero .atmosphere-air .observatory-entry {
+  .observatory-hero .atmosphere-air .hero-field-eyebrow-wrap {
     margin-top: 0;
-    margin-bottom: 0.25rem;
+    margin-bottom: 0;
   }
   .observatory-hero .atmosphere-air {
     gap: 1rem;
@@ -2060,13 +2162,23 @@ html.theme-atmosphere .atm-reading-line {
     padding-right: 0.2rem;
   }
 
-  .atmosphere-air .hero-weather-panel.degree-wrap {
-    margin-top: 0.65rem;
-    padding: 0.85rem 0.95rem 1rem;
+  .atmosphere-air .hero-reading-stack {
+    gap: 1.15rem;
+    margin-top: 0.2rem;
+  }
+
+  .atmosphere-air .hero-reading-split.hero-weather-panel.degree-wrap {
+    padding: 0.05rem 0 0.2rem;
+    gap: 0.7rem 0.85rem;
   }
 
   .degree-value {
     font-size: clamp(11rem, 68vw, 16rem);
+  }
+
+  /* El hero en rejilla no usa el grado pantalla-completa del strip */
+  .observatory-hero .hero-reading-split .degree-value {
+    font-size: clamp(2.65rem, 15vw, 3.85rem);
   }
 
   .atmosphere-air .condition-line {
@@ -5017,6 +5129,10 @@ body.contribute-ritual .page {
     font-size: clamp(8rem, 24vw, 11rem);
   }
 
+  .observatory-hero .hero-reading-split .degree-value {
+    font-size: clamp(2.4rem, 12vw, 3.6rem);
+  }
+
   .cta-observatory {
     margin-top: 0.42rem;
   }
@@ -5109,6 +5225,10 @@ body.contribute-ritual .page {
 
   .degree-value {
     font-size: clamp(12rem, 72vw, 17rem);
+  }
+
+  .observatory-hero .hero-reading-split .degree-value {
+    font-size: clamp(2.5rem, 14vw, 3.65rem);
   }
 
   .degree-value .degree-unit {
@@ -5232,6 +5352,10 @@ body.contribute-ritual .page {
 
   .degree-value {
     font-size: clamp(11rem, 75vw, 16rem);
+  }
+
+  .observatory-hero .hero-reading-split .degree-value {
+    font-size: clamp(2.35rem, 13vw, 3.45rem);
   }
 
   .observatory-hero .hero-identity-line {
