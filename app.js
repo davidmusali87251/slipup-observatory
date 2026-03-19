@@ -783,7 +783,7 @@ const UI_COPY = {
     fieldEchoAriaPrefix: "Field response",
     eyebrowLayer: "Atmosphere",
     eyebrowContext: "Moments",
-    heroBridgeLine: "A small place to share human moments.",
+    heroBridgeLine: "A place for human moments",
     heroBridgeSub1: "Write a moment from your day.",
     heroScrollHint: "The field reveals as you move ↓",
     sharedFieldLine: "Shared field — last 48h",
