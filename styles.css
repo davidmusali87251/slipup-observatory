@@ -520,12 +520,33 @@ html.theme-atmosphere .contribute-page .legal-links .text-link:hover {
 }
 
 html.theme-atmosphere .contribute-page #saveButton.cta {
-  color: color-mix(in oklab, var(--text) 92%, #f4f2ff);
+  color: #f7f8ff;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--scope-accent, #7f8fb2) 62%, #2a3446) 0%,
+    color-mix(in oklab, var(--scope-accent, #7f8fb2) 48%, #1f2b3a) 100%
+  );
+  border-color: color-mix(in oklab, var(--scope-accent, #7f8fb2) 70%, #dfe8f5);
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.1),
-    0 0 22px rgba(139, 108, 255, 0.16),
-    0 2px 10px rgba(0, 0, 0, 0.22);
+    0 1px 0 rgba(255, 255, 255, 0.14) inset,
+    0 0 22px rgba(139, 108, 255, 0.18),
+    0 3px 12px rgba(0, 0, 0, 0.28);
+}
+
+html.theme-atmosphere .contribute-page #saveButton.cta:hover {
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--scope-accent, #7f8fb2) 68%, #2c3750) 0%,
+    color-mix(in oklab, var(--scope-accent, #7f8fb2) 54%, #223045) 100%
+  );
+  border-color: color-mix(in oklab, var(--scope-accent, #7f8fb2) 78%, #ecf2ff);
+  color: #ffffff;
+}
+
+html.theme-atmosphere .contribute-page #saveButton.cta:focus-visible {
+  outline: 2px solid color-mix(in oklab, #edf4ff 74%, var(--scope-accent, #7f8fb2));
+  outline-offset: 2px;
 }
 
 html.theme-atmosphere .contribute-page .contribute-cta-hint {

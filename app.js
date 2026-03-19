@@ -759,7 +759,7 @@ const UI_COPY = {
     contributeInvite: "A shared atmosphere of human moments.\nLet one moment rise.",
     ctaObservatoryLabel: "Contribute",
     contributeFooterLine: "Let one moment rise.",
-    trust: "No account. Region only. Shared moments.",
+    trust: "No account. Region only. Just shared moments.",
     scopeLabel: "48h",
     recentFromRemote: "Across the atmosphere.",
     recentFromLocal: "Moments from this device only.",
