@@ -551,36 +551,90 @@ html.theme-atmosphere .contribute-page .contribute-rise-tone--revealed .contribu
 }
 html.theme-atmosphere .contribute-page .contribute-kind-state-label {
   color: color-mix(in oklab, var(--soft) 62%, var(--text));
-  opacity: 0.9;
+  opacity: 0.88;
+  transition:
+    opacity 0.35s ease,
+    color 0.35s ease,
+    font-weight 0.2s ease;
 }
+/* Sin seleccionar: un poco más apagado para que el elegido destaque */
+html.theme-atmosphere .contribute-page .contribute-kind-state:not(:has(:checked)) .contribute-kind-state-label {
+  opacity: 0.72;
+}
+/* Observed = frío / claridad */
 html.theme-atmosphere .contribute-page .contribute-kind-state--observed .contribute-kind-state-surface {
-  background: color-mix(in oklab, var(--bg-deep) 35%, rgba(255, 255, 255, 0.04));
-  border-color: color-mix(in oklab, var(--line) 32%, transparent);
+  background: color-mix(in oklab, var(--bg-deep) 68%, rgba(110, 190, 255, 0.14));
+  border-color: color-mix(in oklab, #7ec8ff 42%, var(--line));
+  box-shadow:
+    inset 0 0 0 1px rgba(110, 200, 255, 0.1),
+    0 1px 6px rgba(0, 0, 0, 0.18);
 }
+/* Avoidable = cálido / tensión suave */
 html.theme-atmosphere .contribute-page .contribute-kind-state--avoidable .contribute-kind-state-surface {
-  background: color-mix(in oklab, var(--bg-deep) 55%, rgba(0, 0, 0, 0.12));
-  border-color: color-mix(in oklab, var(--line) 52%, transparent);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+  background: color-mix(in oklab, var(--bg-deep) 62%, rgba(235, 165, 88, 0.18));
+  border-color: color-mix(in oklab, #e8a85c 48%, var(--line));
+  box-shadow:
+    inset 0 0 0 1px rgba(235, 165, 88, 0.12),
+    0 2px 10px rgba(0, 0, 0, 0.22);
 }
+/* Fertile = crecimiento / fresco */
 html.theme-atmosphere .contribute-page .contribute-kind-state--fertile .contribute-kind-state-surface {
-  background: color-mix(in oklab, var(--bg-deep) 28%, rgba(255, 255, 255, 0.07));
-  border-color: color-mix(in oklab, var(--line) 22%, transparent);
+  background: color-mix(in oklab, var(--bg-deep) 66%, rgba(110, 230, 185, 0.13));
+  border-color: color-mix(in oklab, #6ee4b9 40%, var(--line));
+  box-shadow:
+    inset 0 0 0 1px rgba(110, 230, 185, 0.1),
+    0 1px 6px rgba(0, 0, 0, 0.16);
   transform: translateY(-0.5px);
 }
-html.theme-atmosphere .contribute-page .contribute-kind-state:hover .contribute-kind-state-surface {
-  border-color: color-mix(in oklab, var(--line) 65%, rgba(139, 108, 255, 0.15));
+html.theme-atmosphere .contribute-page .contribute-kind-state:hover:not(:has(:checked)) .contribute-kind-state-surface {
+  filter: brightness(1.12);
+}
+html.theme-atmosphere .contribute-page .contribute-kind-state--observed:hover:not(:has(:checked)) .contribute-kind-state-surface {
+  border-color: color-mix(in oklab, #9ad8ff 55%, var(--line));
+}
+html.theme-atmosphere .contribute-page .contribute-kind-state--avoidable:hover:not(:has(:checked)) .contribute-kind-state-surface {
+  border-color: color-mix(in oklab, #f0bc78 52%, var(--line));
+}
+html.theme-atmosphere .contribute-page .contribute-kind-state--fertile:hover:not(:has(:checked)) .contribute-kind-state-surface {
+  border-color: color-mix(in oklab, #8af0cc 48%, var(--line));
 }
 html.theme-atmosphere .contribute-page .contribute-kind-state:has(:checked) .contribute-kind-state-label {
-  color: color-mix(in oklab, var(--text) 92%, var(--soft));
+  color: color-mix(in oklab, var(--text) 94%, #fff);
   opacity: 1;
+  font-weight: 600;
 }
-html.theme-atmosphere .contribute-page .contribute-kind-state:has(:checked) .contribute-kind-state-surface {
-  border-color: color-mix(in oklab, var(--line) 58%, rgba(139, 108, 255, 0.2));
-}
-html.theme-atmosphere .contribute-page .contribute-kind-state:has(:focus-visible) .contribute-kind-state-surface {
+html.theme-atmosphere .contribute-page .contribute-kind-state--observed:has(:checked) .contribute-kind-state-surface {
+  background: color-mix(in oklab, var(--bg-deep) 48%, rgba(110, 200, 255, 0.32));
+  border-color: color-mix(in oklab, #9ad8ff 72%, #fff);
   box-shadow:
-    0 0 0 2px rgba(92, 61, 255, 0.28),
-    0 2px 10px rgba(0, 0, 0, 0.2);
+    0 0 0 2px rgba(120, 200, 255, 0.55),
+    0 6px 22px rgba(100, 180, 255, 0.18),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  filter: none;
+}
+html.theme-atmosphere .contribute-page .contribute-kind-state--avoidable:has(:checked) .contribute-kind-state-surface {
+  background: color-mix(in oklab, var(--bg-deep) 45%, rgba(240, 175, 95, 0.34));
+  border-color: color-mix(in oklab, #f0bc78 68%, #fff);
+  box-shadow:
+    0 0 0 2px rgba(235, 165, 88, 0.55),
+    0 6px 22px rgba(235, 150, 70, 0.2),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  filter: none;
+}
+html.theme-atmosphere .contribute-page .contribute-kind-state--fertile:has(:checked) .contribute-kind-state-surface {
+  background: color-mix(in oklab, var(--bg-deep) 50%, rgba(110, 230, 185, 0.3));
+  border-color: color-mix(in oklab, #8af0cc 65%, #fff);
+  box-shadow:
+    0 0 0 2px rgba(110, 230, 185, 0.5),
+    0 6px 22px rgba(80, 200, 160, 0.18),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  filter: none;
+}
+/* Foco teclado: anillo aparte para no pisar el box-shadow del estado seleccionado */
+html.theme-atmosphere .contribute-page .contribute-kind-state:has(:focus-visible) {
+  outline: 2px solid color-mix(in oklab, var(--soft) 55%, transparent);
+  outline-offset: 3px;
+  border-radius: 13px;
 }
 html.theme-atmosphere #contributeForm[data-kind-preview="observed"] #noteInput {
   box-shadow:
@@ -5287,41 +5341,70 @@ html.theme-atmosphere .panel-recent::after {
   text-align: center;
   line-height: 1.25;
   color: color-mix(in oklab, var(--muted) 58%, var(--text));
-  opacity: 0.9;
+  opacity: 0.88;
   transition:
-    opacity 0.48s ease,
-    color 0.48s ease;
+    opacity 0.35s ease,
+    color 0.35s ease,
+    font-weight 0.2s ease;
   font-family: var(--font-reading);
 }
+.contribute-kind-state:not(:has(:checked)) .contribute-kind-state-label {
+  opacity: 0.74;
+}
 .contribute-kind-state--observed .contribute-kind-state-surface {
-  background: color-mix(in oklab, #faf7ff 88%, #e8ecf4);
-  border-color: color-mix(in oklab, var(--muted) 14%, transparent);
+  background: color-mix(in oklab, #e8f4ff 55%, #faf7ff);
+  border-color: color-mix(in oklab, #7eb8e8 35%, var(--muted));
+  box-shadow: inset 0 0 0 1px rgba(100, 170, 220, 0.12);
 }
 .contribute-kind-state--avoidable .contribute-kind-state-surface {
-  background: color-mix(in oklab, #2f455b 6%, #f3f0fa);
-  border-color: color-mix(in oklab, var(--muted) 24%, transparent);
-  box-shadow: 0 1px 5px rgba(15, 24, 38, 0.07);
+  background: color-mix(in oklab, #fff5e8 40%, #f3f0fa);
+  border-color: color-mix(in oklab, #d4a050 32%, var(--muted));
+  box-shadow:
+    inset 0 0 0 1px rgba(212, 160, 80, 0.14),
+    0 1px 5px rgba(15, 24, 38, 0.07);
 }
 .contribute-kind-state--fertile .contribute-kind-state-surface {
-  background: color-mix(in oklab, #ffffff 78%, #faf7ff);
-  border-color: color-mix(in oklab, var(--muted) 12%, transparent);
+  background: color-mix(in oklab, #e8fff5 45%, #faf7ff);
+  border-color: color-mix(in oklab, #5ec9a0 30%, var(--muted));
+  box-shadow: inset 0 0 0 1px rgba(94, 201, 160, 0.12);
   transform: translateY(-0.5px);
 }
-.contribute-kind-state:hover .contribute-kind-state-surface {
-  border-color: color-mix(in oklab, var(--muted) 34%, transparent);
+.contribute-kind-state:hover:not(:has(:checked)) .contribute-kind-state-surface {
+  filter: brightness(1.03);
 }
 .contribute-kind-state:has(:checked) .contribute-kind-state-label {
   opacity: 1;
-  color: color-mix(in oklab, var(--text) 90%, var(--muted));
+  font-weight: 600;
+  color: color-mix(in oklab, var(--text) 92%, var(--muted));
 }
-.contribute-kind-state:has(:checked) .contribute-kind-state-surface {
-  border-color: color-mix(in oklab, var(--muted) 40%, transparent);
+.contribute-kind-state--observed:has(:checked) .contribute-kind-state-surface {
+  background: color-mix(in oklab, #d4eaff 42%, #faf7ff);
+  border-color: color-mix(in oklab, #4a9fd4 55%, var(--text));
+  box-shadow:
+    0 0 0 2px rgba(74, 159, 212, 0.45),
+    0 4px 14px rgba(74, 159, 212, 0.15),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+.contribute-kind-state--avoidable:has(:checked) .contribute-kind-state-surface {
+  background: color-mix(in oklab, #ffe8cc 38%, #f3f0fa);
+  border-color: color-mix(in oklab, #c48830 48%, var(--text));
+  box-shadow:
+    0 0 0 2px rgba(196, 136, 48, 0.42),
+    0 4px 14px rgba(196, 136, 48, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+.contribute-kind-state--fertile:has(:checked) .contribute-kind-state-surface {
+  background: color-mix(in oklab, #d4f5e8 40%, #ffffff);
+  border-color: color-mix(in oklab, #2fa878 42%, var(--text));
+  box-shadow:
+    0 0 0 2px rgba(47, 168, 120, 0.4),
+    0 4px 14px rgba(47, 168, 120, 0.12),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5);
 }
 .contribute-kind-state:has(:focus-visible) {
-  outline: none;
-}
-.contribute-kind-state:has(:focus-visible) .contribute-kind-state-surface {
-  box-shadow: 0 0 0 2px color-mix(in oklab, #8fa9c9 38%, transparent);
+  outline: 2px solid color-mix(in oklab, var(--muted) 55%, #8fa9c9);
+  outline-offset: 3px;
+  border-radius: 13px;
 }
 #contributeForm[data-kind-preview="observed"] #noteInput {
   box-shadow:
