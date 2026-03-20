@@ -1023,6 +1023,71 @@ html.theme-atmosphere .observatory-hero[data-field-entry="present"] .panel.panel
   box-shadow: 0 1.25rem 2.65rem -0.48rem color-mix(in oklab, var(--layer-ground) 21%, transparent);
 }
 
+/* Hero: un solo campo — lectura e invitación como continuidad; Orbital como borde, no foco rival. */
+html.theme-atmosphere .observatory-hero .topbar-ai {
+  font-size: 0.64rem;
+  font-weight: 400;
+  letter-spacing: 0.07em;
+  text-transform: none;
+  opacity: 0.58;
+  color: color-mix(in oklab, var(--muted) 72%, var(--text));
+  transition:
+    opacity var(--tempo-field) ease,
+    color var(--tempo-field) ease;
+}
+html.theme-atmosphere .observatory-hero .topbar-ai:hover {
+  opacity: 0.9;
+  color: color-mix(in oklab, var(--text) 82%, var(--muted));
+  text-decoration: none;
+}
+html.theme-atmosphere .observatory-hero .topbar-ai:focus-visible {
+  opacity: 1;
+  outline: 2px solid color-mix(in oklab, var(--line) 55%, rgba(139, 108, 255, 0.35));
+  outline-offset: 3px;
+}
+html.theme-atmosphere .observatory-hero .panel.panel-observatory {
+  gap: 0.14rem;
+}
+html.theme-atmosphere .observatory-hero .atmosphere-air {
+  padding-bottom: 0.12rem;
+}
+html.theme-atmosphere .observatory-hero .hero-reading-stack {
+  gap: 0.95rem;
+  margin-bottom: 0.08rem;
+}
+html.theme-atmosphere .observatory-hero .hero-field-eyebrow-wrap .layer-title {
+  opacity: 0.97;
+  letter-spacing: 0.11em;
+}
+html.theme-atmosphere .observatory-hero .atmosphere-grounding {
+  padding-top: 0.34rem;
+  gap: 0.82rem;
+  max-width: min(40ch, 100%);
+}
+html.theme-atmosphere .observatory-hero .atmosphere-grounding::before {
+  opacity: 0.12;
+  width: min(64%, 148px);
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--line) 55%, transparent),
+    transparent
+  );
+}
+html.theme-atmosphere .observatory-hero .atmosphere-grounding::after {
+  top: calc(0.34rem + 3px);
+}
+html.theme-atmosphere .observatory-hero .horizon-pulse-bar {
+  margin-bottom: 0.38rem;
+}
+html.theme-atmosphere .observatory-hero .cta-observatory-wrap {
+  margin-top: 0.05rem;
+}
+html.theme-atmosphere .observatory-hero .atmospheric-weather-caption-wrap {
+  margin-top: 0.05rem;
+}
+
 .observatory-hero.observatory--pattern::before {
   opacity: 0.1;
 }
@@ -2557,6 +2622,13 @@ html.theme-atmosphere .atm-reading-line {
     top: calc(0.5rem + 3px);
     animation-duration: 12s;
   }
+  html.theme-atmosphere .observatory-hero .atmosphere-grounding {
+    padding-top: 0.3rem;
+    gap: 0.58rem;
+  }
+  html.theme-atmosphere .observatory-hero .atmosphere-grounding::after {
+    top: calc(0.3rem + 3px);
+  }
 
   .atmosphere-grounding .cta-observatory {
     margin-top: 0;
@@ -3086,12 +3158,7 @@ html.theme-atmosphere .observatory-hero .topbar-brand {
     0 0 20px rgba(139, 108, 255, 0.16),
     0 1px 3px rgba(0, 0, 0, 0.5);
 }
-html.theme-atmosphere .observatory-hero .topbar-ai {
-  color: color-mix(in oklab, var(--text) 88%, var(--soft));
-  text-shadow:
-    0 0 14px rgba(139, 108, 255, 0.14),
-    0 1px 2px rgba(0, 0, 0, 0.45);
-}
+/* Orbital: estilo “borde” en ~1026; no duplicar aquí para no recuperar brillo. */
 html.theme-atmosphere .observatory-hero .eyebrow-layer.layer-title {
   color: color-mix(in oklab, var(--soft) 82%, #ffffff);
   text-shadow:
