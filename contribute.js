@@ -106,20 +106,15 @@ function updateToneReveal() {
   const has = (noteInput?.value?.trim()?.length ?? 0) > 0;
   if (!has) typeTouched = false;
   toneWrap?.classList.toggle("contribute-rise-tone--revealed", has);
+  /* Kind/Tone siempre interactivos: disabled + radio 1px rompía toques en Safari móvil; validación en submit. */
   if (kindStatesEl) {
-    if (has) kindStatesEl.removeAttribute("aria-disabled");
-    else kindStatesEl.setAttribute("aria-disabled", "true");
+    kindStatesEl.removeAttribute("aria-disabled");
   }
-  /* disabled nativo: en móvil funciona mejor que pointer-events/tabindex (touch + teclado). */
   form?.querySelectorAll('input[name="type"]').forEach((r) => {
-    r.disabled = !has;
-    r.removeAttribute("tabindex");
-    r.removeAttribute("aria-disabled");
+    r.removeAttribute("disabled");
   });
   if (moodInput) {
-    moodInput.disabled = !has;
-    moodInput.removeAttribute("tabindex");
-    moodInput.removeAttribute("aria-disabled");
+    moodInput.removeAttribute("disabled");
   }
 }
 
