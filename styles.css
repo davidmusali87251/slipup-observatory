@@ -65,8 +65,9 @@
   --descent-gap-nearby: 3.25rem;
   --descent-gap-horizon: 2.75rem;
   --descent-gap-strata: 4.25rem;
-  /* Espacio entre capa Orbital y hero: recorrido largo al subir desde la atmósfera (sensación de “llegada más arriba”). */
-  --orbital-to-hero-gap: clamp(7.5rem, min(42vh, 28rem), 32rem);
+  /* Espacio entre Orbital y hero: va en margin-top del hero (no solo padding en Orbital).
+   * Así el hueco muestra el fondo de .page/body y se percibe como “tramo” real, no más textura orbital. */
+  --orbital-to-hero-gap: clamp(9rem, 52vh, 40rem);
   --block-gap: 0.85rem;
   --layer-transition: 1.5rem;
   --site-legal-height: 2.75rem;
@@ -79,6 +80,20 @@
   --atmo-peak: 0.5rem;
   --atmo-descend: 0.95rem;
   --atmo-ground: 0.6rem;
+}
+
+/* Orbital → hero (móvil/tablet narrow): hueco perceptible sin depender solo del ancho; vh estable; dvh opcional (Safari/iOS). */
+@media (max-width: 600px) {
+  :root {
+    --orbital-to-hero-gap: clamp(7rem, 54vh, 30rem);
+  }
+}
+@media (max-width: 600px) {
+  @supports (height: 100dvh) {
+    :root {
+      --orbital-to-hero-gap: clamp(7rem, min(54vh, 72dvh), 30rem);
+    }
+  }
 }
 
 /* Móvil: mínimos legibles (evitar letra demasiado pequeña en pantallas normales) */
@@ -972,6 +987,8 @@ body.sheet-open {
    Orden en el panel: ascenso (entrada, orientación) → pico (grado) → descenso (condición, instrumento) → grounding (CTA). */
 .observatory-hero {
   min-height: 100vh;
+  /* Separación visible respecto a Orbital (ver --orbital-to-hero-gap: el padding orbital sigue el mismo fondo de capa). */
+  margin-top: var(--orbital-to-hero-gap);
   display: flex;
   flex-direction: column;
   /* padding-top reserva espacio para la topbar fija; poco margen para que no se vea separada */
@@ -3690,10 +3707,10 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
   color: var(--text);
 }
 
-/* Un icono + panel (lista) — estilo observatorio, sin bloque de título siempre visible */
+/* Un icono + panel (lista) — FAB fijo esquina inferior derecha: no empuja el flujo ni compite con el bloque central. */
 .hidden-from-view-wrap {
-  margin: 0.35rem 0 0;
-  text-align: center;
+  margin: 0;
+  padding: 0;
   font-size: 0.75rem;
   color: var(--muted);
 }
@@ -3701,15 +3718,27 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
   display: none;
 }
 
-/* Móvil: la barra legal fija (z-index 150) tapaba el trigger (z-index 1 de .page > *).
-   Subimos el stack y damos aire/scroll-margin para que el círculo no quede bajo el footer. */
+/* Visible: fuera del flujo, encima de la barra legal (no entre “Place a moment” y el footer). */
+.hidden-from-view-wrap:not(.hidden) {
+  position: fixed;
+  right: max(0.65rem, env(safe-area-inset-right, 0px));
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--site-legal-height) + 0.55rem);
+  left: auto;
+  z-index: 160;
+  width: auto;
+  max-width: none;
+  text-align: right;
+  pointer-events: none;
+  isolation: isolate;
+}
+
+.hidden-from-view-wrap:not(.hidden) .hidden-from-view-cluster {
+  pointer-events: auto;
+}
+
 @media (max-width: 600px) {
   .hidden-from-view-wrap:not(.hidden) {
-    position: relative;
-    z-index: 160;
-    isolation: isolate;
-    margin-bottom: calc(var(--site-legal-height-mobile, 5.5rem) * 0.35 + 0.65rem);
-    scroll-margin-bottom: calc(var(--site-legal-height-mobile, 5.5rem) + env(safe-area-inset-bottom, 0px) + 0.75rem);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + var(--site-legal-height-mobile, 5.5rem) + 0.45rem);
   }
 
   .hidden-from-view-trigger {
@@ -3721,10 +3750,10 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
 .hidden-from-view-cluster {
   position: relative;
   display: inline-flex;
-  justify-content: center;
-  width: 100%;
-  min-height: 2.75rem;
-  align-items: flex-end;
+  justify-content: flex-end;
+  width: auto;
+  min-height: 0;
+  align-items: center;
 }
 
 .hidden-from-view-trigger {
@@ -3849,31 +3878,7 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
   }
 }
 
-/* Tras la regla base del panel: en ≤600px el panel abre hacia abajo (no queda tapado por el hero/top ni fuera del viewport). */
-@media (max-width: 600px) {
-  .hidden-from-view-panel {
-    bottom: auto;
-    top: calc(100% + 0.45rem);
-    animation-name: hidden-from-view-panel-in-mobile;
-  }
-}
-
-@keyframes hidden-from-view-panel-in-mobile {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-0.35rem) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
-  }
-}
-
-@media (max-width: 600px) and (prefers-reduced-motion: reduce) {
-  .hidden-from-view-panel {
-    animation: none;
-  }
-}
+/* FAB abajo-derecha: el panel sigue abriendo hacia arriba (encima del botón), lejos del borde inferior del viewport. */
 
 .hidden-from-view-panel-hint {
   margin: 0 0.85rem 0.5rem;
@@ -4066,6 +4071,12 @@ html.theme-atmosphere .page .site-legal {
 #orbital {
   scroll-margin-top: 4rem;
 }
+@media (max-width: 600px) {
+  #orbital {
+    /* Ancla "Orbital ↑" / hash: respeta barra + safe area en móvil. */
+    scroll-margin-top: calc(3.75rem + env(safe-area-inset-top, 0px));
+  }
+}
 .panel-orbital {
   position: relative;
   overflow: hidden;
@@ -4075,8 +4086,7 @@ html.theme-atmosphere .page .site-legal {
   text-align: center;
   max-width: 720px;
   margin: 0 auto;
-  /* padding-bottom extra: separa Orbital del hero; al subir desde la atmósfera el ascenso se siente más largo. */
-  padding: calc(env(safe-area-inset-top, 0px) + 3rem) 1rem calc(2rem + var(--orbital-to-hero-gap));
+  padding: calc(env(safe-area-inset-top, 0px) + 3rem) 1rem 2rem;
   border-bottom: 1px solid color-mix(in oklab, var(--line) 35%, transparent);
 }
 .panel-orbital > * {
