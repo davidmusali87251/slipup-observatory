@@ -68,6 +68,10 @@
   --block-gap: 0.85rem;
   --layer-transition: 1.5rem;
   --site-legal-height: 2.75rem;
+  /* Barra superior (topbar fijo) e inferior (site-legal): mismo ritmo que el top bar */
+  --site-bar-pad-x: 1rem;
+  --site-bar-pad-y: 0.5rem;
+  --site-bar-gap: 1rem;
   /* Espacio dentro de la atmósfera: ascenso (hacia el grado) y descenso (hacia horizonte) */
   --atmo-ascend: 1.35rem;
   --atmo-peak: 0.5rem;
@@ -81,6 +85,21 @@
     --text-caption: 0.8rem;
     --text-label: 0.75rem;
     --text-micro: 0.72rem;
+    --site-bar-pad-x: 0.75rem;
+    --site-bar-pad-y: 0.4rem;
+  }
+}
+
+@media (max-width: 360px) {
+  :root {
+    --site-bar-pad-x: 0.5rem;
+    --site-bar-gap: 0.5rem;
+  }
+}
+
+@media (max-width: 320px) {
+  :root {
+    --site-bar-pad-x: 0.4rem;
   }
 }
 
@@ -170,6 +189,12 @@ html.theme-atmosphere {
   --atm-glow-hero: calc(0.18 * (var(--atm-glow-alpha) / 0.2));
   /* Ritmo unificado: transiciones del campo ~650ms (continuidad, no micro-interacción tipo app) */
   --tempo-field: 650ms;
+  /* Top bar + barra inferior: mismo cromado (gradiente compartido) */
+  --site-bar-chrome-gradient: linear-gradient(
+    180deg,
+    rgba(27, 21, 64, 0.85) 0%,
+    rgba(11, 12, 26, 0.95) 100%
+  );
 }
 
 /* Cuerpo: noche profunda + gradiente vertical (más profundidad abajo) */
@@ -274,11 +299,7 @@ html.theme-atmosphere .moment-note {
   color: color-mix(in oklab, var(--text) 92%, var(--soft));
 }
 html.theme-atmosphere .observatory-hero .topbar.topbar-fixed {
-  background: linear-gradient(
-    180deg,
-    rgba(27, 21, 64, 0.85) 0%,
-    rgba(11, 12, 26, 0.95) 100%
-  );
+  background: var(--site-bar-chrome-gradient);
 }
 html.theme-atmosphere .panel,
 html.theme-atmosphere .local-climate {
@@ -817,11 +838,8 @@ html.theme-atmosphere #recentMoments.moment-list .moment-item > span.moment-meta
   }
 }
 
-/* Tema atmósfera: móvil (contraste extra en CTA y footer) */
+/* Tema atmósfera: móvil (contraste extra en CTA y footer) — padding barra: --site-bar-pad-* */
 @media (max-width: 480px) {
-  html.theme-atmosphere .observatory-hero .topbar.topbar-fixed {
-    padding: calc(env(safe-area-inset-top, 0px) + 0.4rem) 0.75rem 0.4rem;
-  }
   html.theme-atmosphere .degree-value {
     font-size: clamp(1.6rem, 5vw, 2rem);
   }
@@ -1116,7 +1134,6 @@ html.theme-atmosphere .observatory-hero .hero-field-eyebrow-wrap .layer-title {
 html.theme-atmosphere .observatory-hero .atmosphere-grounding {
   padding-top: 0.34rem;
   gap: 0.82rem;
-  max-width: min(40ch, 100%);
 }
 html.theme-atmosphere .observatory-hero .atmosphere-grounding::before {
   opacity: 0.12;
@@ -1253,9 +1270,9 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption-wrap .instr
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: calc(env(safe-area-inset-top, 0px) + 0.5rem) 1rem 0.5rem;
-  min-height: 2.75rem;
+  gap: var(--site-bar-gap);
+  padding: calc(env(safe-area-inset-top, 0px) + var(--site-bar-pad-y)) var(--site-bar-pad-x) var(--site-bar-pad-y);
+  min-height: var(--site-legal-height);
   /* Gradiente que termina como el inicio del hero para continuidad visual (sin costura) */
   background: linear-gradient(
     180deg,
@@ -1474,6 +1491,14 @@ h2 {
   z-index: 0;
 }
 
+/* Hero: una sola columna central (mismo ancho en “aire” y “horizonte”). */
+.observatory-hero .panel.panel-observatory {
+  --hero-column-max: min(40ch, 100%);
+}
+.observatory-hero .atmosphere-grounding {
+  max-width: var(--hero-column-max);
+}
+
 /* Estrato: lectura en el aire (arriba del horizonte). Una sola columna centrada. Orden fijo: identidad → Atmosphere → resto. */
 .atmosphere-air {
   display: flex;
@@ -1491,7 +1516,7 @@ h2 {
 
 /* Hero: un poco más de ancho para centrar grado + columna 19ch. */
 .observatory-hero .atmosphere-air {
-  max-width: min(40ch, 100%);
+  max-width: var(--hero-column-max);
 }
 
 /* Dual-layer hero: capa puente humana (entrada) antes del sistema simbólico. */
@@ -1732,7 +1757,7 @@ html.theme-atmosphere .observatory-hero .atmosphere-air .hero-reading-split.hero
   gap: 0.32rem;
   min-width: 0;
   max-width: 19ch;
-  padding: 0 0.45rem 0 1.05rem;
+  padding: 0 0.7rem;
   margin: 0 auto;
   text-align: center;
   border-left: 1px solid color-mix(in oklab, var(--line) 38%, transparent);
@@ -2014,8 +2039,14 @@ html.theme-atmosphere[data-atmosphere-state="observed"] .atmosphere-grounding::a
 .atmosphere-grounding .cta-bridge-copy-stack,
 .atmosphere-grounding .trust-microcopy-wrap {
   width: 100%;
-  max-width: 34ch;
+  max-width: min(40ch, 100%);
   box-sizing: border-box;
+}
+.observatory-hero .atmosphere-grounding .atm-reading-line,
+.observatory-hero .atmosphere-grounding .climate-summary-line,
+.observatory-hero .atmosphere-grounding .cta-bridge-copy-stack,
+.observatory-hero .atmosphere-grounding .trust-microcopy-wrap {
+  max-width: var(--hero-column-max);
 }
 
 /* Microcopy + línea puente: un bloque compacto (pegados) */
@@ -2201,6 +2232,7 @@ html.theme-atmosphere .horizon-pulse-bar::before {
 .atmosphere-grounding .atmospheric-weather-caption {
   margin-top: 0.4rem;
 }
+
 .atmospheric-weather-caption-wrap {
   position: relative;
   display: flex;
@@ -2210,14 +2242,15 @@ html.theme-atmosphere .horizon-pulse-bar::before {
   gap: 0.12rem;
   margin-top: 0.35rem;
   width: 100%;
-  max-width: 34ch;
+  max-width: min(40ch, 100%);
   margin-left: auto;
   margin-right: auto;
   text-align: center;
 }
 
-/* Ancla el bloque trust + aclaración + i al fondo de la capa grounding */
+/* Ancla el bloque trust + aclaración + i al fondo de la capa grounding; misma columna que el aire */
 .observatory-hero .atmosphere-grounding .atmospheric-weather-caption-wrap {
+  max-width: var(--hero-column-max);
   margin-top: auto;
   margin-bottom: 0;
   padding-bottom: 0.15rem;
@@ -2226,6 +2259,11 @@ html.theme-atmosphere .horizon-pulse-bar::before {
   margin: 0;
   text-align: center;
   white-space: nowrap;
+}
+/* Hero: misma columna; en viewport estrecho el texto puede partir sin desbordar */
+.observatory-hero .atmospheric-weather-caption-wrap .trust-microcopy {
+  white-space: normal;
+  max-width: 100%;
 }
 .atmospheric-weather-caption-wrap .atmospheric-weather-caption {
   margin: 0;
@@ -2535,9 +2573,10 @@ html.theme-atmosphere .atm-reading-line {
     padding: calc(env(safe-area-inset-top, 0px) + 4rem) 0 var(--page-pad-top);
   }
 
-  .atmosphere-air,
-  .atmosphere-grounding {
-    max-width: 100%;
+  /* Columna hero: no forzar 100% — mantener --hero-column-max (lectura alineada) */
+  .observatory-hero .atmosphere-air,
+  .observatory-hero .atmosphere-grounding {
+    max-width: var(--hero-column-max, min(40ch, 100%));
   }
 
   .climate-instrument {
@@ -3562,20 +3601,6 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
   font-family: var(--font-sans);
 }
 
-.observatory-tagline {
-  margin: 1.25rem 0 0;
-  text-align: center;
-  font-size: 0.68rem;
-  letter-spacing: 0.04em;
-  color: var(--muted);
-  opacity: 0.78;
-  font-family: var(--font-serif);
-  line-height: 1.4;
-  max-width: 22ch;
-  margin-left: auto;
-  margin-right: auto;
-}
-
 .contribute-footer-link {
   font-size: 0.72rem;
   letter-spacing: 0.06em;
@@ -3645,16 +3670,23 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
   right: 0;
   z-index: 150;
   margin: 0;
-  padding: 0.4rem 1rem;
+  padding: var(--site-bar-pad-y) var(--site-bar-pad-x) calc(env(safe-area-inset-bottom, 0px) + var(--site-bar-pad-y));
   min-height: var(--site-legal-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 0.45rem;
+  gap: var(--site-bar-gap);
   background: color-mix(in oklab, var(--bg) 97%, var(--bg-deep));
   border-top: 1px solid color-mix(in oklab, var(--line) 75%, transparent);
   box-sizing: border-box;
+}
+
+/* Misma cromía que el top bar fijo del hero (tema observatorio) */
+html.theme-atmosphere .page .site-legal {
+  background: var(--site-bar-chrome-gradient);
+  border-top: 1px solid color-mix(in oklab, var(--line) 42%, transparent);
+  box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.12);
 }
 
 .site-legal-left {
@@ -3683,14 +3715,18 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
     gap: 0.35rem;
     min-height: auto;
     margin-top: 1rem;
-    padding-top: 0.4rem;
-    padding-bottom: max(0.45rem, env(safe-area-inset-bottom, 0px));
-    padding-left: max(0.5rem, env(safe-area-inset-left, 0px));
-    padding-right: max(0.5rem, env(safe-area-inset-right, 0px));
+    padding: var(--site-bar-pad-y) max(var(--site-bar-pad-x), env(safe-area-inset-left, 0px))
+      calc(env(safe-area-inset-bottom, 0px) + var(--site-bar-pad-y)) max(var(--site-bar-pad-x), env(safe-area-inset-right, 0px));
     max-width: 100vw;
     box-sizing: border-box;
     background: transparent;
     border-top: 1px solid color-mix(in oklab, var(--line) 30%, transparent);
+    box-shadow: none;
+  }
+
+  html.theme-atmosphere .page .site-legal {
+    background: transparent;
+    border-top-color: color-mix(in oklab, var(--line) 30%, transparent);
     box-shadow: none;
   }
 
@@ -5871,9 +5907,9 @@ html.theme-atmosphere .panel-recent::after {
     padding-right: 0.25rem;
   }
 
-  .atmosphere-air,
-  .atmosphere-grounding {
-    max-width: 100%;
+  .observatory-hero .atmosphere-air,
+  .observatory-hero .atmosphere-grounding {
+    max-width: var(--hero-column-max, min(40ch, 100%));
   }
 
   .observatory-hero {
@@ -5889,11 +5925,6 @@ html.theme-atmosphere .panel-recent::after {
     font-size: clamp(1.08rem, 4.7vw, 1.32rem);
   }
 
-  .observatory-hero .topbar.topbar-fixed {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
-    gap: 0.5rem;
-  }
   .observatory-hero .topbar-brand {
     min-width: 0;
     font-size: clamp(0.9rem, 4.2vw, 1.1rem);
@@ -6007,8 +6038,6 @@ html.theme-atmosphere .panel-recent::after {
   }
 
   .page .site-legal {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
     font-size: 0.65rem;
   }
 
@@ -6058,11 +6087,6 @@ html.theme-atmosphere .panel-recent::after {
     gap: 0.9rem;
   }
 
-  .observatory-hero .topbar.topbar-fixed {
-    padding-left: 0.4rem;
-    padding-right: 0.4rem;
-    gap: 0.4rem;
-  }
   .observatory-hero .topbar-brand {
     font-size: clamp(0.82rem, 4vw, 1rem);
   }

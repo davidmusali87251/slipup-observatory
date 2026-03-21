@@ -126,11 +126,24 @@ async function safeJson(response) {
   }
 }
 
+/**
+ * Momento moderado / retirado: no debe mostrarse en listas públicas.
+ * El servidor (Edge Function) debe excluirlos del GET; aquí unificamos flags por si el payload evoluciona.
+ */
+function isMomentRemovedFromPublicView(raw) {
+  if (!raw || typeof raw !== "object") return true;
+  if (raw.hidden === true || raw.removed === true) return true;
+  const st = raw.moderation_status;
+  if (st === "removed" || st === "rejected" || st === "blocked") return true;
+  return false;
+}
+
 function sanitizeMoment(raw) {
   const type = ALLOWED_TYPES.has(raw?.type) ? raw.type : "observed";
   const mood = ALLOWED_MOODS.has(raw?.mood) ? raw.mood : "calm";
   const timestamp = raw?.timestamp ? new Date(raw.timestamp).toISOString() : new Date().toISOString();
   const relateCount = typeof raw?.relate_count === "number" && raw.relate_count >= 0 ? raw.relate_count : 0;
+  const hidden = isMomentRemovedFromPublicView(raw);
   return {
     id: raw?.id || crypto.randomUUID(),
     timestamp,
@@ -140,7 +153,7 @@ function sanitizeMoment(raw) {
     mood,
     note: normalizeNote(raw?.note),
     shared: Boolean(raw?.shared),
-    hidden: Boolean(raw?.hidden),
+    hidden,
     geo_bucket: typeof raw?.geo_bucket === "string" ? raw.geo_bucket.trim().slice(0, 64) : null,
     relate_count: relateCount,
   };
@@ -190,7 +203,7 @@ async function fetchSharedMomentsRemote(limit = 10, windowHours = 48, opts = {})
           : Array.isArray(payload?.items)
             ? payload.items
             : [];
-      const sanitized = items.map(sanitizeMoment);
+      const sanitized = items.map(sanitizeMoment).filter((m) => !m.hidden);
       if (!skipCache) sharedGetCache.set(cacheKey, { at: Date.now(), items: sanitized });
       return sanitized;
     } finally {
