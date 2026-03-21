@@ -1056,6 +1056,11 @@ body.sheet-open {
 /* Tema observatorio: una capa más de profundidad — niebla violeta muy suave centrada en el horizonte (deep sky → violet mist → horizon glow → panel). */
 html.theme-atmosphere .observatory-hero::after {
   background:
+    radial-gradient(
+      ellipse 175% 44% at 50% 77%,
+      color-mix(in oklab, var(--soft) 12%, transparent) 0%,
+      transparent 56%
+    ),
     linear-gradient(
       180deg,
       color-mix(in oklab, var(--bg) 18%, transparent) 0%,
@@ -1081,6 +1086,12 @@ html.theme-atmosphere .observatory-hero::after {
 /* Segunda capa de niebla: más baja, más ancha, muy difusa — aire violeta acumulado alrededor del horizonte (presencia atmosférica, no color). */
 html.theme-atmosphere .observatory-hero::before {
   background:
+    radial-gradient(
+      ellipse 200% 95% at 44% 54%,
+      rgba(92, 61, 255, 0.05) 0%,
+      rgba(92, 61, 255, 0.025) 32%,
+      transparent 62%
+    ),
     radial-gradient(ellipse 160% 100% at 50% 5%, color-mix(in oklab, var(--bg) 88%, var(--layer-air)) 0%, transparent 48%),
     radial-gradient(ellipse 130% 85% at 50% 50%, var(--layer-horizon) 0%, transparent 58%),
     radial-gradient(
@@ -1114,6 +1125,65 @@ html.theme-atmosphere .observatory-hero[data-field-entry="present"] .panel.panel
   filter: brightness(1.022);
   transform: scale(1.006);
   box-shadow: 0 1.25rem 2.65rem -0.48rem color-mix(in oklab, var(--layer-ground) 21%, transparent);
+}
+
+/* ── Violet haze (hero): masa atmosférica detrás de la lectura — suspendido en el campo, no UI plana.
+   Capa interna al panel + refuerzo en ::before/::after del section; solo theme-atmosphere. */
+@keyframes slipup-violet-haze-field {
+  0%,
+  100% {
+    opacity: 0.79;
+  }
+  50% {
+    opacity: 0.87;
+  }
+}
+
+html.theme-atmosphere .observatory-hero .panel.panel-observatory::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    repeating-linear-gradient(
+      112deg,
+      rgba(255, 255, 255, 0.012) 0px,
+      transparent 1px,
+      transparent 3px
+    ),
+    repeating-linear-gradient(
+      -18deg,
+      rgba(6, 8, 22, 0.045) 0px,
+      transparent 1px,
+      transparent 4px
+    ),
+    radial-gradient(
+      ellipse 105% 72% at 56% 47%,
+      color-mix(in oklab, var(--royal) 10%, transparent) 0%,
+      transparent 64%
+    ),
+    radial-gradient(
+      ellipse 82% 92% at 50% 38%,
+      color-mix(in oklab, var(--royal) 17%, transparent) 0%,
+      color-mix(in oklab, var(--bg-deep) 52%, transparent) 48%,
+      transparent 74%
+    ),
+    radial-gradient(
+      ellipse 125% 68% at 48% 58%,
+      color-mix(in oklab, var(--violet-light) 11%, transparent) 0%,
+      transparent 58%
+    );
+  opacity: 0.83;
+  animation: slipup-violet-haze-field 92s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.theme-atmosphere .observatory-hero .panel.panel-observatory::before {
+    animation: none;
+    opacity: 0.82;
+  }
 }
 
 /* Hero: un solo campo — lectura e invitación como continuidad; Orbital como borde, no foco rival. */
