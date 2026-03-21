@@ -1603,14 +1603,22 @@ html.theme-atmosphere .hero-bridge-sub {
 
 html.theme-atmosphere .observatory-hero .hero-bridge-line {
   transform-origin: center center;
-  animation: hero-bridge-appear-atmo 2.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  /* Ritmo más pausado: ebullición → condensación (~3.75s; antes 2.25s). */
+  animation: hero-bridge-appear-atmo 3.75s cubic-bezier(0.18, 0.82, 0.25, 1) forwards;
   will-change: transform, filter, letter-spacing;
 }
 html.theme-atmosphere .observatory-hero .hero-bridge-sub {
   animation-name: hero-bridge-fade-in-sub-atmo;
+  animation-duration: 1.35s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-delay: 0.55s;
 }
 html.theme-atmosphere .observatory-hero .hero-bridge-sub:first-of-type {
   animation-name: hero-bridge-fade-in-sub-first-atmo;
+  animation-delay: 0.45s;
+}
+html.theme-atmosphere .observatory-hero .hero-bridge-sub:last-of-type {
+  animation-delay: 0.95s;
 }
 
 @media (prefers-reduced-motion: reduce) {
