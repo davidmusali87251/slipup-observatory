@@ -153,7 +153,7 @@ body {
     linear-gradient(180deg, #f8f6ff 0%, var(--bg-ink) 100%);
   min-height: 100vh;
   background-attachment: fixed;
-  transition: background 700ms ease;
+  /* Sin transición: cambios de --atmo recalculan gradientes; interpolar "background" provoca parpadeo/delay en lecturas. */
   overscroll-behavior-y: none;
 }
 
@@ -207,7 +207,7 @@ html.theme-atmosphere body {
     var(--sky-deep) 100%
   );
   color: var(--text);
-  transition: background 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* Misma razón que body base: actualizaciones de grado/atmósfera no deben animar todo el fondo ~1s. */
 }
 
 /* Entrada contribute: acercamiento al mismo campo, no corte de “nueva pantalla”. */
@@ -309,10 +309,11 @@ html.theme-atmosphere .local-climate {
 }
 html.theme-atmosphere .panel-observatory {
   box-shadow: 0 1.2rem 2.5rem -0.5rem color-mix(in oklab, var(--layer-ground) 18%, transparent);
+  /* Ritmo corto: latent→present y lecturas no deben “arrastrar” 650ms en todo el panel (parpadeo perceptual). */
   transition:
-    box-shadow var(--tempo-field) ease,
-    filter var(--tempo-field) ease,
-    transform var(--tempo-field) ease;
+    box-shadow 220ms ease,
+    filter 220ms ease,
+    transform 220ms ease;
   transform: scale(1);
   filter: brightness(1);
 }
@@ -999,7 +1000,8 @@ body.sheet-open {
     radial-gradient(ellipse 160% 100% at 50% 5%, color-mix(in oklab, var(--bg) 88%, var(--layer-air)) 0%, transparent 48%),
     radial-gradient(ellipse 130% 85% at 50% 50%, var(--layer-horizon) 0%, transparent 58%);
   opacity: 0.62;
-  transition: opacity 1.5s ease;
+  /* Antes 1.5s: al cruzar latent/present el velo tardaba demasiado y competía con lecturas nuevas. */
+  transition: opacity 0.22s ease;
   z-index: 0;
 }
 
@@ -1081,7 +1083,7 @@ html.theme-atmosphere .observatory-hero[data-field-entry="latent"]::after {
 }
 html.theme-atmosphere .observatory-hero[data-field-entry="present"]::before,
 html.theme-atmosphere .observatory-hero[data-field-entry="present"]::after {
-  transition: opacity var(--tempo-field) ease;
+  transition: opacity 200ms ease;
 }
 html.theme-atmosphere .observatory-hero[data-field-entry="present"]::before {
   opacity: 0.93;
@@ -1188,15 +1190,15 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption-wrap .instr
   opacity: 0.1;
 }
 
-/* Micro-respiración: variación lentísima para que la lectura se sienta suspendida en el aire. Menos amplitud que duración agresiva. */
+/* Micro-respiración: solo transform (no opacity) para no batir subpíxeles del texto al actualizar lecturas. */
 @keyframes hero-breathe {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.975; }
+  0%, 100% { transform: translateZ(0); }
+  50% { transform: translateY(-0.4px) translateZ(0); }
 }
 
 .observatory-hero.hero-breathe .atmosphere-air,
 .observatory-hero.hero-breathe .atmosphere-grounding {
-  animation: hero-breathe 10s ease-in-out infinite;
+  animation: hero-breathe 12s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3689,6 +3691,23 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
   display: none;
 }
 
+/* Móvil: la barra legal fija (z-index 150) tapaba el trigger (z-index 1 de .page > *).
+   Subimos el stack y damos aire/scroll-margin para que el círculo no quede bajo el footer. */
+@media (max-width: 600px) {
+  .hidden-from-view-wrap:not(.hidden) {
+    position: relative;
+    z-index: 160;
+    isolation: isolate;
+    margin-bottom: calc(var(--site-legal-height-mobile, 5.5rem) * 0.35 + 0.65rem);
+    scroll-margin-bottom: calc(var(--site-legal-height-mobile, 5.5rem) + env(safe-area-inset-bottom, 0px) + 0.75rem);
+  }
+
+  .hidden-from-view-trigger {
+    -webkit-tap-highlight-color: color-mix(in oklab, var(--text) 14%, transparent);
+    touch-action: manipulation;
+  }
+}
+
 .hidden-from-view-cluster {
   position: relative;
   display: inline-flex;
@@ -3815,6 +3834,32 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .hidden-from-view-panel {
+    animation: none;
+  }
+}
+
+/* Tras la regla base del panel: en ≤600px el panel abre hacia abajo (no queda tapado por el hero/top ni fuera del viewport). */
+@media (max-width: 600px) {
+  .hidden-from-view-panel {
+    bottom: auto;
+    top: calc(100% + 0.45rem);
+    animation-name: hidden-from-view-panel-in-mobile;
+  }
+}
+
+@keyframes hidden-from-view-panel-in-mobile {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-0.35rem) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 600px) and (prefers-reduced-motion: reduce) {
   .hidden-from-view-panel {
     animation: none;
   }
