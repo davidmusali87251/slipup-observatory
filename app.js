@@ -1435,6 +1435,9 @@ const strataLines = document.getElementById("strataLines");
 const strataMetricsLine = document.getElementById("strataMetricsLine");
 const hiddenFromViewWrap = document.getElementById("hidden-from-view-wrap");
 const hiddenFromViewList = document.getElementById("hiddenFromViewList");
+const hiddenFromViewToggle = document.getElementById("hiddenFromViewToggle");
+const hiddenFromViewPanel = document.getElementById("hiddenFromViewPanel");
+const hiddenFromViewBadge = document.getElementById("hiddenFromViewBadge");
 
 const query = new URLSearchParams(window.location.search);
 const contributed = query.get("contributed") === "1";
@@ -3082,8 +3085,10 @@ function initHeroOnboarding() {
 }
 
 function renderRecent(sharedMoments, constellations) {
+  if (!recentMoments) return;
   recentMoments.innerHTML = "";
-  let list = sortMomentsByRecencyFirst(sharedMoments.slice(0, RENDER_LIMIT));
+  const raw = Array.isArray(sharedMoments) ? sharedMoments : [];
+  let list = sortMomentsByRecencyFirst(raw.slice(0, RENDER_LIMIT));
 
   if (list.length === 0) {
     const ui = UI_COPY[LANG] || UI_COPY.en;
@@ -4126,7 +4131,21 @@ function scheduleNearbyEcho() {
   }, 900 + Math.random() * 300);
 }
 
-/** Pinta la sección "Hidden from view" con botones "Show again" por cada id oculto. Muestra la frase/nota del momento cuando existe. */
+/** @type {((e: Event) => void) | null} */
+let hiddenFromViewOutsideClick = null;
+
+function closeHiddenFromViewPanel() {
+  if (!hiddenFromViewPanel || !hiddenFromViewToggle) return;
+  hiddenFromViewPanel.hidden = true;
+  hiddenFromViewToggle.setAttribute("aria-expanded", "false");
+  hiddenFromViewWrap?.classList.remove("hidden-from-view-wrap--open");
+  if (hiddenFromViewOutsideClick) {
+    document.removeEventListener("click", hiddenFromViewOutsideClick);
+    hiddenFromViewOutsideClick = null;
+  }
+}
+
+/** Un solo icono; el panel lista momentos ocultos y “Show again” (estilo observatorio). */
 function renderHiddenFromView() {
   if (!hiddenFromViewWrap || !hiddenFromViewList) return;
   const entries = getHiddenMoments();
@@ -4136,17 +4155,30 @@ function renderHiddenFromView() {
     hiddenFromViewWrap.hidden = true;
     hiddenFromViewList.innerHTML = "";
     const descElEmpty = document.getElementById("hiddenFromViewDescription");
-    if (descElEmpty) descElEmpty.hidden = true;
+    if (descElEmpty) descElEmpty.textContent = "";
+    if (hiddenFromViewBadge) hiddenFromViewBadge.textContent = "";
+    closeHiddenFromViewPanel();
     return;
   }
   hiddenFromViewWrap.classList.remove("hidden");
   hiddenFromViewWrap.hidden = false;
-  const titleEl = hiddenFromViewWrap.querySelector(".hidden-from-view-title");
-  if (titleEl) titleEl.textContent = ui.hiddenFromViewTitle || "Hidden from view";
+  const n = entries.length;
+  if (hiddenFromViewBadge) hiddenFromViewBadge.textContent = n > 9 ? "9+" : String(n);
+  if (hiddenFromViewToggle) {
+    hiddenFromViewToggle.setAttribute(
+      "aria-label",
+      LANG === "es"
+        ? `Ocultos de vista (${n}) — abrir para restaurar momentos`
+        : `Hidden from view (${n}) — open to restore moments`
+    );
+  }
+  if (hiddenFromViewPanel) {
+    hiddenFromViewPanel.setAttribute("aria-label", ui.hiddenFromViewTitle || "Hidden from view");
+  }
   const descEl = document.getElementById("hiddenFromViewDescription");
   if (descEl) {
-    descEl.textContent = ui.hiddenFromViewDescription || "Moments you hid from this view. You can show them again below.";
-    descEl.hidden = false;
+    descEl.textContent =
+      ui.hiddenFromViewDescription || "Moments you hid from this view. You can show them again below.";
   }
   hiddenFromViewList.innerHTML = "";
   const showAgain = ui.showAgainLabel || "Show again";
@@ -4161,7 +4193,7 @@ function renderHiddenFromView() {
     btn.type = "button";
     btn.className = "text-button hidden-from-view-show-again";
     btn.textContent = showAgain;
-    btn.setAttribute("aria-label", (LANG === "es" ? "Mostrar de nuevo este momento" : "Show this moment again"));
+    btn.setAttribute("aria-label", LANG === "es" ? "Mostrar de nuevo este momento" : "Show this moment again");
     btn.addEventListener("click", () => {
       removeHiddenMomentId(entry.id);
       if (observatoryState?.sharedMoments) refreshObservatoryLists(observatoryState.sharedMoments);
@@ -4170,6 +4202,43 @@ function renderHiddenFromView() {
     li.appendChild(label);
     li.appendChild(btn);
     hiddenFromViewList.appendChild(li);
+  });
+}
+
+let hiddenFromViewToggleInited = false;
+function initHiddenFromViewToggle() {
+  if (hiddenFromViewToggleInited || !hiddenFromViewToggle || !hiddenFromViewPanel || !hiddenFromViewWrap) return;
+  hiddenFromViewToggleInited = true;
+
+  function openHiddenFromViewPanel() {
+    hiddenFromViewPanel.hidden = false;
+    hiddenFromViewToggle.setAttribute("aria-expanded", "true");
+    hiddenFromViewWrap.classList.add("hidden-from-view-wrap--open");
+    hiddenFromViewOutsideClick = (e) => {
+      if (!hiddenFromViewWrap.contains(/** @type {Node | null} */ (e.target))) closeHiddenFromViewPanel();
+    };
+    setTimeout(() => {
+      if (hiddenFromViewPanel.hidden || !hiddenFromViewOutsideClick) return;
+      document.addEventListener("click", hiddenFromViewOutsideClick);
+    }, 0);
+  }
+
+  function toggleHiddenFromViewPanel() {
+    if (hiddenFromViewPanel.hidden) openHiddenFromViewPanel();
+    else closeHiddenFromViewPanel();
+  }
+
+  hiddenFromViewToggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (hiddenFromViewWrap.hidden || hiddenFromViewWrap.classList.contains("hidden")) return;
+    toggleHiddenFromViewPanel();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape" || hiddenFromViewPanel.hidden) return;
+    if (document.body.classList.contains("sheet-open")) return;
+    closeHiddenFromViewPanel();
+    hiddenFromViewToggle.focus();
   });
 }
 
@@ -4473,8 +4542,17 @@ async function boot() {
     fetchGeoIndexRemote(8760, "", 4000).then((g) => g).catch(() => null),
   ]);
   const sharedMoments = sharedResult.items;
+  const uiBoot = UI_COPY[LANG] || UI_COPY.en;
   if (recentContext) {
-    recentContext.textContent = "";
+    if (sharedResult.source === "remote") {
+      recentContext.textContent = uiBoot.recentFromRemote || "";
+      recentContext.classList.toggle("recent-context-hidden", !recentContext.textContent);
+      recentContext.setAttribute("aria-hidden", recentContext.textContent ? "false" : "true");
+    } else {
+      recentContext.textContent = uiBoot.recentFromLocal || "";
+      recentContext.classList.remove("recent-context-hidden");
+      recentContext.setAttribute("aria-hidden", "false");
+    }
   }
   const canonicalState = deriveClimateState(climateTruth, sharedMoments, moments);
   const fieldScopes = buildFieldScopeOptions();
@@ -4634,7 +4712,10 @@ async function boot() {
 
   if (conditionLine) {
     const ui = UI_COPY[LANG] || UI_COPY.en;
-    if (isRemoteReady() && sharedResult.source === "local" && climateTruth.source === "local") {
+    const climateLocal = climateTruth.source === "local";
+    const momentsLocal = sharedResult.source === "local";
+    /* Sin canal remoto configurado, o remoto activo pero todo cayó a local: lectura solo dispositivo. */
+    if (!isRemoteReady() || (momentsLocal && climateLocal)) {
       conditionLine.textContent = ui.conditionOffline || "Reading from this device only.";
     } else {
       conditionLine.textContent = canonicalState.condition;
@@ -4804,6 +4885,7 @@ async function boot() {
     updateClimateDebugPanel(observatoryState.canonicalState);
   }
 
+  initHiddenFromViewToggle();
   renderHiddenFromView();
   initOrbitalLayer();
 

@@ -84,6 +84,170 @@ function applyContributePageCopy() {
   document.title = copy.documentTitle;
 }
 
+/**
+ * Selector de tono estilo observatorio (listbox); el <select> oculto mantiene name/value y validación.
+ */
+function initContributeMoodPicker() {
+  const wrap = document.querySelector(".contribute-mood-wrap");
+  const select = document.getElementById("moodInput");
+  const trigger = document.getElementById("moodCombobox");
+  const panel = document.getElementById("moodListbox");
+  if (!wrap || !select || !trigger || !panel) return;
+
+  const options = /** @type {HTMLElement[]} */ ([...panel.querySelectorAll('[role="option"]')]);
+  const labelEl = trigger.querySelector(".contribute-mood-trigger-label");
+
+  function getLabelForValue(v) {
+    for (let i = 0; i < select.options.length; i++) {
+      if (select.options[i].value === v) return select.options[i].textContent.trim();
+    }
+    return v;
+  }
+
+  function syncTriggerLabel() {
+    if (labelEl) labelEl.textContent = getLabelForValue(select.value);
+  }
+
+  function setAriaSelected() {
+    const val = select.value;
+    options.forEach((opt) => {
+      const isSel = opt.getAttribute("data-value") === val;
+      opt.setAttribute("aria-selected", isSel ? "true" : "false");
+    });
+  }
+
+  /** @type {((e: Event) => void) | null} */
+  let docListener = null;
+
+  function closePanel() {
+    panel.hidden = true;
+    wrap.classList.remove("contribute-mood-wrap--open");
+    trigger.setAttribute("aria-expanded", "false");
+    if (docListener) {
+      document.removeEventListener("click", docListener);
+      docListener = null;
+    }
+  }
+
+  function openPanel() {
+    panel.hidden = false;
+    wrap.classList.add("contribute-mood-wrap--open");
+    trigger.setAttribute("aria-expanded", "true");
+    const idx = options.findIndex((o) => o.getAttribute("data-value") === select.value);
+    const focusIdx = idx >= 0 ? idx : 0;
+    requestAnimationFrame(() => {
+      options[focusIdx]?.focus();
+    });
+    docListener = (e) => {
+      if (!wrap.contains(/** @type {Node | null} */ (e.target))) closePanel();
+    };
+    setTimeout(() => {
+      document.addEventListener("click", docListener);
+    }, 0);
+  }
+
+  function selectByIndex(i) {
+    if (i < 0 || i >= options.length) return;
+    const v = options[i].getAttribute("data-value");
+    if (!v || !ALLOWED_MOODS.has(v)) return;
+    select.value = v;
+    setAriaSelected();
+    select.dispatchEvent(new Event("input", { bubbles: true }));
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+    syncTriggerLabel();
+    closePanel();
+    trigger.focus();
+  }
+
+  trigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (wrap.classList.contains("contribute-mood-wrap--open")) closePanel();
+    else openPanel();
+  });
+
+  options.forEach((opt, i) => {
+    opt.addEventListener("click", (e) => {
+      e.stopPropagation();
+      selectByIndex(i);
+    });
+  });
+
+  trigger.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      if (panel.hidden) openPanel();
+      return;
+    }
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      if (panel.hidden) openPanel();
+      else closePanel();
+    }
+    if (e.key === "Escape" && !panel.hidden) {
+      e.preventDefault();
+      closePanel();
+      trigger.focus();
+    }
+  });
+
+  panel.addEventListener("keydown", (e) => {
+    const active = document.activeElement;
+    let cur =
+      active instanceof HTMLElement ? options.indexOf(active) : -1;
+    if (cur < 0) {
+      cur = options.findIndex((o) => o.getAttribute("data-value") === select.value);
+    }
+    if (e.key === "Escape") {
+      e.preventDefault();
+      closePanel();
+      trigger.focus();
+      return;
+    }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const n = Math.min(options.length - 1, (cur >= 0 ? cur : 0) + 1);
+      options[n]?.focus();
+      return;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      const start = cur >= 0 ? cur : options.length - 1;
+      const n = Math.max(0, start - 1);
+      options[n]?.focus();
+      return;
+    }
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      const i = cur >= 0 ? cur : options.findIndex((o) => o.getAttribute("data-value") === select.value);
+      if (i >= 0) selectByIndex(i);
+    }
+    if (e.key === "Home") {
+      e.preventDefault();
+      options[0]?.focus();
+    }
+    if (e.key === "End") {
+      e.preventDefault();
+      options[options.length - 1]?.focus();
+    }
+  });
+
+  wrap.addEventListener("focusout", (e) => {
+    const r = /** @type {FocusEvent} */ (e).relatedTarget;
+    if (r && wrap.contains(r)) return;
+    window.setTimeout(() => {
+      if (!wrap.contains(document.activeElement)) closePanel();
+    }, 0);
+  });
+
+  select.addEventListener("change", () => {
+    syncTriggerLabel();
+    setAriaSelected();
+  });
+
+  syncTriggerLabel();
+  setAriaSelected();
+}
+
 /** Deshabilita Place / muestra aviso si la nota coincide con la lista bloqueada (cliente). */
 function updateNotePolicyUI() {
   const blocked = isNoteBlocked(noteInput?.value ?? "");
@@ -535,6 +699,7 @@ if (kindStatesEl && form) {
 }
 
 applyContributePageCopy();
+initContributeMoodPicker();
 clampNoteLength();
 syncSaveState();
 updateNoteAnalysisLine();

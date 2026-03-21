@@ -474,7 +474,7 @@ html.theme-atmosphere .contribute-page .panel-contribute::before {
   transition: opacity var(--tempo-field) ease;
 }
 
-html.theme-atmosphere .contribute-page .field select,
+html.theme-atmosphere .contribute-page .field select:not(.contribute-mood-native),
 html.theme-atmosphere .contribute-page .field input[type="text"] {
   background: rgba(11, 12, 26, 0.38);
   border-color: rgba(139, 108, 255, 0.13);
@@ -487,11 +487,11 @@ html.theme-atmosphere .contribute-page .field input[type="text"] {
     background-color var(--tempo-field) ease,
     filter var(--tempo-field) ease;
 }
-html.theme-atmosphere .contribute-page .field select:hover,
+html.theme-atmosphere .contribute-page .field select:not(.contribute-mood-native):hover,
 html.theme-atmosphere .contribute-page .field input[type="text"]:hover {
   border-color: rgba(139, 108, 255, 0.22);
 }
-html.theme-atmosphere .contribute-page .field select:focus,
+html.theme-atmosphere .contribute-page .field select:not(.contribute-mood-native):focus,
 html.theme-atmosphere .contribute-page .field input[type="text"]:focus {
   /* Asentar: superficie más densa, casi sin “anillo de app” */
   border-color: rgba(139, 108, 255, 0.16);
@@ -799,7 +799,7 @@ html.theme-atmosphere .contribute-page .contribute-back-link {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
-html.theme-atmosphere .contribute-page #moodInput,
+html.theme-atmosphere .contribute-page .contribute-mood-trigger,
 html.theme-atmosphere .contribute-page #noteInput {
   color: var(--text);
 }
@@ -3678,8 +3678,9 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
   color: var(--text);
 }
 
+/* Un icono + panel (lista) — estilo observatorio, sin bloque de título siempre visible */
 .hidden-from-view-wrap {
-  margin: 1rem 0 0;
+  margin: 0.35rem 0 0;
   text-align: center;
   font-size: 0.75rem;
   color: var(--muted);
@@ -3687,43 +3688,204 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
 .hidden-from-view-wrap.hidden {
   display: none;
 }
-.hidden-from-view-title {
-  margin: 0 0 0.35rem;
-  font-weight: 500;
+
+.hidden-from-view-cluster {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  width: 100%;
+  min-height: 2.75rem;
+  align-items: flex-end;
 }
-.hidden-from-view-description {
-  margin: 0 0 0.5rem;
-  font-size: 0.8rem;
-  color: var(--muted);
+
+.hidden-from-view-trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: 0;
+  padding: 0;
+  border: 1px solid color-mix(in oklab, var(--line) 45%, rgba(139, 108, 255, 0.18));
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--bg-deep) 72%, rgba(36, 32, 88, 0.28));
+  color: color-mix(in oklab, var(--soft) 55%, var(--text));
+  box-shadow:
+    0 2px 14px rgba(0, 0, 0, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
 }
+
+.hidden-from-view-trigger:hover {
+  border-color: color-mix(in oklab, var(--line) 55%, rgba(139, 108, 255, 0.35));
+  color: var(--text);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(139, 108, 255, 0.12);
+}
+
+.hidden-from-view-trigger:focus {
+  outline: none;
+  box-shadow:
+    0 2px 14px rgba(0, 0, 0, 0.12),
+    0 0 0 3px rgba(92, 61, 255, 0.22);
+}
+
+.hidden-from-view-trigger:focus-visible {
+  outline: 2px solid rgba(139, 108, 255, 0.45);
+  outline-offset: 2px;
+}
+
+.hidden-from-view-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.92;
+}
+
+.hidden-from-view-wrap--open .hidden-from-view-trigger {
+  border-color: rgba(139, 108, 255, 0.4);
+  color: var(--text);
+}
+
+.hidden-from-view-badge {
+  position: absolute;
+  top: -0.15rem;
+  right: -0.15rem;
+  min-width: 1.15rem;
+  height: 1.15rem;
+  padding: 0 0.28rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: var(--text);
+  background: linear-gradient(145deg, rgba(92, 61, 255, 0.55), rgba(139, 108, 255, 0.35));
+  border: 1px solid rgba(201, 196, 255, 0.35);
+  border-radius: 999px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+
+.hidden-from-view-badge:empty {
+  display: none;
+}
+
+.hidden-from-view-panel {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 0.45rem);
+  transform: translateX(-50%);
+  z-index: 380;
+  width: min(100vw - 2.5rem, 20rem);
+  max-height: min(50vh, 16rem);
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.55rem 0 0.45rem;
+  text-align: left;
+  border-radius: 14px;
+  border: 1px solid color-mix(in oklab, var(--line) 48%, rgba(139, 108, 255, 0.22));
+  background: linear-gradient(180deg, rgba(18, 20, 42, 0.98) 0%, rgba(10, 12, 26, 0.99) 100%);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(139, 108, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-overflow-scrolling: touch;
+  animation: hidden-from-view-panel-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes hidden-from-view-panel-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(0.35rem) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hidden-from-view-panel {
+    animation: none;
+  }
+}
+
+.hidden-from-view-panel-hint {
+  margin: 0 0.85rem 0.5rem;
+  padding: 0 0.15rem;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: color-mix(in oklab, var(--soft) 65%, var(--text));
+  font-weight: 400;
+}
+
 .hidden-from-view-list {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0 0.35rem;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.35rem;
+  flex-direction: column;
+  gap: 0.15rem;
 }
+
 .hidden-from-view-item {
   margin: 0;
-  padding: 0;
+  padding: 0.45rem 0.5rem;
   display: flex;
+  flex-direction: row;
   align-items: center;
-  gap: 0.35rem;
+  justify-content: space-between;
+  gap: 0.65rem;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
+
+.hidden-from-view-item:hover {
+  background: color-mix(in oklab, rgba(92, 61, 255, 0.12) 40%, transparent);
+  border-color: rgba(139, 108, 255, 0.12);
+}
+
 .hidden-from-view-item-label {
-  font-size: 0.75rem;
-  color: var(--muted);
+  flex: 1;
+  min-width: 0;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: color-mix(in oklab, var(--text) 88%, var(--soft));
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
 .hidden-from-view-show-again {
-  font-size: 0.7rem;
-  color: var(--muted);
-  padding: 0.2rem 0.4rem;
+  flex-shrink: 0;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(201, 196, 255, 0.85);
+  padding: 0.35rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(139, 108, 255, 0.28);
+  background: rgba(92, 61, 255, 0.12);
+  text-decoration: none;
 }
+
 .hidden-from-view-show-again:hover {
   color: var(--text);
-  text-decoration: underline;
+  border-color: rgba(139, 108, 255, 0.45);
+  background: rgba(92, 61, 255, 0.2);
 }
 
 .page .site-legal {
@@ -5218,6 +5380,12 @@ html.theme-atmosphere .panel-recent::after {
   overflow: hidden;
 }
 
+/* Menú de tono (listbox): el panel no debe recortarse por overflow:hidden */
+.panel-contribute:has(.contribute-mood-wrap--open) {
+  overflow: visible;
+  z-index: 4;
+}
+
 /* Brillo de fondo: glow sutil para la capa contribute */
 .panel-contribute::before {
   content: "";
@@ -5590,9 +5758,9 @@ html.theme-atmosphere .panel-recent::after {
     padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
   }
   html.theme-atmosphere .contribute-page .field input[type="text"]#noteInput,
-  html.theme-atmosphere .contribute-page .field select#moodInput,
+  html.theme-atmosphere .contribute-page .contribute-mood-trigger,
   .contribute-page .field input[type="text"]#noteInput,
-  .contribute-page .field select#moodInput {
+  .contribute-page .contribute-mood-trigger {
     font-size: max(16px, 1rem);
     line-height: 1.35;
   }
@@ -5610,7 +5778,7 @@ html.theme-atmosphere .panel-recent::after {
     height: 1.15rem;
     flex-shrink: 0;
   }
-  .contribute-page .field-tone select#moodInput {
+  .contribute-page .contribute-mood-trigger {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
@@ -5624,7 +5792,7 @@ html.theme-atmosphere .panel-recent::after {
   #contributeForm[data-kind-preview] #noteInput {
     transition: none;
   }
-  html.theme-atmosphere .contribute-page .field select,
+  html.theme-atmosphere .contribute-page .field select:not(.contribute-mood-native),
   html.theme-atmosphere .contribute-page .field input[type="text"],
   html.theme-atmosphere .contribute-page #contributeForm #noteInput,
   html.theme-atmosphere .contribute-page #saveButton.cta,
@@ -5689,7 +5857,7 @@ html.theme-atmosphere .panel-recent::after {
   opacity: 0.9;
 }
 
-.field select,
+.field select:not(.contribute-mood-native),
 .field input[type="text"] {
   padding: 0.6rem 0.75rem;
   border: 1px solid color-mix(in oklab, #a8b8ca 85%, transparent);
@@ -5709,7 +5877,7 @@ html.theme-atmosphere .panel-recent::after {
     background 180ms ease;
 }
 
-.contribute-page #moodInput,
+.contribute-page .contribute-mood-trigger,
 .contribute-page #noteInput {
   font-family: var(--font-sans);
   font-size: 0.95rem;
@@ -5739,17 +5907,208 @@ html.theme-atmosphere .contribute-page #noteInput.contribute-note--blocked {
 html.theme-atmosphere .note-policy-hint {
   color: color-mix(in oklab, #e8a0a0 75%, var(--muted));
 }
-.contribute-page .field-tone select {
-  min-height: 44px;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  cursor: pointer;
-  width: 100%;
+/* Tone: listbox estilo observatorio (trigger + panel); el <select> va con .visually-hidden */
+.contribute-mood-wrap {
   position: relative;
+  width: 100%;
   z-index: 2;
 }
 
-.field select {
+.contribute-page .field select.contribute-mood-native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  appearance: none;
+  background: none;
+  box-shadow: none;
+}
+
+.contribute-mood-trigger {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  padding-right: 2.35rem;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  border: 1px solid color-mix(in oklab, #a8b8ca 85%, transparent);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff 0%, #faf7ff 100%);
+  box-shadow:
+    0 1px 0 #ffffffde inset,
+    0 2px 8px color-mix(in oklab, #2f455b 6%, transparent);
+  transition:
+    border-color 160ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.contribute-mood-trigger:hover {
+  border-color: color-mix(in oklab, var(--text) 24%, #c8d6e7);
+}
+
+.contribute-mood-trigger:focus {
+  outline: none;
+  border-color: color-mix(in oklab, var(--text) 28%, #c8d6e7);
+  box-shadow:
+    0 1px 0 #ffffffde inset,
+    0 0 0 3px color-mix(in oklab, #5c7a9a 22%, transparent);
+}
+
+.contribute-mood-trigger-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.contribute-mood-trigger-chevron {
+  position: absolute;
+  right: 0.65rem;
+  top: 50%;
+  width: 0.65rem;
+  height: 0.65rem;
+  margin-top: -0.2rem;
+  border-right: 1.5px solid color-mix(in oklab, #3f5267 85%, #8899aa);
+  border-bottom: 1.5px solid color-mix(in oklab, #3f5267 85%, #8899aa);
+  transform: rotate(45deg);
+  transition: transform 0.22s ease;
+  pointer-events: none;
+}
+
+.contribute-mood-wrap--open .contribute-mood-trigger-chevron {
+  margin-top: 0.1rem;
+  transform: rotate(225deg);
+}
+
+.contribute-mood-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  z-index: 60;
+  margin: 0;
+  padding: 0.4rem 0;
+  list-style: none;
+  border-radius: 14px;
+  border: 1px solid color-mix(in oklab, #a8b8ca 75%, transparent);
+  background: linear-gradient(180deg, #ffffff 0%, #f8f6ff 100%);
+  box-shadow:
+    0 12px 36px color-mix(in oklab, #2f455b 14%, transparent),
+    0 1px 0 #ffffffc4 inset,
+    0 0 0 1px color-mix(in oklab, #ffffff 40%, transparent);
+  animation: contribute-mood-panel-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes contribute-mood-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.contribute-mood-option {
+  margin: 0;
+  padding: 0.62rem 1rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.92rem;
+  letter-spacing: 0.02em;
+  color: #1d2e3f;
+  border-left: 3px solid transparent;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.contribute-mood-option:hover,
+.contribute-mood-option:focus {
+  outline: none;
+  background: color-mix(in oklab, #5c61ff 8%, #f5f3ff);
+}
+
+.contribute-mood-option[aria-selected="true"] {
+  background: color-mix(in oklab, #5c61ff 12%, #f0ecff);
+  border-left-color: color-mix(in oklab, #5c61ff 55%, #8899cc);
+  font-weight: 600;
+}
+
+html.theme-atmosphere .contribute-mood-trigger {
+  border: 1px solid color-mix(in oklab, var(--line) 45%, rgba(139, 108, 255, 0.14));
+  background: rgba(11, 12, 26, 0.38);
+  box-shadow:
+    0 2px 14px rgba(0, 0, 0, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.025) inset;
+  color: var(--text);
+}
+
+html.theme-atmosphere .contribute-mood-trigger:hover {
+  border-color: color-mix(in oklab, var(--line) 55%, rgba(139, 108, 255, 0.22));
+}
+
+html.theme-atmosphere .contribute-mood-trigger:focus {
+  border-color: rgba(139, 108, 255, 0.35);
+  box-shadow:
+    0 2px 20px rgba(0, 0, 0, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.055) inset,
+    0 0 0 3px rgba(92, 61, 255, 0.18);
+}
+
+html.theme-atmosphere .contribute-mood-trigger-chevron {
+  border-color: color-mix(in oklab, var(--soft) 55%, rgba(201, 196, 255, 0.5));
+}
+
+html.theme-atmosphere .contribute-mood-panel {
+  border: 1px solid color-mix(in oklab, var(--line) 48%, rgba(139, 108, 255, 0.2));
+  background: linear-gradient(
+    180deg,
+    rgba(18, 20, 42, 0.97) 0%,
+    rgba(12, 14, 30, 0.98) 100%
+  );
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(139, 108, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+}
+
+html.theme-atmosphere .contribute-mood-option {
+  color: color-mix(in oklab, var(--text) 94%, var(--soft));
+}
+
+html.theme-atmosphere .contribute-mood-option:hover,
+html.theme-atmosphere .contribute-mood-option:focus {
+  background: color-mix(in oklab, rgba(92, 61, 255, 0.18) 40%, rgba(18, 20, 42, 0.95));
+}
+
+html.theme-atmosphere .contribute-mood-option[aria-selected="true"] {
+  background: color-mix(in oklab, rgba(92, 61, 255, 0.22) 45%, rgba(14, 16, 34, 0.92));
+  border-left-color: rgba(139, 108, 255, 0.65);
+  color: var(--text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contribute-mood-panel {
+    animation: none;
+  }
+}
+
+.field select:not(.contribute-mood-native) {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -5762,25 +6121,7 @@ html.theme-atmosphere .note-policy-hint {
   background-size: auto, 0.9rem;
 }
 
-/* Táctil: -webkit-appearance:none en <select> a veces impide abrir el picker en WebKit móvil. */
-@media (hover: none) and (pointer: coarse) {
-  .contribute-page .field-tone select#moodInput {
-    -webkit-appearance: menulist-button;
-    appearance: auto;
-  }
-  html.theme-atmosphere .contribute-page .field-tone select#moodInput {
-    -webkit-appearance: menulist-button;
-    appearance: auto;
-    background-image: none;
-    background-color: rgba(11, 12, 26, 0.42);
-    border: 1px solid color-mix(in oklab, var(--line) 45%, rgba(139, 108, 255, 0.14));
-    box-shadow:
-      0 2px 14px rgba(0, 0, 0, 0.08),
-      0 1px 0 rgba(255, 255, 255, 0.025) inset;
-  }
-}
-
-.field select:hover,
+.field select:not(.contribute-mood-native):hover,
 .field input[type="text"]:hover {
   border-color: color-mix(in oklab, var(--text) 24%, #c8d6e7);
 }
@@ -5811,7 +6152,7 @@ html.theme-atmosphere .note-policy-hint {
   text-transform: none;
 }
 
-.field select:focus,
+.field select:not(.contribute-mood-native):focus,
 .field input[type="text"]:focus {
   outline: none;
   border-color: color-mix(in oklab, #8fa9c9 74%, #ffffff);
