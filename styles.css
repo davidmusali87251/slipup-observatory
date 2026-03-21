@@ -3398,14 +3398,14 @@ html.theme-atmosphere .daily-tone-line {
   content: " ";
 }
 html.theme-atmosphere .observatory-pulse {
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.71);
   font-size: 0.68rem;
   text-shadow:
-    0 0 8px rgba(201, 196, 255, 0.1),
-    0 1px 2px rgba(0, 0, 0, 0.32);
+    0 0 6px rgba(201, 196, 255, 0.07),
+    0 1px 2px rgba(0, 0, 0, 0.28);
 }
 html.theme-atmosphere .observatory-pulse.is-visible {
-  opacity: 0.62;
+  opacity: 0.56;
 }
 html.theme-atmosphere .observatory-pulse-label {
   font-weight: 400;
@@ -3491,14 +3491,16 @@ html.theme-atmosphere .observatory-hero .hero-weather-panel .atmospheric-weather
     0 1px 2px rgba(0, 0, 0, 0.42);
 }
 html.theme-atmosphere .observatory-hero .hero-scroll-hint.hero-scroll-hint--visible {
-  color: color-mix(in oklab, var(--muted) 78%, var(--soft));
-  opacity: 0.42;
+  color: color-mix(in oklab, var(--muted) 82%, var(--soft));
+  opacity: 0.32;
   font-size: 0.63rem;
   letter-spacing: 0.11em;
   font-weight: 400;
-  text-shadow: 0 0 14px rgba(92, 61, 255, 0.06);
-  margin-top: 0.05rem;
-  margin-bottom: 0.12rem;
+  text-shadow: 0 0 14px rgba(92, 61, 255, 0.04);
+  margin-top: 0;
+  margin-bottom: 0.1rem;
+  /* Un poco más arriba: lee como velo del campo / radar, no como paso previo al CTA. */
+  transform: translateY(-3px);
 }
 html.theme-atmosphere .observatory-hero .warmup-hint {
   color: #ebe7ff;
@@ -3526,12 +3528,12 @@ html.theme-atmosphere .observatory-hero .atmosphere-grounding .hero-bridge-sub--
 /* Móvil: un pelo más de lectura en la franja medio-baja (sin volver a la densidad de escritorio). */
 @media (max-width: 480px) {
   html.theme-atmosphere .observatory-hero .hero-scroll-hint.hero-scroll-hint--visible {
-    opacity: 0.52;
+    opacity: 0.44;
     font-size: 0.64rem;
   }
 
   html.theme-atmosphere .observatory-pulse.is-visible {
-    opacity: 0.72;
+    opacity: 0.65;
   }
 
   html.theme-atmosphere .observatory-hero .atmosphere-grounding .hero-bridge-sub--grounding {
