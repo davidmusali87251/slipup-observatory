@@ -23,6 +23,16 @@ Clean rebuild aligned with the Observatory model.
 
 Open `index.html` in a browser.
 
+### Lint (ESLint)
+
+```bash
+npm install
+npm run lint
+```
+
+- `npm run lint:fix` — aplica correcciones automáticas donde aplique.
+- `npm run lint:strict` — falla si hay **warnings** (útil cuando se limpien avisos en `app.js`).
+
 ## Deployments
 
 **Condición:** no incluir `PLAN_MASTER.md` en lo que se despliega. El archivo está en `.gitignore`. Si ya fue commiteado antes, ejecutar una vez: `git rm --cached PLAN_MASTER.md` y hacer commit para quitarlo del árbol desplegado; el archivo seguirá en disco para uso interno.

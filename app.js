@@ -2049,6 +2049,14 @@ function loadMoments() {
   }
 }
 
+function saveMoments(moments) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(moments));
+  } catch {
+    /* quota / modo privado */
+  }
+}
+
 function getRecentWindow(moments) {
   const now = Date.now();
   const twoDaysMs = 48 * 60 * 60 * 1000;
@@ -3569,7 +3577,7 @@ function renderLocalClimate(localState, canonicalState, scopeLabel = "Nearby", p
   const pressureMode = localState?.pressureMode || "stabilizing";
   const seed = Math.round((localState?.computedDegree || BASELINE) * 10) + (localState?.total || 0);
   const source = localState?.source;
-  let readingLine = "";
+  let readingLine;
   if (source === "global_view" || source === "global_fallback") {
     const arr = ui.nearbyReadingFallback || ["Quiet.", "Light signal."];
     readingLine = pickCopy(arr, seed);
@@ -3862,7 +3870,7 @@ function triggerPostContributeSequence(canonicalState, lang) {
   const p1 = ui.postContributePhase1 || [];
   const p2 = ui.postContributePhase2 || [];
   const summaryLines = ui.postContributeSummaryLine || [];
-  const total = Number(canonicalState?.total) ?? 0;
+  const total = Number(canonicalState?.total) || 0;
   const seed = (total * 7 + Math.round(Number(canonicalState?.computedDegree) || 0)) | 0;
   const phase1Text =
     (typeof ui.postContributePhase1Line === "string" && ui.postContributePhase1Line.trim()) ||

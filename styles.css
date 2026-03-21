@@ -97,6 +97,7 @@
   }
 }
 
+
 @media (max-width: 320px) {
   :root {
     --site-bar-pad-x: 0.4rem;
@@ -558,7 +559,7 @@ html.theme-atmosphere .contribute-page .contribute-rise-tone .field-tone-label {
 html.theme-atmosphere .contribute-page .contribute-rise-tone:not(.contribute-rise-tone--revealed) .contribute-tone-interactive {
   opacity: 0.4;
   filter: saturate(0.92);
-  pointer-events: none;
+  /* Sin pointer-events:none: en iOS/WebKit móvil a veces no se restauran toques; el bloqueo va en input[disabled] (JS). */
   transition:
     opacity var(--tempo-field) cubic-bezier(0.22, 1, 0.36, 1),
     filter var(--tempo-field) ease;
@@ -566,6 +567,7 @@ html.theme-atmosphere .contribute-page .contribute-rise-tone:not(.contribute-ris
 html.theme-atmosphere .contribute-page .contribute-rise-tone--revealed .contribute-tone-interactive {
   opacity: 1;
   filter: none;
+  pointer-events: auto;
   transition:
     opacity var(--tempo-field) cubic-bezier(0.22, 1, 0.36, 1),
     filter var(--tempo-field) ease;
@@ -3702,50 +3704,69 @@ html.theme-atmosphere .page .site-legal {
   flex-shrink: 0;
 }
 
-/* Barra legal fija: en pantallas estrechas no forzar una sola fila (Strata ↓ fuera de pantalla). */
+/* Barra legal: misma barra fija que en desktop; Strata a la derecha; padding para no tapar contenido */
 @media (max-width: 600px) {
+  :root {
+    --site-legal-height-mobile: 5.5rem;
+  }
+
   .page:has(.site-legal) {
-    padding-bottom: calc(var(--page-pad-bottom) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(
+      var(--page-pad-bottom) + var(--site-legal-height-mobile) + env(safe-area-inset-bottom, 0px)
+    );
   }
 
   .page .site-legal {
-    position: static;
-    flex-direction: column;
-    justify-content: center;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 150;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
     align-items: center;
-    gap: 0.35rem;
-    min-height: auto;
-    margin-top: 1rem;
+    gap: min(var(--site-bar-gap), 0.65rem);
+    min-height: var(--site-legal-height);
+    margin: 0;
     padding: var(--site-bar-pad-y) max(var(--site-bar-pad-x), env(safe-area-inset-left, 0px))
       calc(env(safe-area-inset-bottom, 0px) + var(--site-bar-pad-y)) max(var(--site-bar-pad-x), env(safe-area-inset-right, 0px));
     max-width: 100vw;
     box-sizing: border-box;
-    background: transparent;
-    border-top: 1px solid color-mix(in oklab, var(--line) 30%, transparent);
-    box-shadow: none;
+    background: color-mix(in oklab, var(--bg) 97%, var(--bg-deep));
+    border-top: 1px solid color-mix(in oklab, var(--line) 75%, transparent);
+    box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.12);
   }
 
   html.theme-atmosphere .page .site-legal {
-    background: transparent;
-    border-top-color: color-mix(in oklab, var(--line) 30%, transparent);
-    box-shadow: none;
+    background: var(--site-bar-chrome-gradient);
+    border-top: 1px solid color-mix(in oklab, var(--line) 42%, transparent);
+    box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.12);
   }
 
   .site-legal-left {
-    justify-content: center;
+    justify-content: flex-start;
+    align-items: center;
     flex-wrap: wrap;
-    width: 100%;
-    max-width: 100%;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: calc(100% - 4.75rem);
     row-gap: 0.28rem;
+    column-gap: 0.45rem;
+    overflow-wrap: anywhere;
+    text-align: left;
   }
 
   .site-legal-strata-link {
     margin-left: 0;
+    flex: 0 0 auto;
+    align-self: center;
     width: auto;
+    min-width: min(4.5rem, 22vw);
     max-width: none;
     display: inline-block;
-    margin-top: 0.1rem;
-    text-align: center;
+    margin-top: 0;
+    text-align: right;
     box-sizing: border-box;
     font-family: var(--font-observatory);
     font-size: 0.65rem;
@@ -5318,7 +5339,6 @@ html.theme-atmosphere .panel-recent::after {
 .contribute-rise-tone:not(.contribute-rise-tone--revealed) .contribute-tone-interactive {
   opacity: 0.36;
   filter: saturate(0.94);
-  pointer-events: none;
   transition:
     opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1),
     filter 0.5s ease;
@@ -5326,6 +5346,7 @@ html.theme-atmosphere .panel-recent::after {
 .contribute-rise-tone--revealed .contribute-tone-interactive {
   opacity: 1;
   filter: none;
+  pointer-events: auto;
 }
 .contribute-kind-states {
   display: grid;
@@ -5495,6 +5516,34 @@ html.theme-atmosphere .panel-recent::after {
   }
   .contribute-rise-tone {
     padding: 0.7rem 0.8rem 0.8rem;
+  }
+}
+
+/* Contribute — móvil: evitar zoom por foco en iOS (inputs ≥16px), home indicator y toques */
+@media (max-width: 600px) {
+  .contribute-page {
+    padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  }
+  html.theme-atmosphere .contribute-page .field input[type="text"]#noteInput,
+  html.theme-atmosphere .contribute-page .field select#moodInput,
+  .contribute-page .field input[type="text"]#noteInput,
+  .contribute-page .field select#moodInput {
+    font-size: max(16px, 1rem);
+    line-height: 1.35;
+  }
+  .contribute-kind-state {
+    touch-action: manipulation;
+    min-height: max(2.85rem, 44px);
+  }
+  .contribute-page #saveButton.cta {
+    touch-action: manipulation;
+    min-height: 44px;
+  }
+  .contribute-page .field-inline input[type="checkbox"] {
+    touch-action: manipulation;
+    width: 1.15rem;
+    height: 1.15rem;
+    flex-shrink: 0;
   }
 }
 

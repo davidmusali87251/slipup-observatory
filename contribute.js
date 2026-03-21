@@ -91,34 +91,35 @@ function setKindPreview(kind) {
   else form.removeAttribute("data-kind-preview");
 }
 
+const NOTE_MAX_LEN = 19;
+
+/** Asegura límite 19 (algunos móviles/IME ignoran maxlength hasta commit). */
+function clampNoteLength() {
+  if (!noteInput) return;
+  const v = noteInput.value;
+  if (v.length > NOTE_MAX_LEN) {
+    noteInput.value = v.slice(0, NOTE_MAX_LEN);
+  }
+}
+
 function updateToneReveal() {
   const has = (noteInput?.value?.trim()?.length ?? 0) > 0;
   if (!has) typeTouched = false;
   toneWrap?.classList.toggle("contribute-rise-tone--revealed", has);
   if (kindStatesEl) {
-    if (has) {
-      kindStatesEl.removeAttribute("aria-disabled");
-    } else {
-      kindStatesEl.setAttribute("aria-disabled", "true");
-    }
+    if (has) kindStatesEl.removeAttribute("aria-disabled");
+    else kindStatesEl.setAttribute("aria-disabled", "true");
   }
+  /* disabled nativo: en móvil funciona mejor que pointer-events/tabindex (touch + teclado). */
   form?.querySelectorAll('input[name="type"]').forEach((r) => {
-    if (has) {
-      r.removeAttribute("tabindex");
-      r.removeAttribute("aria-disabled");
-    } else {
-      r.setAttribute("tabindex", "-1");
-      r.setAttribute("aria-disabled", "true");
-    }
+    r.disabled = !has;
+    r.removeAttribute("tabindex");
+    r.removeAttribute("aria-disabled");
   });
   if (moodInput) {
-    if (has) {
-      moodInput.removeAttribute("tabindex");
-      moodInput.removeAttribute("aria-disabled");
-    } else {
-      moodInput.setAttribute("tabindex", "-1");
-      moodInput.setAttribute("aria-disabled", "true");
-    }
+    moodInput.disabled = !has;
+    moodInput.removeAttribute("tabindex");
+    moodInput.removeAttribute("aria-disabled");
   }
 }
 
@@ -300,7 +301,8 @@ function syncSaveState() {
   updateNotePolicyUI();
 }
 
-noteInput.addEventListener("input", () => {
+function onNoteFieldActivity() {
+  clampNoteLength();
   if (formStatus.textContent === MSG_COMPLETE_FIELD) {
     setFormStatus("");
   }
@@ -308,6 +310,32 @@ noteInput.addEventListener("input", () => {
   updateNoteAnalysisLine();
   updateToneReveal();
   scheduleKindSuggest();
+}
+
+noteInput.addEventListener("input", onNoteFieldActivity);
+noteInput.addEventListener("change", onNoteFieldActivity);
+noteInput.addEventListener("paste", () => requestAnimationFrame(onNoteFieldActivity));
+noteInput.addEventListener("cut", () => requestAnimationFrame(onNoteFieldActivity));
+noteInput.addEventListener("compositionend", onNoteFieldActivity);
+
+/** iOS/Safari: al restaurar desde caché (swipe back), re-sincronizar estado del formulario. */
+window.addEventListener("pageshow", (e) => {
+  if (e.persisted) {
+    clampNoteLength();
+    syncSaveState();
+    updateNoteAnalysisLine();
+    updateToneReveal();
+    scheduleKindSuggest();
+  }
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState !== "visible" || !noteInput) return;
+  requestAnimationFrame(() => {
+    clampNoteLength();
+    updateToneReveal();
+    syncSaveState();
+  });
 });
 
 consentInput?.addEventListener("change", () => {
@@ -484,6 +512,7 @@ if (kindStatesEl && form) {
   });
 }
 
+clampNoteLength();
 syncSaveState();
 updateNoteAnalysisLine();
 updateToneReveal();
