@@ -131,11 +131,23 @@ async function safeJson(response) {
  * El servidor (Edge Function GET) debe excluirlos; aquí refuerzo si el payload incluye flags o estados raros.
  */
 function isMomentRemovedFromPublicView(raw) {
-  if (!raw || typeof raw !== "object") return true;
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return true;
   if (raw.hidden === true || raw.removed === true) return true;
   const st = raw.moderation_status;
   if (typeof st === "string" && st.length > 0 && st !== "published") return true;
   return false;
+}
+
+/** Evita RangeError en toISOString() si el servidor envía timestamp raro o inválido. */
+function safeIsoTimestamp(raw) {
+  if (raw === undefined || raw === null || raw === "") {
+    return new Date().toISOString();
+  }
+  const d = new Date(raw);
+  if (Number.isNaN(d.getTime())) {
+    return new Date().toISOString();
+  }
+  return d.toISOString();
 }
 
 /** Respuesta POST rechazada por moderación / términos (4xx + cuerpo opcional). */
@@ -149,15 +161,19 @@ function isModerationRejectedPost(status, data) {
 }
 
 function sanitizeMoment(raw) {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+    return null;
+  }
   const type = ALLOWED_TYPES.has(raw?.type) ? raw.type : "observed";
   const mood = ALLOWED_MOODS.has(raw?.mood) ? raw.mood : "calm";
-  const timestamp = raw?.timestamp ? new Date(raw.timestamp).toISOString() : new Date().toISOString();
+  const timestamp = raw?.timestamp ? safeIsoTimestamp(raw.timestamp) : new Date().toISOString();
+  const createdAt = raw?.created_at ? safeIsoTimestamp(raw.created_at) : timestamp;
   const relateCount = typeof raw?.relate_count === "number" && raw.relate_count >= 0 ? raw.relate_count : 0;
   const hidden = isMomentRemovedFromPublicView(raw);
   return {
     id: raw?.id || crypto.randomUUID(),
     timestamp,
-    created_at: raw?.created_at || timestamp,
+    created_at: createdAt,
     client_day: raw?.client_day || null,
     type,
     mood,
@@ -213,7 +229,15 @@ async function fetchSharedMomentsRemote(limit = 10, windowHours = 48, opts = {})
           : Array.isArray(payload?.items)
             ? payload.items
             : [];
-      const sanitized = items.map(sanitizeMoment).filter((m) => !m.hidden);
+      const sanitized = items
+        .map((row) => {
+          try {
+            return sanitizeMoment(row);
+          } catch {
+            return null;
+          }
+        })
+        .filter((m) => m && !m.hidden);
       if (!skipCache) sharedGetCache.set(cacheKey, { at: Date.now(), items: sanitized });
       return sanitized;
     } finally {
