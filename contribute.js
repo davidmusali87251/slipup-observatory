@@ -57,6 +57,33 @@ function getContributeLang() {
   return (document.documentElement.getAttribute("lang") || "en").startsWith("es") ? "es" : "en";
 }
 
+/**
+ * Título (#contributeHeadline), línea secundaria (#contributeSubtitle) y document.title.
+ * Cambiá `en` / `es` aquí; en `contribute.html` mantené title + og/twitter alineados con la variante `en`
+ * (meta para crawlers que no ejecutan JS).
+ */
+const CONTRIBUTE_PAGE = {
+  en: {
+    headline: "The observatory opens",
+    secondaryLine: "Into the shared field",
+    documentTitle: "The observatory opens — SlipUp™ Observatory",
+  },
+  es: {
+    headline: "El observatorio recibe",
+    secondaryLine: "Hacia el campo compartido",
+    documentTitle: "El observatorio recibe — SlipUp™ Observatory",
+  },
+};
+
+function applyContributePageCopy() {
+  const copy = CONTRIBUTE_PAGE[getContributeLang()] || CONTRIBUTE_PAGE.en;
+  const h1 = document.getElementById("contributeHeadline");
+  if (h1) h1.textContent = copy.headline;
+  const sub = document.getElementById("contributeSubtitle");
+  if (sub) sub.textContent = copy.secondaryLine;
+  document.title = copy.documentTitle;
+}
+
 /** Deshabilita Place / muestra aviso si la nota coincide con la lista bloqueada (cliente). */
 function updateNotePolicyUI() {
   const blocked = isNoteBlocked(noteInput?.value ?? "");
@@ -507,6 +534,7 @@ if (kindStatesEl && form) {
   });
 }
 
+applyContributePageCopy();
 clampNoteLength();
 syncSaveState();
 updateNoteAnalysisLine();

@@ -1159,7 +1159,6 @@ html.theme-atmosphere .observatory-hero .cta-observatory-wrap {
 /* Puente superior + cola post-Place: mismo campo; Place como decantación, no estación intermedia. */
 html.theme-atmosphere .observatory-hero .hero-bridge-line {
   margin-bottom: 0.88rem;
-  opacity: 0.86;
 }
 html.theme-atmosphere .observatory-hero .cta-bridge-copy-stack {
   margin-top: 0.08rem;
@@ -1557,10 +1556,40 @@ html.theme-atmosphere .hero-bridge-sub {
     0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
-@keyframes hero-bridge-fade-in-atmo {
-  from { opacity: 0; }
-  to { opacity: 0.97; }
+/* Aparición del título puente: ebullición (difuso, amplio) → condensación (nítido, estable) */
+@keyframes hero-bridge-appear-atmo {
+  0% {
+    opacity: 0;
+    transform: scale(1.07) translateY(0.18em);
+    letter-spacing: 0.24em;
+    filter: blur(0.2rem);
+  }
+  20% {
+    opacity: 0.42;
+    transform: scale(1.045) translateY(-0.05em);
+    letter-spacing: 0.17em;
+    filter: blur(0.12rem);
+  }
+  38% {
+    opacity: 0.72;
+    transform: scale(1.03) translateY(0.05em);
+    letter-spacing: 0.1em;
+    filter: blur(0.06rem);
+  }
+  58% {
+    opacity: 0.9;
+    transform: scale(1.012) translateY(-0.02em);
+    letter-spacing: 0.045em;
+    filter: blur(0.02rem);
+  }
+  100% {
+    opacity: 0.97;
+    transform: scale(1) translateY(0);
+    letter-spacing: 0.02em;
+    filter: none;
+  }
 }
+
 @keyframes hero-bridge-fade-in-sub-atmo {
   from { opacity: 0; }
   to { opacity: 0.84; }
@@ -1571,7 +1600,9 @@ html.theme-atmosphere .hero-bridge-sub {
 }
 
 html.theme-atmosphere .observatory-hero .hero-bridge-line {
-  animation-name: hero-bridge-fade-in-atmo;
+  transform-origin: center center;
+  animation: hero-bridge-appear-atmo 2.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, filter, letter-spacing;
 }
 html.theme-atmosphere .observatory-hero .hero-bridge-sub {
   animation-name: hero-bridge-fade-in-sub-atmo;
@@ -1584,6 +1615,10 @@ html.theme-atmosphere .observatory-hero .hero-bridge-sub:first-of-type {
   html.theme-atmosphere .observatory-hero .hero-bridge-line {
     animation: none;
     opacity: 0.96;
+    transform: none;
+    letter-spacing: 0.02em;
+    filter: none;
+    will-change: auto;
   }
   html.theme-atmosphere .observatory-hero .hero-bridge-sub:first-of-type {
     animation: none;
@@ -1596,15 +1631,32 @@ html.theme-atmosphere .observatory-hero .hero-bridge-sub:first-of-type {
 }
 
 html.theme-atmosphere .observatory-hero .hero-bridge-line.hero-bridge-settled {
+  will-change: auto;
   opacity: 0.88;
 }
 html.theme-atmosphere .observatory-hero .hero-bridge-sub.hero-bridge-settled {
   opacity: 0.76;
 }
 
-@keyframes hero-bridge-fade-in {
-  from { opacity: 0; }
-  to { opacity: 0.8; }
+@keyframes hero-bridge-appear {
+  0% {
+    opacity: 0;
+    transform: scale(1.06) translateY(0.12em);
+    letter-spacing: 0.18em;
+    filter: blur(0.1rem);
+  }
+  45% {
+    opacity: 0.82;
+    transform: scale(1.02) translateY(0);
+    letter-spacing: 0.06em;
+    filter: blur(0.03rem);
+  }
+  100% {
+    opacity: 0.8;
+    transform: scale(1) translateY(0);
+    letter-spacing: 0.02em;
+    filter: none;
+  }
 }
 @keyframes hero-bridge-fade-in-sub {
   from { opacity: 0; }
@@ -1615,7 +1667,9 @@ html.theme-atmosphere .observatory-hero .hero-bridge-sub.hero-bridge-settled {
   to { opacity: 0.5; }
 }
 .hero-bridge-line {
-  animation: hero-bridge-fade-in 0.2s ease-out forwards;
+  transform-origin: center center;
+  animation: hero-bridge-appear 2.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: transform, filter, letter-spacing;
 }
 .hero-bridge-sub {
   opacity: 0;
@@ -1634,7 +1688,13 @@ html.theme-atmosphere .observatory-hero .hero-bridge-sub.hero-bridge-settled {
     animation: none;
     animation-delay: 0s;
   }
-  .hero-bridge-line { opacity: 0.8; }
+  .hero-bridge-line {
+    opacity: 0.8;
+    transform: none;
+    letter-spacing: 0.02em;
+    filter: none;
+    will-change: auto;
+  }
   .hero-bridge-sub:first-of-type { opacity: 0.5; }
   .hero-bridge-sub:last-of-type { opacity: 0.55; }
 }
@@ -1643,6 +1703,9 @@ html.theme-atmosphere .observatory-hero .hero-bridge-sub.hero-bridge-settled {
 .hero-bridge-sub.hero-bridge-settled {
   opacity: 0.68;
   transition: opacity 600ms ease;
+}
+.hero-bridge-line.hero-bridge-settled {
+  will-change: auto;
 }
 .hero-bridge-sub.hero-bridge-settled {
   opacity: 0.52;
