@@ -1224,7 +1224,8 @@ html.theme-atmosphere .observatory-hero .hero-field-eyebrow-wrap .layer-title {
 }
 html.theme-atmosphere .observatory-hero .atmosphere-grounding {
   padding-top: 0.34rem;
-  gap: 0.82rem;
+  /* Menos “stack” entre capas; Place respira como decantación. */
+  gap: 0.62rem;
 }
 html.theme-atmosphere .observatory-hero .atmosphere-grounding::before {
   opacity: 0.12;
@@ -1244,7 +1245,7 @@ html.theme-atmosphere .observatory-hero .horizon-pulse-bar {
   margin-bottom: 0.38rem;
 }
 html.theme-atmosphere .observatory-hero .cta-observatory-wrap {
-  margin-top: 0.05rem;
+  margin-top: 0.42rem;
 }
 
 /* Puente superior + cola post-Place: mismo campo; Place como decantación, no estación intermedia. */
@@ -1255,17 +1256,17 @@ html.theme-atmosphere .observatory-hero .cta-bridge-copy-stack {
   margin-top: 0.08rem;
 }
 html.theme-atmosphere .observatory-hero .atmospheric-weather-caption-wrap {
-  gap: 0.4rem;
-  margin-top: 0.3rem;
-  padding-top: 0.14rem;
+  gap: 0.22rem;
+  margin-top: 0.18rem;
+  padding-top: 0.08rem;
 }
 html.theme-atmosphere .observatory-hero .atmospheric-weather-caption-wrap .atmospheric-weather-caption {
-  opacity: 0.48;
-  font-size: 0.66rem;
+  opacity: 0.4;
+  font-size: 0.64rem;
   text-shadow: none;
 }
 html.theme-atmosphere .observatory-hero .atmospheric-weather-caption-wrap .instrument-info-btn {
-  opacity: 0.44;
+  opacity: 0.36;
   width: 1.05rem;
   height: 1.05rem;
   min-width: 1.05rem;
@@ -3397,10 +3398,18 @@ html.theme-atmosphere .daily-tone-line {
   content: " ";
 }
 html.theme-atmosphere .observatory-pulse {
-  color: rgba(255, 255, 255, 0.92);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.68rem;
   text-shadow:
-    0 0 12px rgba(201, 196, 255, 0.18),
-    0 1px 2px rgba(0, 0, 0, 0.45);
+    0 0 8px rgba(201, 196, 255, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.32);
+}
+html.theme-atmosphere .observatory-pulse.is-visible {
+  opacity: 0.62;
+}
+html.theme-atmosphere .observatory-pulse-label {
+  font-weight: 400;
+  letter-spacing: 0.04em;
 }
 
 /* Patrón (type|mood) arriba del grado; el valor numérico va debajo */
@@ -3482,11 +3491,14 @@ html.theme-atmosphere .observatory-hero .hero-weather-panel .atmospheric-weather
     0 1px 2px rgba(0, 0, 0, 0.42);
 }
 html.theme-atmosphere .observatory-hero .hero-scroll-hint.hero-scroll-hint--visible {
-  color: color-mix(in oklab, #d4cfff 65%, var(--muted));
-  opacity: 0.9;
-  text-shadow:
-    0 0 12px rgba(139, 108, 255, 0.18),
-    0 1px 2px rgba(0, 0, 0, 0.4);
+  color: color-mix(in oklab, var(--muted) 78%, var(--soft));
+  opacity: 0.42;
+  font-size: 0.63rem;
+  letter-spacing: 0.11em;
+  font-weight: 400;
+  text-shadow: 0 0 14px rgba(92, 61, 255, 0.06);
+  margin-top: 0.05rem;
+  margin-bottom: 0.12rem;
 }
 html.theme-atmosphere .observatory-hero .warmup-hint {
   color: #ebe7ff;
@@ -3501,20 +3513,42 @@ html.theme-atmosphere .observatory-hero .transient-reading-line.is-visible {
 html.theme-atmosphere .observatory-hero .atmosphere-grounding .cta-microcopy,
 html.theme-atmosphere .observatory-hero .atmosphere-grounding .trust-microcopy {
   color: #eae6fc;
-  opacity: 0.78;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.28);
+  opacity: 0.58;
+  font-size: 0.72rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.22);
 }
 html.theme-atmosphere .observatory-hero .atmosphere-grounding .hero-bridge-sub--grounding {
-  color: rgba(248, 246, 255, 0.82);
-  opacity: 0.78;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+  color: rgba(248, 246, 255, 0.78);
+  opacity: 0.62;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.28);
 }
 
-/* Móvil: un poco más de presencia en trust/CTA sin reabrir la cola global (hero-bridge-sub sigue en 0.78). */
+/* Móvil: un pelo más de lectura en la franja medio-baja (sin volver a la densidad de escritorio). */
 @media (max-width: 480px) {
+  html.theme-atmosphere .observatory-hero .hero-scroll-hint.hero-scroll-hint--visible {
+    opacity: 0.52;
+    font-size: 0.64rem;
+  }
+
+  html.theme-atmosphere .observatory-pulse.is-visible {
+    opacity: 0.72;
+  }
+
+  html.theme-atmosphere .observatory-hero .atmosphere-grounding .hero-bridge-sub--grounding {
+    opacity: 0.68;
+  }
+
   html.theme-atmosphere .observatory-hero .atmosphere-grounding .cta-microcopy,
   html.theme-atmosphere .observatory-hero .atmosphere-grounding .trust-microcopy {
-    opacity: 0.82;
+    opacity: 0.7;
+  }
+
+  html.theme-atmosphere .observatory-hero .atmospheric-weather-caption-wrap .atmospheric-weather-caption {
+    opacity: 0.46;
+  }
+
+  html.theme-atmosphere .observatory-hero .atmospheric-weather-caption-wrap .instrument-info-btn {
+    opacity: 0.42;
   }
 }
 html.theme-atmosphere .observatory-hero .cta-observatory {
