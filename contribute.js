@@ -3,6 +3,7 @@
  */
 import { postMomentRemote, fetchClimateRemote, isRemoteReady } from "./remote.js";
 import { getNoteSignalBreakdown } from "./modelConstants.js";
+import { isNoteBlocked } from "./noteContentPolicy.js";
 
 const STORAGE_KEY = "slipup_v2_moments";
 
@@ -16,11 +17,67 @@ const consentInput = document.getElementById("consentInput");
 const saveButton = document.getElementById("saveButton");
 const formStatus = document.getElementById("formStatus");
 const noteAnalysisLine = document.getElementById("noteAnalysisLine");
+const notePolicyHint = document.getElementById("notePolicyHint");
 const ALLOWED_MOODS = new Set(["calm", "focus", "stressed", "curious", "tired"]);
 const ALLOWED_TYPES = new Set(["fertile", "avoidable", "observed"]);
 
+/** Mensajes fijos de validación (para limpiar al editar sin depender de truncado). */
+const MSG_COMPLETE_FIELD = "Complete this field before saving.";
+const MSG_ACCEPT_TERMS = "Please accept Privacy and Terms to save this moment.";
+
+/** Máximo de caracteres visibles en #formStatus (evita párrafos largos si el servidor devuelve texto). */
+const FORM_STATUS_MAX_CHARS = 120;
+
+/**
+ * @param {string} [msg]
+ * @param {number} [maxChars]
+ */
+function setFormStatus(msg, maxChars = FORM_STATUS_MAX_CHARS) {
+  if (!formStatus) return;
+  const raw = String(msg ?? "");
+  if (raw === "") {
+    formStatus.textContent = "";
+    formStatus.removeAttribute("title");
+    return;
+  }
+  const t = raw.trim();
+  if (t.length > maxChars) {
+    formStatus.textContent = `${t.slice(0, Math.max(0, maxChars - 1))}\u2026`;
+    formStatus.title = t;
+  } else {
+    formStatus.textContent = t;
+    formStatus.removeAttribute("title");
+  }
+}
+
 let typeTouched = false;
 let kindSuggestTimer = null;
+
+function getContributeLang() {
+  return (document.documentElement.getAttribute("lang") || "en").startsWith("es") ? "es" : "en";
+}
+
+/** Deshabilita Place / muestra aviso si la nota coincide con la lista bloqueada (cliente). */
+function updateNotePolicyUI() {
+  const blocked = isNoteBlocked(noteInput?.value ?? "");
+  if (noteInput) {
+    noteInput.setAttribute("aria-invalid", blocked ? "true" : "false");
+    noteInput.classList.toggle("contribute-note--blocked", blocked);
+  }
+  if (notePolicyHint) {
+    if (blocked) {
+      const lang = getContributeLang();
+      notePolicyHint.textContent =
+        lang === "es"
+          ? "Esa frase no está permitida aquí. Cambiala para guardar."
+          : "That wording isn’t allowed here. Change it to save.";
+      notePolicyHint.hidden = false;
+    } else {
+      notePolicyHint.textContent = "";
+      notePolicyHint.hidden = true;
+    }
+  }
+}
 
 function getSelectedType() {
   const el = form?.querySelector('input[name="type"]:checked');
@@ -238,12 +295,14 @@ function hasValidNote() {
 
 function syncSaveState() {
   const consentOk = Boolean(consentInput?.checked);
-  saveButton.disabled = !hasValidNote() || !consentOk;
+  const blocked = isNoteBlocked(noteInput?.value ?? "");
+  if (saveButton) saveButton.disabled = !hasValidNote() || !consentOk || blocked;
+  updateNotePolicyUI();
 }
 
 noteInput.addEventListener("input", () => {
-  if (formStatus.textContent === "Complete this field before saving.") {
-    formStatus.textContent = "";
+  if (formStatus.textContent === MSG_COMPLETE_FIELD) {
+    setFormStatus("");
   }
   syncSaveState();
   updateNoteAnalysisLine();
@@ -252,8 +311,8 @@ noteInput.addEventListener("input", () => {
 });
 
 consentInput?.addEventListener("change", () => {
-  if (formStatus.textContent === "Please accept Privacy and Terms to save this moment.") {
-    formStatus.textContent = "";
+  if (formStatus.textContent === MSG_ACCEPT_TERMS) {
+    setFormStatus("");
   }
   syncSaveState();
 });
@@ -261,37 +320,48 @@ consentInput?.addEventListener("change", () => {
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (form.dataset.submitting === "1") return;
-  formStatus.textContent = "";
+  setFormStatus("");
 
   if (!moodInput.value || !ALLOWED_MOODS.has(moodInput.value)) {
-    formStatus.textContent = "Choose a mood.";
+    setFormStatus("Choose a mood.");
     return;
   }
   if (!hasValidNote()) {
-    formStatus.textContent = "Complete this field before saving.";
+    setFormStatus(MSG_COMPLETE_FIELD);
     syncSaveState();
     noteInput.focus();
     return;
   }
-  if (consentInput && !consentInput.checked) {
-    formStatus.textContent = "Please accept Privacy and Terms to save this moment.";
-    consentInput.focus();
+
+  const lang = getContributeLang();
+  if (isNoteBlocked(noteInput.value)) {
+    setFormStatus(
+      lang === "es" ? "Esa frase no está permitida aquí." : "That wording isn’t allowed here."
+    );
+    updateNotePolicyUI();
+    noteInput.focus();
     return;
   }
 
-  const lang = (document.documentElement.getAttribute("lang") || "en").startsWith("es") ? "es" : "en";
+  if (consentInput && !consentInput.checked) {
+    setFormStatus(MSG_ACCEPT_TERMS);
+    consentInput.focus();
+    return;
+  }
   form.dataset.submitting = "1";
   if (saveButton) {
     saveButton.disabled = true;
     saveButton.setAttribute("aria-busy", "true");
   }
-  formStatus.textContent = sharedInput.checked
-    ? lang === "es"
-      ? "Enviando al campo compartido…"
-      : "Sending to the shared field…"
-    : lang === "es"
-      ? "La lectura se ajusta."
-      : "The reading adjusts.";
+  setFormStatus(
+    sharedInput.checked
+      ? lang === "es"
+        ? "Enviando al campo compartido…"
+        : "Sending to the shared field…"
+      : lang === "es"
+        ? "La lectura se ajusta."
+        : "The reading adjusts."
+  );
 
   const localMoment = makeMoment();
   const moments = loadMoments();
@@ -327,14 +397,32 @@ form.addEventListener("submit", async (event) => {
   } else {
     const remoteResult = await postMomentRemote(makeRemoteMomentPayload());
     if (remoteResult.ok) {
-      formStatus.textContent = pickRitual();
+      setFormStatus(pickRitual());
       try { window.atmosphere?.bump?.(); } catch (_) {}
+    } else if (remoteResult.moderationRejected) {
+      setFormStatus(
+        lang === "es"
+          ? "Guardado local. No publicado (moderación)."
+          : "Saved locally. Not published (moderation)."
+      );
     } else if (remoteResult.status === 422) {
-      formStatus.textContent = "Saved locally. Shared sync couldn't accept this moment.";
+      setFormStatus(
+        lang === "es"
+          ? "Guardado local. No se aceptó la sincronización."
+          : "Saved locally. Sync didn’t accept this."
+      );
     } else if (remoteResult.status === 429) {
-      formStatus.textContent = "Saved locally. Shared channel is temporarily busy.";
+      setFormStatus(
+        lang === "es"
+          ? "Guardado local. Canal ocupado, probá de nuevo."
+          : "Saved locally. Channel busy — try again."
+      );
     } else {
-      formStatus.textContent = "Saved locally. Shared sync is unavailable.";
+      setFormStatus(
+        lang === "es"
+          ? "Guardado local. Sincronización no disponible."
+          : "Saved locally. Sync unavailable."
+      );
     }
   }
 

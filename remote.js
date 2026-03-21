@@ -128,13 +128,23 @@ async function safeJson(response) {
 
 /**
  * Momento moderado / retirado: no debe mostrarse en listas públicas.
- * El servidor (Edge Function) debe excluirlos del GET; aquí unificamos flags por si el payload evoluciona.
+ * El servidor (Edge Function GET) debe excluirlos; aquí refuerzo si el payload incluye flags o estados raros.
  */
 function isMomentRemovedFromPublicView(raw) {
   if (!raw || typeof raw !== "object") return true;
   if (raw.hidden === true || raw.removed === true) return true;
   const st = raw.moderation_status;
-  if (st === "removed" || st === "rejected" || st === "blocked") return true;
+  if (typeof st === "string" && st.length > 0 && st !== "published") return true;
+  return false;
+}
+
+/** Respuesta POST rechazada por moderación / términos (4xx + cuerpo opcional). */
+function isModerationRejectedPost(status, data) {
+  if (status !== 400 && status !== 422) return false;
+  if (!data || typeof data !== "object") return status === 422;
+  if (data.moderation === true || data.moderation_rejected === true) return true;
+  const c = data.code ?? data.error;
+  if (typeof c === "string" && /moderat|prohibited|content_reject|policy/i.test(c)) return true;
   return false;
 }
 
@@ -238,11 +248,13 @@ async function postMomentRemote(inputMoment) {
     });
     const data = await safeJson(response);
     if (!response.ok) {
+      const moderationRejected = isModerationRejectedPost(response.status, data);
       return {
         ok: false,
-        reason: "REMOTE_POST_FAILED",
+        reason: moderationRejected ? "REMOTE_POST_MODERATION" : "REMOTE_POST_FAILED",
         status: response.status,
         data,
+        moderationRejected,
       };
     }
     return { ok: true, status: response.status, data };

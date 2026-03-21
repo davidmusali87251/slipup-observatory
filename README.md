@@ -68,7 +68,7 @@ This repo includes a production-early backend path that keeps privacy risk low a
 - SQL scale buckets patch: `supabase/sql/phase3_scale_buckets.sql`
 - SQL marker/combo patch: `supabase/sql/phase4_marker_tables.sql`
 - Edge Functions:
-  - `supabase/functions/moments/index.ts`
+  - `supabase/functions/moments/index.ts` — validación de nota alineada con `noteContentPolicy.js` (convivencia / anti-spam); rechaza con **422** y `moderation_rejected: true` si incumple.
   - `supabase/functions/climate/index.ts`
 
 ### Function secrets (recommended)
@@ -85,6 +85,7 @@ Set these in Supabase Functions secrets:
 - `CLIMATE_GET_WINDOW_SECONDS` (default `60`)
 - `CLIMATE_GET_MAX` (default `180`)
 - `LOCAL_MIN_MASS` (default `30`)
+- `SLIPUP_NOTE_BLOCKLIST_EXTRA` (opcional) — JSON array de strings, p. ej. `["frase extra"]`, para ampliar la lista base sin redeploy de código.
 
 **Supabase Pro:** Con el plan Pro tienes backups diarios, sin pausa del proyecto y pooler dedicado. Para conexiones directas a Postgres (fuera de las Edge Functions), usa el **Dedicated Pooler** desde el Dashboard (Connect → Connection strings → Pooler). Las Edge Functions usan `SUPABASE_URL` + service role (API); con Pro puedes subir opcionalmente los límites (p. ej. `MOMENTS_GET_MAX`, `CLIMATE_GET_MAX`) vía secrets si necesitas más capacidad.
 
