@@ -4489,14 +4489,13 @@ function paintHeroReadingEarly(localMoments) {
 }
 
 /**
- * Cruce perceptual del campo (index): presencia → data-field-entry=present;
- * clic en el panel fuera de controles continúa a contribute (sin cursor “landing page”).
+ * Cruce perceptual del campo (index): presencia → data-field-entry=present
+ * (dwell en hero, scroll, touch). No navegación implícita a contribute: Place sigue siendo el CTA explícito.
  */
 function initFieldEntryShift() {
   if (typeof window === "undefined") return;
   const hero = document.getElementById("observatory-hero");
-  const panel = document.getElementById("observatory");
-  if (!hero || !panel) return;
+  if (!hero) return;
 
   if (!hero.dataset.fieldEntry) hero.dataset.fieldEntry = "latent";
 
@@ -4530,19 +4529,6 @@ function initFieldEntryShift() {
   window.addEventListener("scroll", onScrollEngage, { passive: true });
 
   hero.addEventListener("touchstart", engagePresence, { passive: true });
-
-  const interactiveSel =
-    "a[href], button, input, select, textarea, [role='button'], label, .instrument-info-btn, .instrument-info-popover";
-
-  panel.addEventListener("click", (e) => {
-    const t = e.target;
-    if (!(t instanceof Element)) return;
-    if (t.closest(interactiveSel)) return;
-    if (e.defaultPrevented) return;
-    if (typeof e.button === "number" && e.button !== 0) return;
-    engagePresence();
-    window.location.href = "./contribute.html";
-  });
 }
 
 async function boot() {
