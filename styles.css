@@ -3707,7 +3707,7 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
   color: var(--text);
 }
 
-/* Un icono + panel (lista) — FAB fijo esquina inferior derecha: no empuja el flujo ni compite con el bloque central. */
+/* Un icono + panel (lista) — dentro de Strata, esquina inferior izquierda (no flotante global). */
 .hidden-from-view-wrap {
   margin: 0;
   padding: 0;
@@ -3718,42 +3718,102 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
   display: none;
 }
 
-/* Visible: fuera del flujo, encima de la barra legal (no entre “Place a moment” y el footer). */
-.hidden-from-view-wrap:not(.hidden) {
-  position: fixed;
-  right: max(0.65rem, env(safe-area-inset-right, 0px));
-  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--site-legal-height) + 0.55rem);
-  left: auto;
-  z-index: 160;
+/* En flujo normal (fuera de Strata) no aplica esquina; Strata sobrescribe abajo. */
+.hidden-from-view-cluster {
+  position: relative;
+  display: inline-flex;
+  justify-content: flex-start;
   width: auto;
-  max-width: none;
-  text-align: right;
-  pointer-events: none;
-  isolation: isolate;
+  min-height: 0;
+  align-items: center;
 }
 
-.hidden-from-view-wrap:not(.hidden) .hidden-from-view-cluster {
+/* Strata activa: anclar el control al borde inferior izquierdo de la capa (encima del gradiente ::after). */
+.ground-strata.is-active .hidden-from-view-wrap:not(.hidden) {
+  position: absolute;
+  left: max(0.35rem, env(safe-area-inset-left, 0px));
+  bottom: 0.55rem;
+  z-index: 3;
+  width: auto;
+  max-width: none;
+  text-align: left;
+  pointer-events: none;
+}
+
+.ground-strata.is-active .hidden-from-view-wrap:not(.hidden) .hidden-from-view-cluster {
   pointer-events: auto;
 }
 
-@media (max-width: 600px) {
-  .hidden-from-view-wrap:not(.hidden) {
-    bottom: calc(env(safe-area-inset-bottom, 0px) + var(--site-legal-height-mobile, 5.5rem) + 0.45rem);
-  }
+/* Hueco para que el botón no tape la última línea / share cuando hay contenido Strata. */
+.ground-strata.is-active:has(.hidden-from-view-wrap:not(.hidden)) {
+  padding-bottom: max(3.75rem, calc(2rem + 2.75rem));
+}
 
+.ground-strata .hidden-from-view-trigger {
+  border-color: rgba(255, 255, 255, 0.28);
+  background: color-mix(in oklab, rgba(12, 8, 28, 0.55) 70%, rgba(92, 61, 255, 0.15));
+  color: rgba(255, 255, 255, 0.88);
+  box-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+}
+
+.ground-strata .hidden-from-view-trigger:hover {
+  border-color: rgba(201, 196, 255, 0.45);
+  color: #fff;
+}
+
+/* Panel alineado al borde izquierdo del botón (no centrado al viewport). */
+.ground-strata .hidden-from-view-panel {
+  left: 0;
+  right: auto;
+  transform: none;
+  animation: hidden-from-view-panel-in-strata 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes hidden-from-view-panel-in-strata {
+  from {
+    opacity: 0;
+    transform: translateY(0.35rem) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ground-strata .hidden-from-view-panel {
+    animation: none;
+  }
+}
+
+@media (max-width: 600px) {
   .hidden-from-view-trigger {
     -webkit-tap-highlight-color: color-mix(in oklab, var(--text) 14%, transparent);
     touch-action: manipulation;
   }
 }
 
-.hidden-from-view-cluster {
-  position: relative;
-  display: inline-flex;
-  justify-content: flex-end;
-  width: auto;
-  min-height: 0;
-  align-items: center;
+/* Solo botón ocultos sin líneas Strata: bloque compacto (renderStrata + clase en JS). */
+.ground-strata.ground-strata--corner-only.is-active .strata-seeds-label,
+.ground-strata.ground-strata--corner-only.is-active .strata-lines,
+.ground-strata.ground-strata--corner-only.is-active .strata-share-wrap,
+.ground-strata.ground-strata--corner-only.is-active .strata-metrics-line {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.ground-strata.ground-strata--corner-only.is-active {
+  min-height: 5.5rem;
+  padding-top: 0.75rem;
 }
 
 .hidden-from-view-trigger {
@@ -3877,8 +3937,6 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption:not(.hidden
     animation: none;
   }
 }
-
-/* FAB abajo-derecha: el panel sigue abriendo hacia arriba (encima del botón), lejos del borde inferior del viewport. */
 
 .hidden-from-view-panel-hint {
   margin: 0 0.85rem 0.5rem;

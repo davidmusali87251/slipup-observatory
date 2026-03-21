@@ -3724,15 +3724,32 @@ function renderStrata(moments, canonicalState) {
   const lines = buildStrataLines(longWindow, canonicalState);
   const strataContextEl = document.getElementById("strataContext");
   const ui = UI_COPY[LANG] || UI_COPY.en;
+  if (groundStrata) groundStrata.classList.remove("ground-strata--corner-only");
   if (strataContextEl) {
     strataContextEl.textContent = ui.strataContextLine || "Below the surface, your moments settle into deeper record.";
   }
   if (!lines.length) {
-    groundStrata.classList.remove("is-active");
-    groundStrata.hidden = true;
+    const hasHidden = getHiddenMoments().length > 0;
+    if (!hasHidden) {
+      groundStrata.classList.remove("is-active");
+      groundStrata.hidden = true;
+      strataLines.innerHTML = "";
+      const wrap = document.getElementById("strataShareWrap");
+      if (wrap) {
+        wrap.classList.add("hidden");
+        wrap.hidden = true;
+      }
+      return;
+    }
+    /* Sin líneas Strata pero hay momentos ocultos: mostrar solo la esquina (control dentro de #ground-strata). */
+    groundStrata.hidden = false;
+    groundStrata.classList.add("is-active", "ground-strata--corner-only");
     strataLines.innerHTML = "";
     const wrap = document.getElementById("strataShareWrap");
-    if (wrap) { wrap.classList.add("hidden"); wrap.hidden = true; }
+    if (wrap) {
+      wrap.classList.add("hidden");
+      wrap.hidden = true;
+    }
     return;
   }
 
@@ -4145,6 +4162,24 @@ function closeHiddenFromViewPanel() {
   }
 }
 
+/** Si hay ocultos pero aún no hay líneas Strata, abre la capa solo para el control en esquina (ver CSS .ground-strata--corner-only). */
+function syncGroundStrataForHiddenCorner() {
+  if (!groundStrata || !strataLines) return;
+  if (getHiddenMoments().length > 0) {
+    if (strataLines.children.length === 0) {
+      groundStrata.hidden = false;
+      groundStrata.classList.add("is-active", "ground-strata--corner-only");
+    } else {
+      groundStrata.classList.remove("ground-strata--corner-only");
+    }
+    return;
+  }
+  if (groundStrata.classList.contains("ground-strata--corner-only")) {
+    groundStrata.classList.remove("ground-strata--corner-only", "is-active");
+    groundStrata.hidden = true;
+  }
+}
+
 /** Un solo icono; el panel lista momentos ocultos y “Show again” (estilo observatorio). */
 function renderHiddenFromView() {
   if (!hiddenFromViewWrap || !hiddenFromViewList) return;
@@ -4158,6 +4193,7 @@ function renderHiddenFromView() {
     if (descElEmpty) descElEmpty.textContent = "";
     if (hiddenFromViewBadge) hiddenFromViewBadge.textContent = "";
     closeHiddenFromViewPanel();
+    syncGroundStrataForHiddenCorner();
     return;
   }
   hiddenFromViewWrap.classList.remove("hidden");
@@ -4203,6 +4239,7 @@ function renderHiddenFromView() {
     li.appendChild(btn);
     hiddenFromViewList.appendChild(li);
   });
+  syncGroundStrataForHiddenCorner();
 }
 
 let hiddenFromViewToggleInited = false;
