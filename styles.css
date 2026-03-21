@@ -65,6 +65,8 @@
   --descent-gap-nearby: 3.25rem;
   --descent-gap-horizon: 2.75rem;
   --descent-gap-strata: 4.25rem;
+  /* Espacio entre capa Orbital y hero: recorrido largo al subir desde la atmósfera (sensación de “llegada más arriba”). */
+  --orbital-to-hero-gap: clamp(7.5rem, min(42vh, 28rem), 32rem);
   --block-gap: 0.85rem;
   --layer-transition: 1.5rem;
   --site-legal-height: 2.75rem;
@@ -4073,7 +4075,8 @@ html.theme-atmosphere .page .site-legal {
   text-align: center;
   max-width: 720px;
   margin: 0 auto;
-  padding: calc(env(safe-area-inset-top, 0px) + 3rem) 1rem 2rem;
+  /* padding-bottom extra: separa Orbital del hero; al subir desde la atmósfera el ascenso se siente más largo. */
+  padding: calc(env(safe-area-inset-top, 0px) + 3rem) 1rem calc(2rem + var(--orbital-to-hero-gap));
   border-bottom: 1px solid color-mix(in oklab, var(--line) 35%, transparent);
 }
 .panel-orbital > * {
