@@ -4442,12 +4442,7 @@ function initFieldEntryShift() {
 async function boot() {
   applyUICopy();
   initFieldEntryShift();
-
-  const hash = (window.location.hash || "").trim();
-  const hero = document.getElementById("observatory-hero");
-  if (hero && (!hash || hash === "#top")) {
-    requestAnimationFrame(() => hero.scrollIntoView({ behavior: "auto", block: "start" }));
-  }
+  /* Scroll inicial al hero: index.html incluye script inline al abrir #observatory-hero (evita flash de Orbital). */
 
   const moments = loadMoments();
   const previousComputed = getStoredComputedDegree();

@@ -52,6 +52,17 @@
         <p id="orbitalTransitionLine" class="orbital-transition-line hidden" role="status" aria-live="polite"></p>
       </section>
       <section id="observatory-hero" class="observatory-hero hero-breathe" aria-label="Observatory hero" data-field-entry="latent">
+        <!-- Inmediato: sin esto el primer frame muestra Orbital y luego salta al hero (rAF en app.js). -->
+        <script>
+          (function () {
+            try {
+              var h = (location.hash || "").trim();
+              if (h && h !== "#top") return;
+              var el = document.getElementById("observatory-hero");
+              if (el) el.scrollIntoView({ behavior: "auto", block: "start" });
+            } catch (_) {}
+          })();
+        </script>
         <div id="atmSignals" class="atm-signals" aria-hidden="true"></div>
         <header class="topbar topbar-fixed">
           <a href="#observatory-hero" class="topbar-brand">
