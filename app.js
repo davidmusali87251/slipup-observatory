@@ -791,9 +791,9 @@ const UI_COPY = {
     eyebrowContext: "Moments",
     heroBridgeLine: "Human moments.",
     heroBridgeSub1: "Write a moment from your day.",
-    /** Tercer polo del hero: puerta a Orbital; ubicación en el campo, no identidad ni predicción. */
-    heroOrbitalLabel: "Orbital",
-    heroOrbitalTagline: "Your relation to the shared field.",
+    /** Tercer polo: promesa al sujeto (enlace). Nombre de capa / territorio en tagline — ver panel #orbital. */
+    heroOrbitalLabel: "Your place in the field",
+    heroOrbitalTagline: "Orbital",
     heroScrollHint: "The field reveals as you move ↓",
     sharedFieldLine: "Shared field — last 48h",
     horizonTitle: "Horizon",
@@ -946,8 +946,8 @@ const UI_COPY = {
     eyebrowContext: "Momentos",
     heroBridgeLine: "Momentos humanos.",
     heroBridgeSub1: "Escribí un momento de tu día.",
-    heroOrbitalLabel: "Orbital",
-    heroOrbitalTagline: "Tu relación con el campo compartido.",
+    heroOrbitalLabel: "Tu lugar en el campo",
+    heroOrbitalTagline: "Orbital",
     heroScrollHint: "El campo se revela al moverte ↓",
     sharedFieldLine: "Campo compartido — últimas 48 h",
     horizonTitle: "Horizonte",

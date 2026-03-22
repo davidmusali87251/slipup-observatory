@@ -1284,10 +1284,11 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption-wrap .instr
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.18rem;
+  gap: 0.24rem;
   width: 100%;
   max-width: var(--hero-column-max, min(40ch, 100%));
-  margin: 0.42rem auto 0.12rem;
+  /* Un poco más de aire respecto a “Write a moment…” (tercera coordenada vs. gesto). */
+  margin: 0.58rem auto 0.12rem;
   padding: 0.48rem 0.5rem 0;
   box-sizing: border-box;
   position: relative;
@@ -1298,21 +1299,26 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption-wrap .instr
 html.theme-atmosphere .observatory-hero .hero-orbital-pole {
   /* Misma familia de borde que títulos de capa en tema (Nearby / Horizon), más diluido. */
   border-top-color: color-mix(in oklab, var(--line) 38%, rgba(139, 108, 255, 0.06));
-  margin-top: 0.35rem;
+  margin-top: 0.56rem;
   margin-bottom: 0.28rem;
   padding-top: 0.4rem;
   padding-bottom: 0.08rem;
 }
 
+/* Frase de promesa (no rótulo en versal); alineada a lectura de capa. */
 .hero-orbital-anchor {
   text-decoration: none;
-  padding: 0.2rem 0.4rem;
+  padding: 0.22rem 0.5rem;
   margin: 0;
   font-family: var(--font-observatory);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  line-height: 1.38;
+  text-align: center;
+  max-width: min(36ch, 100%);
+  text-wrap: balance;
   color: #6b7d8f;
   opacity: 0.88;
   transition:
@@ -1360,6 +1366,15 @@ html.theme-atmosphere .observatory-hero .hero-orbital-anchor:focus-visible {
   text-align: center;
 }
 
+/* Nombre del territorio / capa (contraste con la frase promesa en el enlace). */
+.hero-orbital-tagline.hero-orbital-layer-name {
+  max-width: 22ch;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  font-size: 0.56rem;
+  opacity: 0.62;
+}
+
 /* Misma pista que trust / microcopy de grounding; un escalón más suave. */
 html.theme-atmosphere .observatory-hero .hero-orbital-tagline {
   color: color-mix(in oklab, var(--muted) 90%, var(--soft));
@@ -1368,11 +1383,18 @@ html.theme-atmosphere .observatory-hero .hero-orbital-tagline {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
 }
 
+html.theme-atmosphere .observatory-hero .hero-orbital-tagline.hero-orbital-layer-name {
+  opacity: 0.52;
+  font-size: 0.54rem;
+  letter-spacing: 0.12em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
+}
+
 @media (max-width: 520px) {
   /* Escala acorde a .observatory-hero .layer-title en estrecho; el polo sigue más pequeño que la ceja. */
   html.theme-atmosphere .observatory-hero .hero-orbital-anchor {
-    font-size: clamp(0.64rem, 3.1vw, 0.76rem);
-    letter-spacing: 0.11em;
+    font-size: clamp(0.62rem, 2.9vw, 0.72rem);
+    letter-spacing: 0.035em;
   }
 }
 
@@ -1392,6 +1414,10 @@ html.theme-atmosphere .observatory-hero .hero-orbital-tagline {
 
   html.theme-atmosphere .observatory-hero .hero-orbital-tagline {
     font-size: 0.58rem;
+  }
+
+  html.theme-atmosphere .observatory-hero .hero-orbital-tagline.hero-orbital-layer-name {
+    font-size: 0.52rem;
   }
 }
 
