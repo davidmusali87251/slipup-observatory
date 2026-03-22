@@ -1210,23 +1210,25 @@ html.theme-atmosphere .observatory-hero .topbar-ai:focus-visible {
   outline-offset: 3px;
 }
 html.theme-atmosphere .observatory-hero .panel.panel-observatory {
-  gap: 0.14rem;
+  /* ~2 cm entre lectura (aire) y columna de horizonte; hereda a .atmosphere-grounding. */
+  --hero-stack-gap: 2cm;
+  gap: var(--hero-stack-gap);
 }
 html.theme-atmosphere .observatory-hero .atmosphere-air {
-  padding-bottom: 0.12rem;
+  padding-bottom: 0.55rem;
 }
 html.theme-atmosphere .observatory-hero .hero-reading-stack {
   gap: 0.95rem;
-  margin-bottom: 0.08rem;
+  margin-bottom: 0.45rem;
 }
 html.theme-atmosphere .observatory-hero .hero-field-eyebrow-wrap .layer-title {
   opacity: 0.97;
   letter-spacing: 0.11em;
 }
 html.theme-atmosphere .observatory-hero .atmosphere-grounding {
-  padding-top: 0.34rem;
-  /* Paso uniforme: mismo ritmo entre pulso→CTA→puente→Orbital (sin márgenes extra que rompan la columna). */
-  --hero-grounding-step: 0.72rem;
+  padding-top: 0.42rem;
+  /* Mismo paso ~2 cm (hereda --hero-stack-gap del panel): pulso→CTA→puente→Orbital. */
+  --hero-grounding-step: var(--hero-stack-gap);
   gap: var(--hero-grounding-step);
 }
 html.theme-atmosphere .observatory-hero .atmosphere-grounding::before {
@@ -1241,7 +1243,7 @@ html.theme-atmosphere .observatory-hero .atmosphere-grounding::before {
   );
 }
 html.theme-atmosphere .observatory-hero .atmosphere-grounding::after {
-  top: calc(0.34rem + 3px);
+  top: calc(0.42rem + 3px);
 }
 html.theme-atmosphere .observatory-hero .horizon-pulse-bar {
   margin-bottom: 0;
@@ -3076,7 +3078,6 @@ html.theme-atmosphere .atm-reading-line {
   }
   html.theme-atmosphere .observatory-hero .atmosphere-grounding {
     padding-top: 0.3rem;
-    --hero-grounding-step: 0.58rem;
     gap: var(--hero-grounding-step);
   }
   html.theme-atmosphere .observatory-hero .atmosphere-grounding::after {
