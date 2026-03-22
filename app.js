@@ -791,6 +791,9 @@ const UI_COPY = {
     eyebrowContext: "Moments",
     heroBridgeLine: "Human moments.",
     heroBridgeSub1: "Write a moment from your day.",
+    /** Tercer polo del hero: puerta a Orbital; ubicación en el campo, no identidad ni predicción. */
+    heroOrbitalLabel: "Orbital",
+    heroOrbitalTagline: "Your relation to the shared field.",
     heroScrollHint: "The field reveals as you move ↓",
     sharedFieldLine: "Shared field — last 48h",
     horizonTitle: "Horizon",
@@ -943,6 +946,8 @@ const UI_COPY = {
     eyebrowContext: "Momentos",
     heroBridgeLine: "Momentos humanos.",
     heroBridgeSub1: "Escribí un momento de tu día.",
+    heroOrbitalLabel: "Orbital",
+    heroOrbitalTagline: "Tu relación con el campo compartido.",
     heroScrollHint: "El campo se revela al moverte ↓",
     sharedFieldLine: "Campo compartido — últimas 48 h",
     horizonTitle: "Horizonte",
@@ -1079,6 +1084,10 @@ function applyUICopy() {
   if (heroBridgeLineEl && ui.heroBridgeLine) heroBridgeLineEl.textContent = ui.heroBridgeLine;
   const heroBridgeSub1El = document.getElementById("heroBridgeSub1");
   if (heroBridgeSub1El && ui.heroBridgeSub1) heroBridgeSub1El.textContent = ui.heroBridgeSub1;
+  const heroOrbitalNameEl = document.querySelector(".hero-orbital-name");
+  if (heroOrbitalNameEl && ui.heroOrbitalLabel) heroOrbitalNameEl.textContent = ui.heroOrbitalLabel;
+  const heroOrbitalTaglineEl = document.getElementById("heroOrbitalTagline");
+  if (heroOrbitalTaglineEl && ui.heroOrbitalTagline) heroOrbitalTaglineEl.textContent = ui.heroOrbitalTagline;
   const heroScrollHintEl = document.getElementById("heroScrollHint");
   if (heroScrollHintEl && ui.heroScrollHint) heroScrollHintEl.textContent = ui.heroScrollHint;
   const horizonTitleEl = document.querySelector(".horizon-line");

@@ -1192,7 +1192,8 @@ html.theme-atmosphere .observatory-hero .topbar-ai {
   font-weight: 400;
   letter-spacing: 0.07em;
   text-transform: none;
-  opacity: 0.58;
+  /* Un pelo más tenue que el Orbital del hero: mismo destino, menos eco visual. */
+  opacity: 0.48;
   color: color-mix(in oklab, var(--muted) 72%, var(--text));
   transition:
     opacity var(--tempo-field) ease,
@@ -1257,8 +1258,8 @@ html.theme-atmosphere .observatory-hero .cta-bridge-copy-stack {
 }
 html.theme-atmosphere .observatory-hero .atmospheric-weather-caption-wrap {
   gap: 0.22rem;
-  margin-top: 0.18rem;
-  padding-top: 0.08rem;
+  margin-top: 0.4rem;
+  padding-top: 0.12rem;
 }
 html.theme-atmosphere .observatory-hero .atmospheric-weather-caption-wrap .atmospheric-weather-caption {
   opacity: 0.4;
@@ -1274,6 +1275,124 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption-wrap .instr
   font-size: 0.52rem;
   font-weight: 500;
   border-color: color-mix(in oklab, var(--muted) 38%, transparent);
+}
+
+/* ── Tercer polo del hero: Orbital.
+   Alineado al sistema de capas (.layer-title, ceja “Today in the world”, panel Orbital):
+   misma familia tipográfica, peso 500, tracking de capa; más tenue que la ceja (tercer fuerza). */
+.hero-orbital-pole {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.18rem;
+  width: 100%;
+  max-width: var(--hero-column-max, min(40ch, 100%));
+  margin: 0.42rem auto 0.12rem;
+  padding: 0.48rem 0.5rem 0;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  border-top: 1px solid color-mix(in oklab, var(--line) 22%, transparent);
+}
+
+html.theme-atmosphere .observatory-hero .hero-orbital-pole {
+  /* Misma familia de borde que títulos de capa en tema (Nearby / Horizon), más diluido. */
+  border-top-color: color-mix(in oklab, var(--line) 38%, rgba(139, 108, 255, 0.06));
+  margin-top: 0.35rem;
+  margin-bottom: 0.28rem;
+  padding-top: 0.4rem;
+  padding-bottom: 0.08rem;
+}
+
+.hero-orbital-anchor {
+  text-decoration: none;
+  padding: 0.2rem 0.4rem;
+  margin: 0;
+  font-family: var(--font-observatory);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #6b7d8f;
+  opacity: 0.88;
+  transition:
+    opacity 0.2s ease,
+    color 0.2s ease;
+}
+
+.hero-orbital-anchor:hover {
+  color: color-mix(in oklab, var(--text) 85%, var(--muted));
+}
+
+/* Color + halo como ceja “Today in the world”, con menos peso (no compite con Place). */
+html.theme-atmosphere .observatory-hero .hero-orbital-anchor {
+  color: color-mix(in oklab, var(--soft) 82%, #ffffff);
+  opacity: 0.5;
+  text-shadow:
+    0 0 14px rgba(201, 196, 255, 0.1),
+    0 1px 2px rgba(0, 0, 0, 0.36);
+}
+
+html.theme-atmosphere .observatory-hero .hero-orbital-anchor:hover {
+  opacity: 0.68;
+  color: color-mix(in oklab, var(--text) 88%, var(--soft));
+  text-shadow:
+    0 0 16px rgba(201, 196, 255, 0.14),
+    0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+html.theme-atmosphere .observatory-hero .hero-orbital-anchor:focus-visible {
+  outline: 2px solid color-mix(in oklab, var(--line) 48%, rgba(139, 108, 255, 0.38));
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.hero-orbital-tagline {
+  margin: 0;
+  padding: 0 0.35rem;
+  max-width: 26ch;
+  font-family: var(--font-observatory);
+  font-size: 0.62rem;
+  line-height: 1.42;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  opacity: 0.72;
+  text-align: center;
+}
+
+/* Misma pista que trust / microcopy de grounding; un escalón más suave. */
+html.theme-atmosphere .observatory-hero .hero-orbital-tagline {
+  color: color-mix(in oklab, var(--muted) 90%, var(--soft));
+  opacity: 0.44;
+  font-size: 0.6rem;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
+}
+
+@media (max-width: 520px) {
+  /* Escala acorde a .observatory-hero .layer-title en estrecho; el polo sigue más pequeño que la ceja. */
+  html.theme-atmosphere .observatory-hero .hero-orbital-anchor {
+    font-size: clamp(0.64rem, 3.1vw, 0.76rem);
+    letter-spacing: 0.11em;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-orbital-pole {
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 0.4rem;
+    padding-right: 0.4rem;
+  }
+
+  .hero-orbital-tagline {
+    max-width: 32ch;
+    font-size: 0.6rem;
+    line-height: 1.42;
+  }
+
+  html.theme-atmosphere .observatory-hero .hero-orbital-tagline {
+    font-size: 0.58rem;
+  }
 }
 
 .observatory-hero.observatory--pattern::before {
