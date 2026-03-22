@@ -1363,7 +1363,8 @@ html.theme-atmosphere .observatory-hero .atmosphere-grounding .atmospheric-weath
 html.theme-atmosphere .observatory-hero .hero-orbital-pole {
   /* Misma familia de borde; un poco más de presencia luminosa que el borde mínimo. */
   border-top-color: color-mix(in oklab, var(--line) 42%, rgba(180, 165, 255, 0.1));
-  margin-top: 0;
+  /* Sube un poco el bloque respecto al hueco del panel (sin tocar el paso Orbital→trust). */
+  margin-top: -0.45rem;
   margin-bottom: 0.28rem;
   padding-top: 0.4rem;
   padding-bottom: 0.08rem;
