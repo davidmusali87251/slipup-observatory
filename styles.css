@@ -1210,16 +1210,17 @@ html.theme-atmosphere .observatory-hero .topbar-ai:focus-visible {
   outline-offset: 3px;
 }
 html.theme-atmosphere .observatory-hero .panel.panel-observatory {
-  /* ~2 cm entre lectura (aire) y columna de horizonte; hereda a .atmosphere-grounding. */
-  --hero-stack-gap: 2cm;
-  gap: var(--hero-stack-gap);
+  /* Aire lectura→horizonte (más junto). Paso cluster→Orbital: --hero-grounding-step (sigue ~2 cm). */
+  --hero-air-to-ground-gap: 1.3rem;
+  --hero-grounding-step: 2cm;
+  gap: var(--hero-air-to-ground-gap);
 }
 html.theme-atmosphere .observatory-hero .atmosphere-air {
-  padding-bottom: 0.55rem;
+  padding-bottom: 0.35rem;
 }
 html.theme-atmosphere .observatory-hero .hero-reading-stack {
   gap: 0.95rem;
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.28rem;
 }
 html.theme-atmosphere .observatory-hero .hero-field-eyebrow-wrap .layer-title {
   opacity: 0.97;
@@ -1227,8 +1228,7 @@ html.theme-atmosphere .observatory-hero .hero-field-eyebrow-wrap .layer-title {
 }
 html.theme-atmosphere .observatory-hero .atmosphere-grounding {
   padding-top: 0.42rem;
-  /* Paso grande (~2 cm): cluster (horizonte + gesto) → Orbital → trust. */
-  --hero-grounding-step: var(--hero-stack-gap);
+  /* Paso grande: hereda --hero-grounding-step del panel (cluster → Orbital → trust). */
   gap: var(--hero-grounding-step);
 }
 html.theme-atmosphere .observatory-hero .atmosphere-grounding::before {
