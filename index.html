@@ -125,18 +125,15 @@
                   </div>
                 </div>
               </div>
-            </div>
-            <!-- Pulso / hints / pulso observatorio: justo debajo de la lectura, antes del horizonte (CTA). -->
-            <div class="hero-grounding-cta-ledger">
+              <!-- Pulso del horizonte pegado a la lectura (28° + frases); hints siguen en el ledger. -->
               <div id="horizonPulseBar" class="horizon-pulse-bar" aria-hidden="true"></div>
+            </div>
+            <div class="hero-grounding-cta-ledger">
               <p id="heroScrollHint" class="hero-scroll-hint" aria-hidden="true"></p>
               <p id="warmupHint" class="warmup-hint hidden" aria-live="polite"></p>
               <p id="transientReadingLine" class="transient-reading-line hidden" aria-live="polite"></p>
               <p id="observatoryPulseWrap" class="observatory-pulse hidden" role="status" aria-live="polite"><span id="observatoryPulseLabel" class="observatory-pulse-label"></span> <span id="observatoryPulseMessage"></span></p>
             </div>
-          </div>
-          <div class="atmosphere-grounding" aria-label="Toward the horizon">
-            <!-- Gesto + invitación; el paso grande al Orbital va después. -->
             <div class="hero-grounding-cta-cluster">
               <span class="cta-observatory-wrap">
                 <span id="ctaObservatoryTooltip" class="cta-observatory-tooltip" role="tooltip" aria-hidden="true"></span>
@@ -146,6 +143,9 @@
                 <p id="heroBridgeSub1" class="hero-bridge-sub hero-bridge-sub--grounding">Write a moment from your day.</p>
               </div>
             </div>
+          </div>
+          <div class="atmosphere-grounding" aria-label="Toward the horizon">
+            <!-- Solo Orbital + trust; el paso grande desde Place viene del gap del panel. -->
             <!-- Tercer polo: promesa (enlace) + nombre de capa Orbital (puerta real a #orbital). -->
             <div
               class="hero-orbital-pole"
