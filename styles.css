@@ -1216,11 +1216,32 @@ html.theme-atmosphere .observatory-hero .panel.panel-observatory {
   gap: var(--hero-air-to-ground-gap);
 }
 html.theme-atmosphere .observatory-hero .atmosphere-air {
-  padding-bottom: 0.35rem;
+  padding-bottom: 0.2rem;
 }
 html.theme-atmosphere .observatory-hero .hero-reading-stack {
   gap: 0.95rem;
   margin-bottom: 0.28rem;
+}
+
+/* Lectura + ledger (pulso/hints) en una columna; el gap del panel separa esto del horizonte (CTA). */
+.hero-observatory-upper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: min(40ch, 100%);
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  gap: 0.35rem;
+}
+.observatory-hero .hero-observatory-upper {
+  max-width: var(--hero-column-max, min(40ch, 100%));
+}
+html.theme-atmosphere .observatory-hero .hero-observatory-upper {
+  gap: 0.45rem;
 }
 html.theme-atmosphere .observatory-hero .hero-field-eyebrow-wrap .layer-title {
   opacity: 0.97;
@@ -2330,7 +2351,7 @@ html.theme-atmosphere .observatory-hero .hero-weather-panel .hero-field-echo-lin
   min-height: 0;
 }
 
-/* Pulso + CTA + puente: un bloque; el paso grande del grounding separa este cluster de Orbital. */
+/* CTA + puente (pulso va en .hero-observatory-upper); el paso grande del grounding separa cluster de Orbital. */
 .hero-grounding-cta-cluster {
   display: flex;
   flex-direction: column;
@@ -2508,7 +2529,8 @@ html.theme-atmosphere .observatory-hero .atmosphere-grounding .hero-bridge-sub--
   overflow: visible;
   transition: box-shadow var(--pulse-duration) cubic-bezier(0.2, 0.8, 0.2, 1);
 }
-.observatory-hero .atmosphere-grounding .horizon-pulse-bar {
+.observatory-hero .atmosphere-grounding .horizon-pulse-bar,
+.observatory-hero .hero-observatory-upper .horizon-pulse-bar {
   align-self: center;
   flex-shrink: 0;
 }
@@ -2974,6 +2996,7 @@ html.theme-atmosphere .atm-reading-line {
   }
 
   /* Columna hero: no forzar 100% — mantener --hero-column-max (lectura alineada) */
+  .observatory-hero .hero-observatory-upper,
   .observatory-hero .atmosphere-air,
   .observatory-hero .atmosphere-grounding {
     max-width: var(--hero-column-max, min(40ch, 100%));
@@ -6888,6 +6911,7 @@ html.theme-atmosphere .contribute-mood-option[aria-selected="true"] {
     padding-right: 0.25rem;
   }
 
+  .observatory-hero .hero-observatory-upper,
   .observatory-hero .atmosphere-air,
   .observatory-hero .atmosphere-grounding {
     max-width: var(--hero-column-max, min(40ch, 100%));

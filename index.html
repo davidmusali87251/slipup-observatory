@@ -97,44 +97,47 @@
               <span class="scope-sweep"></span>
               <span class="scope-target"></span>
             </div>
-          <div class="atmosphere-air" aria-label="Reading in the air">
-            <p id="heroBridgeLine" class="hero-bridge-line">Human moments.</p>
-            <p class="atmosphere-orientation" aria-hidden="true"></p>
-            <div class="hero-reading-stack">
-              <div class="hero-field-eyebrow-wrap">
-                <p class="eyebrow-layer layer-title">Today in the world</p>
-              </div>
-              <div
-                class="hero-reading-split degree-wrap observatory-reading-panel hero-weather-panel"
-                aria-label="Atmosphere reading"
-              >
-                <div class="hero-reading-degree-col">
-                  <div class="degree-value-row hero-weather-panel-degree">
-                    <p id="degreeValue" class="degree-value">
-                      <span class="degree-num">28</span><sup class="degree-unit" aria-hidden="true">°</sup>
-                    </p>
-                    <span id="degreeScaleLabel" class="degree-scale-label" aria-hidden="true">0–100 scale</span>
-                  </div>
+          <div class="hero-observatory-upper">
+            <div class="atmosphere-air" aria-label="Reading in the air">
+              <p id="heroBridgeLine" class="hero-bridge-line">Human moments.</p>
+              <p class="atmosphere-orientation" aria-hidden="true"></p>
+              <div class="hero-reading-stack">
+                <div class="hero-field-eyebrow-wrap">
+                  <p class="eyebrow-layer layer-title">Today in the world</p>
                 </div>
-                <div class="hero-reading-lines-col">
-                  <p id="climateSummaryLine" class="climate-summary-line hero-weather-line hero-weather-line--summary" role="status" aria-live="polite"></p>
-                  <p id="atmReadingLine" class="atm-reading-line hero-weather-line hero-weather-line--reading" role="status" aria-live="polite"></p>
-                  <p id="atmosphericWeatherLine" class="atmospheric-weather-line hero-weather-line hero-weather-line--tag hidden" role="status" aria-live="polite"></p>
-                  <p id="heroFieldEchoLine" class="hero-field-echo-line hidden" role="status" aria-live="polite"></p>
+                <div
+                  class="hero-reading-split degree-wrap observatory-reading-panel hero-weather-panel"
+                  aria-label="Atmosphere reading"
+                >
+                  <div class="hero-reading-degree-col">
+                    <div class="degree-value-row hero-weather-panel-degree">
+                      <p id="degreeValue" class="degree-value">
+                        <span class="degree-num">28</span><sup class="degree-unit" aria-hidden="true">°</sup>
+                      </p>
+                      <span id="degreeScaleLabel" class="degree-scale-label" aria-hidden="true">0–100 scale</span>
+                    </div>
+                  </div>
+                  <div class="hero-reading-lines-col">
+                    <p id="climateSummaryLine" class="climate-summary-line hero-weather-line hero-weather-line--summary" role="status" aria-live="polite"></p>
+                    <p id="atmReadingLine" class="atm-reading-line hero-weather-line hero-weather-line--reading" role="status" aria-live="polite"></p>
+                    <p id="atmosphericWeatherLine" class="atmospheric-weather-line hero-weather-line hero-weather-line--tag hidden" role="status" aria-live="polite"></p>
+                    <p id="heroFieldEchoLine" class="hero-field-echo-line hidden" role="status" aria-live="polite"></p>
+                  </div>
                 </div>
               </div>
             </div>
+            <!-- Pulso / hints / pulso observatorio: justo debajo de la lectura, antes del horizonte (CTA). -->
+            <div class="hero-grounding-cta-ledger">
+              <div id="horizonPulseBar" class="horizon-pulse-bar" aria-hidden="true"></div>
+              <p id="heroScrollHint" class="hero-scroll-hint" aria-hidden="true"></p>
+              <p id="warmupHint" class="warmup-hint hidden" aria-live="polite"></p>
+              <p id="transientReadingLine" class="transient-reading-line hidden" aria-live="polite"></p>
+              <p id="observatoryPulseWrap" class="observatory-pulse hidden" role="status" aria-live="polite"><span id="observatoryPulseLabel" class="observatory-pulse-label"></span> <span id="observatoryPulseMessage"></span></p>
+            </div>
           </div>
           <div class="atmosphere-grounding" aria-label="Toward the horizon">
-            <!-- Un solo bloque: horizonte + gesto + invitación (el paso grande al Orbital va después). -->
+            <!-- Gesto + invitación; el paso grande al Orbital va después. -->
             <div class="hero-grounding-cta-cluster">
-              <div class="hero-grounding-cta-ledger">
-                <div id="horizonPulseBar" class="horizon-pulse-bar" aria-hidden="true"></div>
-                <p id="heroScrollHint" class="hero-scroll-hint" aria-hidden="true"></p>
-                <p id="warmupHint" class="warmup-hint hidden" aria-live="polite"></p>
-                <p id="transientReadingLine" class="transient-reading-line hidden" aria-live="polite"></p>
-                <p id="observatoryPulseWrap" class="observatory-pulse hidden" role="status" aria-live="polite"><span id="observatoryPulseLabel" class="observatory-pulse-label"></span> <span id="observatoryPulseMessage"></span></p>
-              </div>
               <span class="cta-observatory-wrap">
                 <span id="ctaObservatoryTooltip" class="cta-observatory-tooltip" role="tooltip" aria-hidden="true"></span>
                 <a id="ctaObservatory" class="cta cta-observatory" href="./contribute.html">Place a moment</a>
