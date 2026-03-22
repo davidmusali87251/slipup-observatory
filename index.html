@@ -118,17 +118,20 @@
             </div>
           </div>
           <div class="atmosphere-grounding" aria-label="Toward the horizon">
-            <div id="horizonPulseBar" class="horizon-pulse-bar" aria-hidden="true"></div>
-            <p id="heroScrollHint" class="hero-scroll-hint" aria-hidden="true"></p>
-            <p id="warmupHint" class="warmup-hint hidden" aria-live="polite"></p>
-            <p id="transientReadingLine" class="transient-reading-line hidden" aria-live="polite"></p>
-            <p id="observatoryPulseWrap" class="observatory-pulse hidden" role="status" aria-live="polite"><span id="observatoryPulseLabel" class="observatory-pulse-label"></span> <span id="observatoryPulseMessage"></span></p>
-            <span class="cta-observatory-wrap">
-              <span id="ctaObservatoryTooltip" class="cta-observatory-tooltip" role="tooltip" aria-hidden="true"></span>
-              <a id="ctaObservatory" class="cta cta-observatory" href="./contribute.html">Place a moment</a>
-            </span>
-            <div class="cta-bridge-copy-stack" aria-label="Place a moment">
-              <p id="heroBridgeSub1" class="hero-bridge-sub hero-bridge-sub--grounding">Write a moment from your day.</p>
+            <!-- Un solo bloque: horizonte + gesto + invitación (el paso grande al Orbital va después). -->
+            <div class="hero-grounding-cta-cluster">
+              <div id="horizonPulseBar" class="horizon-pulse-bar" aria-hidden="true"></div>
+              <p id="heroScrollHint" class="hero-scroll-hint" aria-hidden="true"></p>
+              <p id="warmupHint" class="warmup-hint hidden" aria-live="polite"></p>
+              <p id="transientReadingLine" class="transient-reading-line hidden" aria-live="polite"></p>
+              <p id="observatoryPulseWrap" class="observatory-pulse hidden" role="status" aria-live="polite"><span id="observatoryPulseLabel" class="observatory-pulse-label"></span> <span id="observatoryPulseMessage"></span></p>
+              <span class="cta-observatory-wrap">
+                <span id="ctaObservatoryTooltip" class="cta-observatory-tooltip" role="tooltip" aria-hidden="true"></span>
+                <a id="ctaObservatory" class="cta cta-observatory" href="./contribute.html">Place a moment</a>
+              </span>
+              <div class="cta-bridge-copy-stack" aria-label="Place a moment">
+                <p id="heroBridgeSub1" class="hero-bridge-sub hero-bridge-sub--grounding">Write a moment from your day.</p>
+              </div>
             </div>
             <!-- Tercer polo: promesa (enlace) + nombre de capa Orbital (puerta real a #orbital). -->
             <div

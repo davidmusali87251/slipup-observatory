@@ -1227,7 +1227,7 @@ html.theme-atmosphere .observatory-hero .hero-field-eyebrow-wrap .layer-title {
 }
 html.theme-atmosphere .observatory-hero .atmosphere-grounding {
   padding-top: 0.42rem;
-  /* Mismo paso ~2 cm (hereda --hero-stack-gap del panel): pulso→CTA→puente→Orbital. */
+  /* Paso grande (~2 cm): cluster (horizonte + gesto) → Orbital → trust. */
   --hero-grounding-step: var(--hero-stack-gap);
   gap: var(--hero-grounding-step);
 }
@@ -2300,6 +2300,27 @@ html.theme-atmosphere .observatory-hero .hero-weather-panel .hero-field-echo-lin
   /* Ocupa el hueco vertical bajo atmosphere-air para poder anclar el caption abajo */
   flex: 1 1 auto;
   min-height: 0;
+}
+
+/* Pulso + CTA + puente: un bloque; el paso grande del grounding separa este cluster de Orbital. */
+.hero-grounding-cta-cluster {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: min(40ch, 100%);
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  gap: 0.55rem;
+}
+.observatory-hero .hero-grounding-cta-cluster {
+  max-width: var(--hero-column-max, min(40ch, 100%));
+}
+html.theme-atmosphere .observatory-hero .hero-grounding-cta-cluster {
+  gap: 0.62rem;
 }
 
 /* Línea sutil de transición aire → horizonte (casi imperceptible, solo atmósfera) */
