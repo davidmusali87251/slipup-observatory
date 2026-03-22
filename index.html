@@ -34,6 +34,14 @@
     <link rel="stylesheet" href="./styles.css?v={{BUILD_ID}}" />
   </head>
   <body>
+    <!-- Evita URL duplicada /index.html vs / (Search Console: “alternativa con canónica”). Ideal: 301 en CDN/DNS. -->
+    <script>
+      (function () {
+        if (location.pathname === "/index.html") {
+          location.replace(location.origin + "/" + location.search + location.hash);
+        }
+      })();
+    </script>
     <main id="top" class="page">
       <section id="upper-atmosphere" class="upper-atmosphere" aria-hidden="true"></section>
       <section id="orbital" class="panel panel-orbital" aria-label="Orbital layer" data-layer="orbital">
