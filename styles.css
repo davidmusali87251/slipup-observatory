@@ -1225,8 +1225,9 @@ html.theme-atmosphere .observatory-hero .hero-field-eyebrow-wrap .layer-title {
 }
 html.theme-atmosphere .observatory-hero .atmosphere-grounding {
   padding-top: 0.34rem;
-  /* Menos “stack” entre capas; Place respira como decantación. */
-  gap: 0.62rem;
+  /* Paso uniforme: mismo ritmo entre pulso→CTA→puente→Orbital (sin márgenes extra que rompan la columna). */
+  --hero-grounding-step: 0.72rem;
+  gap: var(--hero-grounding-step);
 }
 html.theme-atmosphere .observatory-hero .atmosphere-grounding::before {
   opacity: 0.12;
@@ -1243,10 +1244,10 @@ html.theme-atmosphere .observatory-hero .atmosphere-grounding::after {
   top: calc(0.34rem + 3px);
 }
 html.theme-atmosphere .observatory-hero .horizon-pulse-bar {
-  margin-bottom: 0.38rem;
+  margin-bottom: 0;
 }
 html.theme-atmosphere .observatory-hero .cta-observatory-wrap {
-  margin-top: 0.42rem;
+  margin-top: 0;
 }
 
 /* Puente superior + cola post-Place: mismo campo; Place como decantación, no estación intermedia. */
@@ -1254,12 +1255,12 @@ html.theme-atmosphere .observatory-hero .hero-bridge-line {
   margin-bottom: 0.88rem;
 }
 html.theme-atmosphere .observatory-hero .cta-bridge-copy-stack {
-  margin-top: 0.08rem;
+  margin-top: 0;
 }
 html.theme-atmosphere .observatory-hero .atmospheric-weather-caption-wrap {
   gap: 0.22rem;
-  margin-top: 0.4rem;
-  padding-top: 0.12rem;
+  margin-top: 0;
+  padding-top: 0;
 }
 html.theme-atmosphere .observatory-hero .atmospheric-weather-caption-wrap .atmospheric-weather-caption {
   opacity: 0.4;
@@ -1277,6 +1278,18 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption-wrap .instr
   border-color: color-mix(in oklab, var(--muted) 38%, transparent);
 }
 
+/* Sin hint visible no reservamos huecos extra entre pulso y CTA (misma columna de pasos). */
+html.theme-atmosphere .observatory-hero .atmosphere-grounding .hero-scroll-hint:not(.hero-scroll-hint--visible) {
+  display: none;
+}
+
+/* Orbital → trust: más aire que un solo gap; el bloque sigue anclado al fondo de la capa. */
+html.theme-atmosphere .observatory-hero .atmosphere-grounding .atmospheric-weather-caption-wrap {
+  margin-top: auto;
+  padding-top: 0.95rem;
+  padding-bottom: 0.2rem;
+}
+
 /* ── Tercer polo del hero: Orbital.
    Alineado al sistema de capas (.layer-title, ceja “Today in the world”, panel Orbital):
    misma familia tipográfica, peso 500, tracking de capa; más tenue que la ceja (tercer fuerza). */
@@ -1287,8 +1300,8 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption-wrap .instr
   gap: 0.24rem;
   width: 100%;
   max-width: var(--hero-column-max, min(40ch, 100%));
-  /* Un poco más de aire respecto a “Write a moment…” (tercera coordenada vs. gesto). */
-  margin: 0.58rem auto 0.12rem;
+  /* El paso respecto al puente lo marca el gap de .atmosphere-grounding en tema. */
+  margin: 0 auto 0.12rem;
   padding: 0.48rem 0.5rem 0;
   box-sizing: border-box;
   position: relative;
@@ -1299,7 +1312,7 @@ html.theme-atmosphere .observatory-hero .atmospheric-weather-caption-wrap .instr
 html.theme-atmosphere .observatory-hero .hero-orbital-pole {
   /* Misma familia de borde que títulos de capa en tema (Nearby / Horizon), más diluido. */
   border-top-color: color-mix(in oklab, var(--line) 38%, rgba(139, 108, 255, 0.06));
-  margin-top: 0.56rem;
+  margin-top: 0;
   margin-bottom: 0.28rem;
   padding-top: 0.4rem;
   padding-bottom: 0.08rem;
@@ -3063,7 +3076,8 @@ html.theme-atmosphere .atm-reading-line {
   }
   html.theme-atmosphere .observatory-hero .atmosphere-grounding {
     padding-top: 0.3rem;
-    gap: 0.58rem;
+    --hero-grounding-step: 0.58rem;
+    gap: var(--hero-grounding-step);
   }
   html.theme-atmosphere .observatory-hero .atmosphere-grounding::after {
     top: calc(0.3rem + 3px);
