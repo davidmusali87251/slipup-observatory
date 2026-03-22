@@ -1210,6 +1210,12 @@ html.theme-atmosphere .observatory-hero .topbar-ai:focus-visible {
   outline: 2px solid color-mix(in oklab, var(--line) 55%, rgba(139, 108, 255, 0.35));
   outline-offset: 3px;
 }
+
+/* Desplazamiento global del hero: solo padding-top (todo el panel sube igual).
+   No toca --hero-grounding-step ni gaps internos; las relaciones Place→Orbital→trust siguen definidas por el panel y .atmosphere-grounding. */
+html.theme-atmosphere .observatory-hero {
+  padding-top: calc(4rem + env(safe-area-inset-top, 0px) + 0.25rem - 0.85rem);
+}
 html.theme-atmosphere .observatory-hero .panel.panel-observatory {
   /* Columna superior (lectura + ledger + CTA) → Orbital: mismo paso que dentro del horizonte. */
   --hero-grounding-step: 2cm;
@@ -1363,8 +1369,8 @@ html.theme-atmosphere .observatory-hero .atmosphere-grounding .atmospheric-weath
 html.theme-atmosphere .observatory-hero .hero-orbital-pole {
   /* Misma familia de borde; un poco más de presencia luminosa que el borde mínimo. */
   border-top-color: color-mix(in oklab, var(--line) 42%, rgba(180, 165, 255, 0.1));
-  /* Sube un poco el bloque respecto al hueco del panel (sin tocar el paso Orbital→trust). */
-  margin-top: -0.45rem;
+  /* margin-top: 0 — el paso Place→Orbital lo marca solo el gap del panel + .atmosphere-grounding (sin hacks que rompan la escala). */
+  margin-top: 0;
   margin-bottom: 0.28rem;
   padding-top: 0.4rem;
   padding-bottom: 0.08rem;
