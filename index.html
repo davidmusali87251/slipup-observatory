@@ -73,11 +73,14 @@
         </script>
         <div id="atmSignals" class="atm-signals" aria-hidden="true"></div>
         <header class="topbar topbar-fixed">
-          <a href="#observatory-hero" class="topbar-brand">
+          <a href="#observatory-hero" class="topbar-brand" aria-describedby="heroBrandTooltip">
             SlipUp™ Observatory
-            <span class="topbar-tooltip" aria-hidden="true">Reading from the last 48 hours.</span>
+            <span id="heroBrandTooltip" class="topbar-tooltip topbar-tooltip--promise"></span>
           </a>
-          <a href="#orbital" class="topbar-ai">Orbital ↑</a>
+          <a href="#orbital" class="topbar-ai" aria-describedby="topbarOrbitalTooltip">
+            Orbital ↑
+            <span id="topbarOrbitalTooltip" class="topbar-tooltip topbar-tooltip--orbital"></span>
+          </a>
         </header>
         <p class="atmosphere-value-prop visually-hidden" aria-hidden="true">Collective reading from shared moments</p>
 
@@ -136,8 +139,8 @@
             </div>
             <div class="hero-grounding-cta-cluster">
               <span class="cta-observatory-wrap">
-                <span id="ctaObservatoryTooltip" class="cta-observatory-tooltip" role="tooltip" aria-hidden="true"></span>
-                <a id="ctaObservatory" class="cta cta-observatory" href="./contribute.html">Place a moment</a>
+                <span id="ctaObservatoryTooltip" class="cta-observatory-tooltip"></span>
+                <a id="ctaObservatory" class="cta cta-observatory" href="./contribute.html" aria-describedby="ctaObservatoryTooltip">Place a moment</a>
               </span>
               <div class="cta-bridge-copy-stack" aria-label="Place a moment">
                 <p id="heroBridgeSub1" class="hero-bridge-sub hero-bridge-sub--grounding">Write a moment from your day.</p>

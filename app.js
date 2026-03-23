@@ -753,6 +753,12 @@ const UI_COPY = {
     emptyStateQuiet: "The atmosphere is quiet.",
     emptyStateSignal: "What settles here becomes signal.",
     momentLeavesTrace: "Every moment leaves a trace.",
+    /** Tooltip “Place a moment” (gesto de entrada; distinto de la promesa de marca). */
+    ctaMomentTooltip: "Leave a human trace in the shared field.",
+    /** Topbar marca: promesa entendible (no titular). */
+    topbarBrandTooltip: "Place a moment. Read the field. Find your place in it.",
+    /** Topbar Orbital ↑: capa superior / relación con el campo. */
+    topbarOrbitalTooltip: "Upper layer — relation to the field.",
     supportObservatoryTooltip: "Your support keeps the observatory ad-free and the field alive.",
     supportObservatoryCaption: "Keep the field alive.",
     contributeInvite: "A shared atmosphere of human moments.\nLet one moment rise.",
@@ -911,6 +917,9 @@ const UI_COPY = {
     emptyStateQuiet: "La atmósfera está en calma.",
     emptyStateSignal: "Lo que se asienta aquí se vuelve señal.",
     momentLeavesTrace: "Cada momento deja una traza.",
+    ctaMomentTooltip: "Dejá una traza humana en el campo compartido.",
+    topbarBrandTooltip: "Deja un momento. Lee el campo. Encuentra tu lugar en él.",
+    topbarOrbitalTooltip: "Capa superior — relación con el campo.",
     supportObservatoryTooltip: "Tu apoyo mantiene el observatorio sin anuncios y el campo vivo.",
     supportObservatoryCaption: "Mantené el campo vivo.",
     contributeInvite: "Una atmósfera compartida de momentos humanos.\nDejá subir un momento.",
@@ -1115,7 +1124,12 @@ function applyUICopy() {
   const ctaObservatory = document.getElementById("ctaObservatory");
   if (ctaObservatory && ui.ctaObservatoryLabel) ctaObservatory.textContent = ui.ctaObservatoryLabel;
   const ctaObservatoryTooltip = document.getElementById("ctaObservatoryTooltip");
-  if (ctaObservatoryTooltip && ui.momentLeavesTrace) ctaObservatoryTooltip.textContent = ui.momentLeavesTrace;
+  if (ctaObservatoryTooltip && (ui.ctaMomentTooltip || ui.momentLeavesTrace))
+    ctaObservatoryTooltip.textContent = ui.ctaMomentTooltip || ui.momentLeavesTrace;
+  const heroBrandTooltip = document.getElementById("heroBrandTooltip");
+  if (heroBrandTooltip && ui.topbarBrandTooltip) heroBrandTooltip.textContent = ui.topbarBrandTooltip;
+  const topbarOrbitalTooltip = document.getElementById("topbarOrbitalTooltip");
+  if (topbarOrbitalTooltip && ui.topbarOrbitalTooltip) topbarOrbitalTooltip.textContent = ui.topbarOrbitalTooltip;
   const viewMoreTooltip = document.getElementById("viewMoreTooltip");
   if (viewMoreTooltip && ui.momentLeavesTrace) viewMoreTooltip.textContent = ui.momentLeavesTrace;
   const supportObservatoryTooltip = document.getElementById("supportObservatoryTooltip");
