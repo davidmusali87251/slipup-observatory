@@ -4787,13 +4787,35 @@ async function boot() {
       firstPhaseTarget = clamp(startDisplay + localDirection * 1.2, 0, SCALE);
     }
     settleDuration = clamp(3000 + Math.abs(delta) * 70 + patternVolatilityMs, 3000, 8000);
+    /* El bump atmosférico (body::before) es viewport-global; si el scroll sigue mostrando Orbital, el refuerzo
+       .panel-orbital.is-in-view hace que el feedback se perciba ahí. Tras await, re-anclar al hero y ejecutar
+       ritual/bump en el siguiente frame para que el layout aplique el scroll. */
+    if (heroEl) {
+      try {
+        heroEl.scrollIntoView({ block: "start", behavior: "auto" });
+      } catch (_) {}
+    }
     triggerPostContributeSequence(canonicalState, LANG);
     if (heroEl) {
-      heroEl.classList.add("observatory-hero-ritual");
-      try { window.atmosphere?.bump?.(); } catch (_) {}
-      setTimeout(() => heroEl.classList.remove("observatory-hero-ritual"), 2200);
-    }
-    if (degreeValue && !prefersReducedMotion) {
+      const kickPostContributeHero = () => {
+        heroEl.classList.add("observatory-hero-ritual");
+        try {
+          window.atmosphere?.bump?.();
+        } catch (_) {}
+        window.setTimeout(() => heroEl.classList.remove("observatory-hero-ritual"), 2200);
+        if (degreeValue && !prefersReducedMotion) {
+          degreeValue.classList.add("degree-value--contributed-pulse");
+          window.setTimeout(() => degreeValue.classList.remove("degree-value--contributed-pulse"), 680);
+        }
+      };
+      if (typeof window.requestAnimationFrame === "function") {
+        window.requestAnimationFrame(() => {
+          window.requestAnimationFrame(kickPostContributeHero);
+        });
+      } else {
+        window.setTimeout(kickPostContributeHero, 0);
+      }
+    } else if (degreeValue && !prefersReducedMotion) {
       degreeValue.classList.add("degree-value--contributed-pulse");
       window.setTimeout(() => degreeValue.classList.remove("degree-value--contributed-pulse"), 680);
     }
