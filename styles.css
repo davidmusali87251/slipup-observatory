@@ -66,8 +66,8 @@
   --descent-gap-horizon: 2.75rem;
   --descent-gap-strata: 4.25rem;
   /* Espacio entre Orbital y hero: va en margin-top del hero (no solo padding en Orbital).
-   * Así el hueco muestra el fondo de .page/body y se percibe como “tramo” real, no más textura orbital. */
-  --orbital-to-hero-gap: clamp(9rem, 52vh, 40rem);
+   * Tramo visible sin ocupar ~medio viewport (evita sensación de hero “a mitad de pantalla”). */
+  --orbital-to-hero-gap: clamp(6rem, 28vh, 22rem);
   --block-gap: 0.85rem;
   --layer-transition: 1.5rem;
   --site-legal-height: 2.75rem;
@@ -82,16 +82,16 @@
   --atmo-ground: 0.6rem;
 }
 
-/* Orbital → hero (móvil/tablet narrow): hueco perceptible sin depender solo del ancho; vh estable; dvh opcional (Safari/iOS). */
+/* Orbital → hero (estrecho): tramo más corto que ~50vh para no empujar el hero “a mitad” del scroll. */
 @media (max-width: 600px) {
   :root {
-    --orbital-to-hero-gap: clamp(7rem, 54vh, 30rem);
+    --orbital-to-hero-gap: clamp(3rem, min(20vh, 18dvh), 10rem);
   }
 }
 @media (max-width: 600px) {
   @supports (height: 100dvh) {
     :root {
-      --orbital-to-hero-gap: clamp(7rem, min(54vh, 72dvh), 30rem);
+      --orbital-to-hero-gap: clamp(3rem, min(20vh, 18dvh), 10rem);
     }
   }
 }
