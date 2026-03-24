@@ -872,6 +872,11 @@ const UI_COPY = {
     resonanceFeedback: ["Signal shared.", "You are not alone.", "Another observer.", "Field expanded."],
     atmosphericWeatherCaption: "The atmosphere reflects the last 48 hours of moments.",
     orbitalTransitionLine: "Entering orbital view",
+    /** Orbital Paso 1: estado vacío vs traza desde lastMoment (localStorage). */
+    orbitalInstrumentHeading: "Your trace in the field",
+    orbitalEmptyState: "No trace in the field yet. Place a moment to see your place.",
+    orbitalFieldAriaLabel: "Abstract position of your last trace in the shared field (not geographic).",
+    orbitalTraceStaleNote: "Outside the active resonance window — position still shown.",
     momentConstellationLine: "This moment is part of a constellation.",
     momentConstellationRelatedLabel: "Connected moments",
     momentRemoveLabel: "Remove",
@@ -1041,6 +1046,10 @@ const UI_COPY = {
     resonanceFeedback: ["Señal compartida.", "No estás solo.", "Otro observador.", "Campo expandido."],
     atmosphericWeatherCaption: "La atmósfera refleja las últimas 48 horas de momentos.",
     orbitalTransitionLine: "Entrando a vista orbital",
+    orbitalInstrumentHeading: "Tu traza en el campo",
+    orbitalEmptyState: "Aún no hay traza en el campo. Colocá un momento para ver tu lugar.",
+    orbitalFieldAriaLabel: "Posición abstracta de tu última traza en el campo compartido (no geográfica).",
+    orbitalTraceStaleNote: "Fuera de la ventana de resonancia activa — la posición sigue visible.",
     momentConstellationLine: "Este momento forma parte de una constelación.",
     momentConstellationRelatedLabel: "Momentos conectados",
     momentRemoveLabel: "Quitar",
@@ -1138,6 +1147,10 @@ function applyUICopy() {
   if (supportObservatoryCaption && ui.supportObservatoryCaption) supportObservatoryCaption.textContent = ui.supportObservatoryCaption;
   const strataSeedsEl = document.getElementById("strataSeedsBtn");
   if (strataSeedsEl && ui.strataSeedsLabel) strataSeedsEl.textContent = ui.strataSeedsLabel;
+  const orbitalInstrumentHeading = document.getElementById("orbitalInstrumentHeading");
+  if (orbitalInstrumentHeading && ui.orbitalInstrumentHeading)
+    orbitalInstrumentHeading.textContent = ui.orbitalInstrumentHeading;
+  renderOrbitalShell();
 }
 // FUTURE: Keep scaffold switches explicit for non-active UI lines.
 const FUTURE_UI = {
@@ -4459,10 +4472,96 @@ function updateClimateDebugPanel(canonicalState) {
   `;
 }
 
+/** Lectura de lastMoment para panel Orbital (misma clave que resonancia). */
+function parseLastMomentForOrbital() {
+  try {
+    const raw = localStorage.getItem(LAST_MOMENT_KEY);
+    if (!raw) return null;
+    const o = JSON.parse(raw);
+    if (!o || typeof o.timestamp !== "number") return null;
+    if (typeof o.type !== "string" || typeof o.mood !== "string") return null;
+    return o;
+  } catch {
+    return null;
+  }
+}
+
+/** Posición determinista en el campo (no geográfica): misma entrada ⇒ misma posición. */
+function orbitalHashPosition(seedStr) {
+  let h = 2166136261;
+  for (let i = 0; i < seedStr.length; i++) {
+    h ^= seedStr.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  const hi = h >>> 0;
+  const left = 18 + (hi % 65);
+  const top = 18 + ((hi >>> 12) % 65);
+  return { left, top };
+}
+
+function formatOrbitalTraceLine(last) {
+  const t = String(last.type || "").trim();
+  const m = String(last.mood || "").trim();
+  if (!t && !m) return "";
+  return `${t} · ${m}`;
+}
+
+/** Esqueleto Orbital: vacío vs marcador de traza; capa resonancia reservada en DOM. */
+function renderOrbitalShell() {
+  const emptyEl = document.getElementById("orbitalEmptyState");
+  const wrap = document.getElementById("orbitalFieldWrap");
+  const marker = document.getElementById("orbitalMarker");
+  const meta = document.getElementById("orbitalTraceMeta");
+  const surface = document.getElementById("orbitalFieldSurface");
+  if (!emptyEl || !wrap || !marker || !surface) return;
+
+  const ui = UI_COPY[LANG] || UI_COPY.en;
+  const last = parseLastMomentForOrbital();
+
+  if (!last) {
+    emptyEl.textContent = ui.orbitalEmptyState || "";
+    emptyEl.hidden = false;
+    wrap.hidden = true;
+    wrap.classList.remove("orbital-field-wrap--stale");
+    if (meta) meta.textContent = "";
+    surface.removeAttribute("aria-label");
+    surface.removeAttribute("role");
+    surface.setAttribute("aria-hidden", "true");
+    return;
+  }
+
+  emptyEl.textContent = "";
+  emptyEl.hidden = true;
+  wrap.hidden = false;
+
+  const key = `${last.type}|${last.mood}|${last.timestamp}`;
+  const { left, top } = orbitalHashPosition(key);
+  marker.style.left = `${left}%`;
+  marker.style.top = `${top}%`;
+
+  const rc = getResonanceContext();
+  wrap.classList.toggle("orbital-field-wrap--stale", !rc);
+
+  if (meta) {
+    const base = formatOrbitalTraceLine(last);
+    if (!rc && ui.orbitalTraceStaleNote) {
+      meta.textContent = base ? `${base} — ${ui.orbitalTraceStaleNote}` : ui.orbitalTraceStaleNote;
+    } else {
+      meta.textContent = base;
+    }
+  }
+
+  const aria = ui.orbitalFieldAriaLabel || "";
+  surface.setAttribute("aria-label", aria);
+  surface.setAttribute("role", "img");
+  surface.removeAttribute("aria-hidden");
+}
+
 function initOrbitalLayer() {
   const orbitalSection = document.getElementById("orbital");
   const transitionLine = document.getElementById("orbitalTransitionLine");
   if (!orbitalSection || !transitionLine) return;
+  renderOrbitalShell();
   const ui = UI_COPY[LANG] || UI_COPY.en;
   const label = ui.orbitalTransitionLine || "Entering orbital view";
   const observer = new IntersectionObserver(
@@ -4693,6 +4792,10 @@ async function boot() {
       heroEl.classList.add("observatory-hero-ritual");
       try { window.atmosphere?.bump?.(); } catch (_) {}
       setTimeout(() => heroEl.classList.remove("observatory-hero-ritual"), 2200);
+    }
+    if (degreeValue && !prefersReducedMotion) {
+      degreeValue.classList.add("degree-value--contributed-pulse");
+      window.setTimeout(() => degreeValue.classList.remove("degree-value--contributed-pulse"), 680);
     }
     if (prefersReducedMotion) {
       animateDegree(startDisplay, computedDegree, 0);

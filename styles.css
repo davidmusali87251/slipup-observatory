@@ -1538,6 +1538,33 @@ html.theme-atmosphere .observatory-hero .hero-orbital-tagline.hero-orbital-layer
   }
 }
 
+/* Pulso breve en el grado al volver con ?contributed=1 (evidencia perceptible; suma al ritual del hero). */
+@keyframes degree-contributed-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  45% {
+    transform: scale(1.03);
+    filter: brightness(1.06);
+  }
+}
+.observatory-hero .degree-value.degree-value--contributed-pulse {
+  animation: degree-contributed-pulse 0.68s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .observatory-hero .degree-value.degree-value--contributed-pulse {
+    animation: none;
+    filter: brightness(1.04);
+  }
+}
+html.theme-atmosphere .observatory-hero .degree-value.degree-value--contributed-pulse .degree-num {
+  text-shadow:
+    0 0 28px rgba(139, 108, 255, 0.35),
+    0 0 48px rgba(92, 61, 255, 0.12);
+}
+
 /* Seed hook for future layers (disabled visually by default) */
 .upper-atmosphere {
   height: 0;
@@ -4668,6 +4695,98 @@ html.theme-atmosphere .page .site-legal {
   line-height: 1.5;
   margin-bottom: 0.6rem;
   max-width: 56ch;
+}
+
+/* Paso 1 Orbital: campo abstracto + marcador de traza; resonancia reservada en .orbital-resonance-slot */
+.orbital-instrument {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: min(360px, 92vw);
+  margin: 1rem auto 1.25rem;
+}
+.orbital-empty {
+  font-family: var(--font-observatory);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: color-mix(in oklab, var(--text) 78%, var(--muted));
+  margin: 0 auto;
+  max-width: 38ch;
+  text-align: center;
+}
+.orbital-empty[hidden] {
+  display: none !important;
+}
+.orbital-field-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+}
+.orbital-field-wrap[hidden] {
+  display: none !important;
+}
+.orbital-field-surface {
+  position: relative;
+  width: min(300px, 78vw);
+  height: min(300px, 78vw);
+  margin: 0 auto;
+  border-radius: 50%;
+  border: 1px solid color-mix(in oklab, var(--line) 28%, transparent);
+  background:
+    radial-gradient(circle at 50% 45%, color-mix(in oklab, var(--layer-horizon) 18%, transparent) 0%, transparent 62%),
+    color-mix(in oklab, var(--bg) 92%, var(--layer-air));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--line) 10%, transparent),
+    0 8px 32px color-mix(in oklab, var(--text) 6%, transparent);
+}
+.orbital-marker {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--soft) 55%, #e8e4ff);
+  border: 1px solid color-mix(in oklab, var(--line) 35%, rgba(139, 108, 255, 0.35));
+  box-shadow:
+    0 0 18px rgba(139, 108, 255, 0.45),
+    0 0 36px rgba(92, 61, 255, 0.12);
+  transform: translate(-50%, -50%);
+  transition:
+    left 0.45s ease,
+    top 0.45s ease,
+    opacity 0.35s ease;
+  pointer-events: none;
+}
+.orbital-field-wrap--stale .orbital-marker {
+  opacity: 0.55;
+}
+.orbital-trace-meta {
+  font-family: var(--font-observatory);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  color: color-mix(in oklab, var(--muted) 92%, var(--text));
+  margin: 0;
+  max-width: 40ch;
+  text-align: center;
+}
+.orbital-resonance-slot {
+  width: 100%;
+  min-height: 0;
+  margin: 0.25rem auto 0;
+  /* Capa futura (resonancia / drift): reutilizar este contenedor */
+}
+@media (prefers-reduced-motion: reduce) {
+  .orbital-marker {
+    transition: none;
+  }
+}
+html.theme-atmosphere .orbital-field-surface {
+  border-color: color-mix(in oklab, var(--line) 42%, rgba(139, 108, 255, 0.12));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--line) 14%, transparent),
+    0 8px 36px rgba(92, 61, 255, 0.08);
 }
 
 .orbital-transition-line {

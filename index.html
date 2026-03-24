@@ -51,10 +51,16 @@
         <p class="orbital-subtitle">Instrument observation</p>
         <p class="orbital-copy">Patterns become visible above the atmosphere. Constellations, field readings, and instrument observations are forming here.</p>
         <p class="orbital-copy">Scroll down to the atmosphere, or explore the rest of the observatory.</p>
-        <div class="orbital-seed-blocks" aria-hidden="true">
-          <p class="orbital-seed-label">Constellations</p>
-          <p class="orbital-seed-label">Field readings</p>
-          <p class="orbital-seed-label">Signal clusters</p>
+        <div class="orbital-instrument" id="orbitalInstrument">
+          <p id="orbitalInstrumentHeading" class="visually-hidden"></p>
+          <div id="orbitalEmptyState" class="orbital-empty" role="status" aria-live="polite"></div>
+          <div id="orbitalFieldWrap" class="orbital-field-wrap" hidden>
+            <div class="orbital-field-surface" id="orbitalFieldSurface" aria-hidden="true">
+              <span class="orbital-marker" id="orbitalMarker"></span>
+            </div>
+            <p class="orbital-trace-meta" id="orbitalTraceMeta"></p>
+          </div>
+          <div class="orbital-resonance-slot" id="orbitalResonanceSlot" aria-hidden="true" data-orbital-layer="resonance"></div>
         </div>
         <p class="orbital-contribute-wrap"><a id="orbitalContributeLink" class="text-link orbital-contribute-link" href="./contribute.html">Place a moment</a></p>
         <p id="orbitalTransitionLine" class="orbital-transition-line hidden" role="status" aria-live="polite"></p>
