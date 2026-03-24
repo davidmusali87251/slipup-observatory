@@ -1528,12 +1528,57 @@ html.theme-atmosphere .observatory-hero .hero-orbital-tagline.hero-orbital-layer
   45% { opacity: 0.72; }
 }
 
+/* Sin theme-atmosphere la cúpula ::before está ~0.62; estos valores encajan. */
 .observatory-hero-ritual::before {
   animation: hero-ritual-glow 2.2s ease-out forwards;
 }
 
+/*
+ * Tema observatorio: ::before base ~0.9 y ::after ~0.7–0.76. La animación antigua (0.62–0.72)
+ * pisaba la cúpula y generaba un velo distinto a ::after → sensación de “capa encima” / pantalla a medias.
+ */
+@keyframes hero-ritual-glow-atmosphere {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  45% {
+    opacity: 0.96;
+  }
+}
+html.theme-atmosphere .observatory-hero.observatory-hero-ritual::before {
+  animation: hero-ritual-glow-atmosphere 2.2s ease-out forwards;
+}
+@keyframes hero-ritual-glow-atmosphere-latent {
+  0%,
+  100% {
+    opacity: 0.87;
+  }
+  45% {
+    opacity: 0.93;
+  }
+}
+@keyframes hero-ritual-glow-atmosphere-present {
+  0%,
+  100% {
+    opacity: 0.93;
+  }
+  45% {
+    opacity: 0.98;
+  }
+}
+html.theme-atmosphere .observatory-hero[data-field-entry="latent"].observatory-hero-ritual::before {
+  animation: hero-ritual-glow-atmosphere-latent 2.2s ease-out forwards;
+}
+html.theme-atmosphere .observatory-hero[data-field-entry="present"].observatory-hero-ritual::before {
+  animation: hero-ritual-glow-atmosphere-present 2.2s ease-out forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .observatory-hero-ritual::before {
+    animation: none;
+  }
+  html.theme-atmosphere .observatory-hero.observatory-hero-ritual::before {
     animation: none;
   }
 }
