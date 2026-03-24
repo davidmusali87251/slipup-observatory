@@ -4653,10 +4653,34 @@ function initFieldEntryShift() {
   hero.addEventListener("touchstart", engagePresence, { passive: true });
 }
 
+/** Sin hash (o #top): ancla al hero sin heredar scroll-behavior: smooth de html (evita Orbital arriba o scroll a medias). */
+function ensureObservatoryHeroInViewIfNoHash() {
+  try {
+    const h = (window.location.hash || "").trim();
+    if (h && h !== "#top") return;
+    const el = document.getElementById("observatory-hero");
+    if (!el) return;
+    const html = document.documentElement;
+    const prev = html.style.scrollBehavior;
+    html.style.scrollBehavior = "auto";
+    try {
+      el.scrollIntoView({ block: "start", behavior: "instant" });
+    } catch (_) {
+      el.scrollIntoView({ block: "start", behavior: "auto" });
+    }
+    html.style.scrollBehavior = prev;
+  } catch (_) {}
+}
+
 async function boot() {
   applyUICopy();
   initFieldEntryShift();
-  /* Scroll inicial al hero: index.html incluye script inline al abrir #observatory-hero (evita flash de Orbital). */
+  ensureObservatoryHeroInViewIfNoHash();
+  if (typeof window.requestAnimationFrame === "function") {
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(ensureObservatoryHeroInViewIfNoHash);
+    });
+  }
 
   const moments = loadMoments();
   const previousComputed = getStoredComputedDegree();

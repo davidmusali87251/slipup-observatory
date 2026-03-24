@@ -73,7 +73,17 @@
               var h = (location.hash || "").trim();
               if (h && h !== "#top") return;
               var el = document.getElementById("observatory-hero");
-              if (el) el.scrollIntoView({ behavior: "auto", block: "start" });
+              if (!el) return;
+              /* html { scroll-behavior: smooth } hace que behavior "auto" sea suave: primer frame en Orbital o scroll a medias. */
+              var html = document.documentElement;
+              var prev = html.style.scrollBehavior;
+              html.style.scrollBehavior = "auto";
+              try {
+                el.scrollIntoView({ block: "start", behavior: "instant" });
+              } catch (_) {
+                el.scrollIntoView({ block: "start", behavior: "auto" });
+              }
+              html.style.scrollBehavior = prev;
             } catch (_) {}
           })();
         </script>
