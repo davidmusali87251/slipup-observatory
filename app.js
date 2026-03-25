@@ -4641,7 +4641,7 @@ function renderOrbitalNeighbors(surface, marker, last, userLeft, userTop, ui) {
     span.style.left = `${left}%`;
     span.style.top = `${top}%`;
     const tip = neighborTooltipForMoment(ui, last, m);
-    span.title = tip;
+    span.setAttribute("data-tooltip", tip);
     span.setAttribute("aria-label", `${ui.orbitalNeighborAria || "Nearby trace"}. ${tip}`);
     span.setAttribute("role", "img");
     span.tabIndex = 0;
@@ -4654,7 +4654,8 @@ function renderOrbitalShell() {
   const emptyEl = document.getElementById("orbitalEmptyState");
   const wrap = document.getElementById("orbitalFieldWrap");
   const marker = document.getElementById("orbitalMarker");
-  const meta = document.getElementById("orbitalTraceMeta");
+  const metaPrimary = document.getElementById("orbitalTraceMetaPrimary");
+  const metaStale = document.getElementById("orbitalTraceMetaStale");
   const surface = document.getElementById("orbitalFieldSurface");
   if (!emptyEl || !wrap || !marker || !surface) return;
 
@@ -4666,7 +4667,11 @@ function renderOrbitalShell() {
     emptyEl.hidden = false;
     wrap.hidden = true;
     wrap.classList.remove("orbital-field-wrap--stale");
-    if (meta) meta.textContent = "";
+    if (metaPrimary) metaPrimary.textContent = "";
+    if (metaStale) {
+      metaStale.textContent = "";
+      metaStale.hidden = true;
+    }
     clearOrbitalNeighborElements(surface);
     const cap = document.getElementById("orbitalResonanceCaption");
     if (cap) {
@@ -4691,12 +4696,15 @@ function renderOrbitalShell() {
   const rc = getResonanceContext();
   wrap.classList.toggle("orbital-field-wrap--stale", !rc);
 
-  if (meta) {
+  if (metaPrimary && metaStale) {
     const base = formatOrbitalTraceLine(last);
+    metaPrimary.textContent = base;
     if (!rc && ui.orbitalTraceStaleNote) {
-      meta.textContent = base ? `${base} — ${ui.orbitalTraceStaleNote}` : ui.orbitalTraceStaleNote;
+      metaStale.textContent = ui.orbitalTraceStaleNote;
+      metaStale.hidden = false;
     } else {
-      meta.textContent = base;
+      metaStale.textContent = "";
+      metaStale.hidden = true;
     }
   }
 
