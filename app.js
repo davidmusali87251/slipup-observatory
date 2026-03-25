@@ -4562,13 +4562,6 @@ function orbitalHashPosition(seedStr) {
   return { left, top };
 }
 
-function formatOrbitalTraceLine(last) {
-  const t = String(last.type || "").trim();
-  const m = String(last.mood || "").trim();
-  if (!t && !m) return "";
-  return `${t} · ${m}`;
-}
-
 /** Vecinos en el disco Orbital: más puntos y radios más amplios (cerca → lejos). */
 const ORBITAL_NEIGHBOR_MAX = 19;
 const ORBITAL_NEIGHBOR_MOODS = ["focus", "calm", "curious", "tired", "stressed"];
@@ -4766,8 +4759,8 @@ function renderOrbitalShell() {
   wrap.classList.toggle("orbital-field-wrap--stale", !rc);
 
   if (metaPrimary && metaStale) {
-    const base = formatOrbitalTraceLine(last);
-    metaPrimary.textContent = base;
+    /* Misma matriz que tooltips de vecinos (tipo × humor × edad del momento). */
+    metaPrimary.textContent = neighborTooltipForMoment(ui, last);
     if (!rc && ui.orbitalTraceStaleNote) {
       metaStale.textContent = ui.orbitalTraceStaleNote;
       metaStale.hidden = false;
