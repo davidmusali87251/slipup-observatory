@@ -47,10 +47,7 @@
       <section id="orbital" class="panel panel-orbital" aria-label="Orbital layer" data-layer="orbital">
         <h2 class="visually-hidden">Orbital</h2>
         <h3 class="orbital-title layer-title">Orbital</h3>
-        <p class="orbital-kicker">Upper layer</p>
         <p class="orbital-subtitle">Instrument observation</p>
-        <p class="orbital-copy">Patterns become visible above the atmosphere. Constellations, field readings, and instrument observations are forming here.</p>
-        <p class="orbital-copy">Scroll down to the atmosphere, or explore the rest of the observatory.</p>
         <div class="orbital-instrument" id="orbitalInstrument">
           <p id="orbitalInstrumentHeading" class="visually-hidden"></p>
           <div id="orbitalEmptyState" class="orbital-empty" role="status" aria-live="polite"></div>
@@ -58,13 +55,15 @@
             <div class="orbital-field-surface" id="orbitalFieldSurface" aria-hidden="true">
               <span class="orbital-marker" id="orbitalMarker"></span>
             </div>
-            <div class="orbital-resonance-slot" id="orbitalResonanceSlot" data-orbital-layer="resonance">
-              <p id="orbitalResonanceCaption" class="orbital-resonance-caption" hidden aria-live="polite"></p>
+            <div class="orbital-field-readout">
+              <div class="orbital-resonance-slot" id="orbitalResonanceSlot" data-orbital-layer="resonance">
+                <p id="orbitalResonanceCaption" class="orbital-resonance-caption" hidden aria-live="polite"></p>
+              </div>
+              <p class="orbital-trace-meta" id="orbitalTraceMeta">
+                <span class="orbital-trace-meta__primary" id="orbitalTraceMetaPrimary"></span>
+                <span class="orbital-trace-meta__stale" id="orbitalTraceMetaStale" hidden></span>
+              </p>
             </div>
-            <p class="orbital-trace-meta" id="orbitalTraceMeta">
-              <span class="orbital-trace-meta__primary" id="orbitalTraceMetaPrimary"></span>
-              <span class="orbital-trace-meta__stale" id="orbitalTraceMetaStale" hidden></span>
-            </p>
           </div>
         </div>
         <p class="orbital-contribute-wrap"><a id="orbitalContributeLink" class="text-link orbital-contribute-link" href="./contribute.html">Place a moment</a></p>

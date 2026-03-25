@@ -1684,12 +1684,12 @@ html.theme-atmosphere .observatory-hero .degree-value.degree-value--contributed-
   color: var(--text);
 }
 
-/* Tooltip bajo marca / Orbital: promesa o capa — multilínea, sin recargar el titular */
+/* Tooltip bajo marca / Orbital: ancho según texto (no shrink al <a> estrecho), derecha, máx. 2 líneas */
 .observatory-hero .topbar-tooltip {
   position: absolute;
   top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 0;
+  transform: none;
   margin-top: 0.4rem;
   padding: 0.45rem 0.8rem;
   font-family: var(--font-serif);
@@ -1700,9 +1700,19 @@ html.theme-atmosphere .observatory-hero .degree-value.degree-value--contributed-
   background: color-mix(in oklab, var(--bg) 96%, var(--layer-horizon));
   border: 1px solid color-mix(in oklab, var(--line) 70%, transparent);
   border-radius: 6px;
-  white-space: normal;
+  box-sizing: border-box;
+  width: fit-content;
   max-width: min(38ch, calc(100vw - 2 * var(--site-bar-pad-x)));
-  text-align: center;
+  min-width: 0;
+  text-align: right;
+  word-break: normal;
+  overflow-wrap: normal;
+  white-space: normal;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -1714,8 +1724,7 @@ html.theme-atmosphere .observatory-hero .degree-value.degree-value--contributed-
   left: auto;
   right: 0;
   transform: none;
-  max-width: min(34ch, calc(100vw - var(--site-bar-pad-x) - 12px));
-  text-align: right;
+  max-width: min(38ch, calc(100vw - var(--site-bar-pad-x) - 12px));
 }
 .observatory-hero .topbar-brand:hover .topbar-tooltip,
 .observatory-hero .topbar-brand:focus-visible .topbar-tooltip,
@@ -4700,14 +4709,6 @@ html.theme-atmosphere .page .site-legal {
     transition: none;
   }
 }
-.orbital-kicker {
-  font-size: 0.73rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-  opacity: 0.84;
-  margin-bottom: 0.35rem;
-}
 .orbital-title {
   font-size: clamp(1.25rem, 2.8vw, 1.75rem);
   font-weight: 530;
@@ -4735,12 +4736,6 @@ html.theme-atmosphere .page .site-legal {
   color: var(--muted);
   margin: 0 0 0.75rem;
 }
-.orbital-copy {
-  color: color-mix(in oklab, var(--text) 88%, var(--muted));
-  line-height: 1.5;
-  margin-bottom: 0.6rem;
-  max-width: 56ch;
-}
 
 /* Paso 1 Orbital: campo abstracto + marcador de traza; resonancia reservada en .orbital-resonance-slot */
 .orbital-instrument {
@@ -4767,6 +4762,16 @@ html.theme-atmosphere .page .site-legal {
   flex-direction: column;
   align-items: center;
   gap: 0.65rem;
+}
+/* Caption de vecinos + línea de traza: misma columna y ritmo interno (no el mismo gap que disco→texto). */
+.orbital-field-readout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: min(40ch, 92vw);
+  gap: 0.38rem;
+  box-sizing: border-box;
 }
 .orbital-field-wrap[hidden] {
   display: none !important;
@@ -4819,11 +4824,12 @@ html.theme-atmosphere .page .site-legal {
   .orbital-instrument {
     touch-action: manipulation;
   }
+  .orbital-field-readout {
+    max-width: min(40ch, 92vw);
+    padding-inline: max(0.35rem, env(safe-area-inset-left, 0px)) max(0.35rem, env(safe-area-inset-right, 0px));
+  }
   .orbital-resonance-caption {
     font-size: 0.72rem;
-    padding-left: max(0.35rem, env(safe-area-inset-left, 0px));
-    padding-right: max(0.35rem, env(safe-area-inset-right, 0px));
-    max-width: min(40ch, 92vw);
   }
   /* Halo vecinos algo más corto en pantalla estrecha (menos desborde visual). */
   .orbital-neighbor {
@@ -4989,7 +4995,8 @@ html.theme-atmosphere .page .site-legal {
   letter-spacing: 0.03em;
   color: color-mix(in oklab, var(--muted) 92%, var(--text));
   margin: 0;
-  max-width: 40ch;
+  width: 100%;
+  max-width: none;
   text-align: center;
 }
 .orbital-resonance-caption[hidden] {
@@ -5010,7 +5017,8 @@ html.theme-atmosphere .page .site-legal {
   letter-spacing: 0.02em;
   color: color-mix(in oklab, var(--muted) 92%, var(--text));
   margin: 0;
-  max-width: 40ch;
+  width: 100%;
+  max-width: none;
   text-align: center;
 }
 .orbital-trace-meta__primary {
@@ -5025,7 +5033,9 @@ html.theme-atmosphere .page .site-legal {
   letter-spacing: 0.03em;
   color: color-mix(in oklab, var(--muted) 96%, var(--text));
   opacity: 0.88;
-  max-width: 36ch;
+  max-width: 100%;
+  padding-inline: 0.15rem;
+  box-sizing: border-box;
 }
 .orbital-trace-meta__stale[hidden] {
   display: none !important;
@@ -5034,7 +5044,7 @@ html.theme-atmosphere .page .site-legal {
   width: 100%;
   min-height: 0;
   margin: 0;
-  /* Debajo del disco, encima de la línea de traza (tipo · humor). */
+  /* Vecinos en el disco; caption comparte columna con orbital-trace-meta. */
 }
 @media (prefers-reduced-motion: reduce) {
   .orbital-marker {
