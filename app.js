@@ -882,41 +882,30 @@ const UI_COPY = {
     orbitalFieldAriaLabel: "Abstract position of your last trace in the shared field (not geographic).",
     orbitalTraceStaleNote: "Not live right now — your dot still shows.",
     orbitalResonanceCaption: "Other moments nearby, shown as dots.",
-    /** Vecinos Orbital: frase por tipo, banda de humor y antigüedad del momento (sin ranking). */
+    /** Vecinos: tipo × humor × antigüedad (5 buckets &lt;24 h); &gt;24 h stalePast. Tabla “Barren” del doc → clave fertile. */
     orbitalNeighborTooltipMixed: "Related trace in the field.",
     orbitalNeighborTooltipMatrix: {
-      stalePast: "A past moment lingers in the field.",
+      stalePast: "Lingering",
       fertile: {
-        focus: [
-          "Your energy just aligned here.",
-          "A focused moment echoes near you.",
-          "Focused energy drifts close.",
-          "A trace of focus lingers here.",
-          "Focus still echoes in the field.",
-        ],
-        calm: [
-          "A gentle trace resonates near you.",
-          "Calm presence joins the field.",
-          "A soft trace drifts nearby.",
-          "Calm energy settles beside you.",
-          "Calm lingers from earlier today.",
-        ],
+        focus: ["Focused trace", "Active focus", "Sharp trace", "Clear point", "Clear point"],
+        calm: ["Still trace", "Quiet trace", "Gentle pause", "Soft point", "Soft point"],
+        curious: ["Curious presence", "Light drift", "Nearby pulse", "Wandering point", "Wandering point"],
+        tired: ["Quiet drift", "Soft rest", "Gentle pause", "Calm pause", "Calm pause"],
+        stressed: ["Tense point", "Sharp edge", "Alert trace", "Strong point", "Strong point"],
       },
-      other: {
-        focus: [
-          "A sharp trace mirrors your focus.",
-          "Focused intensity drifts close.",
-          "A fleeting sharp trace nearby.",
-          "Focused energy lingers softly.",
-          "Sharp focus still echoes here.",
-        ],
-        calm: [
-          "A quiet moment settles beside you.",
-          "Soft calm drifts near you.",
-          "A still trace resonates nearby.",
-          "Calm presence lingers in the field.",
-          "Quiet calm settles from earlier.",
-        ],
+      observed: {
+        focus: ["Growing strong", "Strong pulse", "Focused trace", "Active point", "Active point"],
+        calm: ["Calm growth", "Gentle growth", "Peaceful pulse", "Soft trace", "Soft trace"],
+        curious: ["Curious pulse", "Light trace", "Wandering pulse", "Nearby drift", "Nearby drift"],
+        tired: ["Gentle rest", "Calm rest", "Soft rest", "Quiet pause", "Quiet pause"],
+        stressed: ["Sharp point", "Tense trace", "Strong edge", "Alert pulse", "Alert pulse"],
+      },
+      avoidable: {
+        focus: ["Fleeting edge", "Brief edge", "Sharp pass", "Quick pass", "Last pass"],
+        calm: ["Fleeting calm", "Soft pass", "Quiet drift", "Gentle pass", "Distant pass"],
+        curious: ["Fleeting glance", "Light pass", "Quick drift", "Sideways pass", "Brief drift"],
+        tired: ["Fleeting rest", "Brief pass", "Quiet slip", "Soft slip", "Slow pass"],
+        stressed: ["Fleeting spike", "Tense pass", "Sharp pass", "Quick edge", "Brief edge"],
       },
     },
     orbitalNeighborAria: "Nearby trace in the shared field",
@@ -1096,38 +1085,27 @@ const UI_COPY = {
     orbitalResonanceCaption: "Otros momentos cerca, como puntos.",
     orbitalNeighborTooltipMixed: "Traza relacionada en el campo.",
     orbitalNeighborTooltipMatrix: {
-      stalePast: "Un eco antiguo en el campo.",
+      stalePast: "Perdura",
       fertile: {
-        focus: [
-          "Tu energía acaba de alinearse.",
-          "Un momento enfocado resuena.",
-          "La energía enfocada se acerca.",
-          "Una traza de foco perdura.",
-          "El foco aún resuena aquí.",
-        ],
-        calm: [
-          "Una traza amable resuena cerca.",
-          "La calma entra al campo.",
-          "Una traza suave vaga cerca.",
-          "La calma se asienta cerca.",
-          "La calma viene de antes.",
-        ],
+        focus: ["Traza enfocada", "Foco activo", "Traza afilada", "Punto claro", "Punto claro"],
+        calm: ["Traza quieta", "Traza callada", "Pausa suave", "Punto suave", "Punto suave"],
+        curious: ["Curioso cerca", "Deriva ligera", "Pulso cercano", "Punto errante", "Punto errante"],
+        tired: ["Deriva quieta", "Descanso suave", "Pausa suave", "Calma pausada", "Calma pausada"],
+        stressed: ["Punto tenso", "Borde afilado", "Traza alerta", "Punto fuerte", "Punto fuerte"],
       },
-      other: {
-        focus: [
-          "Una traza afilada refleja foco.",
-          "La intensidad enfocada se acerca.",
-          "Traza aguda y breve cerca.",
-          "La energía enfocada perdura suave.",
-          "Enfoque afilado aún resuena.",
-        ],
-        calm: [
-          "Un momento quieto se asienta.",
-          "Calma suave vaga cerca.",
-          "Una traza quieta resuena cerca.",
-          "La calma perdura en el campo.",
-          "Calma quieta desde antes.",
-        ],
+      observed: {
+        focus: ["Crece fuerte", "Pulso fuerte", "Traza enfocada", "Punto activo", "Punto activo"],
+        calm: ["Calma viva", "Calma suave", "Pulso en paz", "Traza suave", "Traza suave"],
+        curious: ["Pulso curioso", "Traza ligera", "Pulso errante", "Deriva cerca", "Deriva cerca"],
+        tired: ["Descanso suave", "Calma cansada", "Descanso blando", "Pausa quieta", "Pausa quieta"],
+        stressed: ["Punto agudo", "Traza tensa", "Borde fuerte", "Pulso alerta", "Pulso alerta"],
+      },
+      avoidable: {
+        focus: ["Borde fugaz", "Paso breve", "Paso afilado", "Paso rápido", "Último paso"],
+        calm: ["Calma fugaz", "Paso suave", "Deriva quieta", "Paso leve", "Paso lejano"],
+        curious: ["Vistazo fugaz", "Paso ligero", "Deriva rápida", "Paso lateral", "Deriva breve"],
+        tired: ["Descanso fugaz", "Paso breve", "Desliz quieto", "Desliz suave", "Paso lento"],
+        stressed: ["Pico fugaz", "Paso tenso", "Paso afilado", "Borde rápido", "Borde breve"],
       },
     },
     orbitalNeighborAria: "Traza cercana en el campo compartido",
@@ -4591,7 +4569,14 @@ function formatOrbitalTraceLine(last) {
   return `${t} · ${m}`;
 }
 
-const ORBITAL_NEIGHBOR_MAX = 5;
+/** Vecinos en el disco Orbital: más puntos y radios más amplios (cerca → lejos). */
+const ORBITAL_NEIGHBOR_MAX = 19;
+const ORBITAL_NEIGHBOR_MOODS = ["focus", "calm", "curious", "tired", "stressed"];
+
+function normalizeOrbitalNeighborMood(mood) {
+  const m = String(mood || "calm").trim().toLowerCase();
+  return ORBITAL_NEIGHBOR_MOODS.includes(m) ? m : "calm";
+}
 
 function getSharedMomentsForOrbital() {
   try {
@@ -4650,7 +4635,7 @@ function selectOrbitalNeighborMoments(last, sharedPool) {
   return out;
 }
 
-/** Tooltip por vecino: tipo + banda de humor + antigüedad (últimas 48 h); >24 h frase única. */
+/** Tooltip por vecino: tipo (fertile | observed | avoidable) × humor × antigüedad; >24 h stalePast. */
 function neighborTooltipForMoment(ui, neighborMoment) {
   const fallback = ui.orbitalNeighborTooltipMixed || "";
   const matrix = ui.orbitalNeighborTooltipMatrix;
@@ -4668,11 +4653,12 @@ function neighborTooltipForMoment(ui, neighborMoment) {
   const bucket =
     ageMin < 5 ? 0 : ageMin < 15 ? 1 : ageMin < 30 ? 2 : ageMin < 60 ? 3 : 4;
 
-  const typeKey = neighborMoment.type === "fertile" ? "fertile" : "other";
-  const moodVal = String(neighborMoment.mood || "calm");
-  const moodBand = moodVal === "focus" || moodVal === "stressed" ? "focus" : "calm";
+  const rawType = String(neighborMoment.type || "observed").trim().toLowerCase();
+  const typeKey =
+    rawType === "fertile" ? "fertile" : rawType === "avoidable" ? "avoidable" : "observed";
+  const moodKey = normalizeOrbitalNeighborMood(neighborMoment.mood);
 
-  const arr = matrix[typeKey]?.[moodBand];
+  const arr = matrix[typeKey]?.[moodKey];
   const line = Array.isArray(arr) ? arr[bucket] : null;
   return (line && String(line).trim()) || fallback;
 }
@@ -4684,10 +4670,12 @@ function clearOrbitalNeighborElements(surface) {
 function placeNeighborOffset(userLeft, userTop, seedKey, index, total, similarity) {
   const hash = simpleStringHash(seedKey);
   const jitter = (hash % 180) / 180 - 0.5;
-  const baseAngle = (index / Math.max(total, 1)) * Math.PI * 2 + jitter * 0.55;
-  /* Más similitud → radio menor (más cerca del marcador); curva suaviza el extremo bajo. */
+  const baseAngle = (index / Math.max(total, 1)) * Math.PI * 2 + jitter * 0.48;
+  /* Similitud: más cerca del marcador; índice: reparte hacia el borde del disco. */
   const t = clamp(1 - similarity, 0, 1);
-  const radius = 8 + Math.pow(t, 0.88) * 24;
+  const ring = total > 1 ? index / (total - 1) : 0;
+  const inner = 6 + Math.pow(t, 0.88) * 18;
+  const radius = inner + ring * 30;
   let nl = userLeft + Math.cos(baseAngle) * radius;
   let nt = userTop + Math.sin(baseAngle) * radius;
   nl = clamp(nl, 10, 90);
