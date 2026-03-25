@@ -880,8 +880,8 @@ const UI_COPY = {
     orbitalInstrumentHeading: "Your trace in the field",
     orbitalEmptyState: "No trace in the field yet. Place a moment to see your place.",
     orbitalFieldAriaLabel: "Abstract position of your last trace in the shared field (not geographic).",
-    orbitalTraceStaleNote: "Outside the active resonance window — position still shown.",
-    orbitalResonanceCaption: "Nearby traces in the field — not a list, just proximity.",
+    orbitalTraceStaleNote: "Not live right now — your dot still shows.",
+    orbitalResonanceCaption: "Other moments nearby, shown as dots.",
     /** Vecinos Orbital: frase por tipo, banda de humor y antigüedad del momento (sin ranking). */
     orbitalNeighborTooltipMixed: "Related trace in the field.",
     orbitalNeighborTooltipMatrix: {
@@ -1092,8 +1092,8 @@ const UI_COPY = {
     orbitalInstrumentHeading: "Tu traza en el campo",
     orbitalEmptyState: "Aún no hay traza en el campo. Colocá un momento para ver tu lugar.",
     orbitalFieldAriaLabel: "Posición abstracta de tu última traza en el campo compartido (no geográfica).",
-    orbitalTraceStaleNote: "Fuera de la ventana de resonancia activa — la posición sigue visible.",
-    orbitalResonanceCaption: "Trazas cercanas en el campo — no es una lista, solo proximidad.",
+    orbitalTraceStaleNote: "Ahora no está en vivo — tu punto sigue ahí.",
+    orbitalResonanceCaption: "Otros momentos cerca, como puntos.",
     orbitalNeighborTooltipMixed: "Traza relacionada en el campo.",
     orbitalNeighborTooltipMatrix: {
       stalePast: "Un eco antiguo en el campo.",

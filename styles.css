@@ -4730,12 +4730,6 @@ html.theme-atmosphere .page .site-legal {
   border-top: none;
   padding-top: 0;
 }
-.orbital-subtitle {
-  font-size: 0.88rem;
-  font-style: italic;
-  color: var(--muted);
-  margin: 0 0 0.75rem;
-}
 
 /* Paso 1 Orbital: campo abstracto + marcador de traza; resonancia reservada en .orbital-resonance-slot */
 .orbital-instrument {
@@ -4763,7 +4757,7 @@ html.theme-atmosphere .page .site-legal {
   align-items: center;
   gap: 0.65rem;
 }
-/* Caption de vecinos + línea de traza: misma columna y ritmo interno (no el mismo gap que disco→texto). */
+/* Línea de traza (tipo · humor) + caption de vecinos: misma columna y ritmo interno (no el mismo gap que disco→texto). */
 .orbital-field-readout {
   display: flex;
   flex-direction: column;
@@ -5044,7 +5038,7 @@ html.theme-atmosphere .page .site-legal {
   width: 100%;
   min-height: 0;
   margin: 0;
-  /* Vecinos en el disco; caption comparte columna con orbital-trace-meta. */
+  /* Vecinos en el disco; caption va debajo de la línea de traza. */
 }
 @media (prefers-reduced-motion: reduce) {
   .orbital-marker {
