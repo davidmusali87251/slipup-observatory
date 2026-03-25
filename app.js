@@ -77,6 +77,10 @@ const LAST_MOMENT_KEY = "slipup_v2_last_moment";
 const RESONANCE_WINDOW_MS = 30 * 60 * 1000;
 /** Probabilidad de mostrar pulse cuando el estado cambió (rareza → más significativo). */
 const PULSE_RARITY = 0.6;
+/** Pulso al entrar Orbital en vista (IntersectionObserver); no compite con vecinos. */
+const ORBITAL_ENTER_PULSE_MS = 600;
+let orbitalEnterPulseTimeoutId = null;
+let orbitalEnterPulseArmed = true;
 
 function getHiddenMomentIds() {
   try {
@@ -877,6 +881,13 @@ const UI_COPY = {
     orbitalEmptyState: "No trace in the field yet. Place a moment to see your place.",
     orbitalFieldAriaLabel: "Abstract position of your last trace in the shared field (not geographic).",
     orbitalTraceStaleNote: "Outside the active resonance window — position still shown.",
+    orbitalResonanceCaption: "Nearby traces in the field — not a list, just proximity.",
+    orbitalNeighborTooltipTypeMood: "Similar kind and mood in the field.",
+    orbitalNeighborTooltipMood: "Similar mood nearby.",
+    orbitalNeighborTooltipType: "Similar kind of moment nearby.",
+    orbitalNeighborTooltipTime: "Closer in time in the field.",
+    orbitalNeighborTooltipMixed: "Related trace in the field.",
+    orbitalNeighborAria: "Nearby trace in the shared field",
     momentConstellationLine: "This moment is part of a constellation.",
     momentConstellationRelatedLabel: "Connected moments",
     momentRemoveLabel: "Remove",
@@ -1050,6 +1061,13 @@ const UI_COPY = {
     orbitalEmptyState: "Aún no hay traza en el campo. Colocá un momento para ver tu lugar.",
     orbitalFieldAriaLabel: "Posición abstracta de tu última traza en el campo compartido (no geográfica).",
     orbitalTraceStaleNote: "Fuera de la ventana de resonancia activa — la posición sigue visible.",
+    orbitalResonanceCaption: "Trazas cercanas en el campo — no es una lista, solo proximidad.",
+    orbitalNeighborTooltipTypeMood: "Mismo tipo y humor en el campo.",
+    orbitalNeighborTooltipMood: "Humor parecido cerca.",
+    orbitalNeighborTooltipType: "Mismo tipo de momento cerca.",
+    orbitalNeighborTooltipTime: "Más cerca en el tiempo.",
+    orbitalNeighborTooltipMixed: "Traza relacionada en el campo.",
+    orbitalNeighborAria: "Traza cercana en el campo compartido",
     momentConstellationLine: "Este momento forma parte de una constelación.",
     momentConstellationRelatedLabel: "Momentos conectados",
     momentRemoveLabel: "Quitar",
@@ -4318,6 +4336,9 @@ function initHiddenFromViewToggle() {
 /** Actualiza solo las listas de momentos (recent + nearby) con el array indicado. Oculta los momentos marcados como "quitar de mi vista". */
 function refreshObservatoryLists(sharedMoments) {
   if (!observatoryState || !Array.isArray(sharedMoments)) return;
+  try {
+    window.__slipupMomentsCache = sharedMoments;
+  } catch (_) {}
   const filtered = filterHiddenMoments(sharedMoments);
   const constellations = getConstellations(filtered);
   renderRecent(filtered, constellations);
@@ -4331,6 +4352,7 @@ function refreshObservatoryLists(sharedMoments) {
     observatoryState.fieldLensModel
   );
   renderHiddenFromView();
+  renderOrbitalShell();
 }
 
 function normalizeRepetition(repetition) {
@@ -4506,7 +4528,128 @@ function formatOrbitalTraceLine(last) {
   return `${t} · ${m}`;
 }
 
-/** Esqueleto Orbital: vacío vs marcador de traza; capa resonancia reservada en DOM. */
+const ORBITAL_NEIGHBOR_MAX = 5;
+
+function getSharedMomentsForOrbital() {
+  try {
+    const c = window.__slipupMomentsCache;
+    if (Array.isArray(c) && c.length) return c;
+  } catch (_) {}
+  return getSharedMoments(loadMoments());
+}
+
+function isLikelySameMomentAsLast(candidate, last) {
+  if (!last || !candidate) return false;
+  const ct = new Date(candidate.timestamp).getTime();
+  if (Math.abs(ct - last.timestamp) > 3 * 60 * 1000) return false;
+  return candidate.type === last.type && candidate.mood === last.mood;
+}
+
+function scoreNeighborMoment(candidate, last, nowMs) {
+  const typeMatch = candidate.type === last.type ? 1 : 0;
+  const moodMatch = candidate.mood === last.mood ? 1 : 0;
+  const ct = new Date(candidate.timestamp).getTime();
+  const hours = Math.abs(nowMs - ct) / (3600 * 1000);
+  const timeScore = Math.max(0, 1 - Math.min(hours / 48, 1));
+  return typeMatch * 5 + moodMatch * 5 + timeScore * 4;
+}
+
+function similarityFromScore(score) {
+  const max = 14;
+  return clamp(score / max, 0, 1);
+}
+
+function selectOrbitalNeighborMoments(last, sharedPool) {
+  const now = Date.now();
+  const pool = getRecentWindow(Array.isArray(sharedPool) ? sharedPool : []).filter(
+    (m) => m && m.shared && !m.hidden
+  );
+  const scored = pool
+    .filter((m) => !isLikelySameMomentAsLast(m, last))
+    .map((m) => ({
+      moment: m,
+      score: scoreNeighborMoment(m, last, now),
+    }))
+    .sort((a, b) => b.score - a.score);
+  const out = [];
+  const seen = new Set();
+  for (const row of scored) {
+    const id = String(row.moment.id || row.moment.timestamp);
+    if (seen.has(id)) continue;
+    seen.add(id);
+    out.push({
+      moment: row.moment,
+      score: row.score,
+      similarity: similarityFromScore(row.score),
+    });
+    if (out.length >= ORBITAL_NEIGHBOR_MAX) break;
+  }
+  return out;
+}
+
+function neighborTooltipForMoment(ui, last, neighborMoment) {
+  const tm = neighborMoment.type === last.type;
+  const mm = neighborMoment.mood === last.mood;
+  if (tm && mm) return ui.orbitalNeighborTooltipTypeMood || ui.orbitalNeighborTooltipMixed;
+  if (tm) return ui.orbitalNeighborTooltipType || ui.orbitalNeighborTooltipMixed;
+  if (mm) return ui.orbitalNeighborTooltipMood || ui.orbitalNeighborTooltipMixed;
+  return ui.orbitalNeighborTooltipTime || ui.orbitalNeighborTooltipMixed;
+}
+
+function clearOrbitalNeighborElements(surface) {
+  surface.querySelectorAll(".orbital-neighbor").forEach((el) => el.remove());
+}
+
+function placeNeighborOffset(userLeft, userTop, seedKey, index, total, similarity) {
+  const hash = simpleStringHash(seedKey);
+  const jitter = (hash % 180) / 180 - 0.5;
+  const baseAngle = (index / Math.max(total, 1)) * Math.PI * 2 + jitter * 0.55;
+  /* Más similitud → radio menor (más cerca del marcador); curva suaviza el extremo bajo. */
+  const t = clamp(1 - similarity, 0, 1);
+  const radius = 8 + Math.pow(t, 0.88) * 24;
+  let nl = userLeft + Math.cos(baseAngle) * radius;
+  let nt = userTop + Math.sin(baseAngle) * radius;
+  nl = clamp(nl, 10, 90);
+  nt = clamp(nt, 10, 90);
+  return { left: nl, top: nt };
+}
+
+function renderOrbitalNeighbors(surface, marker, last, userLeft, userTop, ui) {
+  clearOrbitalNeighborElements(surface);
+  const caption = document.getElementById("orbitalResonanceCaption");
+  const picks = selectOrbitalNeighborMoments(last, getSharedMomentsForOrbital());
+  if (caption) {
+    if (picks.length === 0) {
+      caption.textContent = "";
+      caption.hidden = true;
+    } else {
+      caption.textContent = ui.orbitalResonanceCaption || "";
+      caption.hidden = false;
+    }
+  }
+  if (picks.length === 0) return;
+  const n = picks.length;
+  picks.forEach((row, index) => {
+    const m = row.moment;
+    const seedKey = `${m.id || m.timestamp}|${m.type}|${m.mood}`;
+    const { left, top } = placeNeighborOffset(userLeft, userTop, seedKey, index, n, row.similarity);
+    const span = document.createElement("span");
+    span.className = "orbital-neighbor";
+    span.setAttribute("data-neighbor-type", String(m.type || "observed"));
+    const st = clamp(0.3 + Math.pow(row.similarity, 0.92) * 0.7, 0, 1);
+    span.style.setProperty("--orbital-neighbor-strength", String(st));
+    span.style.left = `${left}%`;
+    span.style.top = `${top}%`;
+    const tip = neighborTooltipForMoment(ui, last, m);
+    span.title = tip;
+    span.setAttribute("aria-label", `${ui.orbitalNeighborAria || "Nearby trace"}. ${tip}`);
+    span.setAttribute("role", "img");
+    span.tabIndex = 0;
+    surface.insertBefore(span, marker);
+  });
+}
+
+/** Esqueleto Orbital: vacío vs marcador de traza; vecinos en resonancia (Paso 2). */
 function renderOrbitalShell() {
   const emptyEl = document.getElementById("orbitalEmptyState");
   const wrap = document.getElementById("orbitalFieldWrap");
@@ -4524,6 +4667,12 @@ function renderOrbitalShell() {
     wrap.hidden = true;
     wrap.classList.remove("orbital-field-wrap--stale");
     if (meta) meta.textContent = "";
+    clearOrbitalNeighborElements(surface);
+    const cap = document.getElementById("orbitalResonanceCaption");
+    if (cap) {
+      cap.textContent = "";
+      cap.hidden = true;
+    }
     surface.removeAttribute("aria-label");
     surface.removeAttribute("role");
     surface.setAttribute("aria-hidden", "true");
@@ -4555,6 +4704,37 @@ function renderOrbitalShell() {
   surface.setAttribute("aria-label", aria);
   surface.setAttribute("role", "img");
   surface.removeAttribute("aria-hidden");
+  renderOrbitalNeighbors(surface, marker, last, left, top, ui);
+}
+
+function clearOrbitalEnterPulseTargets() {
+  const wrap = document.getElementById("orbitalFieldWrap");
+  const instrument = document.getElementById("orbitalInstrument");
+  if (wrap) wrap.classList.remove("orbital-field-wrap--enter");
+  if (instrument) instrument.classList.remove("orbital-instrument--enter");
+}
+
+function scheduleOrbitalEnterPulse() {
+  if (typeof window === "undefined") return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const wrap = document.getElementById("orbitalFieldWrap");
+  const instrument = document.getElementById("orbitalInstrument");
+  if (!instrument) return;
+  if (orbitalEnterPulseTimeoutId) {
+    window.clearTimeout(orbitalEnterPulseTimeoutId);
+    orbitalEnterPulseTimeoutId = null;
+  }
+  clearOrbitalEnterPulseTargets();
+  const useWrap = wrap && !wrap.hidden;
+  if (useWrap) {
+    wrap.classList.add("orbital-field-wrap--enter");
+  } else {
+    instrument.classList.add("orbital-instrument--enter");
+  }
+  orbitalEnterPulseTimeoutId = window.setTimeout(() => {
+    orbitalEnterPulseTimeoutId = null;
+    clearOrbitalEnterPulseTargets();
+  }, ORBITAL_ENTER_PULSE_MS);
 }
 
 function initOrbitalLayer() {
@@ -4571,8 +4751,18 @@ function initOrbitalLayer() {
           transitionLine.textContent = label;
           transitionLine.classList.remove("hidden");
           orbitalSection.classList.add("is-in-view");
+          if (orbitalEnterPulseArmed) {
+            orbitalEnterPulseArmed = false;
+            scheduleOrbitalEnterPulse();
+          }
         } else {
           orbitalSection.classList.remove("is-in-view");
+          orbitalEnterPulseArmed = true;
+          if (orbitalEnterPulseTimeoutId) {
+            window.clearTimeout(orbitalEnterPulseTimeoutId);
+            orbitalEnterPulseTimeoutId = null;
+          }
+          clearOrbitalEnterPulseTargets();
         }
       });
     },

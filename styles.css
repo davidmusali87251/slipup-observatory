@@ -4771,6 +4771,68 @@ html.theme-atmosphere .page .site-legal {
 .orbital-field-wrap[hidden] {
   display: none !important;
 }
+
+/* Entrada en vista Orbital: pulso breve (JS añade --enter ~600ms). Vecinos no dependen de esto. */
+@keyframes orbital-layer-enter-glow {
+  0% {
+    filter: brightness(1);
+  }
+  42% {
+    filter: brightness(1.035) drop-shadow(0 0 18px rgba(92, 61, 255, 0.14));
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+.orbital-field-wrap--enter,
+.orbital-instrument--enter {
+  animation: orbital-layer-enter-glow 0.62s ease-out forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .orbital-field-wrap--enter,
+  .orbital-instrument--enter {
+    animation: none;
+  }
+}
+
+/* Móvil: pulso más contenido (menos halo / menos coste de filter en pantallas estrechas). */
+@media (max-width: 600px) {
+  @keyframes orbital-layer-enter-glow-mobile {
+    0% {
+      filter: brightness(1);
+    }
+    48% {
+      filter: brightness(1.018) drop-shadow(0 0 11px rgba(92, 61, 255, 0.085));
+    }
+    100% {
+      filter: brightness(1);
+    }
+  }
+  .orbital-field-wrap--enter,
+  .orbital-instrument--enter {
+    animation-name: orbital-layer-enter-glow-mobile;
+    animation-duration: 0.52s;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+  .orbital-instrument {
+    touch-action: manipulation;
+  }
+  .orbital-resonance-caption {
+    font-size: 0.72rem;
+    padding-left: max(0.35rem, env(safe-area-inset-left, 0px));
+    padding-right: max(0.35rem, env(safe-area-inset-right, 0px));
+    max-width: min(40ch, 92vw);
+  }
+  /* Halo vecinos algo más corto en pantalla estrecha (menos desborde visual). */
+  .orbital-neighbor {
+    box-shadow:
+      0 0 calc(6px + var(--orbital-neighbor-strength, 0.5) * 12px) rgba(139, 108, 255, calc(0.12 + var(--orbital-neighbor-strength, 0.5) * 0.24)),
+      0 0 calc(3px + var(--orbital-neighbor-strength, 0.5) * 5px) rgba(92, 61, 255, 0.09);
+  }
+}
+
 .orbital-field-surface {
   position: relative;
   width: min(300px, 78vw);
@@ -4802,7 +4864,70 @@ html.theme-atmosphere .page .site-legal {
     top 0.45s ease,
     opacity 0.35s ease;
   pointer-events: none;
+  z-index: 3;
 }
+
+/* Paso 2 Orbital: vecinos abstractos (sin feed ni ranking); intensidad ~ similitud type/mood/tiempo. */
+.orbital-neighbor {
+  position: absolute;
+  width: calc(7px + var(--orbital-neighbor-strength, 0.5) * 5px);
+  height: calc(7px + var(--orbital-neighbor-strength, 0.5) * 5px);
+  margin: 0;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  z-index: 2;
+  cursor: default;
+  border: 1px solid color-mix(in oklab, var(--line) 40%, transparent);
+  background: color-mix(in oklab, var(--muted) 72%, var(--bg));
+  box-shadow:
+    0 0 calc(9px + var(--orbital-neighbor-strength, 0.5) * 16px) rgba(139, 108, 255, calc(0.14 + var(--orbital-neighbor-strength, 0.5) * 0.3)),
+    0 0 calc(5px + var(--orbital-neighbor-strength, 0.5) * 7px) rgba(92, 61, 255, 0.1);
+  transition:
+    opacity 0.35s ease,
+    box-shadow 0.35s ease,
+    transform 0.35s ease;
+  opacity: calc(0.55 + var(--orbital-neighbor-strength, 0.5) * 0.4);
+  box-sizing: border-box;
+  outline: none;
+}
+.orbital-neighbor[data-neighbor-type="fertile"] {
+  background: color-mix(in oklab, var(--glow) 22%, var(--bg-deep));
+  border-color: color-mix(in oklab, var(--glow) 22%, var(--line));
+}
+.orbital-neighbor[data-neighbor-type="avoidable"] {
+  background: color-mix(in oklab, #c9a8ff 14%, var(--bg-deep));
+  border-color: color-mix(in oklab, var(--line) 55%, rgba(201, 168, 255, 0.25));
+}
+.orbital-neighbor[data-neighbor-type="observed"] {
+  background: color-mix(in oklab, var(--muted) 55%, var(--bg));
+}
+.orbital-neighbor:hover,
+.orbital-neighbor:focus-visible {
+  opacity: 1;
+  box-shadow:
+    0 0 18px rgba(139, 108, 255, 0.35),
+    0 0 28px rgba(92, 61, 255, 0.12);
+  z-index: 4;
+}
+.orbital-field-wrap--stale .orbital-neighbor {
+  opacity: calc(0.35 + var(--orbital-neighbor-strength, 0.5) * 0.28);
+}
+
+.orbital-resonance-caption {
+  font-family: var(--font-observatory);
+  font-size: 0.68rem;
+  line-height: 1.45;
+  letter-spacing: 0.03em;
+  color: color-mix(in oklab, var(--muted) 92%, var(--text));
+  margin: 0;
+  max-width: 40ch;
+  text-align: center;
+}
+.orbital-resonance-caption[hidden] {
+  display: none !important;
+}
+
 .orbital-field-wrap--stale .orbital-marker {
   opacity: 0.55;
 }
@@ -4824,6 +4949,9 @@ html.theme-atmosphere .page .site-legal {
 }
 @media (prefers-reduced-motion: reduce) {
   .orbital-marker {
+    transition: none;
+  }
+  .orbital-neighbor {
     transition: none;
   }
 }
