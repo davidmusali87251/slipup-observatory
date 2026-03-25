@@ -882,11 +882,43 @@ const UI_COPY = {
     orbitalFieldAriaLabel: "Abstract position of your last trace in the shared field (not geographic).",
     orbitalTraceStaleNote: "Outside the active resonance window — position still shown.",
     orbitalResonanceCaption: "Nearby traces in the field — not a list, just proximity.",
-    orbitalNeighborTooltipTypeMood: "Similar kind and mood in the field.",
-    orbitalNeighborTooltipMood: "Similar mood nearby.",
-    orbitalNeighborTooltipType: "Similar kind of moment nearby.",
-    orbitalNeighborTooltipTime: "Closer in time in the field.",
+    /** Vecinos Orbital: frase por tipo, banda de humor y antigüedad del momento (sin ranking). */
     orbitalNeighborTooltipMixed: "Related trace in the field.",
+    orbitalNeighborTooltipMatrix: {
+      stalePast: "A past moment lingers in the field.",
+      fertile: {
+        focus: [
+          "Your energy just aligned here.",
+          "A focused moment echoes near you.",
+          "Focused energy drifts close.",
+          "A trace of focus lingers here.",
+          "Focus still echoes in the field.",
+        ],
+        calm: [
+          "A gentle trace resonates near you.",
+          "Calm presence joins the field.",
+          "A soft trace drifts nearby.",
+          "Calm energy settles beside you.",
+          "Calm lingers from earlier today.",
+        ],
+      },
+      other: {
+        focus: [
+          "A sharp trace mirrors your focus.",
+          "Focused intensity drifts close.",
+          "A fleeting sharp trace nearby.",
+          "Focused energy lingers softly.",
+          "Sharp focus still echoes here.",
+        ],
+        calm: [
+          "A quiet moment settles beside you.",
+          "Soft calm drifts near you.",
+          "A still trace resonates nearby.",
+          "Calm presence lingers in the field.",
+          "Quiet calm settles from earlier.",
+        ],
+      },
+    },
     orbitalNeighborAria: "Nearby trace in the shared field",
     momentConstellationLine: "This moment is part of a constellation.",
     momentConstellationRelatedLabel: "Connected moments",
@@ -1062,11 +1094,42 @@ const UI_COPY = {
     orbitalFieldAriaLabel: "Posición abstracta de tu última traza en el campo compartido (no geográfica).",
     orbitalTraceStaleNote: "Fuera de la ventana de resonancia activa — la posición sigue visible.",
     orbitalResonanceCaption: "Trazas cercanas en el campo — no es una lista, solo proximidad.",
-    orbitalNeighborTooltipTypeMood: "Mismo tipo y humor en el campo.",
-    orbitalNeighborTooltipMood: "Humor parecido cerca.",
-    orbitalNeighborTooltipType: "Mismo tipo de momento cerca.",
-    orbitalNeighborTooltipTime: "Más cerca en el tiempo.",
     orbitalNeighborTooltipMixed: "Traza relacionada en el campo.",
+    orbitalNeighborTooltipMatrix: {
+      stalePast: "Un eco antiguo en el campo.",
+      fertile: {
+        focus: [
+          "Tu energía acaba de alinearse.",
+          "Un momento enfocado resuena.",
+          "La energía enfocada se acerca.",
+          "Una traza de foco perdura.",
+          "El foco aún resuena aquí.",
+        ],
+        calm: [
+          "Una traza amable resuena cerca.",
+          "La calma entra al campo.",
+          "Una traza suave vaga cerca.",
+          "La calma se asienta cerca.",
+          "La calma viene de antes.",
+        ],
+      },
+      other: {
+        focus: [
+          "Una traza afilada refleja foco.",
+          "La intensidad enfocada se acerca.",
+          "Traza aguda y breve cerca.",
+          "La energía enfocada perdura suave.",
+          "Enfoque afilado aún resuena.",
+        ],
+        calm: [
+          "Un momento quieto se asienta.",
+          "Calma suave vaga cerca.",
+          "Una traza quieta resuena cerca.",
+          "La calma perdura en el campo.",
+          "Calma quieta desde antes.",
+        ],
+      },
+    },
     orbitalNeighborAria: "Traza cercana en el campo compartido",
     momentConstellationLine: "Este momento forma parte de una constelación.",
     momentConstellationRelatedLabel: "Momentos conectados",
@@ -4587,13 +4650,31 @@ function selectOrbitalNeighborMoments(last, sharedPool) {
   return out;
 }
 
-function neighborTooltipForMoment(ui, last, neighborMoment) {
-  const tm = neighborMoment.type === last.type;
-  const mm = neighborMoment.mood === last.mood;
-  if (tm && mm) return ui.orbitalNeighborTooltipTypeMood || ui.orbitalNeighborTooltipMixed;
-  if (tm) return ui.orbitalNeighborTooltipType || ui.orbitalNeighborTooltipMixed;
-  if (mm) return ui.orbitalNeighborTooltipMood || ui.orbitalNeighborTooltipMixed;
-  return ui.orbitalNeighborTooltipTime || ui.orbitalNeighborTooltipMixed;
+/** Tooltip por vecino: tipo + banda de humor + antigüedad (últimas 48 h); >24 h frase única. */
+function neighborTooltipForMoment(ui, neighborMoment) {
+  const fallback = ui.orbitalNeighborTooltipMixed || "";
+  const matrix = ui.orbitalNeighborTooltipMatrix;
+  if (!matrix || !neighborMoment) return fallback;
+
+  const rawTs = neighborMoment.timestamp;
+  const t = rawTs != null ? new Date(rawTs).getTime() : NaN;
+  if (Number.isNaN(t)) return fallback;
+
+  const now = Date.now();
+  const ageMin = Math.max(0, (now - t) / (60 * 1000));
+
+  if (ageMin >= 24 * 60) return matrix.stalePast || fallback;
+
+  const bucket =
+    ageMin < 5 ? 0 : ageMin < 15 ? 1 : ageMin < 30 ? 2 : ageMin < 60 ? 3 : 4;
+
+  const typeKey = neighborMoment.type === "fertile" ? "fertile" : "other";
+  const moodVal = String(neighborMoment.mood || "calm");
+  const moodBand = moodVal === "focus" || moodVal === "stressed" ? "focus" : "calm";
+
+  const arr = matrix[typeKey]?.[moodBand];
+  const line = Array.isArray(arr) ? arr[bucket] : null;
+  return (line && String(line).trim()) || fallback;
 }
 
 function clearOrbitalNeighborElements(surface) {
@@ -4640,7 +4721,7 @@ function renderOrbitalNeighbors(surface, marker, last, userLeft, userTop, ui) {
     span.style.setProperty("--orbital-neighbor-strength", String(st));
     span.style.left = `${left}%`;
     span.style.top = `${top}%`;
-    const tip = neighborTooltipForMoment(ui, last, m);
+    const tip = neighborTooltipForMoment(ui, m);
     span.setAttribute("data-tooltip", tip);
     span.setAttribute("aria-label", `${ui.orbitalNeighborAria || "Nearby trace"}. ${tip}`);
     span.setAttribute("role", "img");
