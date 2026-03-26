@@ -880,7 +880,6 @@ const UI_COPY = {
     orbitalInstrumentHeading: "Your trace in the field",
     orbitalEmptyState: "No trace in the field yet. Place a moment to see your place.",
     orbitalFieldAriaLabel: "Abstract position of your last trace in the shared field (not geographic).",
-    orbitalTraceStaleNote: "Not live right now — your dot still shows.",
     orbitalResonanceCaption: "Other moments nearby, shown as dots.",
     /** Vecinos: 1–2 palabras; sujeto implícito; buckets = más reciente → más lejano (&lt;24 h). */
     orbitalNeighborTooltipMixed: "Nearby trace",
@@ -1081,7 +1080,6 @@ const UI_COPY = {
     orbitalInstrumentHeading: "Tu traza en el campo",
     orbitalEmptyState: "Aún no hay traza en el campo. Colocá un momento para ver tu lugar.",
     orbitalFieldAriaLabel: "Posición abstracta de tu última traza en el campo compartido (no geográfica).",
-    orbitalTraceStaleNote: "Ahora no está en vivo — tu punto sigue ahí.",
     orbitalResonanceCaption: "Otros momentos cerca, como puntos.",
     orbitalNeighborTooltipMixed: "Traza relacionada en el campo.",
     orbitalNeighborTooltipMatrix: {
@@ -4763,7 +4761,6 @@ function renderOrbitalShell() {
   const wrap = document.getElementById("orbitalFieldWrap");
   const marker = document.getElementById("orbitalMarker");
   const metaPrimary = document.getElementById("orbitalTraceMetaPrimary");
-  const metaStale = document.getElementById("orbitalTraceMetaStale");
   const surface = document.getElementById("orbitalFieldSurface");
   if (!emptyEl || !wrap || !marker || !surface) return;
 
@@ -4776,10 +4773,6 @@ function renderOrbitalShell() {
     wrap.hidden = true;
     wrap.classList.remove("orbital-field-wrap--stale");
     if (metaPrimary) metaPrimary.textContent = "";
-    if (metaStale) {
-      metaStale.textContent = "";
-      metaStale.hidden = true;
-    }
     clearOrbitalNeighborElements(surface);
     const cap = document.getElementById("orbitalResonanceCaption");
     if (cap) {
@@ -4804,16 +4797,9 @@ function renderOrbitalShell() {
   const rc = getResonanceContext();
   wrap.classList.toggle("orbital-field-wrap--stale", !rc);
 
-  if (metaPrimary && metaStale) {
+  if (metaPrimary) {
     /* Misma matriz que tooltips de vecinos (tipo × humor × edad del momento). */
     metaPrimary.textContent = neighborTooltipForMoment(ui, last);
-    if (!rc && ui.orbitalTraceStaleNote) {
-      metaStale.textContent = ui.orbitalTraceStaleNote;
-      metaStale.hidden = false;
-    } else {
-      metaStale.textContent = "";
-      metaStale.hidden = true;
-    }
   }
 
   const aria = ui.orbitalFieldAriaLabel || "";
