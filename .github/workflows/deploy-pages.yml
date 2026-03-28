@@ -56,6 +56,8 @@ jobs:
             sed -i "s|{{BUILD_ID}}|${BUILD_ID}|g" "$f"
           done
           echo "Build ID substituted in $(ls _site/*.html | wc -l) HTML files"
+          # Mismo BUILD_ID en import de remote.js (los módulos no heredan ?v= del script padre; evita remote.js viejo en caché).
+          sed -i "s|from \"./remote.js\"|from \"./remote.js?v=${BUILD_ID}\"|g" _site/app.js
 
       - name: Check remote.js has real URLs when secrets are set
         env:
@@ -71,7 +73,10 @@ jobs:
       - name: Verify _site before upload
         run: |
           ls -la _site/
-          test -f _site/index.html && test -f _site/app.js && test -f _site/contribute.js && test -f _site/noteContentPolicy.js && test -f _site/atmosphere.js && test -f _site/atmosphere-signal.js && echo "Artifacts OK"
+          test -f _site/index.html && test -f _site/app.js && test -f _site/remote.js && test -f _site/contribute.js && test -f _site/noteContentPolicy.js && test -f _site/atmosphere.js && test -f _site/atmosphere-signal.js
+          grep -q "fetchTextResonanceRemote" _site/remote.js || { echo "::error::remote.js must export fetchTextResonanceRemote (sync with app.js imports)."; exit 1; }
+          grep -q "remote.js?v=" _site/app.js || { echo "::error::app.js import of remote.js should be cache-busted for deploy."; exit 1; }
+          echo "Artifacts OK"
 
       - name: Smoke test (backend reachable)
         env:
