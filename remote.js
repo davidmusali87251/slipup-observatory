@@ -4,7 +4,11 @@ const USE_REMOTE_SHARED = false;
 const REMOTE_MOMENTS_URL = "https://YOUR_PROJECT_REF.supabase.co/functions/v1/moments";
 const REMOTE_CLIMATE_URL = "https://YOUR_PROJECT_REF.supabase.co/functions/v1/climate";
 const REMOTE_RELATE_URL = REMOTE_MOMENTS_URL ? REMOTE_MOMENTS_URL.replace(/\/moments\/?$/, "/relate") : "";
+const REMOTE_TEXT_RESONANCE_URL = REMOTE_MOMENTS_URL
+  ? REMOTE_MOMENTS_URL.replace(/\/moments\/?$/, "/text-resonance")
+  : "";
 const REMOTE_ANON_KEY = "";
+
 
 const REMOTE_TIMEOUT_MS = 4500;
 const GET_RETRY_BACKOFF_MS = 600; // GET: 1 retry on network/5xx; POST: no retry
@@ -315,6 +319,68 @@ async function postRelateMoment(momentId) {
   }
 }
 
+function clampResonanceScore(n) {
+  const x = Number(n);
+  if (!Number.isFinite(x)) return null;
+  return Math.min(14, Math.max(0, x));
+}
+
+function serializeMomentForTextResonance(m) {
+  if (!m || typeof m !== "object") return null;
+  return {
+    id: m.id != null ? String(m.id) : "",
+    timestamp: m.timestamp != null ? String(m.timestamp) : "",
+    type: typeof m.type === "string" ? m.type : "observed",
+    mood: typeof m.mood === "string" ? m.mood : "calm",
+    note: normalizeNote(m.note),
+  };
+}
+
+/**
+ * PR3a: POST a Edge text-resonance (stub puede devolver scores: null). α=0 en app → solo stub visible.
+ * @returns {Promise<null|Record<string, number>>} Mapa id vecino → 0..14, o null si no hay datos útiles / error.
+ */
+async function fetchTextResonanceRemote(lastMoment, neighborMoments) {
+  if (!isRemoteReady() || !REMOTE_TEXT_RESONANCE_URL) {
+    return null;
+  }
+  const last = serializeMomentForTextResonance(lastMoment);
+  if (!last) return null;
+  const neighbors = (Array.isArray(neighborMoments) ? neighborMoments : [])
+    .map(serializeMomentForTextResonance)
+    .filter(Boolean);
+  const body = {
+    modelVersion: "stub-0",
+    last,
+    neighbors,
+  };
+  const scoped = withTimeout(undefined, REMOTE_TIMEOUT_MS);
+  try {
+    const response = await fetch(REMOTE_TEXT_RESONANCE_URL, {
+      method: "POST",
+      headers: buildHeaders(),
+      body: JSON.stringify(body),
+      signal: scoped.signal,
+      cache: "no-store",
+    });
+    const data = await safeJson(response);
+    if (!response.ok || !data || typeof data !== "object") return null;
+    const scores = data.scores;
+    if (scores === null || scores === undefined) return null;
+    if (typeof scores !== "object" || Array.isArray(scores)) return null;
+    const out = {};
+    for (const [k, v] of Object.entries(scores)) {
+      const c = clampResonanceScore(v);
+      if (c !== null) out[String(k)] = c;
+    }
+    return Object.keys(out).length ? out : null;
+  } catch {
+    return null;
+  } finally {
+    scoped.clear();
+  }
+}
+
 async function fetchClimateRemote(windowHours = 48, referenceTime = "", scope = "global", geo = "") {
   if (!isRemoteReady() || !REMOTE_CLIMATE_URL) {
     throw new Error("REMOTE_CLIMATE_NOT_READY");
@@ -407,6 +473,7 @@ export {
   fetchSharedMomentsRemote,
   postMomentRemote,
   postRelateMoment,
+  fetchTextResonanceRemote,
   fetchClimateRemote,
   fetchGeoIndexRemote,
 };
