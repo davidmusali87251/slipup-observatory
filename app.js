@@ -5,6 +5,7 @@ import {
   fetchClimateRemote,
   fetchGeoIndexRemote,
   fetchSharedMomentsRemote,
+  fetchTextResonanceRemote,
   isRemoteReady,
   postRelateMoment,
 } from "./remote.js";
@@ -4618,19 +4619,14 @@ function mergeResonanceScores(scoreAi, scoreStub, alpha) {
 }
 
 /**
- * Punto de entrada para resonancia textual vía Edge o modelo (embeddings, etc.).
- * Mock PR2: delay corto y `null` → merge con α=0 sigue siendo solo stub; sin await aquí mientras α=0.
+ * Punto de entrada para resonancia textual vía Edge (PR3a: POST; stub puede devolver scores: null).
+ * Con α=0 el merge sigue siendo solo stub; sin await en selectOrbitalNeighborMoments mientras α=0.
  * @param {{id?:*,timestamp?:*,type?:string,mood?:string,note?:string}|null|undefined} lastMoment
  * @param {Array} neighborMoments Candidatos ya filtrados (mismo pool que Orbital).
  * @returns {Promise<null|Record<string, number>>} Mapa id vecino → score 0..14, o null si no hay capa AI.
  */
 function fetchTextResonanceScores(lastMoment, neighborMoments) {
-  const ms = 75;
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(null);
-    }, ms);
-  });
+  return fetchTextResonanceRemote(lastMoment, neighborMoments);
 }
 
 function orbitalResonancePoolFingerprint(pool) {

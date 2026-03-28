@@ -58,11 +58,15 @@ function escape(str) {
 const relateUrl = config.REMOTE_MOMENTS_URL
   ? config.REMOTE_MOMENTS_URL.replace(/\/moments\/?$/, "/relate")
   : "";
+const textResonanceUrl = config.REMOTE_MOMENTS_URL
+  ? config.REMOTE_MOMENTS_URL.replace(/\/moments\/?$/, "/text-resonance")
+  : "";
 const configBlock = `// Generated or edited locally. Do not commit real values. See README and remote.local.js.example.
 const USE_REMOTE_SHARED = ${config.USE_REMOTE_SHARED};
 const REMOTE_MOMENTS_URL = "${escape(config.REMOTE_MOMENTS_URL)}";
 const REMOTE_CLIMATE_URL = "${escape(config.REMOTE_CLIMATE_URL)}";
 const REMOTE_RELATE_URL = "${escape(relateUrl)}";
+const REMOTE_TEXT_RESONANCE_URL = "${escape(textResonanceUrl)}";
 const REMOTE_ANON_KEY = "${escape(config.REMOTE_ANON_KEY)}";
 `;
 
