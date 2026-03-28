@@ -4599,6 +4599,40 @@ function computeTextSimilarityStub(lastMoment, neighborMoment, nowMs) {
   return scoreNeighborMoment(neighborMoment, lastMoment, nowMs);
 }
 
+/** Peso de resonancia textual (AI) vs stub; 0 = solo stub, sin cambio observable hasta PRs posteriores. */
+const ALPHA_TEXT_RESONANCE = 0;
+
+/**
+ * @param {number|null|undefined} scoreAi Misma escala que stub (0–14); null/undefined si aún no hay AI.
+ * @param {number} scoreStub
+ * @param {number} alpha 0..1
+ * @returns {number}
+ */
+function mergeResonanceScores(scoreAi, scoreStub, alpha) {
+  const a = clamp(Number(alpha), 0, 1);
+  const stub = Number(scoreStub) || 0;
+  if (a <= 0) return stub;
+  const ai = Number(scoreAi);
+  if (!Number.isFinite(ai)) return stub;
+  return clamp(a * ai + (1 - a) * stub, 0, 14);
+}
+
+/**
+ * Punto de entrada para resonancia textual vía Edge o modelo (embeddings, etc.).
+ * Mock PR2: delay corto y `null` → merge con α=0 sigue siendo solo stub; sin await aquí mientras α=0.
+ * @param {{id?:*,timestamp?:*,type?:string,mood?:string,note?:string}|null|undefined} lastMoment
+ * @param {Array} neighborMoments Candidatos ya filtrados (mismo pool que Orbital).
+ * @returns {Promise<null|Record<string, number>>} Mapa id vecino → score 0..14, o null si no hay capa AI.
+ */
+function fetchTextResonanceScores(lastMoment, neighborMoments) {
+  const ms = 75;
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(null);
+    }, ms);
+  });
+}
+
 function orbitalResonancePoolFingerprint(pool) {
   const ids = (Array.isArray(pool) ? pool : [])
     .map((m) => (m && (m.id != null || m.timestamp != null) ? String(m.id || m.timestamp) : ""))
@@ -4649,12 +4683,14 @@ function selectOrbitalNeighborMoments(last, sharedPool) {
       const score =
         cacheHit && typeof idToScore[id] === "number"
           ? idToScore[id]
-          : computeTextSimilarityStub(last, m, now);
+          : mergeResonanceScores(null, computeTextSimilarityStub(last, m, now), ALPHA_TEXT_RESONANCE);
       return { moment: m, score };
     })
     .sort((a, b) => b.score - a.score);
 
   if (!cacheHit && typeof window !== "undefined") {
+    /* Tras stub: ejercitar pipeline async (mock → null). Con α=0 no se await: cero latencia extra. PR3: await + merge si α>0. */
+    void fetchTextResonanceScores(last, candidates).catch(() => {});
     const scoreByNeighborId = {};
     for (const row of scored) {
       const id = String(row.moment.id || row.moment.timestamp);
