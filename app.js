@@ -4593,23 +4593,82 @@ function scoreNeighborMoment(candidate, last, nowMs) {
   return typeMatch * 5 + moodMatch * 5 + timeScore * 4;
 }
 
+/** Stub capa AI: hoy delega en `scoreNeighborMoment` (tipo/mood/tiempo). Futuro: embeddings + texto (`note`). */
+function computeTextSimilarityStub(lastMoment, neighborMoment, nowMs) {
+  if (!lastMoment || !neighborMoment) return 0;
+  return scoreNeighborMoment(neighborMoment, lastMoment, nowMs);
+}
+
+function orbitalResonancePoolFingerprint(pool) {
+  const ids = (Array.isArray(pool) ? pool : [])
+    .map((m) => (m && (m.id != null || m.timestamp != null) ? String(m.id || m.timestamp) : ""))
+    .filter(Boolean)
+    .sort();
+  return `${ids.length}:${simpleStringHash(ids.join("|"))}`;
+}
+
+function buildOrbitalResonanceCacheKey(last, pool) {
+  const fp = orbitalResonancePoolFingerprint(pool);
+  return `${last.timestamp}|${last.type}|${last.mood}|${fp}`;
+}
+
 function similarityFromScore(score) {
   const max = 14;
   return clamp(score / max, 0, 1);
 }
+
+const ORBITAL_RESONANCE_STUB_VERSION = 1;
 
 function selectOrbitalNeighborMoments(last, sharedPool) {
   const now = Date.now();
   const pool = getRecentWindow(Array.isArray(sharedPool) ? sharedPool : []).filter(
     (m) => m && m.shared && !m.hidden
   );
-  const scored = pool
-    .filter((m) => !isLikelySameMomentAsLast(m, last))
-    .map((m) => ({
-      moment: m,
-      score: scoreNeighborMoment(m, last, now),
-    }))
+  const cacheKey = buildOrbitalResonanceCacheKey(last, pool);
+
+  let cacheHit = false;
+  let idToScore = null;
+  try {
+    const c = typeof window !== "undefined" ? window.__orbitalResonanceCache : null;
+    if (
+      c &&
+      c.key === cacheKey &&
+      c.stubVersion === ORBITAL_RESONANCE_STUB_VERSION &&
+      c.scoreByNeighborId &&
+      typeof c.scoreByNeighborId === "object"
+    ) {
+      cacheHit = true;
+      idToScore = c.scoreByNeighborId;
+    }
+  } catch (_) {}
+
+  const candidates = pool.filter((m) => !isLikelySameMomentAsLast(m, last));
+  const scored = candidates
+    .map((m) => {
+      const id = String(m.id || m.timestamp);
+      const score =
+        cacheHit && typeof idToScore[id] === "number"
+          ? idToScore[id]
+          : computeTextSimilarityStub(last, m, now);
+      return { moment: m, score };
+    })
     .sort((a, b) => b.score - a.score);
+
+  if (!cacheHit && typeof window !== "undefined") {
+    const scoreByNeighborId = {};
+    for (const row of scored) {
+      const id = String(row.moment.id || row.moment.timestamp);
+      scoreByNeighborId[id] = row.score;
+    }
+    window.__orbitalResonanceCache = {
+      key: cacheKey,
+      scoreByNeighborId,
+      stubVersion: ORBITAL_RESONANCE_STUB_VERSION,
+      computedAt: Date.now(),
+      source: "stub",
+    };
+  }
+
   const out = [];
   const seen = new Set();
   for (const row of scored) {
