@@ -5,6 +5,8 @@
 
 module.exports = {
   USE_REMOTE_SHARED: true,
+  /** true solo cuando la Edge text-resonance esté desplegada con CORS; si no, dejar false. */
+  USE_REMOTE_TEXT_RESONANCE: false,
   REMOTE_MOMENTS_URL: "https://YOUR_PROJECT_REF.supabase.co/functions/v1/moments",
   REMOTE_CLIMATE_URL: "https://YOUR_PROJECT_REF.supabase.co/functions/v1/climate",
   REMOTE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzeWZjZGRpdXpyYWJ1amZsdnBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI1NjA3NzcsImV4cCI6MjA4ODEzNjc3N30.2nK9n_bhhSQeFZXgLOhB6cLZHptAn4iG6HI1rPcRnM4",

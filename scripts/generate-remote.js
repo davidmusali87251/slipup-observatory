@@ -20,6 +20,8 @@ if (!fs.existsSync(remotePath) && fs.existsSync(templatePath)) {
 
 let config = {
   USE_REMOTE_SHARED: false,
+  /** Cuando la Edge `text-resonance` esté desplegada con CORS, poner true (env o remote.local.js). */
+  USE_REMOTE_TEXT_RESONANCE: false,
   REMOTE_MOMENTS_URL: "https://YOUR_PROJECT_REF.supabase.co/functions/v1/moments",
   REMOTE_CLIMATE_URL: "https://YOUR_PROJECT_REF.supabase.co/functions/v1/climate",
   REMOTE_ANON_KEY: "",
@@ -32,6 +34,7 @@ if (fs.existsSync(localPath)) {
     if (local.REMOTE_MOMENTS_URL) config.REMOTE_MOMENTS_URL = String(local.REMOTE_MOMENTS_URL);
     if (local.REMOTE_CLIMATE_URL) config.REMOTE_CLIMATE_URL = String(local.REMOTE_CLIMATE_URL);
     if (local.REMOTE_ANON_KEY !== undefined) config.REMOTE_ANON_KEY = String(local.REMOTE_ANON_KEY || "");
+    if (local.USE_REMOTE_TEXT_RESONANCE !== undefined) config.USE_REMOTE_TEXT_RESONANCE = Boolean(local.USE_REMOTE_TEXT_RESONANCE);
   } catch (e) {
     console.warn("Warning: could not load remote.local.js:", e.message);
   }
@@ -41,6 +44,10 @@ if (process.env.REMOTE_MOMENTS_URL) config.REMOTE_MOMENTS_URL = String(process.e
 if (process.env.REMOTE_CLIMATE_URL) config.REMOTE_CLIMATE_URL = String(process.env.REMOTE_CLIMATE_URL || "").trim();
 if (process.env.REMOTE_ANON_KEY !== undefined) config.REMOTE_ANON_KEY = String(process.env.REMOTE_ANON_KEY || "").trim();
 if (process.env.USE_REMOTE_SHARED !== undefined) config.USE_REMOTE_SHARED = process.env.USE_REMOTE_SHARED === "true" || process.env.USE_REMOTE_SHARED === "1";
+if (process.env.USE_REMOTE_TEXT_RESONANCE !== undefined) {
+  config.USE_REMOTE_TEXT_RESONANCE =
+    process.env.USE_REMOTE_TEXT_RESONANCE === "true" || process.env.USE_REMOTE_TEXT_RESONANCE === "1";
+}
 
 // Quita espacios/saltos de línea al pegar secrets y escapa caracteres que romperían el JS
 function trimSecret(s) {
@@ -67,6 +74,7 @@ const REMOTE_MOMENTS_URL = "${escape(config.REMOTE_MOMENTS_URL)}";
 const REMOTE_CLIMATE_URL = "${escape(config.REMOTE_CLIMATE_URL)}";
 const REMOTE_RELATE_URL = "${escape(relateUrl)}";
 const REMOTE_TEXT_RESONANCE_URL = "${escape(textResonanceUrl)}";
+const USE_REMOTE_TEXT_RESONANCE = ${config.USE_REMOTE_TEXT_RESONANCE};
 const REMOTE_ANON_KEY = "${escape(config.REMOTE_ANON_KEY)}";
 `;
 

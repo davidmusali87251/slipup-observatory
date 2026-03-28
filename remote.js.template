@@ -6,6 +6,8 @@ const REMOTE_RELATE_URL = REMOTE_MOMENTS_URL ? REMOTE_MOMENTS_URL.replace(/\/mom
 const REMOTE_TEXT_RESONANCE_URL = REMOTE_MOMENTS_URL
   ? REMOTE_MOMENTS_URL.replace(/\/moments\/?$/, "/text-resonance")
   : "";
+/** Activar solo cuando la Edge `text-resonance` esté desplegada con CORS (evita errores de preflight en consola). */
+const USE_REMOTE_TEXT_RESONANCE = false;
 const REMOTE_ANON_KEY = "";
 
 const REMOTE_TIMEOUT_MS = 4500;
@@ -316,7 +318,7 @@ function serializeMomentForTextResonance(m) {
  * @returns {Promise<null|Record<string, number>>} Mapa id vecino → 0..14, o null si no hay datos útiles / error.
  */
 async function fetchTextResonanceRemote(lastMoment, neighborMoments) {
-  if (!isRemoteReady() || !REMOTE_TEXT_RESONANCE_URL || textResonanceFetchSkipped) {
+  if (!USE_REMOTE_TEXT_RESONANCE || !isRemoteReady() || !REMOTE_TEXT_RESONANCE_URL || textResonanceFetchSkipped) {
     return null;
   }
   const last = serializeMomentForTextResonance(lastMoment);

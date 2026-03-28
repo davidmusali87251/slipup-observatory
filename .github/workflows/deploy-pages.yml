@@ -2,6 +2,7 @@
 # Genera remote.js con secrets antes del deploy para que producción use el backend real.
 # En el repo: Settings → Secrets and variables → Actions → añadir:
 #   REMOTE_MOMENTS_URL, REMOTE_CLIMATE_URL, REMOTE_ANON_KEY, USE_REMOTE_SHARED
+#   Opcional: USE_REMOTE_TEXT_RESONANCE = true cuando la Edge text-resonance exista con CORS
 
 name: Deploy to GitHub Pages
 
@@ -37,6 +38,7 @@ jobs:
           REMOTE_CLIMATE_URL: ${{ secrets.REMOTE_CLIMATE_URL }}
           REMOTE_ANON_KEY: ${{ secrets.REMOTE_ANON_KEY }}
           USE_REMOTE_SHARED: ${{ secrets.USE_REMOTE_SHARED }}
+          USE_REMOTE_TEXT_RESONANCE: ${{ secrets.USE_REMOTE_TEXT_RESONANCE }}
         run: node scripts/generate-remote.js
 
       - name: Prepare site
