@@ -20,6 +20,9 @@ const sharedGetCache = new Map();
 const climateGetCache = new Map();
 const geoIndexCache = new Map();
 
+/** Tras fallo de red/CORS en text-resonance, no repetir POST en esta carga (menos ruido en consola). */
+let textResonanceFetchSkipped = false;
+
 function withTimeout(signal, timeoutMs) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -313,7 +316,7 @@ function serializeMomentForTextResonance(m) {
  * @returns {Promise<null|Record<string, number>>} Mapa id vecino → 0..14, o null si no hay datos útiles / error.
  */
 async function fetchTextResonanceRemote(lastMoment, neighborMoments) {
-  if (!isRemoteReady() || !REMOTE_TEXT_RESONANCE_URL) {
+  if (!isRemoteReady() || !REMOTE_TEXT_RESONANCE_URL || textResonanceFetchSkipped) {
     return null;
   }
   const last = serializeMomentForTextResonance(lastMoment);
@@ -347,6 +350,7 @@ async function fetchTextResonanceRemote(lastMoment, neighborMoments) {
     }
     return Object.keys(out).length ? out : null;
   } catch {
+    textResonanceFetchSkipped = true;
     return null;
   } finally {
     scoped.clear();
