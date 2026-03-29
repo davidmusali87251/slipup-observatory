@@ -10,7 +10,13 @@ docs/
 PLAN_MASTER.md
 SLIPUP_MASTER_CONTEXT.md
 schema_v2.sql
-supabase/
+# supabase: ignorar casi todo; excepción — solo stub text-resonance (sin secretos)
+supabase/*
+!supabase/functions/
+supabase/functions/*
+!supabase/functions/text-resonance/
+supabase/functions/text-resonance/*
+!supabase/functions/text-resonance/index.ts
 BACKLOG.md
 SLIPUP_ORIGIN_2026.md
 

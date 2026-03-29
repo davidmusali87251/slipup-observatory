@@ -5,7 +5,7 @@
 | # | Qué hacés | Dónde |
 |---|-----------|--------|
 | **1** | `npx supabase login` y `npx supabase link --project-ref TU_PROJECT_REF` | Terminal (una vez por PC/proyecto) |
-| **2** | Copiar `scripts/text-resonance.edge.example.ts` → `supabase/functions/text-resonance/index.ts` | Explorador de archivos o editor |
+| **2** | El cableado vive en **`supabase/functions/text-resonance/index.ts`** (en el repo). Si en tu máquina no existe, copiá desde `scripts/text-resonance.edge.example.ts` | — |
 | **3** | `npx supabase functions deploy text-resonance` | Terminal (cada vez que cambies la función) |
 | **4** | En `remote.local.js`: `USE_REMOTE_TEXT_RESONANCE: true` → `node scripts/generate-remote.js` | Editor + terminal |
 | **5** | Probar en el navegador (Red + Consola) y, si aplica, secret en GitHub | Ver sección **Paso 5** abajo |
@@ -48,10 +48,8 @@ supabase link --project-ref TU_PROJECT_REF
 
 ### C. Crear la función y copiar el código
 
-1. Crear carpetas: `supabase/functions/text-resonance/` (si no existen).
-2. Copiar el contenido de **`scripts/text-resonance.edge.example.ts`** a:
-   - **`supabase/functions/text-resonance/index.ts`**
-3. No hace falta tocar la lógica para el primer deploy: el stub devuelve `scores: null` y CORS correcto.
+1. En el repo ya está **`supabase/functions/text-resonance/index.ts`** (stub + CORS). Si clonás y no ves la carpeta, hacé pull; si solo tenés el ejemplo, copiá **`scripts/text-resonance.edge.example.ts`** a esa ruta.
+2. No hace falta tocar la lógica para el primer deploy: el stub devuelve `scores: null` y CORS correcto.
 
 ### D. Desplegar
 

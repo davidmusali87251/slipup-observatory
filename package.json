@@ -8,6 +8,6 @@
     "@eslint/js": "^10.0.1",
     "eslint": "^10.1.0",
     "globals": "^17.4.0",
-    "supabase": "^2.78.0"
+    "supabase": "^2.84.4"
   }
 }
