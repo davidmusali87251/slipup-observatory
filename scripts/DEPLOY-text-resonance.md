@@ -148,3 +148,31 @@ Si pide confirmación o versión, seguí las indicaciones de la CLI. Al terminar
 - **CORS / preflight**: revisá que el deploy sea el último `index.ts` (OPTIONS 204 + headers).
 - **404 en la URL**: nombre de función o `project-ref` mal al linkear.
 - **No subas** `remote.js` con anon key real al repo público: regenerá con placeholders antes de `git add`.
+
+---
+
+## Checklist principiantes (comandos exactos)
+
+Usá **PowerShell** en la carpeta del repo, por ejemplo:
+
+`cd "C:\Users\...\SlipUP Observatory"`
+
+| # | Comando | Qué mirar |
+|---|---------|-----------|
+| 1 | `npx supabase login` | Navegador: inicio de sesión; al final: “You are now logged in”. |
+| 2 | `npx supabase link --project-ref TU_PROJECT_REF` | Poné tu **Reference ID** (Dashboard → Project Settings → General). Debe decir `Finished supabase link.` |
+| 3 | `npx supabase functions deploy text-resonance` | `Deployed Functions … text-resonance`. El aviso “Docker is not running” **se puede ignorar** para este deploy. |
+| 4 | En `remote.local.js`: `USE_REMOTE_TEXT_RESONANCE: true` | Guardar archivo. |
+| 5 | `node scripts/generate-remote.js` | `remote.js updated from remote.local.js`. |
+| 6 | `npx --yes serve -p 8080` y abrir `http://localhost:8080` | F12 → **Red**: POST a `…/text-resonance` con **200** si el flag es `true`; **Consola** sin errores CORS. |
+| 7 | (Opcional) GitHub → Secrets → `USE_REMOTE_TEXT_RESONANCE` = `true` | Solo para el sitio en Pages; después de probar local. |
+
+**Archivo de la función:** en el repo ya está **`supabase/functions/text-resonance/index.ts`** (no hace falta copiar `text-resonance.edge.example.ts` salvo que falte en tu disco).
+
+**No uses** `npm install -g supabase` (no está soportado). **No necesitás** `npx supabase start` ni Docker para desplegar la función en la nube.
+
+### Resumen costo / AI
+
+- **Stub + Edge sin LLM:** costo ~**gratis** en plan Supabase habitual para pruebas.
+- **AI real (APIs de terceros):** costo por **tokens / llamadas**; viene después (PR3b+).
+- Con **α = 0**, glow y tooltip siguen igual **stub** aunque la Edge responda `scores: null`.
