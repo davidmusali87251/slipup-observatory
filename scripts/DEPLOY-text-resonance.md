@@ -12,14 +12,14 @@
 
 1. Crear cuenta en [Supabase](https://supabase.com) si no tenés.
 2. **Supabase CLI en Windows (elegí una opción):**
-   - **Sin instalar global (recomendado si `supabase` “no se reconoce”):** tenés [Node.js](https://nodejs.org) instalado, y en PowerShell usás el prefijo `npx`:
+   - **Recomendado:** [Node.js](https://nodejs.org) + **`npx supabase …`** (no hace falta comando global `supabase`):
      - `npx supabase login`
      - `npx supabase link --project-ref TU_PROJECT_REF`
      - `npx supabase functions deploy text-resonance`
-   - **Instalación global:** `npm install -g supabase` y luego cerrá y abrí la terminal; probá `supabase --version`.
-   - Otras: [Scoop](https://scoop.sh), binario desde [releases](https://github.com/supabase/cli/releases).
-3. Comando de login: escribí **`supabase login`** o **`npx supabase login`** **sin** caracteres extra al final (no `login#`).
-4. `login` abre el navegador para autorizar.
+   - **No uses** `npm install -g supabase`: el paquete npm indica que **la instalación global no está soportada**; fallará con error explícito.
+   - **CLI global por otro medio:** [winget](https://github.com/supabase/cli#windows-package-managers), [Scoop](https://scoop.sh), o binario desde [releases](https://github.com/supabase/cli/releases) — así `supabase` queda en el PATH.
+3. **`npx supabase start` y Docker:** solo sirve para **Supabase local** (base de datos en tu PC). Para **desplegar funciones en la nube** (lo que hace SlipUp) **no hace falta** Docker ni `supabase start`. Si ves “Docker is not running” al hacer **deploy**, suele ser advertencia; si el deploy termina en “Deployed Functions”, está bien.
+4. Comando de login: **`npx supabase login`** (o `supabase login` si instalaste la CLI por winget/Scoop). **Sin** caracteres extra al final (no `login#`). Abrís el navegador y autorizás.
 
 ### B. Enlazar tu proyecto
 
