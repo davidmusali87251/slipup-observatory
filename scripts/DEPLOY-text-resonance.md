@@ -1,5 +1,17 @@
 # Guía: deploy de la Edge `text-resonance` (principiantes)
 
+## Los 5 pasos (orden)
+
+| # | Qué hacés | Dónde |
+|---|-----------|--------|
+| **1** | `npx supabase login` y `npx supabase link --project-ref TU_PROJECT_REF` | Terminal (una vez por PC/proyecto) |
+| **2** | Copiar `scripts/text-resonance.edge.example.ts` → `supabase/functions/text-resonance/index.ts` | Explorador de archivos o editor |
+| **3** | `npx supabase functions deploy text-resonance` | Terminal (cada vez que cambies la función) |
+| **4** | En `remote.local.js`: `USE_REMOTE_TEXT_RESONANCE: true` → `node scripts/generate-remote.js` | Editor + terminal |
+| **5** | Probar en el navegador (Red + Consola) y, si aplica, secret en GitHub | Ver sección **Paso 5** abajo |
+
+---
+
 ## Qué ya está hecho en el código (no hace falta que lo programes)
 
 - Cliente: `fetchTextResonanceRemote` en `remote.js`, flag `USE_REMOTE_TEXT_RESONANCE`, merge con α=0.
@@ -88,11 +100,45 @@ Si pide confirmación o versión, seguí las indicaciones de la CLI. Al terminar
 
 2. El workflow ya pasa ese valor a `generate-remote.js` en el deploy. Hacé push a `main` y esperá el deploy.
 
-## Cómo saber si salió bien
+---
 
-- Con flag `false`: no debe aparecer ningún request a `text-resonance` en la pestaña **Red** de las herramientas de desarrollador.
-- Con flag `true` y función desplegada: POST a `.../text-resonance` con **200**; sin errores rojos de CORS en **Consola**.
-- Orbital (glow + tooltips) debe verse **normal**; con α=0 la UI sigue basada en **stub** aunque la Edge responda.
+## Paso 5 · Probar y verificar (detalle)
+
+**Objetivo:** comprobar que Orbital sigue bien y que, si activaste el flag, la llamada a `text-resonance` no rompe nada (sin errores CORS).
+
+### 5.1 Servidor local (no abras `file://`)
+
+1. En la raíz del repo:
+
+   ```bash
+   npx --yes serve -p 8080
+   ```
+
+2. En el navegador: `http://localhost:8080` (no el archivo `index.html` directo desde el disco).
+
+### 5.2 Herramientas de desarrollador (F12)
+
+1. Pestaña **Red** (Network): recargá la página con Orbital visible (scroll hasta esa sección si hace falta).
+2. **Si `USE_REMOTE_TEXT_RESONANCE` es `false` en el `remote.js` generado:** no debería aparecer ninguna petición cuyo nombre sea `text-resonance`. Eso es correcto (solo stub, sin fetch).
+3. **Si es `true` y ya desplegaste el paso 3:** debería haber un **POST** a `…/functions/v1/text-resonance` con estado **200**. Si ves **(failed)** o error CORS en rojo en **Consola**, la función o CORS aún no están bien; el sitio puede seguir viéndose bien porque el cliente vuelve al stub.
+
+### 5.3 Qué esperar en la UI
+
+- **Glow y tooltips de vecinos en Orbital:** deben verse **normales** (igual que antes).
+- Con **α = 0** en la app, los números que pintan glow/tooltip siguen saliendo del **stub** aunque la Edge responda `scores: null`. No esperes un cambio visual hasta PR3c (α > 0).
+
+### 5.4 Producción (`www.slipup.io`)
+
+1. Añadí el secret `USE_REMOTE_TEXT_RESONANCE` = `true` solo cuando el paso 5 en local ya esté limpio (sin CORS).
+2. Esperá el deploy de GitHub Actions y repetí la comprobación de **Red + Consola** en el dominio público.
+
+---
+
+## Cómo saber si salió bien (resumen)
+
+- Con flag `false`: no debe aparecer ningún request a `text-resonance` en **Red**.
+- Con flag `true` y función desplegada: POST con **200** y **Consola** sin errores de CORS.
+- Orbital (glow + tooltips) **normal**; con α=0 la UI sigue basada en **stub** aunque la Edge responda.
 
 ## Costo
 
