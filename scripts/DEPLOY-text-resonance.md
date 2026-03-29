@@ -11,9 +11,15 @@
 ### A. Una sola vez: herramientas
 
 1. Crear cuenta en [Supabase](https://supabase.com) si no tenés.
-2. Instalar **Supabase CLI**: [documentación oficial](https://supabase.com/docs/guides/cli) (Windows: `scoop install supabase` o descargar binario).
-3. En terminal, en **cualquier carpeta**:
-   - `supabase login` (abre el navegador para autorizar).
+2. **Supabase CLI en Windows (elegí una opción):**
+   - **Sin instalar global (recomendado si `supabase` “no se reconoce”):** tenés [Node.js](https://nodejs.org) instalado, y en PowerShell usás el prefijo `npx`:
+     - `npx supabase login`
+     - `npx supabase link --project-ref TU_PROJECT_REF`
+     - `npx supabase functions deploy text-resonance`
+   - **Instalación global:** `npm install -g supabase` y luego cerrá y abrí la terminal; probá `supabase --version`.
+   - Otras: [Scoop](https://scoop.sh), binario desde [releases](https://github.com/supabase/cli/releases).
+3. Comando de login: escribí **`supabase login`** o **`npx supabase login`** **sin** caracteres extra al final (no `login#`).
+4. `login` abre el navegador para autorizar.
 
 ### B. Enlazar tu proyecto
 
@@ -23,6 +29,8 @@ Desde la raíz del repo SlipUp (o donde tengas el proyecto):
 cd ruta/al/repo/SlipUP-Observatory
 supabase link --project-ref TU_PROJECT_REF
 ```
+
+(Si no tenés `supabase` en el PATH: `npx supabase link --project-ref TU_PROJECT_REF`.)
 
 `TU_PROJECT_REF` está en Supabase → **Project Settings → General → Reference ID** (no es secreto; es un id público del proyecto).
 
@@ -38,6 +46,8 @@ supabase link --project-ref TU_PROJECT_REF
 ```bash
 supabase functions deploy text-resonance
 ```
+
+(O con npx: `npx supabase functions deploy text-resonance`.)
 
 Si pide confirmación o versión, seguí las indicaciones de la CLI. Al terminar, la URL será:
 
